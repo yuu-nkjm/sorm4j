@@ -25,4 +25,4 @@ cache:
       - $HOME/.m2
 
 script:
-   - mvn pom.xml clean verify 
+   - mvn clean verify 
