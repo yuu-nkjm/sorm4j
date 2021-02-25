@@ -364,7 +364,7 @@ public class TestSimple {
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
       simpleOrMapper.readByPrimaryKey(Simple01.class, id);
     } catch (Exception e) {
-      log.error(e, e);
+      log.error(e);
     }
   }
 
@@ -382,7 +382,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Class [net.sf.persist.tests.common.Simple02] specifies table [hello_world] that does not
       // exist in the database");
-      log.error(e, e);
+      log.error(e);
     }
   }
 
@@ -470,7 +470,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Field [intCol] from class [net.sf.persist.tests.common.Simple08] has conflicting
       // NoColumn and Column annotations");
-      log.error(e, e);
+      log.error(e);
     }
   }
 
@@ -486,7 +486,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Setter [public void net.sf.persist.tests.common.Simple10.setStringCol()] should have a
       // single parameter but has 0");
-      log.error(e, e);
+      log.error(e);
     }
   }
 
@@ -508,7 +508,7 @@ public class TestSimple {
         // assertEquals(e.getMessage(),
         // "Getter [public void net.sf.persist.tests.common.Simple09.getStringCol()] must have a
         // return parameter");
-        log.error(e, e);
+        log.error(e);
       }
     }
   }

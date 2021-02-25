@@ -14,13 +14,6 @@ public final class SqlWithNamedPlaceholders {
   // ordered parameters
   private final Object[] parameters;
 
-  public static void main(String[] args) {
-    String sql = "select * from simple where id=:idid and name=:name";
-    Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
-    System.out.println(SqlWithNamedPlaceholders.createWithNamedParameters(sql, namedParams));
-    SqlWithNamedPlaceholders.createBuilder(sql).putAllParameters(namedParams).build();
-  }
-
   private SqlWithNamedPlaceholders(String sql, Object[] parameters) {
     this.sql = sql;
     this.parameters = parameters;
