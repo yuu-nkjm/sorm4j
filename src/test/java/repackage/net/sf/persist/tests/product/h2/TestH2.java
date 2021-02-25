@@ -41,7 +41,6 @@ public class TestH2 {
     } catch (SQLException | URISyntaxException | IOException e) {
       e.printStackTrace();
     }
-
   }
 
 
