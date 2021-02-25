@@ -1,4 +1,4 @@
-# Sorm4j: Simple micro Object-Relation Mapper for Java [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master)
+# Sorm4j: Simple micro Object-Relation Mapper for Java [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=master)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=master)
 
 Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. It provides only simple functionalities to map `java.sql.ResultSet` of the query to POJO objects and to set POJO objects into `java.sql.PreparedStatement` parameters.
 
