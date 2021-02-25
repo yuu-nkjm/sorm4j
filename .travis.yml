@@ -25,4 +25,4 @@ cache:
       - $HOME/.m2
 
 script:
-   - mvn pom.xml clean verify $ADDITIONAL_MAVEN_ARGS
+   - mvn pom.xml clean verify 
