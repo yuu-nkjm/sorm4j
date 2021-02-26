@@ -1,3 +1,6 @@
 language: java
 jdk: openjdk11
-script: mvn clean verify -Dgpg.skip=true
+install:
+- mvn compile -Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true -B
+script:
+- mvn test -B
