@@ -35,9 +35,9 @@ public final class SqlFromTableMapping {
     this.mergeSql = mergeSqlPrefix + insertOrMergePlaceholders;
 
 
-    this.selectByPrimaryKeySql = "select " + toColumList(allColumns) + " from " + tableName
-        + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
     this.selectAllSql = "select " + toColumList(allColumns) + " from " + tableName;
+    this.selectByPrimaryKeySql =
+        selectAllSql + " " + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
 
     this.updateSql = "update " + tableName + createUpdateSetClause(notPrimaryKeys)
         + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
@@ -106,6 +106,7 @@ public final class SqlFromTableMapping {
   public String getDeleteSql() {
     return deleteSql;
   }
+
   public String getDeleteAllSql() {
     return deleteAllSql;
   }
@@ -117,8 +118,6 @@ public final class SqlFromTableMapping {
         + ", mergeSql=" + mergeSql + ", insertSqlPrefix=" + insertSqlPrefix + ", mergeSqlPrefix="
         + mergeSqlPrefix + ", insertOrMergePlaceholders=" + insertOrMergePlaceholders + "]";
   }
-
-
 
 
 }
