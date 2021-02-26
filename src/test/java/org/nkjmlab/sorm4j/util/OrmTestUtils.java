@@ -12,10 +12,18 @@ public class OrmTestUtils {
   public static final Guest GUEST_CAROL = new Guest("Carol", "Osaka");
   public static final Guest GUEST_DAVE = new Guest("Dave", "Nara");
 
+  public static final Player PLAYER_ALICE = new Player(1, "Alice", "Kyoto");
+  public static final Player PLAYER_BOB = new Player(2, "Bob", "Tokyo");
+  public static final Player PLAYER_CAROL = new Player(3, "Carol", "Osaka");
+  public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
+
   private static final String SQL_CREATE_TABLE_GUESTS =
       "CREATE TABLE IF NOT EXISTS guests (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
   private static final String SQL_CREATE_TABLE_PLAYERS =
-      "CREATE TABLE IF NOT EXISTS guests (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
+      "CREATE TABLE IF NOT EXISTS players (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
+
+  private static final String SQL_CREATE_TABLE_PLAYERS1 =
+      "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
   public static OrmService createOrmService() {
     return OrmService.of(jdbcUrl, user, password);
@@ -41,6 +49,7 @@ public class OrmTestUtils {
 
   private static void createPlayerTable(OrmService srv) {
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
+    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS1));
   }
 
 
