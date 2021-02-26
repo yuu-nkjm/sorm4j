@@ -29,12 +29,12 @@ public class OrmTestUtils {
     return OrmService.of(jdbcUrl, user, password);
   }
 
-  public static void createTable(OrmService srv, Class<?> clazz) {
+  public static void recreateTable(OrmService srv, Class<?> clazz) {
     String name = clazz.getSimpleName();
     if (name.equals(Guest.class.getSimpleName())) {
-      createGuestTable(srv);
+      recreateGuestTable(srv);
     } else if (name.equals(Player.class.getSimpleName())) {
-      createPlayerTable(srv);
+      recreatePlayerTable(srv);
     } else {
       throw new IllegalArgumentException(clazz + " is illegal");
     }
@@ -43,12 +43,15 @@ public class OrmTestUtils {
   }
 
 
-  private static void createGuestTable(OrmService srv) {
+  private static void recreateGuestTable(OrmService srv) {
+    srv.run(conn -> conn.execute("DROP TABLE guests IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_GUESTS));
   }
 
-  private static void createPlayerTable(OrmService srv) {
+  private static void recreatePlayerTable(OrmService srv) {
+    srv.run(conn -> conn.execute("DROP TABLE players IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
+    srv.run(conn -> conn.execute("DROP TABLE players1 IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS1));
   }
 

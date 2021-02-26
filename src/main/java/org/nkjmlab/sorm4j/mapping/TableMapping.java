@@ -33,6 +33,7 @@ import org.nkjmlab.sorm4j.util.Try;
 public final class TableMapping<T> extends Mapping<T> {
 
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  private final Map<String, Class<?>> setterParamTypeMap = new ConcurrentHashMap<>();
 
   final JavaToSqlDataConverter javaToSqlConverter;
 
@@ -127,8 +128,6 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
 
-  private static final Map<String, Class<?>> setterParamTypeMap = new ConcurrentHashMap<>();
-
   private Class<?> getSetterParamType(String column) {
     return setterParamTypeMap.computeIfAbsent(column,
         k -> columnToAccessorMap.get(column).getSetterParameterType());
@@ -191,8 +190,8 @@ public final class TableMapping<T> extends Mapping<T> {
         String columnName = metaData.getColumnName(1);
         // Don't user type from metadata (metaData.getColumnType(1)) because object class of
         // container is prior.
-        Class<?> type = getSetterParamType(columnName);
-        final Object value = sqlToJavaConverter.getValueByClass(resultSet, 1, type);
+        Class<?> classType = getSetterParamType(columnName);
+        final Object value = sqlToJavaConverter.getValueByClass(resultSet, 1, classType);
         setValue(object, columnName, value);
         ret.add(value);
       }

@@ -16,11 +16,9 @@ class TypedOrmConnectionTest {
   @BeforeEach
   void setUp() {
     srv = OrmTestUtils.createOrmService();
-    OrmTestUtils.createTable(srv, Guest.class);
-    srv.run(Guest.class, m -> m.deleteAll());
+    OrmTestUtils.recreateTable(srv, Guest.class);
 
-    OrmTestUtils.createTable(srv, Player.class);
-    srv.run(Player.class, m -> m.deleteAll());
+    OrmTestUtils.recreateTable(srv, Player.class);
 
   }
 
@@ -133,5 +131,74 @@ class TypedOrmConnectionTest {
     });
   }
 
+  @Test
+  void testDeleteT() {
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      Player b = OrmTestUtils.PLAYER_BOB;
+      m.insert(a, b);
+      m.delete(a, b);
+      assertThat(m.readAll().size()).isEqualTo(0);
+    });
+  }
 
+  @Test
+  void testDeleteOnStringT() {
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      Player b = OrmTestUtils.PLAYER_BOB;
+      m.insertOn("players1", a, b);
+      m.deleteOn("players1", a, b);
+      assertThat(m.readList("select * from players1").size()).isEqualTo(0);
+    });
+  }
+
+  @Test
+  void testUpdateT() {
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      m.insert(a);
+      m.update(new Player(a.getId(), "UPDATED", "UPDATED"));
+      Player p = m.readByPrimaryKey(a.getId());
+      assertThat(p.getAddress()).isEqualTo("UPDATED");
+    });
+  }
+
+  @Test
+  void testInsertAndGetOnStringT() {
+    srv.run(Guest.class, m -> {
+      Guest a = OrmTestUtils.GUEST_ALICE;
+      InsertResult<Guest> g = m.insertAndGet(a);
+      assertThat(g.getObject().getId()).isEqualTo(1);
+    });
+    srv.run(Guest.class, m -> {
+      Guest a = OrmTestUtils.GUEST_ALICE;
+      InsertResult<Guest> g = m.insertAndGetOn("players1", a);
+      assertThat(g.getObject().getId()).isEqualTo(1);
+    });
+  }
+
+  @Test
+  void testMergeOnT() {
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      Player b = OrmTestUtils.PLAYER_BOB;
+      m.mergeOn("players1", a, b);
+      m.mergeOn("players1", a, b);
+      assertThat(m.readList("select * from players1").size()).isEqualTo(2);
+    });
+  }
+
+  @Test
+  void testMergeT() {
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      Player b = OrmTestUtils.PLAYER_BOB;
+      m.merge(a, b);
+      Player c = new Player(a.getId(), "UPDATED", "UPDATED");
+      m.merge(c, b);
+      assertThat(m.readAll().size()).isEqualTo(2);
+      assertThat(m.readByPrimaryKey(a.getId()).getAddress()).isEqualTo("UPDATED");
+    });
+  }
 }
