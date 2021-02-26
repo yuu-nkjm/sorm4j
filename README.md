@@ -22,7 +22,7 @@ You can get the binary using Maven from [Central Repository](http://mvnrepositor
 Check out the [Sorm4j website](https://scrapbox.io/sorm4j/) for quick start and examples.
 
 ## License
-Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/LICENSE).
+Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).
 
 ## Author
 [yuu-nkjm](https://github.com/yuu-nkjm)
