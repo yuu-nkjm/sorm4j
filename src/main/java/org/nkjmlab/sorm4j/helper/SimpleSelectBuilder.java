@@ -9,7 +9,7 @@ package org.nkjmlab.sorm4j.helper;
  * to: SELECT * FROM customers WHERE id=1 ORDER BY id DESC LIMIT 1
  * </p>
  */
-public class SelectBuilder {
+public final class SimpleSelectBuilder {
 
   private String select;
   private String from;
@@ -17,28 +17,28 @@ public class SelectBuilder {
   private String orderBy;
   private Integer limit;
 
-  public SelectBuilder select(String select) {
+  public SimpleSelectBuilder select(String select) {
     this.select = select;
     return this;
   }
 
-  public SelectBuilder from(String from) {
+  public SimpleSelectBuilder from(String from) {
     this.from = from;
     return this;
 
   }
 
-  public SelectBuilder where(String where) {
+  public SimpleSelectBuilder where(String where) {
     this.where = where;
     return this;
   }
 
-  public SelectBuilder orderBy(String orderBy) {
+  public SimpleSelectBuilder orderBy(String orderBy) {
     this.orderBy = orderBy;
     return this;
   }
 
-  public SelectBuilder limit(int limit) {
+  public SimpleSelectBuilder limit(int limit) {
     this.limit = limit;
     return this;
   }

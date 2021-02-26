@@ -6,7 +6,7 @@ class SelectBuilderTest {
 
   @Test
   void testBuild() {
-    String sql = new SelectBuilder().select("*").from("customers").where("id=1").orderBy("id DESC")
+    String sql = new SimpleSelectBuilder().select("*").from("customers").where("id=1").orderBy("id DESC")
         .limit(1).build();
     System.out.println(sql);
     org.assertj.core.api.Assertions.assertThat(sql)

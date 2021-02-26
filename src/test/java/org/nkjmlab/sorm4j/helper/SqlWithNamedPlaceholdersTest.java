@@ -9,8 +9,7 @@ class SqlWithNamedPlaceholdersTest {
 
   @Test
   void testCreate() {
-    SqlWithNamedPlaceholders sp =
-        SqlWithNamedPlaceholders.createWithNamedParameters(sql, namedParams);
+    Sql sp = Sql.ofNamedParameters(sql, namedParams);
 
     org.assertj.core.api.Assertions.assertThat(sp.getSql())
         .isEqualTo("select * from simple where id=? and name=?");
@@ -22,8 +21,8 @@ class SqlWithNamedPlaceholdersTest {
 
   @Test
   void testBuilder() {
-    SqlWithNamedPlaceholders sp =
-        SqlWithNamedPlaceholders.createBuilder(sql).putAllParameters(namedParams).build();
+
+    Sql sp = new SqlWithNamedParametersBuilder(sql).putAllParameters(namedParams).build();
 
     org.assertj.core.api.Assertions.assertThat(sp.getSql())
         .isEqualTo("select * from simple where id=? and name=?");
