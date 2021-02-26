@@ -16,20 +16,27 @@ public class Sorm4jDemo {
   private static final String password = "";
 
   private static final String SQL_CREATE_TABLE_CUSTOMERS =
-      "CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
+      "CREATE TABLE IF NOT EXISTS customers (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
-  private static final Customer c1_1 = new Customer("Alice", "Kyoto");
-  private static final Customer c1_2 = new Customer("Bob", "Tokyo");
-  private static final List<Customer> customers1 = List.of(c1_1, c1_2);
 
-  private static final Customer c2_1 = new Customer("Carol", "Osaka");
-  private static final Customer c2_2 = new Customer("Dave", "Nara");
-  private static final List<Customer> customers2 = List.of(c2_1, c2_2);
+  private static final String SQL_CREATE_TABLE_CUSTOMERS_LOG =
+      "CREATE TABLE IF NOT EXISTS customer_logs (id INT AUTO_INCREMENT PRIMARY KEY, int customer_id, name VARCHAR, address VARCHAR)";
+
+  private static final Customer c1_1 = new Customer(1, "Alice", "Kyoto");
+  private static final Customer c1_2 = new Customer(2, "Bob", "Tokyo");
+  private static final Customer c2_1 = new Customer(3, "Carol", "Osaka");
+  private static final Customer c2_2 = new Customer(4, "Dave", "Nara");
 
   public static void main(String[] args) {
     Sorm4jDemo demo = new Sorm4jDemo();
+    demo.createAndDropTable();
     demo.demoOfSorm4J();
     demo.demoOfUseJdbcConnection();
+  }
+
+  private void createAndDropTable() {
+    // TODO Auto-generated method stub
+
   }
 
   public static void createTable() {}
@@ -39,13 +46,12 @@ public class Sorm4jDemo {
     OrmService service = OrmService.of(jdbcUrl, user, password);
     service.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
 
-    service.run(Customer.class, conn -> conn.insert(customers1));
 
     List<Customer> cs1 = service.execute(conn -> conn.readAll(Customer.class));
     log.debug("{}", cs1);
 
-    List<String> msgs = service.execute(conn -> conn.readAllLazy(Customer.class)).stream()
-        .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
+    List<String> msgs = service.execute(conn -> conn.readAllLazy(Customer.class).stream()
+        .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
     log.debug("{}", msgs);
 
     Customer c1 = service
@@ -55,6 +61,14 @@ public class Sorm4jDemo {
     Customer c2 = service.execute(conn -> conn.readByPrimaryKey(Customer.class, 1));
     log.debug("{}", c2);
 
+    service.run(Customer.class, conn -> conn.insert(new Customer(1, "Alice", "Kyoto")));
+    service.run(Customer.class, conn -> conn.insert(new Customer(2, "Bob", "Tokyo"),
+        new Customer(3, "Carol", "Osaka"), new Customer(4, "Dave", "Nara")));
+
+
+    System.out.println(service
+        .execute(Customer.class, conn -> conn.readList("select * from customers where id=?", 1))
+        .toString());
 
   }
 
@@ -64,7 +78,6 @@ public class Sorm4jDemo {
 
       OrmMapper ormMapper = OrmService.toOrmMapper(conn);
       ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
-      ormMapper.insert(customers2);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");
       log.debug("{}", cs1);
