@@ -223,7 +223,7 @@ public final class TableMapping<T> extends Mapping<T> {
       dp.ifPresent(
           sw -> log.debug("{} ExecuteUpdate for one object of [{}] to [{}] Table at [{}] =? [{}]",
               sw.getFormattedNameAndElapsedTime(), objectClass.getSimpleName(), getTableName(),
-              Try.getForceOrNull(() -> connection.getMetaData().getURL()), sql));
+              Try.getOrNull(() -> connection.getMetaData().getURL()), sql));
       return ret;
     } catch (SQLException e) {
       throw new OrmException(e);
@@ -238,13 +238,18 @@ public final class TableMapping<T> extends Mapping<T> {
    * @since 1.0
    */
 
-
   public int update(Connection connection, T object) {
+    throwExeptionIfPrimaryKeysIsNotExist();
+    return executeUpdate(connection, getSql().getUpdateSql(), getUpdateParameters(object));
+  }
+
+  private void throwExeptionIfPrimaryKeysIsNotExist() {
     if (getPrimaryKeys().size() == 0) {
       throw new OrmException("Table " + getTableName() + " doesn't have a primary key");
     }
-    return executeUpdate(connection, getSql().getUpdateSql(), getUpdateParameters(object));
   }
+
+
 
   /**
    * Updates a batch of objects in the database. The objects will be identified using their mapped
@@ -255,22 +260,20 @@ public final class TableMapping<T> extends Mapping<T> {
    */
 
   public int[] update(Connection connection, T... objects) {
+    throwExeptionIfPrimaryKeysIsNotExist();
     return batch(connection, sql.getUpdateSql(), obj -> getUpdateParameters(obj), objects);
   }
 
   /**
    * Deletes an object in the database. The object will be identified using its mapped table's
-   * primary key. If no primary keys are defined in the mapped table, a RuntimeException will be
-   * thrown.
+   * primary key.
    *
    * @since 1.0
    */
 
 
   public int delete(Connection connection, T object) {
-    if (getPrimaryKeys().size() == 0) {
-      throw new OrmException("Table " + getTableName() + " doesn't have a primary key");
-    }
+    throwExeptionIfPrimaryKeysIsNotExist();
     return executeUpdate(connection, getSql().getDeleteSql(), getDeleteParameters(object));
   }
 
@@ -283,6 +286,7 @@ public final class TableMapping<T> extends Mapping<T> {
    */
 
   public int[] delete(Connection connection, @SuppressWarnings("unchecked") T... objects) {
+    throwExeptionIfPrimaryKeysIsNotExist();
     return batch(connection, sql.getDeleteSql(), obj -> getDeleteParameters(obj), objects);
   }
 

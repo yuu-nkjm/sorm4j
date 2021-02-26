@@ -32,7 +32,7 @@ public final class Try {
 
 
 
-  public static Runnable runOr(ThrowableRunnable onTry, Consumer<Throwable> onCatch) {
+  public static Runnable createRunnable(ThrowableRunnable onTry, Consumer<Throwable> onCatch) {
     return () -> {
       try {
         onTry.run();
@@ -43,7 +43,7 @@ public final class Try {
   }
 
 
-  public static <T> Supplier<T> supplyOr(ThrowableSupplier<T> onTry,
+  public static <T> Supplier<T> createSupplier(ThrowableSupplier<T> onTry,
       Function<Throwable, T> onCatch) {
     return () -> {
       try {
@@ -54,8 +54,16 @@ public final class Try {
     };
   }
 
+  public static <T, X extends RuntimeException> Supplier<T> createSupplierWithThrow(
+      ThrowableSupplier<T> onTry, Function<Throwable, ? extends X> ex) throws X {
+    return createSupplier(onTry, e -> {
+      throw ex.apply(e);
+    });
+  }
 
-  public static <T, R> Consumer<T> consumeOr(ThrowableConsumer<T> onTry,
+
+
+  public static <T, R> Consumer<T> createConsumer(ThrowableConsumer<T> onTry,
       BiConsumer<Throwable, T> onCatch) {
     return x -> {
       try {
@@ -66,7 +74,15 @@ public final class Try {
     };
   }
 
-  public static <T, R> Function<T, R> applyOr(ThrowableFunction<T, R> onTry,
+
+  public static <T, X extends RuntimeException> Consumer<T> createConsumerWithThrow(
+      ThrowableConsumer<T> onTry, Function<Throwable, ? extends X> ex) throws X {
+    return createConsumer(onTry, (e, x) -> {
+      throw ex.apply(e);
+    });
+  }
+
+  public static <T, R> Function<T, R> createFunction(ThrowableFunction<T, R> onTry,
       BiFunction<Throwable, T, R> onCatch) {
     return x -> {
       try {
@@ -77,55 +93,33 @@ public final class Try {
     };
   }
 
-
-
-  public static <T> T getForceOrNull(ThrowableSupplier<T> onTry) {
-    return supplyForce(onTry).get();
+  public static <T, R, X extends RuntimeException> Function<T, R> createFunctionWithThrow(
+      ThrowableFunction<T, R> onTry, Function<Throwable, ? extends X> ex) throws X {
+    return createFunction(onTry, (e, x) -> {
+      throw ex.apply(e);
+    });
   }
 
-  public static <T, X extends RuntimeException> T getForceOrThrow(ThrowableSupplier<T> onTry,
+
+  public static <T> T getOrNull(ThrowableSupplier<T> onTry) {
+    return createSupplier(onTry, e -> {
+      log.error(e.getMessage(), e);
+      return null;
+    }).get();
+  }
+
+  public static <T, X extends RuntimeException> T getOrThrow(ThrowableSupplier<T> onTry,
       Function<Throwable, ? extends X> ex) throws X {
-    return supplyOr(onTry, e -> {
+    return createSupplier(onTry, e -> {
       throw ex.apply(e);
     }).get();
   }
 
-  public static <T> Supplier<T> supplyForce(ThrowableSupplier<T> onTry) {
-    return supplyOr(onTry, e -> {
-      log.error(e.getMessage(), e);
-      return null;
-    });
-  }
-
-
-
-  public static <X extends RuntimeException> Runnable runOrThrow(ThrowableRunnable onTry,
+  public static <T, X extends RuntimeException> void runOrThrow(ThrowableRunnable onTry,
       Function<Throwable, ? extends X> ex) throws X {
-    return runOr(onTry, e -> {
+    createRunnable(onTry, e -> {
       throw ex.apply(e);
-    });
-  }
-
-  public static <T, X extends RuntimeException> Supplier<T> supplyOrThrow(
-      ThrowableSupplier<T> onTry, Function<Throwable, ? extends X> ex) throws X {
-    return supplyOr(onTry, e -> {
-      throw ex.apply(e);
-    });
-  }
-
-
-  public static <T, X extends RuntimeException> Consumer<T> consumeOrThrow(
-      ThrowableConsumer<T> onTry, Function<Throwable, ? extends X> ex) throws X {
-    return consumeOr(onTry, (e, x) -> {
-      throw ex.apply(e);
-    });
-  }
-
-  public static <T, R, X extends RuntimeException> Function<T, R> applyOrThrow(
-      ThrowableFunction<T, R> onTry, Function<Throwable, ? extends X> ex) throws X {
-    return applyOr(onTry, (e, x) -> {
-      throw ex.apply(e);
-    });
+    }).run();;
   }
 
 

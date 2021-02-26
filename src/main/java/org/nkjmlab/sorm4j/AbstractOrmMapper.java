@@ -86,7 +86,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     String key = tableName + "-" + objectClass.getName();
     @SuppressWarnings("unchecked")
     TableMapping<T> ret =
-        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.applyOrThrow(_tableName -> {
+        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_tableName -> {
           TableMapping<T> m = TableMapping.createMapping(sqlToJavaConverter, javaToSqlConverter,
               objectClass, tableName, fieldMapper, batchConfig, connection);
           log.debug(System.lineSeparator() + m.getFormattedString());
@@ -132,19 +132,19 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   @Override
   public int executeUpdate(String sql, Object... parameters) {
     return execPreparedStatementWithParameters(sql, parameters,
-        Try.applyOrThrow(stmt -> stmt.executeUpdate(), OrmException::new));
+        Try.createFunctionWithThrow(stmt -> stmt.executeUpdate(), OrmException::new));
   }
 
   @Override
   public boolean execute(String sql, Object... parameters) {
     return execPreparedStatementWithParameters(sql, parameters,
-        Try.applyOrThrow(stmt -> stmt.execute(), OrmException::new));
+        Try.createFunctionWithThrow(stmt -> stmt.execute(), OrmException::new));
   }
 
   @Override
   public ResultSet executeQuery(String sql, Object... parameters) {
     return execPreparedStatementWithParameters(sql, parameters,
-        Try.applyOrThrow(stmt -> stmt.executeQuery(), OrmException::new));
+        Try.createFunctionWithThrow(stmt -> stmt.executeQuery(), OrmException::new));
   }
 
   private <R> R execPreparedStatementWithParameters(String sql, Object[] parameters,
@@ -334,7 +334,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         dp.ifPresent(
             sw -> log.debug("{} Read [{}] objects from [{}]", sw.getFormattedNameAndElapsedTime(),
                 ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
-                Try.getForceOrNull(() -> connection.getMetaData().getURL())));
+                Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
     } catch (Exception e) {

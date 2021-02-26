@@ -14,7 +14,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
 
   private final int multiRowSize;
 
-  public MultiRowInOneStatementProcessor(TableMapping<T> tableMapping, int batchSize, int multiRowSize) {
+  public MultiRowInOneStatementProcessor(TableMapping<T> tableMapping, int batchSize,
+      int multiRowSize) {
     super(tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
 
@@ -24,7 +25,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   public int[] multiRowInsert(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> PreparedStatementUtils.getPreparedStatement(con,
+                tableMapping.getSql().getMultirowInsertSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 
@@ -32,7 +34,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   public int[] multiRowMerge(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> PreparedStatementUtils.getPreparedStatement(con,
+                tableMapping.getSql().getMultirowMergeSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 

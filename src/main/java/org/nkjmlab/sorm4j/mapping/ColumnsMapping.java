@@ -23,7 +23,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       ColumnFieldMapper nameGuesser) {
     super(sqlToJava, objectClass, nameGuesser);
     this.constructor =
-        Try.supplyOrThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new).get();
+        Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new).get();
     this.constructor.setAccessible(true);
   }
 

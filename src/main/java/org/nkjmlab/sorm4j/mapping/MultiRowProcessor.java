@@ -46,7 +46,7 @@ public abstract class MultiRowProcessor<T> {
   }
 
   boolean getAutoCommit(Connection connection) {
-    return Try.supplyOrThrow(() -> connection.getAutoCommit(), OrmException::new).get();
+    return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), OrmException::new).get();
   }
 
   public int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
@@ -97,7 +97,7 @@ public abstract class MultiRowProcessor<T> {
     dp.ifPresent(sw -> log.debug("{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
         sw.getFormattedNameAndElapsedTime(), IntStream.of(result).sum(), objects.length,
         tableMapping.objectClass, tableMapping.getTableName(),
-        Try.getForceOrNull(() -> con.getMetaData().getURL())));
+        Try.getOrNull(() -> con.getMetaData().getURL())));
     return result;
   }
 

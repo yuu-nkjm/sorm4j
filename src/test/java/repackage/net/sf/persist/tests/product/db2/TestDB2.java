@@ -26,7 +26,7 @@ public class TestDB2 {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.run(Try.consumeOrThrow(conn -> {
+      ormSrv.run(Try.createConsumerWithThrow(conn -> {
         String sql = String.join(System.lineSeparator(),
             Files.readAllLines(new File(TestDB2.class.getResource("db2.sql").toURI()).toPath()));
         conn.executeUpdate(sql);

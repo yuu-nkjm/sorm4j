@@ -42,7 +42,7 @@ public class OrmService {
   }
 
   public static OrmService of(String jdbcUrl, String user, String password) {
-    return of(Try.supplyOrThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
+    return of(Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
         OrmException::new), OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
@@ -51,12 +51,12 @@ public class OrmService {
   }
 
   public static OrmService of(DataSource dataSource, OrmConfigStore configs) {
-    return of(Try.supplyOrThrow(() -> dataSource.getConnection(), OrmException::new), configs);
+    return of(Try.createSupplierWithThrow(() -> dataSource.getConnection(), OrmException::new), configs);
   }
 
   public static OrmService of(String jdbcUrl, String user, String password,
       OrmConfigStore configs) {
-    return of(Try.supplyOrThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
+    return of(Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
         OrmException::new), configs);
   }
 
