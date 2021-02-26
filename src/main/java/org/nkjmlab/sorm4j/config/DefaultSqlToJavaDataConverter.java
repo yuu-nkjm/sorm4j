@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.config;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -10,16 +9,6 @@ import java.util.Map;
 public final class DefaultSqlToJavaDataConverter implements SqlToJavaDataConverter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
-
-  public static void main(String[] args) {
-    System.out.println(Double[].class.getName());
-    System.out.println(Double[].class.getComponentType().getName());
-    System.out.println(Character[].class.getComponentType().getName());
-    System.out.println(Double.class.getName());
-    System.out.println(double.class.getName());
-    System.out.println(BigDecimal.class.getName());
-  }
-
 
   @Override
   public Object getValueByClass(final ResultSet resultSet, final int column, final Class<?> type)

@@ -16,5 +16,4 @@ public interface TypeOrmReader<T> {
 
   List<T> readList(String sql, Object... parameters);
 
-
 }

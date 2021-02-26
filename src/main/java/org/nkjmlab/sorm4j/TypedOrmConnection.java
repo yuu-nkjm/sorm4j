@@ -85,5 +85,4 @@ public class TypedOrmConnection<T> extends TypedOrmMapper<T> implements Closeabl
     return new OrmConnection(getJdbcConnection(), getConfigStore());
   }
 
-
 }

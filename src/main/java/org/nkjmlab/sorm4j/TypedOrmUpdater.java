@@ -12,7 +12,6 @@ public interface TypedOrmUpdater<T> {
 
   int deleteAll();
 
-
   int[] deleteOn(String tableName, List<T> objects);
 
   int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects);
@@ -68,5 +67,7 @@ public interface TypedOrmUpdater<T> {
   int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   int updateOn(String tableName, T object);
+
+
 
 }

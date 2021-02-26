@@ -43,7 +43,7 @@ public final class ReadResultSet<T> implements Iterable<T>, Closeable, AutoClose
     return ret;
   }
 
-  public List<Map<String, Object>> toListMap() {
+  public List<Map<String, Object>> toMapList() {
     List<Map<String, Object>> ret = ormMapper.loadMapList(resultSet);
     close();
     return ret;
