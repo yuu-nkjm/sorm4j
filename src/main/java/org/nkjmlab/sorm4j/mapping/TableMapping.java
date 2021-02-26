@@ -290,6 +290,9 @@ public final class TableMapping<T> extends Mapping<T> {
     return batch(connection, sql.getDeleteSql(), obj -> getDeleteParameters(obj), objects);
   }
 
+  public int deleteAll(Connection connection) {
+    return executeUpdate(connection, sql.getDeleteAllSql());
+  }
 
 
   public int insert(Connection connection, T object) {

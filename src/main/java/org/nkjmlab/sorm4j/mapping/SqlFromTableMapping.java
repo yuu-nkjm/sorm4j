@@ -13,6 +13,7 @@ public final class SqlFromTableMapping {
   private final String insertSql;
   private final String updateSql;
   private final String deleteSql;
+  private final String deleteAllSql;
   private final String mergeSql;
   private final String insertSqlPrefix;
   private final String mergeSqlPrefix;
@@ -42,6 +43,7 @@ public final class SqlFromTableMapping {
         + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
     this.deleteSql =
         "delete from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
+    this.deleteAllSql = "delete from " + tableName;
   }
 
   private String createUpdateSetClause(List<String> notPrimaryKeys) {
@@ -104,6 +106,9 @@ public final class SqlFromTableMapping {
   public String getDeleteSql() {
     return deleteSql;
   }
+  public String getDeleteAllSql() {
+    return deleteAllSql;
+  }
 
   @Override
   public String toString() {
@@ -112,6 +117,7 @@ public final class SqlFromTableMapping {
         + ", mergeSql=" + mergeSql + ", insertSqlPrefix=" + insertSqlPrefix + ", mergeSqlPrefix="
         + mergeSqlPrefix + ", insertOrMergePlaceholders=" + insertOrMergePlaceholders + "]";
   }
+
 
 
 

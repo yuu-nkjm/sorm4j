@@ -15,7 +15,7 @@ public class Sorm4jDemo {
   private static final String user = "sa";
   private static final String password = "";
 
-  private static final String SQL_CREATE_TABLE_GUESTS =
+  private static final String SQL_CREATE_TABLE_CUSTOMERS =
       "CREATE TABLE IF NOT EXISTS customers (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
   private static final Customer c1_1 = new Customer("Alice", "Kyoto");
@@ -30,16 +30,15 @@ public class Sorm4jDemo {
     Sorm4jDemo demo = new Sorm4jDemo();
     demo.demoOfSorm4J();
     demo.demoOfUseJdbcConnection();
-
-
-
   }
+
+  public static void createTable() {}
 
   private void demoOfSorm4J() {
 
     OrmService service = OrmService.of(jdbcUrl, user, password);
+    service.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
 
-    service.run(conn -> conn.execute(SQL_CREATE_TABLE_GUESTS));
     service.run(Customer.class, conn -> conn.insert(customers1));
 
     List<Customer> cs1 = service.execute(conn -> conn.readAll(Customer.class));
@@ -64,7 +63,7 @@ public class Sorm4jDemo {
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
       OrmMapper ormMapper = OrmService.toOrmMapper(conn);
-      ormMapper.execute(SQL_CREATE_TABLE_GUESTS);
+      ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
       ormMapper.insert(customers2);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");

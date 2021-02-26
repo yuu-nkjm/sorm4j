@@ -36,8 +36,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private final static ConcurrentMap<Class<?>, String> classNameToTableNameMap =
       new ConcurrentHashMap<>();
 
-
-
   private final ColumnFieldMapper fieldMapper;
   private final TableNameMapper tableNameMapper;
   private final SqlToJavaDataConverter sqlToJavaConverter;
@@ -233,9 +231,15 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     dp.ifPresent(sw -> log.debug("{} Read [{}] objects of [{}]",
         sw.getFormattedNameAndElapsedTime(), result.size(), objectClass.getSimpleName()));
     return result;
-
   }
 
+  <T> int deleteAllAux(Class<T> objectClass) {
+    return getTableMapping(objectClass).deleteAll(connection);
+  }
+
+  <T> int deleteAllAux(String tableName, Class<T> objectClass) {
+    return getTableMapping(tableName, objectClass).deleteAll(connection);
+  }
 
 
   public Map<String, Object> readMap(final String sql, final Object... parameters) {

@@ -7,7 +7,6 @@ import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public class TypedOrmMapper<T> extends AbstractOrmMapper
-
     implements TypeOrmReader<T>, TypedOrmUpdater<T> {
   public static <T> TypedOrmConnection<T> of(Class<T> objectClass, Connection conn) {
     return new TypedOrmConnection<T>(objectClass, conn, OrmConfigStore.DEFAULT_CONFIGURATIONS);
@@ -142,6 +141,17 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
         mapping -> mapping.delete(getJdbcConnection(), objects), () -> new int[0]);
   }
 
+  @Override
+  public int deleteAll() {
+    return deleteAllAux(objectClass);
+  }
+
+
+  @Override
+  public int deleteOnAll(String tableName) {
+    return deleteAllAux(tableName, objectClass);
+  }
+
 
   @Override
   public int[] update(@SuppressWarnings("unchecked") T... objects) {
@@ -273,5 +283,6 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
   public int[] update(List<T> objects) {
     return applytoArray(objects, array -> update(array));
   }
+
 
 }
