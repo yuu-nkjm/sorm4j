@@ -42,8 +42,10 @@ public class OrmService {
   }
 
   public static OrmService of(String jdbcUrl, String user, String password) {
-    return of(Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
-        OrmException::new), OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(
+        Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
+            OrmException::new),
+        OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
   public static OrmService of(Supplier<Connection> connectionSupplier, OrmConfigStore configs) {
@@ -51,13 +53,14 @@ public class OrmService {
   }
 
   public static OrmService of(DataSource dataSource, OrmConfigStore configs) {
-    return of(Try.createSupplierWithThrow(() -> dataSource.getConnection(), OrmException::new), configs);
+    return of(Try.createSupplierWithThrow(() -> dataSource.getConnection(), OrmException::new),
+        configs);
   }
 
   public static OrmService of(String jdbcUrl, String user, String password,
       OrmConfigStore configs) {
-    return of(Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
-        OrmException::new), configs);
+    return of(Try.createSupplierWithThrow(
+        () -> DriverManager.getConnection(jdbcUrl, user, password), OrmException::new), configs);
   }
 
   public void runWithJdbcConnection(Consumer<Connection> task) {
@@ -84,7 +87,7 @@ public class OrmService {
   }
 
   public <T> void run(Class<T> objectClass, Consumer<TypedOrmConnection<T>> task) {
-    try (TypedOrmConnection<T> conn = getTypedConnection(objectClass)) {
+    try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       task.accept(conn);
     }
   }
@@ -96,7 +99,7 @@ public class OrmService {
   }
 
   public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> task) {
-    try (TypedOrmConnection<T> conn = getTypedConnection(objectClass)) {
+    try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       return task.apply(conn);
     }
   }
@@ -110,7 +113,7 @@ public class OrmService {
 
   public <T> void runTransaction(Class<T> objectClass,
       Consumer<TypedOrmTransaction<T>> transaction) {
-    try (TypedOrmTransaction<T> conn = beginTypedTransaction(objectClass)) {
+    try (TypedOrmTransaction<T> conn = beginTransaction(objectClass)) {
       transaction.accept(conn);
     }
   }
@@ -123,7 +126,7 @@ public class OrmService {
 
   public <T, R> R executeTransaction(Class<T> objectClass,
       Function<TypedOrmTransaction<T>, R> transaction) {
-    try (TypedOrmTransaction<T> conn = beginTypedTransaction(objectClass)) {
+    try (TypedOrmTransaction<T> conn = beginTransaction(objectClass)) {
       return transaction.apply(conn);
     }
   }
@@ -132,7 +135,7 @@ public class OrmService {
     return OrmTransaction.of(getJdbcConnection());
   }
 
-  public <T> TypedOrmTransaction<T> beginTypedTransaction(Class<T> objectClass) {
+  public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
     return TypedOrmTransaction.of(objectClass, getJdbcConnection());
   }
 
@@ -141,8 +144,7 @@ public class OrmService {
     return OrmTransaction.of(getJdbcConnection(), isolationLevel);
   }
 
-  public <T> TypedOrmTransaction<T> beginTypedTransaction(Class<T> objectClass,
-      int isolationLevel) {
+  public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
     return TypedOrmTransaction.of(objectClass, getJdbcConnection(), isolationLevel);
   }
 
@@ -150,7 +152,7 @@ public class OrmService {
     return OrmConnection.of(getJdbcConnection());
   }
 
-  public <T> TypedOrmConnection<T> getTypedConnection(Class<T> objectClass) {
+  public <T> TypedOrmConnection<T> getConnection(Class<T> objectClass) {
     return TypedOrmConnection.of(objectClass, getJdbcConnection());
   }
 

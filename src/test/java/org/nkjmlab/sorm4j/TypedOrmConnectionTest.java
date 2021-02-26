@@ -16,10 +16,8 @@ class TypedOrmConnectionTest {
   @BeforeEach
   void setUp() {
     srv = OrmTestUtils.createOrmService();
-    OrmTestUtils.recreateTable(srv, Guest.class);
-
-    OrmTestUtils.recreateTable(srv, Player.class);
-
+    OrmTestUtils.dropAndCreateTable(srv, Guest.class);
+    OrmTestUtils.dropAndCreateTable(srv, Player.class);
   }
 
   @Test
@@ -70,7 +68,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testToUntyped() {
-    srv.getTypedConnection(Guest.class).toUntyped();
+    srv.getConnection(Guest.class).toUntyped();
   }
 
   @Test
@@ -147,6 +145,8 @@ class TypedOrmConnectionTest {
     srv.run(Player.class, m -> {
       Player a = OrmTestUtils.PLAYER_ALICE;
       Player b = OrmTestUtils.PLAYER_BOB;
+      m.insertOn("players1", a);
+      m.deleteOn("players1", a);
       m.insertOn("players1", a, b);
       m.deleteOn("players1", a, b);
       assertThat(m.readList("select * from players1").size()).isEqualTo(0);
@@ -166,15 +166,35 @@ class TypedOrmConnectionTest {
 
   @Test
   void testInsertAndGetOnStringT() {
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    Guest b = OrmTestUtils.GUEST_BOB;
     srv.run(Guest.class, m -> {
-      Guest a = OrmTestUtils.GUEST_ALICE;
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
     srv.run(Guest.class, m -> {
-      Guest a = OrmTestUtils.GUEST_ALICE;
       InsertResult<Guest> g = m.insertAndGetOn("players1", a);
       assertThat(g.getObject().getId()).isEqualTo(1);
+    });
+  }
+
+  @Test
+  void testInsertAndGetOnStringT0() {
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    Guest b = OrmTestUtils.GUEST_BOB;
+    srv.run(Guest.class, m -> {
+      InsertResult<Guest> g = m.insertAndGet(a, b);
+      assertThat(g.getObject().getId()).isEqualTo(2);
+    });
+  }
+
+  @Test
+  void testInsertAndGetOnStringT1() {
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    Guest b = OrmTestUtils.GUEST_BOB;
+    srv.run(Guest.class, m -> {
+      InsertResult<Guest> g = m.insertAndGetOn("players1", a, b);
+      assertThat(g.getObject().getId()).isEqualTo(2);
     });
   }
 
@@ -183,7 +203,7 @@ class TypedOrmConnectionTest {
     srv.run(Player.class, m -> {
       Player a = OrmTestUtils.PLAYER_ALICE;
       Player b = OrmTestUtils.PLAYER_BOB;
-      m.mergeOn("players1", a, b);
+      m.mergeOn("players1", a);
       m.mergeOn("players1", a, b);
       assertThat(m.readList("select * from players1").size()).isEqualTo(2);
     });
@@ -194,6 +214,7 @@ class TypedOrmConnectionTest {
     srv.run(Player.class, m -> {
       Player a = OrmTestUtils.PLAYER_ALICE;
       Player b = OrmTestUtils.PLAYER_BOB;
+      m.merge(a);
       m.merge(a, b);
       Player c = new Player(a.getId(), "UPDATED", "UPDATED");
       m.merge(c, b);
