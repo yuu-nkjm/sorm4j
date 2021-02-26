@@ -12,14 +12,14 @@ public final class OrmConfigStore {
       new DefaultSqlToJavaDataConverter();
   public static final JavaToSqlDataConverter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
       new DefaultJavaToSqlDataConverter();
-  private static final BatchConfig DEFAULT_BATCH_CONFIG = new BatchConfig();
+  public static final MultiRowProcessorFactory DEFAULT_BATCH_CONFIG = new MultiRowProcessorFactory();
 
   private final String cacheName;
   private final ColumnFieldMapper fieldNameMapper;
   private final TableNameMapper tableNameMapper;
   private final SqlToJavaDataConverter sqlToJavaDataConverter;
   private final JavaToSqlDataConverter javaToSqlDataConverter;
-  private final BatchConfig batchConfig;
+  private final MultiRowProcessorFactory batchConfig;
 
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
   public static final int DEFAULT_ISOLATION_LEVEL = Connection.TRANSACTION_READ_COMMITTED;
@@ -36,7 +36,7 @@ public final class OrmConfigStore {
 
   public OrmConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
       TableNameMapper tableNameMapper, SqlToJavaDataConverter sqlToJavaConverter,
-      JavaToSqlDataConverter javaToSqlConverter, BatchConfig batchConfig) {
+      JavaToSqlDataConverter javaToSqlConverter, MultiRowProcessorFactory batchConfig) {
     this.cacheName = cacheName;
     this.fieldNameMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
@@ -66,7 +66,7 @@ public final class OrmConfigStore {
     return tableNameMapper;
   }
 
-  public BatchConfig getBatchConfig() {
+  public MultiRowProcessorFactory getBatchConfig() {
     return batchConfig;
   }
 
@@ -82,7 +82,7 @@ public final class OrmConfigStore {
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private SqlToJavaDataConverter sqlToJavaDataConverter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
     private JavaToSqlDataConverter javaToSqlDataConverter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
-    private BatchConfig batchConfig = DEFAULT_BATCH_CONFIG;
+    private MultiRowProcessorFactory batchConfig = DEFAULT_BATCH_CONFIG;
 
     public OrmConfigStore build() {
       return new OrmConfigStore(cacheName, fieldNameMapper, tableNameMapper, sqlToJavaDataConverter,
@@ -109,7 +109,7 @@ public final class OrmConfigStore {
       this.javaToSqlDataConverter = javaToSqlDataConverter;
     }
 
-    public void setBatchConfig(BatchConfig batchConfig) {
+    public void setBatchConfig(MultiRowProcessorFactory batchConfig) {
       this.batchConfig = batchConfig;
     }
 

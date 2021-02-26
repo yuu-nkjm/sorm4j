@@ -139,9 +139,9 @@ public class PerformanceH2 {
       final int warmUp = 10;
 
       wrapMonitor(i, warmUp, "[insert multi batch] jdbc", () -> execJdbcBatchInsert(batchSql, as));
+      wrapMonitor(i, warmUp, "[insert multi multirow] orm", () -> execOrmMultiRowInsert(as));
       wrapMonitor(i, warmUp, "[insert multi multirow] jdbc",
           () -> execJdbcMultiRowInsert(multiRowSql, as));
-      wrapMonitor(i, warmUp, "[insert multi multirow] orm", () -> execOrmMultiRowInsert(as));
 
     }
     System.out.println();

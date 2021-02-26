@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j;
 
+import static org.nkjmlab.sorm4j.util.PreparedStatementUtils.*;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.nkjmlab.sorm4j.config.BatchConfig;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
+import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
 import org.nkjmlab.sorm4j.config.TableNameMapper;
@@ -45,7 +46,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
   private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
   private final Connection connection;
-  private final BatchConfig batchConfig;
+  private final MultiRowProcessorFactory batchConfig;
   private final OrmConfigStore configStore;
 
 
@@ -150,7 +151,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private <R> R execPreparedStatementWithParameters(String sql, Object[] parameters,
       Function<PreparedStatement, R> func) {
-    try (PreparedStatement stmt = getPreparedStatement(sql)) {
+    try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       javaToSqlConverter.setParameters(stmt, parameters);
       return func.apply(stmt);
     } catch (SQLException e) {
@@ -159,14 +160,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  private final PreparedStatement getPreparedStatement(final String sql) {
-    try {
-      return connection.prepareStatement(sql);
-    } catch (SQLException e) {
-      throw new OrmException(
-          "Error creating prepared statement for sql [" + sql + "] : " + e.getMessage(), e);
-    }
-  }
 
   protected final <T> T readOneAux(final Class<T> objectClass, final String sql,
       Object... parameters) {
@@ -302,7 +295,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   public final <T> ReadResultSet<T> readLazyAux(Class<T> objectClass, String sql,
       Object... parameters) {
-    final PreparedStatement stmt = getPreparedStatement(sql);
+    final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
@@ -313,7 +306,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   public ReadResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
-    final PreparedStatement stmt = getPreparedStatement(sql);
+    final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
@@ -328,7 +321,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private <R> R execResultSet(String sql, Object[] parameters,
       Function<ResultSet, R> sqlResultReader) {
-    try (PreparedStatement stmt = getPreparedStatement(sql)) {
+    try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       javaToSqlConverter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
         Optional<DebugPoint> dp = DebugPointFactory.createDebugPoint(DebugPointFactory.Name.READ);

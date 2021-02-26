@@ -83,6 +83,13 @@ public final class Try {
     return supplyForce(onTry).get();
   }
 
+  public static <T, X extends RuntimeException> T getForceOrThrow(ThrowableSupplier<T> onTry,
+      Function<Throwable, ? extends X> ex) throws X {
+    return supplyOr(onTry, e -> {
+      throw ex.apply(e);
+    }).get();
+  }
+
   public static <T> Supplier<T> supplyForce(ThrowableSupplier<T> onTry) {
     return supplyOr(onTry, e -> {
       log.error(e.getMessage(), e);
