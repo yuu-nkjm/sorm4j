@@ -21,4 +21,10 @@ public class DataSourceConnectionSource implements ConnectionSource {
   public DataSource getDataSource() {
     return dataSource;
   }
+
+  @Override
+  public String toString() {
+    return "DataSourceConnectionSource [dataSource=" + dataSource + "]";
+  }
+
 }
