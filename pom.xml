@@ -5,6 +5,36 @@
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
   <version>0.9.1</version>
+  <name>sorm4j</name>
+  <description>Simple micro Object-Relation Mapper for Java</description>
+  <url>https://github.com/yuu-nkjm/sorm4j</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Yuu Nakajima</name>
+      <email>yuu.nkjm.pub@gmail.com</email>
+      <organization>nkjmlab.org</organization>
+      <organizationUrl>https://github.com/nkjmlab</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git@github.com:yuu-nkjmb/sorm4j.git</connection>
+    <url>https://github.com/yuu-nkjm/sorm4j</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <properties>
     <junit-version>5.7.1</junit-version>
     <slf4j-version>1.7.30</slf4j-version>
@@ -15,6 +45,7 @@
     <downloadSources>true</downloadSources>
     <downloadJavadocs>true</downloadJavadocs>
   </properties>
+
   <repositories>
     <repository>
       <id>google-maven-central</id>
@@ -25,10 +56,6 @@
       <id>central</id>
       <name>Central Repository</name>
       <url>https://repo.maven.apache.org/maven2</url>
-    </repository>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
     </repository>
     <repository>
       <id>nkjmlab-public</id>
@@ -44,11 +71,7 @@
       </releases>
     </repository>
   </repositories>
-  <scm>
-    <connection>scm:git:git@github.com:yuu-nkjmb/sorm4j.git</connection>
-    <url>https://github.com/yuu-nkjm/sorm4j</url>
-    <tag>HEAD</tag>
-  </scm>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
     <dependency>
@@ -296,25 +319,23 @@
               <goal>jar</goal>
             </goals>
           </execution>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
         <version>1.6.7</version>
-        <executions>
-          <execution>
-            <id>default-deploy</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>deploy</goal>
-            </goals>
-          </execution>
-        </executions>
+        <extensions>true</extensions>
         <configuration>
-          <serverId>nexus</serverId>
-          <nexusUrl>https://maven.nkjmlab.org/nexus/</nexusUrl>
-          <skipStaging>true</skipStaging>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
         </configuration>
       </plugin>
       <!-- ********** for Deployment to remote mvn server END ******* -->
@@ -376,6 +397,20 @@
             <phase>package</phase>
             <goals>
               <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
             </goals>
           </execution>
         </executions>
