@@ -1,21 +1,18 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.ConnectionSuplierConnectionSource;
+import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
-import org.nkjmlab.sorm4j.util.Try;
 
 public class OrmService {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
@@ -30,37 +27,26 @@ public class OrmService {
   }
 
   public static OrmService of(DataSource dataSource) {
-    return of(new DataSourceConnectionSource(dataSource), OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(dataSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
-  private static OrmService of(ConnectionSource connectionSource, OrmConfigStore configs) {
+  public static OrmService of(ConnectionSource connectionSource, OrmConfigStore configs) {
     return new OrmService(connectionSource, configs);
   }
 
-  public static OrmService of(Supplier<Connection> connectionSupplier) {
-    return of(connectionSupplier, OrmConfigStore.DEFAULT_CONFIGURATIONS);
-  }
 
   public static OrmService of(String jdbcUrl, String user, String password) {
-    return of(
-        Try.createSupplierWithThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
-            OrmException::new),
-        OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(jdbcUrl, user, password, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
-  public static OrmService of(Supplier<Connection> connectionSupplier, OrmConfigStore configs) {
-    return of(new ConnectionSuplierConnectionSource(connectionSupplier), configs);
-  }
 
   public static OrmService of(DataSource dataSource, OrmConfigStore configs) {
-    return of(Try.createSupplierWithThrow(() -> dataSource.getConnection(), OrmException::new),
-        configs);
+    return of(new DataSourceConnectionSource(dataSource), configs);
   }
 
   public static OrmService of(String jdbcUrl, String user, String password,
       OrmConfigStore configs) {
-    return of(Try.createSupplierWithThrow(
-        () -> DriverManager.getConnection(jdbcUrl, user, password), OrmException::new), configs);
+    return of(new DriverManagerConnectionSource(jdbcUrl, user, password), configs);
   }
 
   public void runWithJdbcConnection(Consumer<Connection> task) {
