@@ -9,12 +9,28 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 public final class DefaultTableNameGuesser implements TableNameMapper {
 
+
   @Override
-  public String getTableName(final Class<?> objectClass, final Connection connection) {
+  public TableName toValidTableName(String tableName, Connection connection) {
+    try {
+      List<String> candidates = List.of(StringUtils.toUpperCase(tableName));
+      DatabaseMetaData metaData = connection.getMetaData();
+      return getTableNameOnDb(metaData, candidates).orElseThrow(() -> new OrmException(StringUtils
+          .format("[{}]  does not match a existing table in the db. Candidates Name are {}",
+              tableName, candidates)));
+    } catch (SQLException e) {
+      throw new OrmException(e);
+    }
+  }
+
+
+  @Override
+  public TableName getTableName(final Class<?> objectClass, final Connection connection) {
     try {
       DatabaseMetaData metaData = connection.getMetaData();
       final OrmTable tableAnnotation = objectClass.getAnnotation(OrmTable.class);
@@ -39,14 +55,15 @@ public final class DefaultTableNameGuesser implements TableNameMapper {
    * Check if the given names corresponds to a table in the database and returns the corresponding
    * name returned by the database metadata
    */
-  Optional<String> getTableNameOnDb(DatabaseMetaData metaData, List<String> tableNameCandidates) {
+  Optional<TableName> getTableNameOnDb(DatabaseMetaData metaData,
+      List<String> tableNameCandidates) {
 
     try (
         ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
       while (resultSet.next()) {
         String tableNameOnDb = resultSet.getString(3);
         if (StringUtils.containsIgnoreCase(tableNameCandidates, tableNameOnDb)) {
-          return Optional.of(tableNameOnDb);
+          return Optional.of(new TableName(tableNameOnDb));
         }
       }
       return Optional.empty();
@@ -54,6 +71,7 @@ public final class DefaultTableNameGuesser implements TableNameMapper {
       throw new OrmException(e);
     }
   }
+
 
 
 }

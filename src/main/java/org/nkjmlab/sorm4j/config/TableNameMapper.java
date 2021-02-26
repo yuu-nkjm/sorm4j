@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.config;
 
 import java.sql.Connection;
+import org.nkjmlab.sorm4j.mapping.TableName;
 
 public interface TableNameMapper extends OrmConfig {
 
@@ -11,8 +12,8 @@ public interface TableNameMapper extends OrmConfig {
    * @param connection
    * @return table name exists in database.
    */
-  String getTableName(Class<?> objectClass, Connection connection);
+  TableName getTableName(Class<?> objectClass, Connection connection);
 
-
+  TableName toValidTableName(String tableName, Connection connection);
 
 }

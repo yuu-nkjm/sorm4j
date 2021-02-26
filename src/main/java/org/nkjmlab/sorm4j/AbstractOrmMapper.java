@@ -26,6 +26,7 @@ import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
 import org.nkjmlab.sorm4j.config.TableNameMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
+import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.StringUtils;
@@ -33,7 +34,9 @@ import org.nkjmlab.sorm4j.util.Try;
 
 abstract class AbstractOrmMapper implements SqlExecutor {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
-  private final static ConcurrentMap<Class<?>, String> classNameToTableNameMap =
+  private final static ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap =
+      new ConcurrentHashMap<>();
+  private final static ConcurrentMap<String, TableName> tableNameToValidTableNameMap =
       new ConcurrentHashMap<>();
 
   private final ColumnFieldMapper fieldMapper;
@@ -73,7 +76,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
 
   public <T> TableMapping<T> getTableMapping(Class<T> objectClass) {
-    String tableName = toTableName(objectClass);
+    TableName tableName = toTableName(objectClass);
     return getTableMapping(tableName, objectClass);
   }
 
@@ -83,12 +86,16 @@ abstract class AbstractOrmMapper implements SqlExecutor {
    *
    */
   <T> TableMapping<T> getTableMapping(String tableName, Class<T> objectClass) {
-    String key = tableName + "-" + objectClass.getName();
+    return getTableMapping(toTableName(tableName), objectClass);
+  }
+
+  <T> TableMapping<T> getTableMapping(TableName tableName, Class<T> objectClass) {
+    String key = tableName.getName() + "-" + objectClass.getName();
     @SuppressWarnings("unchecked")
     TableMapping<T> ret =
-        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_tableName -> {
+        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = TableMapping.createMapping(sqlToJavaConverter, javaToSqlConverter,
-              objectClass, tableName, fieldMapper, batchConfig, connection);
+              objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
           log.debug(System.lineSeparator() + m.getFormattedString());
           return m;
         }, OrmException::new));
@@ -107,10 +114,15 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return ret;
   }
 
-  private String toTableName(Class<?> objectClass) {
-    String tableName = classNameToTableNameMap.computeIfAbsent(objectClass,
+  private TableName toTableName(String tableName) {
+    return tableNameToValidTableNameMap.computeIfAbsent(tableName,
+        k -> tableNameMapper.toValidTableName(tableName, connection));
+  }
+
+
+  private TableName toTableName(Class<?> objectClass) {
+    return classNameToValidTableNameMap.computeIfAbsent(objectClass,
         k -> tableNameMapper.getTableName(objectClass, connection));
-    return tableName;
   }
 
 
