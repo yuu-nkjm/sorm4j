@@ -13,7 +13,7 @@ You can get the binary using Maven from [Central Repository](http://mvnrepositor
 <dependency>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.2</version>
 </dependency>
 ```
 
