@@ -363,7 +363,7 @@ public class TestSimple {
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
       simpleOrMapper.readByPrimaryKey(Simple01.class, id);
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
     }
   }
 
@@ -381,7 +381,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Class [net.sf.persist.tests.common.Simple02] specifies table [hello_world] that does not
       // exist in the database");
-      log.error(e);
+      log.info(e);
     }
   }
 
@@ -394,7 +394,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple03.class, 1);
       fail("Object lacking field did not trigger exception");
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
       org.assertj.core.api.Assertions.assertThat(e.getMessage())
           .contains("[LONG_COL] does not match any field");
     }
@@ -409,7 +409,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
       fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
       org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
           .contains("argument type mismatch");
     }
@@ -424,7 +424,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple05.class, 1);
       fail("Object with invalid table name did not trigger exception");
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
       org.assertj.core.api.Assertions.assertThat(e.getMessage())
           .contains("does not match a existing table");
     }
@@ -438,7 +438,7 @@ public class TestSimple {
       simpleOrMapper.insert(buildSimple());
       simpleOrMapper.readByPrimaryKey(Simple06.class, 1);
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
     }
   }
 
@@ -451,7 +451,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple07.class, 1);
       fail("Object without getter and setter did not trigger exception");
     } catch (Exception e) {
-      log.error(e);
+      log.info(e);
       org.assertj.core.api.Assertions.assertThat(e.getMessage())
           .contains("[STRING_COL] does not match any field");
     }
@@ -469,7 +469,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Field [intCol] from class [net.sf.persist.tests.common.Simple08] has conflicting
       // NoColumn and Column annotations");
-      log.error(e);
+      log.info(e);
     }
   }
 
@@ -485,7 +485,7 @@ public class TestSimple {
       // assertEquals(e.getMessage(),
       // "Setter [public void net.sf.persist.tests.common.Simple10.setStringCol()] should have a
       // single parameter but has 0");
-      log.error(e);
+      log.info(e);
     }
   }
 
@@ -507,7 +507,7 @@ public class TestSimple {
         // assertEquals(e.getMessage(),
         // "Getter [public void net.sf.persist.tests.common.Simple09.getStringCol()] must have a
         // return parameter");
-        log.error(e);
+        log.info(e);
       }
     }
   }
