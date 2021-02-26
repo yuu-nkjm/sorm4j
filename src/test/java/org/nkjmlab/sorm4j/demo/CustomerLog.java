@@ -1,16 +1,17 @@
 package org.nkjmlab.sorm4j.demo;
 
-public class Customer {
+public class CustomerLog {
 
   private int id;
+  private int customerId;
   private String name;
   private String address;
 
   // Require public no arg constructor (default constructor)
-  public Customer() {}
+  public CustomerLog() {}
 
-  public Customer(int id, String name, String address) {
-    this.id = id;
+  public CustomerLog(int customerId, String name, String address) {
+    this.customerId = customerId;
     this.name = name;
     this.address = address;
   }
@@ -18,6 +19,10 @@ public class Customer {
 
   public int getId() {
     return id;
+  }
+
+  public int getCustomerId() {
+    return customerId;
   }
 
 
@@ -32,8 +37,8 @@ public class Customer {
 
   @Override
   public String toString() {
-    return "Customer [id=" + id + ", address=" + address + ", name=" + name + "]";
+    return "CustomerLog [id=" + id + ", customerId=" + customerId + ", name=" + name + ", address="
+        + address + "]";
   }
-
 
 }

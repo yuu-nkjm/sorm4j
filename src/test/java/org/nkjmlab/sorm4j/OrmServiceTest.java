@@ -19,6 +19,12 @@ class OrmServiceTest {
   }
 
   @Test
+  void testToString() {
+    assertThat(srv.toString()).contains("OrmService");
+  }
+
+
+  @Test
   void testRunWithJdbcConnection() {
     srv.runWithJdbcConnection(con -> {
     });
@@ -57,7 +63,7 @@ class OrmServiceTest {
     try (OrmTransaction tr = srv.beginTransaction()) {
       tr.begin();
       tr.insert(a);
-      //auto-rollback
+      // auto-rollback
     }
     srv.runWithJdbcConnection(con -> {
       assertThat(srv.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);

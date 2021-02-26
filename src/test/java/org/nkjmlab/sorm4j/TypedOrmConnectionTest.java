@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,6 +106,13 @@ class TypedOrmConnectionTest {
       Player b = OrmTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readAllLazy().stream().collect(Collectors.toList())).contains(a, b);
+      assertThat(m.readAllLazy().toList()).contains(a, b);
+      assertThat(m.readAllLazy().getFirst()).isEqualTo(a);
+      Map<String, Object> map = m.readAllLazy().toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+      assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
+          .isEqualTo(a.getAddress());
     });
   }
 
