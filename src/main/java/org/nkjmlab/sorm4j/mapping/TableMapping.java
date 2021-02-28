@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
+import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.config.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
@@ -50,7 +50,7 @@ public final class TableMapping<T> extends Mapping<T> {
   final MultiRowProcessor<T> batcher;
 
 
-  private TableMapping(ResultSetValueGetter sqlToJavaConverter,
+  private TableMapping(ResultSetConverter sqlToJavaConverter,
       PreparedStatementParametersSetter javaToSqlConverter, Class<T> objectClass, String tableName,
       List<Column> columns, ColumnFieldMapper fieldMapper, MultiRowProcessorFactory batchConf,
       Connection connection) {
@@ -108,7 +108,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
 
-  public static final <T> TableMapping<T> createMapping(ResultSetValueGetter sqlToJavaConverter,
+  public static final <T> TableMapping<T> createMapping(ResultSetConverter sqlToJavaConverter,
       PreparedStatementParametersSetter javaToSqlConverter, Class<T> objectClass, String tableName,
       ColumnFieldMapper fieldMapper, MultiRowProcessorFactory batchConfig, Connection connection) {
     try {
