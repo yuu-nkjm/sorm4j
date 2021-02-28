@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import org.nkjmlab.sorm4j.config.DefaultSqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.DefaultResultSetValueGetter;
 
 public final class ColumnOnTable extends Column {
 
@@ -13,6 +13,6 @@ public final class ColumnOnTable extends Column {
 
   @Override
   public String toString() {
-    return getName() + "(" + DefaultSqlToJavaDataConverter.sqlTypeToString(dataType) + ")";
+    return getName() + "(" + DefaultResultSetValueGetter.sqlTypeToString(dataType) + ")";
   }
 }

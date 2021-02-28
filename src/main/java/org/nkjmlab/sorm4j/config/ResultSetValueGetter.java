@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.config;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public interface SqlToJavaDataConverter extends OrmConfig {
+public interface ResultSetValueGetter extends OrmConfig {
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an

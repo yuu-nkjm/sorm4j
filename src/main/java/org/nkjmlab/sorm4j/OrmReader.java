@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 import org.nkjmlab.sorm4j.helper.SqlStatement;
 
 /**
@@ -57,7 +57,7 @@ public interface OrmReader {
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link SqlToJavaDataConverter#getValueBySqlType(ResultSet, int, int)}.
+   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
@@ -74,7 +74,7 @@ public interface OrmReader {
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link SqlToJavaDataConverter#getValueBySqlType(ResultSet, int, int)}.
+   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
@@ -89,7 +89,7 @@ public interface OrmReader {
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link SqlToJavaDataConverter#getValueBySqlType(ResultSet, int, int)}.
+   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link JavaTOSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}

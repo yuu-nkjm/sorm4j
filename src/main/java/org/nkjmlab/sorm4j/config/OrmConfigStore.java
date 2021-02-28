@@ -8,8 +8,8 @@ public final class OrmConfigStore {
   public static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnFieldMapper();
   public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameGuesser();
-  public static final SqlToJavaDataConverter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
-      new DefaultSqlToJavaDataConverter();
+  public static final ResultSetValueGetter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
+      new DefaultResultSetValueGetter();
   public static final PreparedStatementParametersSetter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
       new DefaultPreparedStatementParametersSetter();
   public static final MultiRowProcessorFactory DEFAULT_MULTI_ROW_PROCESSOR_FACTORY =
@@ -18,7 +18,7 @@ public final class OrmConfigStore {
   private final String cacheName;
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
-  private final SqlToJavaDataConverter sqlToJavaDataConverter;
+  private final ResultSetValueGetter resultSetValueGetter;
   private final PreparedStatementParametersSetter preparedStatementParametersSetter;
   private final MultiRowProcessorFactory multiProcessorFactory;
 
@@ -36,12 +36,12 @@ public final class OrmConfigStore {
   }
 
   public OrmConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
-      TableNameMapper tableNameMapper, SqlToJavaDataConverter sqlToJavaConverter,
+      TableNameMapper tableNameMapper, ResultSetValueGetter sqlToJavaConverter,
       PreparedStatementParametersSetter javaToSqlConverter, MultiRowProcessorFactory batchConfig) {
     this.cacheName = cacheName;
     this.columnFieldMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
-    this.sqlToJavaDataConverter = sqlToJavaConverter;
+    this.resultSetValueGetter = sqlToJavaConverter;
     this.preparedStatementParametersSetter = javaToSqlConverter;
     this.multiProcessorFactory = batchConfig;
 
@@ -58,8 +58,8 @@ public final class OrmConfigStore {
   }
 
 
-  public SqlToJavaDataConverter getSqlToJavaDataConverter() {
-    return sqlToJavaDataConverter;
+  public ResultSetValueGetter getSqlToJavaDataConverter() {
+    return resultSetValueGetter;
   }
 
 
@@ -81,12 +81,12 @@ public final class OrmConfigStore {
     private String cacheName = DEFAULT_CACHE;
     private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
-    private SqlToJavaDataConverter sqlToJavaDataConverter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
+    private ResultSetValueGetter resultSetValueGetter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
     private PreparedStatementParametersSetter preparedStatementParametersSetter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
     private MultiRowProcessorFactory multiRowProcessorFactory = DEFAULT_MULTI_ROW_PROCESSOR_FACTORY;
 
     public OrmConfigStore build() {
-      return new OrmConfigStore(cacheName, columnFieldMapper, tableNameMapper, sqlToJavaDataConverter,
+      return new OrmConfigStore(cacheName, columnFieldMapper, tableNameMapper, resultSetValueGetter,
           preparedStatementParametersSetter, multiRowProcessorFactory);
     }
 
@@ -105,8 +105,8 @@ public final class OrmConfigStore {
       return this;
     }
 
-    public Builder setSqlToJavaDataConverter(SqlToJavaDataConverter sqlToJavaDataConverter) {
-      this.sqlToJavaDataConverter = sqlToJavaDataConverter;
+    public Builder setSqlToJavaDataConverter(ResultSetValueGetter resultSetValueGetter) {
+      this.resultSetValueGetter = resultSetValueGetter;
       return this;
     }
 

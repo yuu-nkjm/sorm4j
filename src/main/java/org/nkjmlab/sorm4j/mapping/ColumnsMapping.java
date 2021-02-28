@@ -12,14 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 import org.nkjmlab.sorm4j.util.Try;
 
 public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 
 
-  public ColumnsMapping(SqlToJavaDataConverter sqlToJava, Class<T> objectClass,
+  public ColumnsMapping(ResultSetValueGetter sqlToJava, Class<T> objectClass,
       ColumnFieldMapper nameGuesser) {
     super(sqlToJava, objectClass, nameGuesser);
     this.constructor =
@@ -27,7 +27,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     this.constructor.setAccessible(true);
   }
 
-  public static <T> ColumnsMapping<T> createMapping(SqlToJavaDataConverter converter,
+  public static <T> ColumnsMapping<T> createMapping(ResultSetValueGetter converter,
       Class<T> objectClass, ColumnFieldMapper nameGuesser) {
     return new ColumnsMapping<>(converter, objectClass, nameGuesser);
   }
