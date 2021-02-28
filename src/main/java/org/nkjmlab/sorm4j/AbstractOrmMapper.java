@@ -319,30 +319,30 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  public final <T> ReadResultSet<T> readAllLazyAux(Class<T> objectClass) {
+  public final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
     return readLazyAux(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
-  public final <T> ReadResultSet<T> readLazyAux(Class<T> objectClass, String sql,
+  public final <T> LazyResultSet<T> readLazyAux(Class<T> objectClass, String sql,
       Object... parameters) {
     final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      return new ReadResultSet<T>(this, objectClass, stmt, resultSet);
+      return new LazyResultSet<T>(this, objectClass, stmt, resultSet);
     } catch (SQLException e) {
       throw new OrmException(e);
     }
   }
 
-  public ReadResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
     final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-      ReadResultSet<Map<String, Object>> ret =
-          (ReadResultSet<Map<String, Object>>) new ReadResultSet(this, Map.class, stmt, resultSet);
+      LazyResultSet<Map<String, Object>> ret =
+          (LazyResultSet<Map<String, Object>>) new LazyResultSet(this, Map.class, stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw new OrmException(e);

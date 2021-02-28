@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author nkjm
  *
  */
-public class SqlStatement {
+public final class SqlStatement {
 
   // with ? placeholder
   private final String sql;

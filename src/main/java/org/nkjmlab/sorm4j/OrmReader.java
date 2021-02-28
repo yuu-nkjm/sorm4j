@@ -20,24 +20,26 @@ public interface OrmReader {
 
   <T> List<T> readAll(Class<T> objectClass);
 
-  <T> ReadResultSet<T> readAllLazy(Class<T> objectClass);
+  <T> LazyResultSet<T> readAllLazy(Class<T> objectClass);
 
   /**
    * Reads an object from the database by its primary keys.
    */
   <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
 
+  <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
+
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.ReadResultSet} and convert it to Stream, List, and so on.
+   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet} and convert it to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    * @since 1.0
    */
-  <T> ReadResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters);
+  <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -55,8 +57,7 @@ public interface OrmReader {
    * {@link java.util.Map}.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
@@ -68,27 +69,25 @@ public interface OrmReader {
 
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.ReadResultSet} instance containing data from the execution
+   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet} instance containing data from the execution
    * of the provided parametrized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    * @since 1.0
    */
-  ReadResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
+  LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
 
   /**
    * Reads a list of objects from the database by mapping the SQL execution results to instances of
    * {@link java.util.Map} containing data from the execution of the provided parametrized SQL and
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link JavaTOSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
@@ -98,15 +97,18 @@ public interface OrmReader {
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
 
 
+  <T> T readOne(Class<T> objectClass, SqlStatement sql);
+
   <T> T readFirst(Class<T> objectClass, SqlStatement sql);
 
-  <T> ReadResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
+  <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
 
   <T> List<T> readList(Class<T> objectClass, SqlStatement sql);
 
+
   Map<String, Object> readMapFirst(SqlStatement sql);
 
-  ReadResultSet<Map<String, Object>> readMapLazy(SqlStatement sql);
+  LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql);
 
   List<Map<String, Object>> readMapList(SqlStatement sql);
 
