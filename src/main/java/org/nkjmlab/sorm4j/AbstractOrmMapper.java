@@ -9,7 +9,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,10 +18,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.config.ResultSetConverter;
 import org.nkjmlab.sorm4j.config.TableNameMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
@@ -41,8 +40,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private final ColumnFieldMapper fieldMapper;
   private final TableNameMapper tableNameMapper;
-  private final SqlToJavaDataConverter sqlToJavaConverter;
-  private final JavaToSqlDataConverter javaToSqlConverter;
+  private final ResultSetConverter sqlToJavaConverter;
+  private final PreparedStatementParametersSetter javaToSqlConverter;
 
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
   private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
@@ -66,7 +65,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     this.batchConfig = configStore.getMultiProcessorFactory();
     this.fieldMapper = configStore.getColumnFieldMapper();
     this.tableNameMapper = configStore.getTableNameMapper();
-    this.sqlToJavaConverter = configStore.getSqlToJavaDataConverter();
+    this.sqlToJavaConverter = new ResultSetConverter(configStore.getSqlToJavaDataConverter());
     this.javaToSqlConverter = configStore.getJavaToSqlDataConverter();
     String cacheName = configStore.getCacheName();
     this.tableMappings = Sorm.getTableMappings(cacheName);
@@ -222,7 +221,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
 
   <T> T loadOneObject(Class<T> objectClass, ResultSet resultSet) {
-    return isEnableToConvertNativeSqlType(objectClass) ? loadOneNativeObject(objectClass, resultSet)
+    return isEnableToConvertNativeSqlType(objectClass)
+        ? sqlToJavaConverter.toOneNativeObject(resultSet, objectClass)
         : loadOnePojo(objectClass, resultSet);
   }
 
@@ -274,7 +274,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
         Map<String, Object> ret = null;
         if (resultSet.next()) {
-          ret = loadOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+          ret = sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
         }
         if (resultSet.next()) {
           throw new OrmException("Non-unique result returned");
@@ -291,7 +291,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       try {
         ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
         if (resultSet.next()) {
-          return loadOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+          return sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
         }
         return null;
       } catch (SQLException e) {
@@ -310,7 +310,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final List<Map<String, Object>> ret = new ArrayList<>();
       ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
       while (resultSet.next()) {
-        ret.add(loadOneMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
+        ret.add(sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
       }
       return ret;
     } catch (SQLException e) {
@@ -319,30 +319,30 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  public final <T> ReadResultSet<T> readAllLazyAux(Class<T> objectClass) {
+  public final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
     return readLazyAux(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
-  public final <T> ReadResultSet<T> readLazyAux(Class<T> objectClass, String sql,
+  public final <T> LazyResultSet<T> readLazyAux(Class<T> objectClass, String sql,
       Object... parameters) {
     final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      return new ReadResultSet<T>(this, objectClass, stmt, resultSet);
+      return new LazyResultSet<T>(this, objectClass, stmt, resultSet);
     } catch (SQLException e) {
       throw new OrmException(e);
     }
   }
 
-  public ReadResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
     final PreparedStatement stmt = getPreparedStatement(connection, sql);
     try {
       javaToSqlConverter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-      ReadResultSet<Map<String, Object>> ret =
-          (ReadResultSet<Map<String, Object>>) new ReadResultSet(this, Map.class, stmt, resultSet);
+      LazyResultSet<Map<String, Object>> ret =
+          (LazyResultSet<Map<String, Object>>) new LazyResultSet(this, Map.class, stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw new OrmException(e);
@@ -375,7 +375,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
           DebugPointFactory.createDebugPoint(DebugPointFactory.Name.LOAD_OBJECT);
       final List<T> ret = new ArrayList<>();
       while (resultSet.next()) {
-        ret.add(loadOneNativeObject(objectClass, resultSet));
+        ret.add(sqlToJavaConverter.toOneNativeObject(resultSet, objectClass));
       }
       dp.ifPresent(sw -> {
         try {
@@ -407,39 +407,13 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return mapping.createObject(resultSet);
   }
 
-  private final <T> T loadOneNativeObject(final Class<T> objectClass, final ResultSet resultSet) {
-    try {
-      // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
-      // is prior.
-      Object value = sqlToJavaConverter.getValueByClass(resultSet, 1, objectClass);
-      @SuppressWarnings("unchecked")
-      T valueT = (T) value;
-      return valueT;
-    } catch (SQLException e) {
-      throw new OrmException("Fail to get value as [" + objectClass.getSimpleName() + "]", e);
-    }
-  }
 
   Map<String, Object> loadOneMap(ResultSet resultSet) {
     ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
-    return loadOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+    return sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
 
   }
 
-  private Map<String, Object> loadOneMap(final ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) {
-    try {
-      final Map<String, Object> ret = new LinkedHashMap<>();
-      for (int i = 1; i <= columns.size(); i++) {
-        int type = columnTypes.get(i - 1);
-        Object value = sqlToJavaConverter.getValueBySqlType(resultSet, i, type);
-        ret.put(columns.get(i - 1), value);
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
-    }
-  }
 
 
   protected final <T, R> R execSqlIfParameterExists(T[] objects,

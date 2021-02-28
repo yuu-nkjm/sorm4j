@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.SqlStatement;
 
 public class SqlWithNamedParameters {
 

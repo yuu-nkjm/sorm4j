@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.config;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public interface JavaToSqlDataConverter extends OrmConfig {
+public interface PreparedStatementParametersSetter extends OrmConfig {
   /**
    * Sets parameters in the given prepared statement. i.e. Convert From Java To Sql.
    *

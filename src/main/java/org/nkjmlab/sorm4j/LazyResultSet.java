@@ -15,14 +15,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-public final class ReadResultSet<T> implements Iterable<T>, Closeable, AutoCloseable {
+public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoCloseable {
 
   private final Class<T> objectClass;
   private final AbstractOrmMapper ormMapper;
   private final ResultSet resultSet;
   private final PreparedStatement stmt;
 
-  ReadResultSet(AbstractOrmMapper ormMapper, Class<T> objectClass, PreparedStatement stmt,
+  LazyResultSet(AbstractOrmMapper ormMapper, Class<T> objectClass, PreparedStatement stmt,
       ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;

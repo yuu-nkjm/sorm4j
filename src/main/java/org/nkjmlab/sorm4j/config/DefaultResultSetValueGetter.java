@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class DefaultSqlToJavaDataConverter implements SqlToJavaDataConverter {
+public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.helper.SqlStatement;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 /**
@@ -265,7 +264,7 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
 
 
   @Override
-  public <T> ReadResultSet<T> readAllLazy(Class<T> objectClass) {
+  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
     return readAllLazyAux(objectClass);
   }
 
@@ -275,7 +274,7 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   }
 
   @Override
-  public <T> ReadResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
     return readLazyAux(objectClass, sql, parameters);
   }
 
@@ -300,7 +299,7 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   }
 
   @Override
-  public <T> ReadResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql) {
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql) {
     return readLazy(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -315,13 +314,23 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   }
 
   @Override
-  public ReadResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
     return readMapLazy(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public List<Map<String, Object>> readMapList(SqlStatement sql) {
     return readMapList(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
+    return readOneAux(objectClass, sql, parameters);
+  }
+
+  @Override
+  public <T> T readOne(Class<T> objectClass, SqlStatement sql) {
+    return readOneAux(objectClass, sql.getSql(), sql.getParameters());
   }
 
 }

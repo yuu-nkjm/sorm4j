@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.ResultSet;
-import org.nkjmlab.sorm4j.helper.SqlStatement;
 
 public interface SqlExecutor {
 

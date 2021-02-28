@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.helper;
+package org.nkjmlab.sorm4j;
 
 import java.util.Arrays;
 
@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author nkjm
  *
  */
-public class SqlStatement {
+public final class SqlStatement {
 
   // with ? placeholder
   private final String sql;

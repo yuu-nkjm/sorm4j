@@ -13,18 +13,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 abstract class Mapping<T> {
-  private static final org.slf4j.Logger log =
-      org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-  protected final SqlToJavaDataConverter sqlToJavaConverter;
+  protected final ResultSetConverter sqlToJavaConverter;
   protected final Class<T> objectClass;
   protected final ColumnToAccessorMap columnToAccessorMap;
 
-  public Mapping(SqlToJavaDataConverter sqlToJavaConverter, Class<T> objectClass,
+  public Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass,
       ColumnFieldMapper nameGuesser) {
     this(sqlToJavaConverter, objectClass, guessColumnNames(objectClass, nameGuesser), nameGuesser);
   }
@@ -47,8 +46,8 @@ abstract class Mapping<T> {
 
 
 
-  public Mapping(SqlToJavaDataConverter sqlToJavaConverter, Class<T> objectClass,
-      List<Column> columns, ColumnFieldMapper nameGuesser) {
+  public Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass, List<Column> columns,
+      ColumnFieldMapper nameGuesser) {
     this.sqlToJavaConverter = sqlToJavaConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = new ColumnToAccessorMap(createAccessors(columns, nameGuesser));

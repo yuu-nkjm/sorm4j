@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.config.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
@@ -35,7 +35,7 @@ public final class TableMapping<T> extends Mapping<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
   private final Map<String, Class<?>> setterParamTypeMap = new ConcurrentHashMap<>();
 
-  final JavaToSqlDataConverter javaToSqlConverter;
+  final PreparedStatementParametersSetter javaToSqlConverter;
 
   private final String tableName;
   private final List<String> primaryKeys;
@@ -50,8 +50,8 @@ public final class TableMapping<T> extends Mapping<T> {
   final MultiRowProcessor<T> batcher;
 
 
-  private TableMapping(SqlToJavaDataConverter sqlToJavaConverter,
-      JavaToSqlDataConverter javaToSqlConverter, Class<T> objectClass, String tableName,
+  private TableMapping(ResultSetConverter sqlToJavaConverter,
+      PreparedStatementParametersSetter javaToSqlConverter, Class<T> objectClass, String tableName,
       List<Column> columns, ColumnFieldMapper fieldMapper, MultiRowProcessorFactory batchConf,
       Connection connection) {
     super(sqlToJavaConverter, objectClass, columns, fieldMapper);
@@ -108,8 +108,8 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
 
-  public static final <T> TableMapping<T> createMapping(SqlToJavaDataConverter sqlToJavaConverter,
-      JavaToSqlDataConverter javaToSqlConverter, Class<T> objectClass, String tableName,
+  public static final <T> TableMapping<T> createMapping(ResultSetConverter sqlToJavaConverter,
+      PreparedStatementParametersSetter javaToSqlConverter, Class<T> objectClass, String tableName,
       ColumnFieldMapper fieldMapper, MultiRowProcessorFactory batchConfig, Connection connection) {
     try {
       DatabaseMetaData metaData = connection.getMetaData();

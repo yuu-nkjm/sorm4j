@@ -10,10 +10,10 @@ class OrmConfigStoreTest {
   private static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnFieldMapper();
   private static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameGuesser();
-  private static final SqlToJavaDataConverter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
-      new DefaultSqlToJavaDataConverter();
-  private static final JavaToSqlDataConverter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
-      new DefaultJavaToSqlDataConverter();
+  private static final ResultSetValueGetter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
+      new DefaultResultSetValueGetter();
+  private static final PreparedStatementParametersSetter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
+      new DefaultPreparedStatementParametersSetter();
   private static final MultiRowProcessorFactory DEFAULT_MULTI_ROW_PROCESSOR_FACTORY =
       new MultiRowProcessorFactory();
 

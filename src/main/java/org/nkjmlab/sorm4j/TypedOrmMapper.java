@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.helper.SqlStatement;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public class TypedOrmMapper<T> extends AbstractOrmMapper
@@ -52,12 +51,12 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
   }
 
   @Override
-  public ReadResultSet<T> readLazy(String sql, Object... parameters) {
+  public LazyResultSet<T> readLazy(String sql, Object... parameters) {
     return readLazyAux(objectClass, sql, parameters);
   }
 
   @Override
-  public ReadResultSet<T> readAllLazy() {
+  public LazyResultSet<T> readAllLazy() {
     return readAllLazyAux(objectClass);
   }
 
@@ -307,13 +306,23 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
   }
 
   @Override
-  public ReadResultSet<T> readLazy(SqlStatement sql) {
+  public LazyResultSet<T> readLazy(SqlStatement sql) {
     return readLazy(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public List<T> readList(SqlStatement sql) {
     return readList(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public T readOne(String sql, Object... parameters) {
+    return readOneAux(objectClass, sql, parameters);
+  }
+
+  @Override
+  public T readOne(SqlStatement sql) {
+    return readOneAux(objectClass, sql.getSql(), sql.getParameters());
   }
 
 

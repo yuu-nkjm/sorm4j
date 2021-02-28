@@ -12,22 +12,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.config.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.Try;
 
 public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 
 
-  public ColumnsMapping(SqlToJavaDataConverter sqlToJava, Class<T> objectClass,
+  public ColumnsMapping(ResultSetConverter sqlToJava, Class<T> objectClass,
       ColumnFieldMapper nameGuesser) {
     super(sqlToJava, objectClass, nameGuesser);
     this.constructor =
-        Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new).get();
+        Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new)
+            .get();
     this.constructor.setAccessible(true);
   }
 
-  public static <T> ColumnsMapping<T> createMapping(SqlToJavaDataConverter converter,
+  public static <T> ColumnsMapping<T> createMapping(ResultSetConverter converter,
       Class<T> objectClass, ColumnFieldMapper nameGuesser) {
     return new ColumnsMapping<>(converter, objectClass, nameGuesser);
   }
@@ -45,7 +46,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   public T createObject(ResultSet resultSet) {
     List<String> columns = createColumns(resultSet);
     List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
-    return createObject(columns, createValues(resultSet, setterParamTypes));
+    return createObject(columns,
+        sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
   public List<T> createObjectList(ResultSet resultSet) {
@@ -55,7 +57,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
       final List<T> ret = new ArrayList<>();
       while (resultSet.next()) {
-        ret.add(createObject(columns, createValues(resultSet, setterParamTypes)));
+        ret.add(createObject(columns,
+            sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes)));
       }
       return ret;
     } catch (IllegalArgumentException | SecurityException | SQLException e) {
@@ -63,19 +66,6 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-
-  private final List<Object> createValues(ResultSet resultSet, List<Class<?>> setterParamTypes) {
-    try {
-      final List<Object> values = new ArrayList<>(setterParamTypes.size());
-      for (int i = 1; i <= setterParamTypes.size(); i++) {
-        final Class<?> type = setterParamTypes.get(i - 1);
-        values.add(sqlToJavaConverter.getValueByClass(resultSet, i, type));
-      }
-      return values;
-    } catch (IllegalArgumentException | SecurityException | SQLException e) {
-      throw new OrmException(e);
-    }
-  }
 
 
   private T createObject(List<String> columns, List<Object> values) {
