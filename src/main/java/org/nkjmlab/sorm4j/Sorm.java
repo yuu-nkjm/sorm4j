@@ -14,37 +14,37 @@ import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
-public class OrmService {
+public class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   private final ConnectionSource connectionSource;
 
   private final OrmConfigStore configStore;
 
-  private OrmService(ConnectionSource connectionSource, OrmConfigStore configs) {
+  private Sorm(ConnectionSource connectionSource, OrmConfigStore configs) {
     this.configStore = configs;
     this.connectionSource = connectionSource;
   }
 
-  public static OrmService of(DataSource dataSource) {
+  public static Sorm of(DataSource dataSource) {
     return of(dataSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
-  public static OrmService of(ConnectionSource connectionSource, OrmConfigStore configs) {
-    return new OrmService(connectionSource, configs);
+  public static Sorm of(ConnectionSource connectionSource, OrmConfigStore configs) {
+    return new Sorm(connectionSource, configs);
   }
 
 
-  public static OrmService of(String jdbcUrl, String user, String password) {
+  public static Sorm of(String jdbcUrl, String user, String password) {
     return of(jdbcUrl, user, password, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
 
-  public static OrmService of(DataSource dataSource, OrmConfigStore configs) {
+  public static Sorm of(DataSource dataSource, OrmConfigStore configs) {
     return of(new DataSourceConnectionSource(dataSource), configs);
   }
 
-  public static OrmService of(String jdbcUrl, String user, String password,
+  public static Sorm of(String jdbcUrl, String user, String password,
       OrmConfigStore configs) {
     return of(new DriverManagerConnectionSource(jdbcUrl, user, password), configs);
   }

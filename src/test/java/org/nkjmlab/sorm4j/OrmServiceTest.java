@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.util.Player;
 
 class OrmServiceTest {
 
-  private OrmService srv;
+  private Sorm srv;
 
   @BeforeEach
   void setUp() {

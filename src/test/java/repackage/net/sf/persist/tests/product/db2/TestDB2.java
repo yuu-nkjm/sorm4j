@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.OrmService;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.util.Try;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
@@ -20,7 +20,7 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 @Disabled
 public class TestDB2 {
 
-  private static final OrmService ormSrv = OrmService
+  private static final Sorm ormSrv = Sorm
       .of(JdbcConnectionPool.create("jdbc:h2:mem:persist;MODE=DB2", "persist", "persist"));
 
   @BeforeAll

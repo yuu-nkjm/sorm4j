@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.util;
 
-import org.nkjmlab.sorm4j.OrmService;
+import org.nkjmlab.sorm4j.Sorm;
 
 public class OrmTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
@@ -25,11 +25,11 @@ public class OrmTestUtils {
   private static final String SQL_CREATE_TABLE_PLAYERS1 =
       "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
-  public static OrmService createOrmService() {
-    return OrmService.of(jdbcUrl, user, password);
+  public static Sorm createOrmService() {
+    return Sorm.of(jdbcUrl, user, password);
   }
 
-  public static void dropAndCreateTable(OrmService srv, Class<?> clazz) {
+  public static void dropAndCreateTable(Sorm srv, Class<?> clazz) {
     String name = clazz.getSimpleName();
     if (name.equals(Guest.class.getSimpleName())) {
       dropAndCreateGuestTable(srv);
@@ -43,12 +43,12 @@ public class OrmTestUtils {
   }
 
 
-  private static void dropAndCreateGuestTable(OrmService srv) {
+  private static void dropAndCreateGuestTable(Sorm srv) {
     srv.run(conn -> conn.execute("DROP TABLE guests IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_GUESTS));
   }
 
-  private static void dropAndCreatePlayerTable(OrmService srv) {
+  private static void dropAndCreatePlayerTable(Sorm srv) {
     srv.run(conn -> conn.execute("DROP TABLE players IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
     srv.run(conn -> conn.execute("DROP TABLE players1 IF EXISTS"));

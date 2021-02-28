@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.util.Player;
 
 class TypedOrmConnectionTest {
 
-  private OrmService srv;
+  private Sorm srv;
 
   @BeforeEach
   void setUp() {
@@ -107,7 +107,7 @@ class TypedOrmConnectionTest {
       m.insert(a, b);
       assertThat(m.readAllLazy().stream().collect(Collectors.toList())).contains(a, b);
       assertThat(m.readAllLazy().toList()).contains(a, b);
-      assertThat(m.readAllLazy().getFirst()).isEqualTo(a);
+      assertThat(m.readAllLazy().first()).isEqualTo(a);
       Map<String, Object> map = m.readAllLazy().toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
