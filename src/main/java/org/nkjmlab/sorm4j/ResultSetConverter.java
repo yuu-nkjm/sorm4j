@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
 
 public class ResultSetConverter {
