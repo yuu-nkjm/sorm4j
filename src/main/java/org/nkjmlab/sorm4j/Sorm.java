@@ -9,8 +9,8 @@ import java.util.function.Function;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
+import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
@@ -44,76 +44,74 @@ public class Sorm {
     return of(new DataSourceConnectionSource(dataSource), configs);
   }
 
-  public static Sorm of(String jdbcUrl, String user, String password,
-      OrmConfigStore configs) {
+  public static Sorm of(String jdbcUrl, String user, String password, OrmConfigStore configs) {
     return of(new DriverManagerConnectionSource(jdbcUrl, user, password), configs);
   }
 
-  public void runWithJdbcConnection(Consumer<Connection> task) {
+  public void runWithJdbcConnection(Consumer<Connection> handler) {
     try (Connection conn = getJdbcConnection()) {
-      task.accept(conn);
+      handler.accept(conn);
     } catch (SQLException e) {
       throw new OrmException(e);
     }
   }
 
-  public <R> R executeWithJdbcConnection(Function<Connection, R> task) {
+  public <R> R executeWithJdbcConnection(Function<Connection, R> handler) {
     try (Connection conn = getJdbcConnection()) {
-      return task.apply(conn);
+      return handler.apply(conn);
     } catch (SQLException e) {
       throw new OrmException(e);
     }
   }
 
 
-  public void run(Consumer<OrmConnection> task) {
+  public void run(Consumer<OrmConnection> handler) {
     try (OrmConnection conn = getConnection()) {
-      task.accept(conn);
+      handler.accept(conn);
     }
   }
 
-  public <T> void run(Class<T> objectClass, Consumer<TypedOrmConnection<T>> task) {
+  public <T> void run(Class<T> objectClass, Consumer<TypedOrmConnection<T>> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
-      task.accept(conn);
+      handler.accept(conn);
     }
   }
 
-  public <R> R execute(Function<OrmConnection, R> task) {
+  public <R> R execute(Function<OrmConnection, R> handler) {
     try (OrmConnection conn = getConnection()) {
-      return task.apply(conn);
+      return handler.apply(conn);
     }
   }
 
-  public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> task) {
+  public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
-      return task.apply(conn);
+      return handler.apply(conn);
     }
   }
 
 
-  public void runTransaction(Consumer<OrmTransaction> transaction) {
+  public void runTransaction(Consumer<OrmTransaction> handler) {
     try (OrmTransaction conn = beginTransaction()) {
-      transaction.accept(conn);
+      handler.accept(conn);
     }
   }
 
-  public <T> void runTransaction(Class<T> objectClass,
-      Consumer<TypedOrmTransaction<T>> transaction) {
-    try (TypedOrmTransaction<T> conn = beginTransaction(objectClass)) {
-      transaction.accept(conn);
+  public <T> void runTransaction(Class<T> objectClass, Consumer<TypedOrmTransaction<T>> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
+      handler.accept(transaction);
     }
   }
 
-  public <R> R executeTransaction(Function<OrmTransaction, R> transaction) {
-    try (OrmTransaction conn = beginTransaction()) {
-      return transaction.apply(conn);
+  public <R> R executeTransaction(Function<OrmTransaction, R> handler) {
+    try (OrmTransaction transaction = beginTransaction()) {
+      return handler.apply(transaction);
     }
   }
 
   public <T, R> R executeTransaction(Class<T> objectClass,
-      Function<TypedOrmTransaction<T>, R> transaction) {
-    try (TypedOrmTransaction<T> conn = beginTransaction(objectClass)) {
-      return transaction.apply(conn);
+      Function<TypedOrmTransaction<T>, R> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
+      return handler.apply(transaction);
     }
   }
 
