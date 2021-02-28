@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-public final class DefaultJavaToSqlDataConverter implements JavaToSqlDataConverter {
+public final class DefaultPreparedStatementParametersSetter implements PreparedStatementParametersSetter {
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override

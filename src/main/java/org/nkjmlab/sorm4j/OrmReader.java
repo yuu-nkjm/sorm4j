@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
+import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
 import org.nkjmlab.sorm4j.helper.SqlStatement;
 
@@ -34,7 +34,7 @@ public interface OrmReader {
    * Returns an {@link org.nkjmlab.sorm4j.ReadResultSet} and convert it to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link JavaToSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    * @since 1.0
    */
@@ -46,7 +46,7 @@ public interface OrmReader {
    * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link JavaToSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    */
   <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);
@@ -60,7 +60,7 @@ public interface OrmReader {
    * {@link SqlToJavaDataConverter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link JavaToSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    * @since 1.0
    */
@@ -77,7 +77,7 @@ public interface OrmReader {
    * {@link SqlToJavaDataConverter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link JavaToSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
    * @since 1.0
    */

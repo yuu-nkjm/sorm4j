@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
+import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
@@ -42,7 +42,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private final ColumnFieldMapper fieldMapper;
   private final TableNameMapper tableNameMapper;
   private final SqlToJavaDataConverter sqlToJavaConverter;
-  private final JavaToSqlDataConverter javaToSqlConverter;
+  private final PreparedStatementParametersSetter javaToSqlConverter;
 
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
   private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
