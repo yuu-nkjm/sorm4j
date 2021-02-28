@@ -2,9 +2,12 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.helper.SqlStatement;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 /**
@@ -274,6 +277,51 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   @Override
   public <T> ReadResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
     return readLazyAux(objectClass, sql, parameters);
+  }
+
+  @Override
+  public boolean execute(SqlStatement sql) {
+    return execute(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public ResultSet executeQuery(SqlStatement sql) {
+    return executeQuery(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public int executeUpdate(SqlStatement sql) {
+    return executeUpdate(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public <T> T readFirst(Class<T> objectClass, SqlStatement sql) {
+    return readFirst(objectClass, sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public <T> ReadResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql) {
+    return readLazy(objectClass, sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public <T> List<T> readList(Class<T> objectClass, SqlStatement sql) {
+    return readList(objectClass, sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public Map<String, Object> readMapFirst(SqlStatement sql) {
+    return readMapFirst(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public ReadResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+    return readMapLazy(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public List<Map<String, Object>> readMapList(SqlStatement sql) {
+    return readMapList(sql.getSql(), sql.getParameters());
   }
 
 }

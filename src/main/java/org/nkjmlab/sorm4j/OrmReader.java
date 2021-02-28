@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.config.JavaToSqlDataConverter;
 import org.nkjmlab.sorm4j.config.SqlToJavaDataConverter;
+import org.nkjmlab.sorm4j.helper.SqlStatement;
 
 /**
  * The main interface of Reading functions of ORM reader.
@@ -96,5 +97,20 @@ public interface OrmReader {
    * @since 1.0
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
+
+
+  <T> T readFirst(Class<T> objectClass, SqlStatement sql);
+
+  <T> ReadResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
+
+  <T> List<T> readList(Class<T> objectClass, SqlStatement sql);
+
+  Map<String, Object> readMapFirst(SqlStatement sql);
+
+  ReadResultSet<Map<String, Object>> readMapLazy(SqlStatement sql);
+
+  List<Map<String, Object>> readMapList(SqlStatement sql);
+
+
 
 }

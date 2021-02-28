@@ -3,6 +3,8 @@ package org.nkjmlab.sorm4j;
 import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.io.Closeable;
 import java.sql.Connection;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try;
 
@@ -69,6 +71,22 @@ public class TypedOrmConnection<T> extends TypedOrmMapper<T> implements Closeabl
     setAutoCommit(false);
     setTransactionIsolation(isolationLevel);
   }
+
+  public void runTransaction(Consumer<TypedOrmConnection<T>> transaction) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    transaction.accept(this);
+    rollback();
+  }
+
+  public <R> R executeTransaction(Function<TypedOrmConnection<T>, R> transaction) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    R ret = transaction.apply(this);
+    rollback();
+    return ret;
+  }
+
 
   public void begin() {
     begin(DEFAULT_ISOLATION_LEVEL);

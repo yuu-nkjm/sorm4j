@@ -69,8 +69,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     this.sqlToJavaConverter = configStore.getSqlToJavaDataConverter();
     this.javaToSqlConverter = configStore.getJavaToSqlDataConverter();
     String cacheName = configStore.getCacheName();
-    this.tableMappings = OrmService.getTableMappings(cacheName);
-    this.columnsMappings = OrmService.getColumnsMappings(cacheName);
+    this.tableMappings = Sorm.getTableMappings(cacheName);
+    this.columnsMappings = Sorm.getColumnsMappings(cacheName);
   }
 
 
@@ -205,6 +205,20 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     }
   }
 
+  <T> T loadOne(Class<T> objectClass, ResultSet resultSet) {
+    try {
+      T ret = null;
+      if (resultSet.next()) {
+        ret = loadOneObject(objectClass, resultSet);
+      }
+      if (resultSet.next()) {
+        throw new RuntimeException("Non-unique result returned");
+      }
+      return ret;
+    } catch (SQLException e) {
+      throw new OrmException(e);
+    }
+  }
 
 
   <T> T loadOneObject(Class<T> objectClass, ResultSet resultSet) {

@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.helper.SqlStatement;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public class TypedOrmMapper<T> extends AbstractOrmMapper
@@ -282,6 +284,36 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
   @Override
   public int[] update(List<T> objects) {
     return applytoArray(objects, array -> update(array));
+  }
+
+  @Override
+  public boolean execute(SqlStatement sql) {
+    return execute(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public ResultSet executeQuery(SqlStatement sql) {
+    return executeQuery(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public int executeUpdate(SqlStatement sql) {
+    return executeUpdate(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public T readFirst(SqlStatement sql) {
+    return readFirst(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public ReadResultSet<T> readLazy(SqlStatement sql) {
+    return readLazy(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public List<T> readList(SqlStatement sql) {
+    return readList(sql.getSql(), sql.getParameters());
   }
 
 

@@ -30,8 +30,13 @@ public final class ReadResultSet<T> implements Iterable<T>, Closeable, AutoClose
     this.resultSet = resultSet;
   }
 
+  public T one() {
+    T ret = ormMapper.loadOne(objectClass, resultSet);
+    close();
+    return ret;
+  }
 
-  public T getFirst() {
+  public T first() {
     T ret = ormMapper.loadFirst(objectClass, resultSet);
     close();
     return ret;
