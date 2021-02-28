@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.ResultSetConverter;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;

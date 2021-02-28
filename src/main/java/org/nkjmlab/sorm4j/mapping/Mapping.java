@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.ResultSetConverter;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.util.StringUtils;
 

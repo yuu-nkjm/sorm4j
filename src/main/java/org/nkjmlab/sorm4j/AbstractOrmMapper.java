@@ -23,6 +23,7 @@ import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.TableNameMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.mapping.ResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.DebugPoint;
