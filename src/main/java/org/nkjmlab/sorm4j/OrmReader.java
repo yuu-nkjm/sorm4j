@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
-import org.nkjmlab.sorm4j.helper.SqlStatement;
 
 /**
  * The main interface of Reading functions of ORM reader.

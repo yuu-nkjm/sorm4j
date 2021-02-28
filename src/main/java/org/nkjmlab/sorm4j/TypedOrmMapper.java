@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.helper.SqlStatement;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public class TypedOrmMapper<T> extends AbstractOrmMapper
