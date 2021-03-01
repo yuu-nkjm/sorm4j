@@ -1,13 +1,12 @@
-package org.nkjmlab.sorm4j.helper;
+package org.nkjmlab.sorm4j;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.SqlStatement;
 
-public class SqlWithNamedParameters {
+public final class SqlWithNamedParameters {
 
   private final String sql;
   private final Map<String, Object> namedParameters = new HashMap<>();
@@ -52,7 +51,7 @@ public class SqlWithNamedParameters {
       orderdParams.put(pos, namedParameters.get(parameterName));
       sql = sql.replaceAll(namedPlaceholder, "?");
     }
-    return new SqlStatement(sql, orderdParams.values().toArray());
+    return SqlStatement.of(sql, orderdParams.values().toArray());
   }
 
 }

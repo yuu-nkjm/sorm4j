@@ -3,6 +3,8 @@ package org.nkjmlab.sorm4j;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.OrmTransaction;
+import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
@@ -53,7 +55,7 @@ class OrmServiceTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(srv.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -66,7 +68,7 @@ class OrmServiceTest {
       // auto-rollback
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(srv.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
     });
     try (OrmTransaction tr = srv.beginTransaction()) {
       tr.begin();
@@ -74,7 +76,7 @@ class OrmServiceTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(srv.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(1);
+      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(1);
     });
   }
 

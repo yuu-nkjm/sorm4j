@@ -1,10 +1,10 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 
-public class TypedOrmTransaction<T> extends TypedOrmConnection<T> {
+public class TypedOrmTransaction<T> extends TypedOrmConnectionImpl<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 

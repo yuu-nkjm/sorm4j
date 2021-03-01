@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 
 public class Sorm4jDemo {
@@ -76,7 +76,7 @@ public class Sorm4jDemo {
 
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
-      OrmMapper ormMapper = Sorm.toOrmMapper(conn);
+      OrmConnection ormMapper = Sorm.toOrmConnection(conn);
       ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");

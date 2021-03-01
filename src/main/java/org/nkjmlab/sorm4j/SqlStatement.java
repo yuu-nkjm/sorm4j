@@ -15,9 +15,13 @@ public final class SqlStatement {
   // ordered parameters
   private final Object[] parameters;
 
-  public SqlStatement(String sql, Object... parameters) {
+  private SqlStatement(String sql, Object... parameters) {
     this.sql = sql;
     this.parameters = parameters;
+  }
+
+  public static SqlStatement of(String sql, Object... parameters) {
+    return new SqlStatement(sql, parameters);
   }
 
   @Override
@@ -35,6 +39,7 @@ public final class SqlStatement {
   public final Object[] getParameters() {
     return parameters;
   }
+
 
 
 }

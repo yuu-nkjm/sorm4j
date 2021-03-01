@@ -1,9 +1,15 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping;
 
+import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.util.Try;
 
-public final class OrmTransaction extends OrmConnection {
+public final class OrmTransaction extends OrmConnectionImpl {
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   OrmTransaction(Connection connection, OrmConfigStore options, int isolationLevel) {
@@ -23,6 +29,27 @@ public final class OrmTransaction extends OrmConnection {
   public static OrmTransaction of(Connection connection, int isolationLevel,
       OrmConfigStore options) {
     return new OrmTransaction(connection, options, isolationLevel);
+  }
+
+  public void runTransaction(Consumer<OrmConnection> handler) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    handler.accept(this);
+    rollback();
+  }
+
+  public <R> R executeTransaction(Function<OrmConnection, R> handler) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    R ret = handler.apply(this);
+    rollback();
+    return ret;
+  }
+
+
+  private void setTransactionIsolation(int isolationLevel) {
+    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
+        OrmException::new);
   }
 
 

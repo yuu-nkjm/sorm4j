@@ -1,32 +1,28 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import org.nkjmlab.sorm4j.InsertResult;
+import org.nkjmlab.sorm4j.LazyResultSet;
+import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.mapping.TableMapping;
 
-public class TypedOrmMapper<T> extends AbstractOrmMapper
-    implements TypeOrmReader<T>, TypedOrmUpdater<T> {
-  public static <T> TypedOrmConnection<T> of(Class<T> objectClass, Connection conn) {
-    return new TypedOrmConnection<T>(objectClass, conn, OrmConfigStore.DEFAULT_CONFIGURATIONS);
-  }
-
-  public static <T> TypedOrmConnection<T> of(Class<T> objectClass, Connection connection,
-      OrmConfigStore options) {
-    return new TypedOrmConnection<T>(objectClass, connection, options);
-  }
+public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 
   private Class<T> objectClass;
 
-  TypedOrmMapper(Class<T> objectClass, Connection connection, OrmConfigStore options) {
+  protected TypedOrmMapperImpl(Class<T> objectClass, Connection connection,
+      OrmConfigStore options) {
     super(connection, options);
     this.objectClass = objectClass;
   }
 
-  public OrmUpdater toUntyped() {
-    return new OrmMapper(getJdbcConnection(), getConfigStore());
+  public OrmMapper toUntyped() {
+    return new OrmMapperImpl(getJdbcConnection(), getConfigStore());
   }
 
   public List<String> getAllColumns() {
@@ -323,6 +319,26 @@ public class TypedOrmMapper<T> extends AbstractOrmMapper
   @Override
   public T readOne(SqlStatement sql) {
     return readOneAux(objectClass, sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public Map<String, Object> readMapOne(SqlStatement sql) {
+    return readMapOne(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public Map<String, Object> readMapFirst(SqlStatement sql) {
+    return readMapFirst(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+    return readMapLazy(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public List<Map<String, Object>> readMapList(SqlStatement sql) {
+    return readMapList(sql.getSql(), sql.getParameters());
   }
 
 

@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.helper;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.SqlStatement;
+import org.nkjmlab.sorm4j.SqlWithNamedParameters;
 
 class SqlWithNamedParametersTest {
   private String sql = "select * from simple where id=:idid and name=:name";

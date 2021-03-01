@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.nkjmlab.sorm4j.mapping.AbstractOrmMapper;
 
 
 public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoCloseable {
@@ -22,7 +23,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
   private final ResultSet resultSet;
   private final PreparedStatement stmt;
 
-  LazyResultSet(AbstractOrmMapper ormMapper, Class<T> objectClass, PreparedStatement stmt,
+  public LazyResultSet(AbstractOrmMapper ormMapper, Class<T> objectClass, PreparedStatement stmt,
       ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;
