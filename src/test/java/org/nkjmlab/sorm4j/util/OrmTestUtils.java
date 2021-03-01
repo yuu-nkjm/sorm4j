@@ -18,6 +18,9 @@ public class OrmTestUtils {
   public static final Player PLAYER_CAROL = new Player(3, "Carol", "Osaka");
   public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
 
+  private static final String SQL_CREATE_TABLE_LOCATIONS =
+      "CREATE TABLE IF NOT EXISTS locations (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR)";
+
   private static final String SQL_CREATE_TABLE_GUESTS =
       "CREATE TABLE IF NOT EXISTS guests (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
   private static final String SQL_CREATE_TABLE_PLAYERS =
@@ -36,6 +39,8 @@ public class OrmTestUtils {
       dropAndCreateGuestTable(srv);
     } else if (name.equals(Player.class.getSimpleName())) {
       dropAndCreatePlayerTable(srv);
+    } else if (name.equals(Location.class.getSimpleName())) {
+      dropAndCreateLocationTable(srv);
     } else {
       throw new IllegalArgumentException(clazz + " is illegal");
     }
@@ -43,6 +48,10 @@ public class OrmTestUtils {
 
   }
 
+  private static void dropAndCreateLocationTable(Sorm srv) {
+    srv.run(conn -> conn.execute("DROP TABLE location IF EXISTS"));
+    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_LOCATIONS));
+  }
 
   private static void dropAndCreateGuestTable(Sorm srv) {
     srv.run(conn -> conn.execute("DROP TABLE guests IF EXISTS"));

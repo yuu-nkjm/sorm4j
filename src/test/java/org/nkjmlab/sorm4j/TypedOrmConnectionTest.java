@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.util.Guest;
+import org.nkjmlab.sorm4j.util.Location;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
@@ -23,6 +24,7 @@ class TypedOrmConnectionTest {
     srv = OrmTestUtils.createSorm();
     OrmTestUtils.dropAndCreateTable(srv, Guest.class);
     OrmTestUtils.dropAndCreateTable(srv, Player.class);
+    OrmTestUtils.dropAndCreateTable(srv, Location.class);
   }
 
   @Test
@@ -441,6 +443,14 @@ class TypedOrmConnectionTest {
     });
   }
 
+  @Test
+  void testEnum() {
+    srv.run(Location.class, m -> {
+      m.insert(new Location(Location.Place.KYOTO));
+      assertThat(m.readFirst("SELECT * FROM locations").getName()).isEqualTo(Location.Place.KYOTO);
+    });
+
+  }
 
   @Test
   void testUpdateOnT() {
