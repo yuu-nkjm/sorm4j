@@ -1,13 +1,18 @@
 
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.nkjmlab.sorm4j.InsertResult;
+import org.nkjmlab.sorm4j.LazyResultSet;
+import org.nkjmlab.sorm4j.OrmReader;
+import org.nkjmlab.sorm4j.OrmUpdater;
+import org.nkjmlab.sorm4j.SqlStatement;
+import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 /**
  * The main class for the ORMapper engine.
@@ -40,7 +45,7 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   }
 
   public <T> TypedOrmConnection<T> toTyped(Class<T> objectClass) {
-    return new TypedOrmConnection<>(objectClass, getJdbcConnection(), getConfigStore());
+    return TypedOrmConnection.of(objectClass, getJdbcConnection(), getConfigStore());
   }
 
 

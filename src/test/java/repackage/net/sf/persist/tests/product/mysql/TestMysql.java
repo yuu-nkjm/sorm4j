@@ -16,7 +16,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;

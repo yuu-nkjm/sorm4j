@@ -12,7 +12,9 @@ import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
 import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
+import org.nkjmlab.sorm4j.mapping.TypedOrmMapper;
 
 public class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();

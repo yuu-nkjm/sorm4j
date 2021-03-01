@@ -20,8 +20,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.InsertResult;
-import org.nkjmlab.sorm4j.OrmMapper;
-import org.nkjmlab.sorm4j.TypedOrmMapper;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
+import org.nkjmlab.sorm4j.mapping.TypedOrmMapper;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 public class TestSimple {

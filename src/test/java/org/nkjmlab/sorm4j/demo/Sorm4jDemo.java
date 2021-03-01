@@ -5,8 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.OrmMapper;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
 
 public class Sorm4jDemo {
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();

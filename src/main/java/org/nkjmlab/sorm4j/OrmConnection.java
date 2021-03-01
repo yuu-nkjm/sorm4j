@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.io.Closeable;
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
 import org.nkjmlab.sorm4j.util.Try;
 
 public class OrmConnection extends OrmMapper implements Closeable, AutoCloseable {

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.mapping.OrmMapper;
 import org.nkjmlab.sorm4j.util.DataSourceHelper;
 import org.sql2o.Sql2o;
 import com.jamonapi.Monitor;

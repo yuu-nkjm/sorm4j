@@ -1,26 +1,33 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.function.Function;
+import org.nkjmlab.sorm4j.InsertResult;
+import org.nkjmlab.sorm4j.LazyResultSet;
+import org.nkjmlab.sorm4j.OrmUpdater;
+import org.nkjmlab.sorm4j.SqlStatement;
+import org.nkjmlab.sorm4j.TypeOrmReader;
+import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.TypedOrmUpdater;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
-import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public class TypedOrmMapper<T> extends AbstractOrmMapper
     implements TypeOrmReader<T>, TypedOrmUpdater<T> {
+
   public static <T> TypedOrmConnection<T> of(Class<T> objectClass, Connection conn) {
-    return new TypedOrmConnection<T>(objectClass, conn, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return TypedOrmConnection.of(objectClass, conn, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
   public static <T> TypedOrmConnection<T> of(Class<T> objectClass, Connection connection,
       OrmConfigStore options) {
-    return new TypedOrmConnection<T>(objectClass, connection, options);
+    return TypedOrmConnection.of(objectClass, connection, options);
   }
 
   private Class<T> objectClass;
 
-  TypedOrmMapper(Class<T> objectClass, Connection connection, OrmConfigStore options) {
+  protected TypedOrmMapper(Class<T> objectClass, Connection connection, OrmConfigStore options) {
     super(connection, options);
     this.objectClass = objectClass;
   }
