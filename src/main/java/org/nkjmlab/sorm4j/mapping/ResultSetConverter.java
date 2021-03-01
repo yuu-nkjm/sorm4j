@@ -18,7 +18,7 @@ public class ResultSetConverter {
     this.resultSetValueGetter = resultSetValueGetter;
   }
 
-  public Map<String, Object> toOneMap(final ResultSet resultSet, List<String> columns,
+  public Map<String, Object> toSingleMap(final ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) {
     try {
       final Map<String, Object> ret = new LinkedHashMap<>();
@@ -33,7 +33,7 @@ public class ResultSetConverter {
     }
   }
 
-  public final <T> T toOneNativeObject(final ResultSet resultSet, final Class<T> objectClass) {
+  public final <T> T toSingleNativeObject(final ResultSet resultSet, final Class<T> objectClass) {
     try {
       // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
       // is prior.

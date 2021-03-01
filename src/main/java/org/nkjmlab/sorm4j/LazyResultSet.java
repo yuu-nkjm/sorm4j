@@ -69,7 +69,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
   }
 
   public Map<String, Object> oneMap() {
-    Map<String, Object> ret = ormMapper.loadOneMapAux(resultSet);
+    Map<String, Object> ret = ormMapper.loadOneMap(resultSet);
     close();
     return ret;
   }
@@ -80,7 +80,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public Map<String, Object> firstMap() {
-    Map<String, Object> ret = ormMapper.loadFirstMapAux(resultSet);
+    Map<String, Object> ret = ormMapper.loadFirstMap(resultSet);
     close();
     return ret;
   }
@@ -137,8 +137,8 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
     @SuppressWarnings("unchecked")
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(Map.class) ? () -> (S) orMapper.loadOneMap(resultSet)
-          : () -> orMapper.loadOneObject(objectClass, resultSet);
+      this.getFunction = objectClass.equals(Map.class) ? () -> (S) orMapper.toSingleMap(resultSet)
+          : () -> orMapper.toSingleObject(objectClass, resultSet);
     }
 
     @Override

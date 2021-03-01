@@ -42,14 +42,14 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         + super.getColumnToAccessorString();
   }
 
-  public T createObject(ResultSet resultSet) {
+  public T loadObject(ResultSet resultSet) {
     List<String> columns = createColumns(resultSet);
     List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
     return createObject(columns,
         sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
-  public List<T> createObjectList(ResultSet resultSet) {
+  public List<T> loadObjectList(ResultSet resultSet) {
     try {
       List<String> columns = createColumns(resultSet);
       List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
