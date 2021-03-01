@@ -163,6 +163,10 @@ public final class Sorm {
         + "]";
   }
 
+  public ConnectionSource getConnectionSource() {
+    return this.connectionSource;
+  }
+
 
 
 }

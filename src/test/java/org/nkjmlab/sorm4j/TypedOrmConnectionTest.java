@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +20,17 @@ class TypedOrmConnectionTest {
     srv = OrmTestUtils.createOrmService();
     OrmTestUtils.dropAndCreateTable(srv, Guest.class);
     OrmTestUtils.dropAndCreateTable(srv, Player.class);
+  }
+
+  @Test
+  void testSormExeption() {
+    try {
+      Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
+          .getDataSource();
+      fail("Should be fail");
+    } catch (Exception e) {
+
+    }
   }
 
   @Test
@@ -161,6 +173,9 @@ class TypedOrmConnectionTest {
 
   @Test
   void testInsertAndGetOnStringT() {
+    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
+
+
     Guest a = OrmTestUtils.GUEST_ALICE;
     Guest b = OrmTestUtils.GUEST_BOB;
     srv.run(Guest.class, m -> {

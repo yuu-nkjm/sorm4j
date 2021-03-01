@@ -20,7 +20,7 @@ public final class SqlWithNamedParameters {
     return this;
   }
 
-  public SqlWithNamedParameters bind(String key, String value) {
+  public SqlWithNamedParameters bind(String key, Object value) {
     this.namedParameters.put(key, value);
     return this;
   }
