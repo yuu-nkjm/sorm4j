@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
-import org.nkjmlab.sorm4j.OrmReader;
-import org.nkjmlab.sorm4j.OrmUpdater;
+import org.nkjmlab.sorm4j.OrmMapper;
 import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
@@ -21,26 +20,18 @@ import org.nkjmlab.sorm4j.config.OrmConfigStore;
  * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
  *
  */
-public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdater {
-
-  public static OrmMapper of(Connection conn) {
-    return of(conn, OrmConfigStore.DEFAULT_CONFIGURATIONS);
-  }
-
-  public static OrmMapper of(Connection connection, OrmConfigStore configStore) {
-    return new OrmMapper(connection, configStore);
-  }
+public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
   /**
    * Creates a instance that will use the default cache for table-object and column-object mappings.
    *
    * @param connection {@link java.sql.Connection} object to be used
    */
-  public OrmMapper(Connection connection) {
-    super(connection, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+  public OrmMapperImpl(Connection connection) {
+    this(connection, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
-  public OrmMapper(Connection connection, OrmConfigStore defaultConfigurations) {
+  public OrmMapperImpl(Connection connection, OrmConfigStore defaultConfigurations) {
     super(connection, defaultConfigurations);
   }
 
@@ -316,6 +307,11 @@ public class OrmMapper extends AbstractOrmMapper implements OrmReader, OrmUpdate
   @Override
   public Map<String, Object> readMapFirst(SqlStatement sql) {
     return readMapFirst(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public Map<String, Object> readMapOne(SqlStatement sql) {
+    return readMapOne(sql.getSql(), sql.getParameters());
   }
 
   @Override

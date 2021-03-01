@@ -16,7 +16,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.mapping.OrmMapper;
+import org.nkjmlab.sorm4j.OrmMapper;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
@@ -46,7 +46,7 @@ public class TestMysql {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = new OrmMapper(conn);
+      OrmMapper persist = OrmMapper.of(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
@@ -72,7 +72,7 @@ public class TestMysql {
   public void testNumericTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = new OrmMapper(conn);
+      OrmMapper persist = OrmMapper.of(conn);
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
       Class<?>[] byteTypes = new Class<?>[] {Byte.class, byte.class};
@@ -101,7 +101,7 @@ public class TestMysql {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = new OrmMapper(conn);
+      OrmMapper persist = OrmMapper.of(conn);
 
       // not testing timestamp here, it doesn't support null values
       BeanMap beanMap = new BeanMap("DatetimeTypes")
@@ -122,7 +122,7 @@ public class TestMysql {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = new OrmMapper(conn);
+      OrmMapper persist = OrmMapper.of(conn);
 
       Class<?>[] binaryTypes =
           new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};

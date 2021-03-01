@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.mapping.OrmMapper;
+import org.nkjmlab.sorm4j.OrmMapper;
 
 
 public class BeanTest {

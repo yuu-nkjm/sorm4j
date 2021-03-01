@@ -72,19 +72,6 @@ class TypedOrmConnectionTest {
     srv.getConnection(Guest.class).toUntyped();
   }
 
-  @Test
-  void testGetAllColumns() {
-    srv.run(Guest.class, m -> {
-      assertThat(m.getAllColumns()).contains("ID", "NAME", "ADDRESS");
-    });
-  }
-
-  @Test
-  void testGetPrimaryKeys() {
-    srv.run(Guest.class, m -> {
-      assertThat(m.getPrimaryKeys()).contains("ID");
-    });
-  }
 
   @Test
   void testReadByPrimaryKey() {

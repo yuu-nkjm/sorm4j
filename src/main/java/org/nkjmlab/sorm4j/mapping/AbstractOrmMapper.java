@@ -19,7 +19,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.LazyResultSet;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
@@ -49,6 +48,18 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   private final MultiRowProcessorFactory batchConfig;
   private final OrmConfigStore configStore;
 
+  private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
+      new ConcurrentHashMap<>(); // key => Cache Name
+  private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
+      new ConcurrentHashMap<>(); // key => Cache Name
+
+  private static ConcurrentMap<String, TableMapping<?>> getTableMappings(String cacheName) {
+    return tableMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+  }
+
+  private static ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings(String cacheName) {
+    return columnsMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+  }
 
   /**
    * Creates a instance
@@ -68,8 +79,8 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     this.sqlToJavaConverter = new ResultSetConverter(configStore.getSqlToJavaDataConverter());
     this.javaToSqlConverter = configStore.getJavaToSqlDataConverter();
     String cacheName = configStore.getCacheName();
-    this.tableMappings = Sorm.getTableMappings(cacheName);
-    this.columnsMappings = Sorm.getColumnsMappings(cacheName);
+    this.tableMappings = getTableMappings(cacheName);
+    this.columnsMappings = getColumnsMappings(cacheName);
   }
 
 
@@ -294,6 +305,24 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
           return sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
         }
         return null;
+      } catch (SQLException e) {
+        throw new OrmException(e);
+      }
+    });
+  }
+
+  public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
+    return execResultSet(sql, parameters, resultSet -> {
+      try {
+        ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+        Map<String, Object> ret = null;
+        if (resultSet.next()) {
+          ret = sqlToJavaConverter.toOneMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+        }
+        if (resultSet.next()) {
+          throw new OrmException("Non-unique result returned");
+        }
+        return ret;
       } catch (SQLException e) {
         throw new OrmException(e);
       }

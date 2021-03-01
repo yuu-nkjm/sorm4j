@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 
 public interface SqlExecutor {
@@ -16,5 +17,6 @@ public interface SqlExecutor {
 
   int executeUpdate(SqlStatement sql);
 
+  Connection getJdbcConnection();
 
 }
