@@ -134,9 +134,9 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     this.tableNameMapper = configStore.getTableNameMapper();
     this.sqlToJavaConverter = new ResultSetConverter(configStore.getSqlToJavaDataConverter());
     this.javaToSqlConverter = configStore.getJavaToSqlDataConverter();
-    String cacheName = configStore.getCacheName();
-    this.tableMappings = getTableMappings(cacheName);
-    this.columnsMappings = getColumnsMappings(cacheName);
+    String configName = configStore.getConfigStoreName();
+    this.tableMappings = getTableMappings(configName);
+    this.columnsMappings = getColumnsMappings(configName);
   }
 
   public <T> int deleteAll(Class<T> objectClass) {
@@ -282,7 +282,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = TableMapping.createMapping(sqlToJavaConverter, javaToSqlConverter,
               objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
-          log.debug(System.lineSeparator() + m.getFormattedString());
+          log.info(System.lineSeparator() + m.getFormattedString());
           return m;
         }, OrmException::new));
     return ret;
@@ -442,23 +442,6 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
             : loadPojoList(objectClass, resultSet));
   }
 
-  public Map<String, Object> readMap(final String sql, final Object... parameters) {
-    return execResultSet(sql, parameters, resultSet -> {
-      try {
-        ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
-        Map<String, Object> ret = null;
-        if (resultSet.next()) {
-          ret = sqlToJavaConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
-        }
-        if (resultSet.next()) {
-          throw new OrmException("Non-unique result returned");
-        }
-        return ret;
-      } catch (SQLException e) {
-        throw new OrmException(e);
-      }
-    });
-  }
 
   public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
     return execResultSet(sql, parameters, resultSet -> {
@@ -493,7 +476,6 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
     return execResultSet(sql, parameters, resultSet -> loadMapList(resultSet));
   }
-
 
   public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
     return execResultSet(sql, parameters, resultSet -> {

@@ -44,19 +44,20 @@ public final class OrmConfigStore {
     this.resultSetValueGetter = sqlToJavaConverter;
     this.preparedStatementParametersSetter = javaToSqlConverter;
     this.multiProcessorFactory = batchConfig;
-
   }
 
+
+  public String getConfigStoreName() {
+    return toString();
+  }
 
   public String getCacheName() {
     return cacheName;
   }
 
-
   public ColumnFieldMapper getColumnFieldMapper() {
     return columnFieldMapper;
   }
-
 
   public ResultSetValueGetter getSqlToJavaDataConverter() {
     return resultSetValueGetter;
@@ -82,7 +83,8 @@ public final class OrmConfigStore {
     private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ResultSetValueGetter resultSetValueGetter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
-    private PreparedStatementParametersSetter preparedStatementParametersSetter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
+    private PreparedStatementParametersSetter preparedStatementParametersSetter =
+        DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
     private MultiRowProcessorFactory multiRowProcessorFactory = DEFAULT_MULTI_ROW_PROCESSOR_FACTORY;
 
     public OrmConfigStore build() {
@@ -110,7 +112,8 @@ public final class OrmConfigStore {
       return this;
     }
 
-    public Builder setJavaToSqlDataConverter(PreparedStatementParametersSetter preparedStatementParametersSetter) {
+    public Builder setJavaToSqlDataConverter(
+        PreparedStatementParametersSetter preparedStatementParametersSetter) {
       this.preparedStatementParametersSetter = preparedStatementParametersSetter;
       return this;
     }
@@ -119,14 +122,6 @@ public final class OrmConfigStore {
       this.multiRowProcessorFactory = batchConfig;
       return this;
     }
-
   }
-
-
-  public static Builder createBuilder() {
-    return new Builder();
-  }
-
-
 
 }

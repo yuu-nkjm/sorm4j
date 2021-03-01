@@ -24,7 +24,7 @@ public class Player {
   }
 
 
-  public String getAddress() {
+  public String readAddress() {
     return address;
   }
 

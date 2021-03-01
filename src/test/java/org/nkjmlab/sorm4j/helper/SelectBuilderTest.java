@@ -8,13 +8,11 @@ class SelectBuilderTest {
   void testBuild() {
     String sql = new SimpleSelectBuilder().select("*").from("customers").where("id=1")
         .orderBy("id DESC").limit(1).build();
-    System.out.println(sql);
     org.assertj.core.api.Assertions.assertThat(sql)
         .isEqualTo("SELECT * FROM customers WHERE id=1 ORDER BY id DESC LIMIT 1");
 
     sql = new SimpleSelectBuilder().select("*").from("customers").where("id=1").orderBy("id DESC")
         .limit(1).toString();
-    System.out.println(sql);
     org.assertj.core.api.Assertions.assertThat(sql)
         .isEqualTo("SELECT * FROM customers WHERE id=1 ORDER BY id DESC LIMIT 1");
   }

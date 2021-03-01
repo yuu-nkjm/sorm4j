@@ -20,7 +20,7 @@ class OrmConfigStoreTest {
   @Test
   void testOrmConfigStore() {
 
-    OrmConfigStore confs = OrmConfigStore.createBuilder().setCacheName(DEFAULT_CACHE)
+    OrmConfigStore confs = new OrmConfigStore.Builder().setCacheName(DEFAULT_CACHE)
         .setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
         .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
         .setSqlToJavaDataConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)

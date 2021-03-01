@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.util.OrmTestUtils.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -11,16 +12,20 @@ import org.nkjmlab.sorm4j.util.Player;
 
 class SimpleBatchProcessorTest {
 
-  private Sorm sorm;
-  private Player a = OrmTestUtils.PLAYER_ALICE;
-  private Player b = OrmTestUtils.PLAYER_BOB;
-  private Player c = OrmTestUtils.PLAYER_CAROL;
+  private static Sorm sorm;
+  private static final Player a = OrmTestUtils.PLAYER_ALICE;
+  private static final Player b = OrmTestUtils.PLAYER_BOB;
+  private static final Player c = OrmTestUtils.PLAYER_CAROL;
 
-  @BeforeEach
-  void setUp() {
-    this.sorm =
+  @BeforeAll
+  static void setUp() {
+    sorm =
         Sorm.of(jdbcUrl, user, password, new OrmConfigStore.Builder().setMultiRowProcessorFactory(
             MultiRowProcessorFactory.of(t -> new SimpleBatchProcessor(t, 10))).build());
+  }
+
+  @BeforeEach
+  void setUpEach() {
     OrmTestUtils.dropAndCreateTable(sorm, Player.class);
   }
 

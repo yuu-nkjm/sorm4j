@@ -15,6 +15,14 @@ import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 public final class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
+  private final ConnectionSource connectionSource;
+  private final OrmConfigStore configStore;
+
+  private Sorm(ConnectionSource connectionSource, OrmConfigStore configs) {
+    this.configStore = configs;
+    this.connectionSource = connectionSource;
+  }
+
   public static Sorm of(ConnectionSource connectionSource, OrmConfigStore configs) {
     return new Sorm(connectionSource, configs);
   }
@@ -48,14 +56,6 @@ public final class Sorm {
     return TypedOrmConnection.of(objectClass, conn);
   }
 
-  private final ConnectionSource connectionSource;
-
-  private final OrmConfigStore configStore;
-
-  private Sorm(ConnectionSource connectionSource, OrmConfigStore configs) {
-    this.configStore = configs;
-    this.connectionSource = connectionSource;
-  }
 
 
   public OrmTransaction beginTransaction() {
@@ -63,7 +63,7 @@ public final class Sorm {
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection());
+    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), configStore);
   }
 
 
@@ -84,6 +84,13 @@ public final class Sorm {
   public <R> R execute(Function<OrmConnection, R> handler) {
     try (OrmConnection conn = getConnection()) {
       return handler.apply(conn);
+    }
+  }
+
+  public <T, R> R executeTransaction(Class<T> objectClass, int isolationLevel,
+      Function<TypedOrmTransaction<T>, R> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
+      return handler.apply(transaction);
     }
   }
 

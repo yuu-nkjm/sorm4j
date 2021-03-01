@@ -3,13 +3,14 @@ package org.nkjmlab.sorm4j;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
-class OrmServiceTest {
+class SormTest {
 
   private Sorm srv;
 
@@ -23,11 +24,20 @@ class OrmServiceTest {
   @Test
   void testToString() {
     assertThat(srv.toString()).contains("OrmService");
+
+    Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
+    Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
+        OrmConfigStore.DEFAULT_CONFIGURATIONS);
+
+    Sorm.of(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
+        .getConnectionSource();
+
   }
 
 
   @Test
   void testRunWithJdbcConnection() {
+
     srv.runWithJdbcConnection(con -> {
     });
 
