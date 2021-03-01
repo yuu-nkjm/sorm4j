@@ -240,7 +240,7 @@ public final class TableMapping<T> extends Mapping<T> {
    * primary key. If no primary keys are defined in the mapped table, a {@link RuntimeException}
    * will be thrown.
    *
-   * @since 1.0
+   *
    */
 
   public int update(Connection connection, T object) {
@@ -261,7 +261,6 @@ public final class TableMapping<T> extends Mapping<T> {
    * table's primary keys. If no primary keys are defined in the mapped table, a
    * {@link RuntimeException} will be thrown.
    *
-   * @since 1.0
    */
 
   public int[] update(Connection connection, T... objects) {
@@ -273,10 +272,7 @@ public final class TableMapping<T> extends Mapping<T> {
    * Deletes an object in the database. The object will be identified using its mapped table's
    * primary key.
    *
-   * @since 1.0
    */
-
-
   public int delete(Connection connection, T object) {
     throwExeptionIfPrimaryKeysIsNotExist();
     return executeUpdate(connection, getSql().getDeleteSql(), getDeleteParameters(object));
@@ -287,7 +283,6 @@ public final class TableMapping<T> extends Mapping<T> {
    * table's primary keys. If no primary keys are defined in a given object, a RuntimeException will
    * be thrown.
    *
-   * @since 1.0
    */
 
   public int[] delete(Connection connection, @SuppressWarnings("unchecked") T... objects) {

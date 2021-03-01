@@ -20,7 +20,6 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
-   * @since 1.0
    */
 
   Map<String, Object> readMapFirst(String sql, Object... parameters);
@@ -37,7 +36,6 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
    *
-   * @since 1.0
    */
   LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
 
@@ -51,7 +49,6 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link JavaTOSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
    *
-   * @since 1.0
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
 

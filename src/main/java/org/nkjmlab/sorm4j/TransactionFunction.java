@@ -6,7 +6,7 @@ public interface TransactionFunction {
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#close()
-   * @since 1.0
+   *
    */
   void close();
 
@@ -14,7 +14,7 @@ public interface TransactionFunction {
    * Commits the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#commit()
-   * @since 1.0
+   *
    */
   void commit();
 
@@ -22,7 +22,7 @@ public interface TransactionFunction {
    * Rollback the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#rollback()
-   * @since 1.0
+   *
    */
   void rollback();
 
@@ -31,7 +31,7 @@ public interface TransactionFunction {
    * this instance.
    *
    * @see java.sql.Connection#setAutoCommit(boolean)
-   * @since 1.0
+   *
    */
   void setAutoCommit(boolean autoCommit);
 

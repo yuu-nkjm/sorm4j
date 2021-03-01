@@ -82,7 +82,7 @@ public interface OrmReader {
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement,Object[])}
    *
-   * @since 1.0
+   *
    */
   <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters);
 
