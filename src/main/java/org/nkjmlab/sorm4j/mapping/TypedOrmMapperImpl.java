@@ -136,14 +136,9 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
 
   @Override
   public int deleteAll() {
-    return deleteAllAux(objectClass);
+    return deleteAll(objectClass);
   }
 
-
-  @Override
-  public int deleteOnAll(String tableName) {
-    return deleteAllAux(tableName, objectClass);
-  }
 
 
   @Override

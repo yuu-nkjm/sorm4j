@@ -52,6 +52,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     setTransactionIsolation(isolationLevel);
   }
 
+  @Override
   public void runTransaction(Consumer<TypedOrmConnection<T>> handler) {
     setAutoCommit(false);
     setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
@@ -59,6 +60,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     rollback();
   }
 
+  @Override
   public <R> R executeTransaction(Function<TypedOrmConnection<T>, R> handler) {
     setAutoCommit(false);
     setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);

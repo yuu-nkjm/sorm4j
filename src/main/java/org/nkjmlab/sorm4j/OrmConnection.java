@@ -24,4 +24,5 @@ public interface OrmConnection extends OrmMapper, TransactionFunction, Closeable
 
   <R> R executeTransaction(Function<OrmConnection, R> handler);
 
+
 }

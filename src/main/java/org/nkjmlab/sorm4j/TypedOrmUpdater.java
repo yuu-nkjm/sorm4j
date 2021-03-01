@@ -18,7 +18,7 @@ public interface TypedOrmUpdater<T> {
 
   int deleteOn(String tableName, T object);
 
-  int deleteOnAll(String tableName);
+  int deleteAllOn(String tableName);
 
   int[] insert(List<T> objects);
 

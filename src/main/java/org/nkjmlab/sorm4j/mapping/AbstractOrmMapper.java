@@ -139,13 +139,13 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     this.columnsMappings = getColumnsMappings(cacheName);
   }
 
-  <T> int deleteAllAux(Class<T> objectClass) {
+  public <T> int deleteAll(Class<T> objectClass) {
     return getTableMapping(objectClass).deleteAll(connection);
   }
 
 
-  <T> int deleteAllAux(String tableName, Class<T> objectClass) {
-    return getTableMapping(tableName, objectClass).deleteAll(connection);
+  public int deleteAllOn(String tableName) {
+    return executeUpdate("DELETE FROM " + tableName);
   }
 
 
