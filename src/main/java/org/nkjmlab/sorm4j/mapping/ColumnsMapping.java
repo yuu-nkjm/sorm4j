@@ -49,7 +49,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
-  public List<T> loadObjectList(ResultSet resultSet) {
+  public final List<T> loadObjectList(ResultSet resultSet) {
     try {
       List<String> columns = createColumns(resultSet);
       List<Class<?>> setterParamTypes = getSetterParamTypes(columns);

@@ -59,7 +59,7 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   }
 
   @Override
-  public List<T> readAll() {
+  public final List<T> readAll() {
     return readAllAux(objectClass);
   }
 

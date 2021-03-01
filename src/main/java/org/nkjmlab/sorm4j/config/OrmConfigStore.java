@@ -46,11 +46,6 @@ public final class OrmConfigStore {
     this.multiProcessorFactory = batchConfig;
   }
 
-
-  public String getConfigStoreName() {
-    return toString();
-  }
-
   public String getCacheName() {
     return cacheName;
   }

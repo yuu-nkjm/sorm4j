@@ -2,6 +2,8 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.sql.DataSource;
@@ -9,11 +11,27 @@ import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
+import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
+import org.nkjmlab.sorm4j.mapping.TableMapping;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 
 public final class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+
+  private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
+      new ConcurrentHashMap<>(); // key => Cache Name
+  private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
+      new ConcurrentHashMap<>(); // key => Cache Name
+
+
+  private static ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings(String cacheName) {
+    return columnsMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+  }
+
+  private static ConcurrentMap<String, TableMapping<?>> getTableMappings(String cacheName) {
+    return tableMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+  }
 
   private final ConnectionSource connectionSource;
   private final OrmConfigStore configStore;
@@ -55,8 +73,6 @@ public final class Sorm {
       Connection conn) {
     return TypedOrmConnection.of(objectClass, conn);
   }
-
-
 
   public OrmTransaction beginTransaction() {
     return OrmTransaction.of(getJdbcConnection(), configStore);

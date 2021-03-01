@@ -249,7 +249,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
 
   @Override
-  public <T> List<T> readAll(Class<T> objectClass) {
+  public final <T> List<T> readAll(Class<T> objectClass) {
     return readAllAux(objectClass);
   }
 
