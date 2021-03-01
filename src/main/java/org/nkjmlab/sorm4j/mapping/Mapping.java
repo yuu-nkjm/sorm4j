@@ -78,14 +78,12 @@ abstract class Mapping<T> {
         s = s != null ? g : isValidSetter(setters.get(fieldName));
       }
       if (f == null && (g == null || s == null)) {
-        log.warn(
+        log.debug(
             "Skip matching with Column [{}] to field because could not found corresponding field.",
             column);
       } else {
         ret.put(column.getName(), new Accessor(column, f, g, s));
       }
-
-
     }
     return ret;
   }
