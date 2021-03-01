@@ -30,7 +30,9 @@ public class OrmTestUtils {
       "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
   public static Sorm createSorm() {
-    return Sorm.of(jdbcUrl, user, password);
+    Sorm ret = Sorm.of(jdbcUrl, user, password);
+    return ret;
+
   }
 
   public static void dropAndCreateTable(Sorm srv, Class<?> clazz) {

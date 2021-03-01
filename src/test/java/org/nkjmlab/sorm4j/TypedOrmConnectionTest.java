@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
@@ -29,6 +30,8 @@ class TypedOrmConnectionTest {
 
   @Test
   void testClose() {
+    Sorm.of(OrmTestUtils.createDataSourceH2()).getConnectionSource();
+
     srv.run(Guest.class, m -> {
       m.close();
       try {
@@ -414,6 +417,9 @@ class TypedOrmConnectionTest {
   void testTransaction() {
     Guest a = OrmTestUtils.GUEST_ALICE;
 
+    srv.runTransaction(m -> {
+      m.insert(a);
+    }, Connection.TRANSACTION_READ_COMMITTED);
 
     srv.runTransaction(Guest.class, m -> {
       m.insert(a);
@@ -456,6 +462,25 @@ class TypedOrmConnectionTest {
   void testUpdateOnT() {
     Player a = OrmTestUtils.PLAYER_ALICE;
     Player b = OrmTestUtils.PLAYER_ALICE;
+
+    // auto-rolback
+    srv.executeTransaction(conn -> conn.insert(a));
+    // auto-rolback
+    srv.runTransaction(conn -> conn.insert(a));
+    try (OrmTransaction trans = srv.beginTransaction()) {
+      // auto-rolback
+      trans.insert(a);
+    }
+    try (OrmTransaction trans = srv.beginTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+      // auto-rolback
+      trans.insert(a);
+    }
+
+    try (Connection conn = srv.getJdbcConnection()) {
+      Sorm.toOrmConnection(conn);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
 
     srv.run(Player.class, m -> m.runTransaction(conn -> {
       m.insert(a);

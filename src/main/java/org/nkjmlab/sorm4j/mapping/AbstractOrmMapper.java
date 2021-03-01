@@ -376,7 +376,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
         ret = toSingleMap(resultSet);
       }
       if (resultSet.next()) {
-        throw new RuntimeException("Non-unique result returned");
+        throw new OrmException("Non-unique result returned");
       }
       return ret;
     } catch (SQLException e) {
