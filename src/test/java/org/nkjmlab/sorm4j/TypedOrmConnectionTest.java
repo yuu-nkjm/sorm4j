@@ -101,20 +101,38 @@ class TypedOrmConnectionTest {
 
   @Test
   void testReadAllLazy() {
+    Player a = OrmTestUtils.PLAYER_ALICE;
+    Player b = OrmTestUtils.PLAYER_BOB;
     srv.run(Player.class, m -> {
-      Player a = OrmTestUtils.PLAYER_ALICE;
-      Player b = OrmTestUtils.PLAYER_BOB;
       m.insert(a);
+
+      Map<String, Object> map = m.readAllLazy().oneMap();
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+
       assertThat(m.readAllLazy().one()).isEqualTo(a);
+
+
       m.insert(b);
       assertThat(m.readAllLazy().stream().collect(Collectors.toList())).contains(a, b);
       assertThat(m.readAllLazy().toList()).contains(a, b);
       assertThat(m.readAllLazy().first()).isEqualTo(a);
-      Map<String, Object> map = m.readAllLazy().toMapList().get(0);
+
+      map = m.readAllLazy().firstMap();
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+      map = m.readAllLazy().toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
       assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
           .isEqualTo(a.getAddress());
+    });
+    srv.run(Player.class, m -> {
+      Map<String, Object> map = m.readMapLazy("select * from players").toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
     });
   }
 

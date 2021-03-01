@@ -444,6 +444,33 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
 
   }
 
+  public Map<String, Object> loadOneMapAux(ResultSet resultSet) {
+    try {
+      Map<String, Object> ret = null;
+      if (resultSet.next()) {
+        ret = loadOneMap(resultSet);
+      }
+      if (resultSet.next()) {
+        throw new RuntimeException("Non-unique result returned");
+      }
+      return ret;
+    } catch (SQLException e) {
+      throw new OrmException(e);
+    }
+  }
+
+  public Map<String, Object> loadFirstMapAux(ResultSet resultSet) {
+    try {
+      Map<String, Object> ret = null;
+      if (resultSet.next()) {
+        ret = loadOneMap(resultSet);
+      }
+      return ret;
+    } catch (SQLException e) {
+      throw new OrmException(e);
+    }
+  }
+
 
 
   protected final <T, R> R execSqlIfParameterExists(T[] objects,

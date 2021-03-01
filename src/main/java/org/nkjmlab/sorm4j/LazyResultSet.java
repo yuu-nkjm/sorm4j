@@ -68,6 +68,24 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
     return ret;
   }
 
+  public Map<String, Object> oneMap() {
+    Map<String, Object> ret = ormMapper.loadOneMapAux(resultSet);
+    close();
+    return ret;
+  }
+
+  /**
+   * Returns the first row in the result set and close.
+   *
+   * @return
+   */
+  public Map<String, Object> firstMap() {
+    Map<String, Object> ret = ormMapper.loadFirstMapAux(resultSet);
+    close();
+    return ret;
+  }
+
+
   /**
    * Returns results in a List of {@code Map<String, Object>}.
    *
