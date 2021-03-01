@@ -22,7 +22,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   }
 
   @Override
-  public int[] multiRowInsert(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowInsert(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
             num -> PreparedStatementUtils.getPreparedStatement(con,
@@ -31,7 +32,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   }
 
   @Override
-  public int[] multiRowMerge(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowMerge(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
             num -> PreparedStatementUtils.getPreparedStatement(con,

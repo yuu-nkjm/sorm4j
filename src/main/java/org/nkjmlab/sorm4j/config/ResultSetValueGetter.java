@@ -23,7 +23,7 @@ public interface ResultSetValueGetter extends OrmConfig {
    * @param column column index in the result set (starting with 1)
    * @param type {@link java.lang.Class} of the object to be returned
    * @throws SQLException
-   * @since 1.0
+   * 
    */
   Object getValueByClass(ResultSet resultSet, int column, Class<?> type) throws SQLException;
 
@@ -40,7 +40,7 @@ public interface ResultSetValueGetter extends OrmConfig {
    * @param column Column index in the result set (starting with 1)
    * @param type type of the column (as defined in {@link java.sql.Types java.sql.Types})
    * @throws SQLException
-   * @since 1.0
+   * 
    */
   Object getValueBySqlType(ResultSet resultSet, int column, int type) throws SQLException;
 

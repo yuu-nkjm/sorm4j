@@ -25,7 +25,7 @@ public class OrmTestUtils {
   private static final String SQL_CREATE_TABLE_PLAYERS1 =
       "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
-  public static Sorm createOrmService() {
+  public static Sorm createSorm() {
     return Sorm.of(jdbcUrl, user, password);
   }
 

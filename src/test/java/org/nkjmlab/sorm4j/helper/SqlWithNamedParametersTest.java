@@ -11,8 +11,6 @@ class SqlWithNamedParametersTest {
 
   @Test
   void testCreate() {
-
-
     SqlStatement sp = SqlWithNamedParameters.toSqlStatement(sql, namedParams);
 
     org.assertj.core.api.Assertions.assertThat(sp.getSql())
@@ -21,13 +19,26 @@ class SqlWithNamedParametersTest {
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
 
+    org.assertj.core.api.Assertions.assertThat(sp.toString())
+        .isEqualTo("[select * from simple where id=? and name=?] with [2, foo]");
+
+
   }
 
   @Test
-  void testBuilder() {
+  void testBindAll() {
+    SqlStatement sp = new SqlWithNamedParameters(sql).bindAll(namedParams).toSqlStatement();
+    org.assertj.core.api.Assertions.assertThat(sp.getSql())
+        .isEqualTo("select * from simple where id=? and name=?");
+    org.assertj.core.api.Assertions.assertThat(sp.getParameters())
+        .isEqualTo(new Object[] {2, "foo"});
+  }
 
-    SqlStatement sp =
-        new SqlWithNamedParameters(sql).bindAll(namedParams).toSqlStatement();
+  @Test
+  void testBind() {
+
+    SqlStatement sp = new SqlWithNamedParameters(sql).bind("name", "foo").bind("id", 1)
+        .bind("idid", 2).toSqlStatement();
 
     org.assertj.core.api.Assertions.assertThat(sp.getSql())
         .isEqualTo("select * from simple where id=? and name=?");
@@ -37,4 +48,5 @@ class SqlWithNamedParametersTest {
 
 
   }
+
 }

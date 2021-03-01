@@ -17,6 +17,10 @@ public interface OrmUpdater {
 
   <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  <T> int deleteAll(Class<T> objectClass);
+
+  int deleteAllOn(String tableName);
+
   <T> int[] insert(List<T> objects);
 
   <T> int insert(T object);

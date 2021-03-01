@@ -26,9 +26,9 @@ public final class SqlStatement {
 
   @Override
   public String toString() {
-    return " [" + sql + "]"
+    return "[" + sql + "]"
         + ((parameters != null && parameters.length != 0)
-            ? " with [" + Arrays.toString(parameters) + "]"
+            ? " with " + Arrays.toString(parameters) + ""
             : "");
   }
 

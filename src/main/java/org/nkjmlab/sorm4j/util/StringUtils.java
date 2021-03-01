@@ -27,11 +27,6 @@ public final class StringUtils {
     return toUpperCase(camelCase.replaceAll("([A-Z])", "_$1"));
   }
 
-
-  public static List<String> toUpperCase(List<String> names) {
-    return names.stream().map(l -> toUpperCase(l)).collect(Collectors.toList());
-  }
-
   public static final List<String> addPluralSuffix(List<String> names) {
     return names.stream()
         .flatMap(name -> List

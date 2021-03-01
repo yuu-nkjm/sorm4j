@@ -15,26 +15,74 @@ import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
  */
 public interface OrmReader {
 
+  /**
+   * Reads all rows from the table indicated by object class.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
   <T> List<T> readAll(Class<T> objectClass);
 
+  /**
+   * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
   <T> LazyResultSet<T> readAllLazy(Class<T> objectClass);
 
   /**
-   * Reads an object from the database by its primary keys.
+   * Reads an object by its primary keys from the table indicated by object class.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param primaryKeyValues
+   * @return
    */
   <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
 
-  <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
+  /**
+   * Reads an object from the database.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
+  <T> T readFirst(Class<T> objectClass, SqlStatement sql);
 
+  /**
+   * Reads an object from the database.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @param parameters
+   * @return
+   */
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet} and convert it to Stream, List, and so on.
+   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet}. It is able to convert to Stream, List, and
+   * so on.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
+  <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
+
+  /**
+   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet}. It is able to convert to Stream, List, and
+   * so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement,Object[])}
    *
-   * @since 1.0
+   *
    */
   <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters);
 
@@ -42,22 +90,46 @@ public interface OrmReader {
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
    * into instances of the given object class. Only the columns returned from the SQL query will be
    * set into the object instance.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
+
+  <T> List<T> readList(Class<T> objectClass, SqlStatement sql);
+
+  /**
+   * Reads a list of objects from the database by mapping the results of the parameterized SQL query
+   * into instances of the given object class. Only the columns returned from the SQL query will be
+   * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object[])}
    *
    */
   <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);
 
-
-
+  /**
+   * Reads only one object from the database.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
   <T> T readOne(Class<T> objectClass, SqlStatement sql);
 
-  <T> T readFirst(Class<T> objectClass, SqlStatement sql);
-
-  <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
-
-  <T> List<T> readList(Class<T> objectClass, SqlStatement sql);
+  /**
+   * Reads only one object from the database.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
 
 
 

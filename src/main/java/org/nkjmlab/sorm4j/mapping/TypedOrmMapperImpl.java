@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
-import org.nkjmlab.sorm4j.OrmMapper;
 import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 
@@ -21,9 +20,6 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
     this.objectClass = objectClass;
   }
 
-  public OrmMapper toUntyped() {
-    return new OrmMapperImpl(getJdbcConnection(), getConfigStore());
-  }
 
   public List<String> getAllColumns() {
     return getAllColumnsAux(objectClass);
@@ -140,14 +136,9 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
 
   @Override
   public int deleteAll() {
-    return deleteAllAux(objectClass);
+    return deleteAll(objectClass);
   }
 
-
-  @Override
-  public int deleteOnAll(String tableName) {
-    return deleteAllAux(tableName, objectClass);
-  }
 
 
   @Override
