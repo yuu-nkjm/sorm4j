@@ -8,13 +8,15 @@ public final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
   }
 
   @Override
-  public int[] multiRowInsert(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowInsert(Connection con, T... objects) {
     return batch(con, tableMapping.getSql().getInsertSql(),
         obj -> tableMapping.getInsertParameters(obj), objects);
   }
 
   @Override
-  public int[] multiRowMerge(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowMerge(Connection con, T... objects) {
     return batch(con, tableMapping.getSql().getMergeSql(),
         obj -> tableMapping.getMergeParameters(obj), objects);
   }

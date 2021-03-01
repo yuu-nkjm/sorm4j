@@ -31,38 +31,22 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     }, OrmException::new);
   }
 
-  /**
-   * Commits the {@link java.sql.Connection Connection} associated with this instance.
-   *
-   * @see java.sql.Connection#commit()
-   * @since 1.0
-   */
+  @Override
   public void commit() {
     Try.runOrThrow(() -> getJdbcConnection().commit(), OrmException::new);
   }
 
-  /**
-   * Rolls back the {@link java.sql.Connection Connection} associated with this instance.
-   *
-   * @see java.sql.Connection#rollback()
-   * @since 1.0
-   */
+  @Override
   public void rollback() {
     Try.runOrThrow(() -> getJdbcConnection().rollback(), OrmException::new);
   }
 
-
-  /**
-   * Sets the auto commit behavior for the {@link java.sql.Connection Connection} associated with
-   * this instance.
-   *
-   * @see java.sql.Connection#setAutoCommit(boolean)
-   * @since 1.0
-   */
+  @Override
   public void setAutoCommit(final boolean autoCommit) {
     Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), OrmException::new);
   }
 
+  @Override
   public void begin(int isolationLevel) {
     setAutoCommit(false);
     setTransactionIsolation(isolationLevel);
@@ -84,6 +68,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   }
 
 
+  @Override
   public void begin() {
     begin(DEFAULT_ISOLATION_LEVEL);
   }

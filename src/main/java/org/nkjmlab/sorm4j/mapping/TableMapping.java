@@ -46,7 +46,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
   private final SqlFromTableMapping sql;
 
-  final MultiRowProcessor<T> batcher;
+  final MultiRowProcessor<T> multiRowProcessor;
 
 
   private TableMapping(ResultSetConverter sqlToJavaConverter,
@@ -57,7 +57,10 @@ public final class TableMapping<T> extends Mapping<T> {
     try {
       this.javaToSqlConverter = javaToSqlConverter;
 
-      this.batcher = (MultiRowProcessor<T>) batchConf.getMultiRowProcessorFactory().apply(this);
+      @SuppressWarnings("unchecked")
+      MultiRowProcessor<T> processor =
+          (MultiRowProcessor<T>) batchConf.getMultiRowProcessorFactory().apply(this);
+      this.multiRowProcessor = processor;
       DatabaseMetaData metaData = connection.getMetaData();
       this.tableName = tableName;
 
@@ -323,7 +326,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
   @SafeVarargs
   public final int[] insert(Connection con, T... objects) {
-    return batcher.multiRowInsert(con, objects);
+    return multiRowProcessor.multiRowInsert(con, objects);
   }
 
 
@@ -349,14 +352,14 @@ public final class TableMapping<T> extends Mapping<T> {
 
   public int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
       T[] objects) {
-    return this.batcher.batch(con, sql, parameterCreator, objects);
+    return this.multiRowProcessor.batch(con, sql, parameterCreator, objects);
   }
 
 
 
   @SuppressWarnings("unchecked")
   public int[] merge(Connection con, T... objects) {
-    int[] result = batcher.multiRowMerge(con, objects);
+    int[] result = multiRowProcessor.multiRowMerge(con, objects);
     return result;
   }
 

@@ -24,9 +24,9 @@ public abstract class MultiRowProcessor<T> {
     this.batchSize = batchSize;
   }
 
-  public abstract int[] multiRowInsert(Connection con, T... objects);
+  public abstract int[] multiRowInsert(Connection con, @SuppressWarnings("unchecked") T... objects);
 
-  public abstract int[] multiRowMerge(Connection con, T... objects);
+  public abstract int[] multiRowMerge(Connection con, @SuppressWarnings("unchecked") T... objects);
 
   void setAutoCommit(Connection connection, boolean autoCommit) {
     Try.runOrThrow(() -> connection.setAutoCommit(autoCommit), OrmException::new);

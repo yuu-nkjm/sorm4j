@@ -22,18 +22,22 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   }
 
   @Override
-  public int[] multiRowInsert(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowInsert(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> PreparedStatementUtils.getPreparedStatement(con,
+                tableMapping.getSql().getMultirowInsertSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 
   @Override
-  public int[] multiRowMerge(Connection con, T... objects) {
+  @SafeVarargs
+  public final int[] multiRowMerge(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con, tableMapping.getSql().getMultirowMergeSql(num)),
+            num -> PreparedStatementUtils.getPreparedStatement(con,
+                tableMapping.getSql().getMultirowMergeSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 

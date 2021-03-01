@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.util;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.OrmTable;
 
 public class Guest {
 
