@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.util;
 
+import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 
 public class OrmTestUtils {
@@ -53,6 +54,14 @@ public class OrmTestUtils {
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
     srv.run(conn -> conn.execute("DROP TABLE players1 IF EXISTS"));
     srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS1));
+  }
+
+  public static DataSource createDataSourceH2() {
+    return DataSourceHelper.createDataSourceH2(jdbcUrl, user, password);
+  }
+
+  public static DataSource createDataSourceHikari() {
+    return DataSourceHelper.createDataSourceHikari(jdbcUrl, user, password);
   }
 
 

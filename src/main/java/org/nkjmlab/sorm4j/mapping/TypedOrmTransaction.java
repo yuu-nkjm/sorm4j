@@ -20,6 +20,11 @@ public class TypedOrmTransaction<T> extends TypedOrmConnectionImpl<T> {
   }
 
   public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection conn,
+      OrmConfigStore options) {
+    return of(objectClass, conn, DEFAULT_ISOLATION_LEVEL, options);
+  }
+
+  public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection conn,
       int isolationLevel) {
     return of(objectClass, conn, isolationLevel, DEFAULT_CONFIGURATIONS);
   }

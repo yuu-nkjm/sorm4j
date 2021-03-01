@@ -253,7 +253,7 @@ class OrmConnectionTest {
       Player c = new Player(a.getId(), "UPDATED", "UPDATED");
       m.merge(c, b);
       assertThat(m.readAll(Player.class).size()).isEqualTo(2);
-      assertThat(m.readByPrimaryKey(Player.class, a.getId()).getAddress()).isEqualTo("UPDATED");
+      assertThat(m.readByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
     });
   }
 
@@ -305,7 +305,7 @@ class OrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
       assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
-          .isEqualTo(a.getAddress());
+          .isEqualTo(a.readAddress());
     });
     srv.run(m -> {
       Map<String, Object> map = m.readMapLazy("select * from players").toMapList().get(0);
@@ -429,9 +429,9 @@ class OrmConnectionTest {
       m.updateOn("players", List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED")));
       Player p = m.readByPrimaryKey(Player.class, a.getId());
-      assertThat(p.getAddress()).isEqualTo("UPDATED");
+      assertThat(p.readAddress()).isEqualTo("UPDATED");
       p = m.readByPrimaryKey(Player.class, b.getId());
-      assertThat(p.getAddress()).isEqualTo("UPDATED");
+      assertThat(p.readAddress()).isEqualTo("UPDATED");
     });
   }
 
@@ -447,9 +447,9 @@ class OrmConnectionTest {
       m.update(List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED")));
       Player p = m.readByPrimaryKey(Player.class, a.getId());
-      assertThat(p.getAddress()).isEqualTo("UPDATED");
+      assertThat(p.readAddress()).isEqualTo("UPDATED");
       p = m.readByPrimaryKey(Player.class, b.getId());
-      assertThat(p.getAddress()).isEqualTo("UPDATED");
+      assertThat(p.readAddress()).isEqualTo("UPDATED");
     });
   }
 
