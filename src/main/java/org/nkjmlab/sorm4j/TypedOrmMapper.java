@@ -1,11 +1,8 @@
-package org.nkjmlab.sorm4j.mapping;
+package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import org.nkjmlab.sorm4j.OrmMapReader;
-import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.TypeOrmReader;
-import org.nkjmlab.sorm4j.TypedOrmUpdater;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.mapping.TypedOrmMapperImpl;
 
 public interface TypedOrmMapper<T>
     extends TypeOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader, SqlExecutor {

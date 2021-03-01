@@ -1,6 +1,10 @@
 package org.nkjmlab.sorm4j.config;
 
 import java.sql.Connection;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.mapping.DefaultResultSetValueGetter;
+import org.nkjmlab.sorm4j.mapping.DefaultTableNameGuesser;
 
 public final class OrmConfigStore {
 

@@ -1,10 +1,11 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
 public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
 

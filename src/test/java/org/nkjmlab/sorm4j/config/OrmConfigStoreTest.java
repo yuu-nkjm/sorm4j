@@ -2,6 +2,10 @@ package org.nkjmlab.sorm4j.config;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.mapping.DefaultResultSetValueGetter;
+import org.nkjmlab.sorm4j.mapping.DefaultTableNameGuesser;
 
 class OrmConfigStoreTest {
 
