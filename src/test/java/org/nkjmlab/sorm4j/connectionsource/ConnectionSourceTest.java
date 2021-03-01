@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.connectionsource;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
 
 class ConnectionSourceTest {
 
@@ -13,15 +14,17 @@ class ConnectionSourceTest {
   @Test
   void test() {
     JdbcConnectionPool cp = JdbcConnectionPool.create(url, user, pw);
-    DataSourceConnectionSource ds = new DataSourceConnectionSource(cp);
-    org.assertj.core.api.Assertions.assertThat(ds.getDataSource()).isEqualTo(cp);
-    org.assertj.core.api.Assertions.assertThat(ds.toString())
+    DataSourceConnectionSource cs = new DataSourceConnectionSource(cp);
+    org.assertj.core.api.Assertions.assertThat(cs.getDataSource()).isEqualTo(cp);
+    org.assertj.core.api.Assertions.assertThat(cs.toString())
         .contains(DataSourceConnectionSource.class.getSimpleName());
     try {
-      org.assertj.core.api.Assertions.assertThat(ds.getConnection()).isNotNull();
+      org.assertj.core.api.Assertions.assertThat(cs.getConnection()).isNotNull();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+
+    Sorm.of(cs);
   }
 
 }

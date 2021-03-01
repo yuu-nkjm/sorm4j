@@ -21,6 +21,8 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void beforAll() {
+    DebugPointFactory.onAll();
+    DebugPointFactory.offAll();
     DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true));
   }
 

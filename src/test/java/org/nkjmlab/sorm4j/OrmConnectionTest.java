@@ -329,6 +329,17 @@ class OrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
+
+    srv.run(m -> {
+      try {
+        m.readAllLazy(Player.class).oneMap();
+        failBecauseExceptionWasNotThrown(OrmException.class);
+      } catch (OrmException e) {
+        assertThat(e.getMessage()).contains("Non-unique");
+      }
+    });
+
+
   }
 
   @Test
