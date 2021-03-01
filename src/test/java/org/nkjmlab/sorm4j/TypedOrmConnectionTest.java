@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
@@ -32,6 +34,17 @@ class TypedOrmConnectionTest {
       } catch (SQLException e) {
         e.printStackTrace();
       }
+    });
+  }
+
+  @Test
+  void testCol() {
+    srv.run(Guest.class, m -> {
+      assertThat(((TypedOrmConnectionImpl<Guest>) m).getAllColumns())
+          .containsAll(List.of("ID", "NAME", "ADDRESS"));
+    });
+    srv.run(Guest.class, m -> {
+      assertThat(((TypedOrmConnectionImpl<Guest>) m).getPrimaryKeys()).containsAll(List.of("ID"));
     });
   }
 
@@ -78,6 +91,16 @@ class TypedOrmConnectionTest {
       m.insert(a, b);
       m.delete(a, b);
       assertThat(m.readAll().size()).isEqualTo(0);
+
+      m.insert(a, b);
+      m.delete(a);
+      m.delete(b);
+      assertThat(m.readAll().size()).isEqualTo(0);
+
+      m.insert(a, b);
+      m.delete(List.of(a, b));
+      assertThat(m.readAll().size()).isEqualTo(0);
+
     });
   }
 
@@ -99,6 +122,22 @@ class TypedOrmConnectionTest {
     });
   }
 
+  @Test
+  void testInsertAndGetOnList() {
+    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
+
+
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    Guest b = OrmTestUtils.GUEST_BOB;
+    srv.run(Guest.class, m -> {
+      InsertResult<Guest> g = m.insertAndGet(List.of(a));
+      assertThat(g.getObject().getId()).isEqualTo(1);
+    });
+    srv.run(Guest.class, m -> {
+      InsertResult<Guest> g = m.insertAndGetOn("players1", List.of(a));
+      assertThat(g.getObject().getId()).isEqualTo(1);
+    });
+  }
 
   @Test
   void testInsertAndGetOnStringT0() {
@@ -130,6 +169,8 @@ class TypedOrmConnectionTest {
       Guest g = m.readFirst("SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
       assertThat(g.getName()).isEqualTo(a.getName());
+      m.deleteAll();
+      assertThat(m.readList("select * from guests").size()).isEqualTo(0);
     });
   }
 
@@ -140,10 +181,19 @@ class TypedOrmConnectionTest {
       Player b = OrmTestUtils.PLAYER_BOB;
       m.insertOn("players1", a, b);
       assertThat(m.readList("select * from players1")).contains(a, b);
-      m.deleteOn("players1", a, b);
+      m.deleteOnAll("players1");
+      assertThat(m.readList("select * from players1").size()).isEqualTo(0);
+    });
+    srv.run(Player.class, m -> {
+      Player a = OrmTestUtils.PLAYER_ALICE;
+      Player b = OrmTestUtils.PLAYER_BOB;
+      m.insertOn("players1", List.of(a, b));
+      assertThat(m.readList("select * from players1")).contains(a, b);
+      m.deleteOn("players1", List.of(a, b));
       assertThat(m.readList("select * from players1").size()).isEqualTo(0);
     });
   }
+
 
   @Test
   void testExec() {
@@ -183,6 +233,9 @@ class TypedOrmConnectionTest {
       m.mergeOn("players1", a);
       m.mergeOn("players1", a, b);
       assertThat(m.readList("select * from players1").size()).isEqualTo(2);
+
+      m.mergeOn("players1", List.of(a, b));
+      assertThat(m.readList("select * from players1").size()).isEqualTo(2);
     });
   }
 
@@ -207,10 +260,31 @@ class TypedOrmConnectionTest {
       Player b = OrmTestUtils.PLAYER_BOB;
       m.merge(a);
       m.merge(a, b);
+      m.merge(List.of(a, b));
       Player c = new Player(a.getId(), "UPDATED", "UPDATED");
       m.merge(c, b);
       assertThat(m.readAll().size()).isEqualTo(2);
       assertThat(m.readByPrimaryKey(a.getId()).getAddress()).isEqualTo("UPDATED");
+    });
+  }
+
+  @Test
+  void testReadLazy() {
+    Player a = OrmTestUtils.PLAYER_ALICE;
+    Player b = OrmTestUtils.PLAYER_BOB;
+    srv.run(Player.class, m -> {
+      m.insert(List.of(a, b));
+      Map<String, Object> map =
+          m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+      map = m.readMapFirst(SqlStatement.of("select * from players"));
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+      Player p = m.readLazy("select * from players").toList().get(0);
+      assertThat(p).isEqualTo(a);
     });
   }
 
@@ -249,6 +323,23 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
+    srv.run(Player.class, m -> {
+      Map<String, Object> map = m.readMapList(SqlStatement.of("select * from players")).get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+    srv.run(Player.class, m -> {
+      Map<String, Object> map =
+          m.readMapOne(SqlStatement.of("select * from players where id=?", 1));
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+    srv.run(Player.class, m -> {
+      Map<String, Object> map =
+          m.readMapLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
   }
 
   @Test
@@ -269,6 +360,11 @@ class TypedOrmConnectionTest {
       Player b = OrmTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readList("select * from players")).contains(a, b);
+      assertThat(m.readList(SqlStatement.of("select * from players"))).contains(a, b);
+      assertThat(m.readOne(SqlStatement.of("select * from players where id=?", 1))).isEqualTo(a);
+      assertThat(m.readOne("select * from players where id=?", 1)).isEqualTo(a);
+
+
     });
   }
 
@@ -315,6 +411,8 @@ class TypedOrmConnectionTest {
       m.insert(a);
       Guest g = m.readFirst("SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
+      g = m.readFirst(SqlStatement.of("SELECT * FROM GUESTS"));
+      assertThat(g.getAddress()).isEqualTo(a.getAddress());
     });
   }
 
@@ -338,6 +436,8 @@ class TypedOrmConnectionTest {
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"));
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED"));
+      m.updateOn("players", List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
+          new Player(b.getId(), "UPDATED", "UPDATED")));
       Player p = m.readByPrimaryKey(a.getId());
       assertThat(p.getAddress()).isEqualTo("UPDATED");
       p = m.readByPrimaryKey(b.getId());
@@ -354,6 +454,8 @@ class TypedOrmConnectionTest {
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"));
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED"));
+      m.update(List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
+          new Player(b.getId(), "UPDATED", "UPDATED")));
       Player p = m.readByPrimaryKey(a.getId());
       assertThat(p.getAddress()).isEqualTo("UPDATED");
       p = m.readByPrimaryKey(b.getId());
