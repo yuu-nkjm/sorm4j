@@ -59,7 +59,7 @@ public final class Sorm {
 
 
   public OrmTransaction beginTransaction() {
-    return OrmTransaction.of(getJdbcConnection());
+    return OrmTransaction.of(getJdbcConnection(), configStore);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
@@ -68,11 +68,11 @@ public final class Sorm {
 
 
   public OrmTransaction beginTransaction(int isolationLevel) {
-    return OrmTransaction.of(getJdbcConnection(), isolationLevel);
+    return OrmTransaction.of(getJdbcConnection(), isolationLevel, configStore);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), isolationLevel);
+    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), isolationLevel, configStore);
   }
 
   public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> handler) {
@@ -109,12 +109,12 @@ public final class Sorm {
   }
 
   public OrmConnection getConnection() {
-    return OrmConnection.of(getJdbcConnection());
+    return OrmConnection.of(getJdbcConnection(), configStore);
   }
 
 
   public <T> TypedOrmConnection<T> getConnection(Class<T> objectClass) {
-    return TypedOrmConnection.of(objectClass, getJdbcConnection());
+    return TypedOrmConnection.of(objectClass, getJdbcConnection(), configStore);
   }
 
   public Connection getJdbcConnection() {
@@ -142,6 +142,20 @@ public final class Sorm {
       handler.accept(transaction);
     }
   }
+
+  public <T> void runTransaction(Class<T> objectClass, int isolationLevel,
+      Consumer<TypedOrmTransaction<T>> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
+      handler.accept(transaction);
+    }
+  }
+
+  public void runTransaction(Consumer<OrmTransaction> handler, int isolationLevel) {
+    try (OrmTransaction conn = beginTransaction(isolationLevel)) {
+      handler.accept(conn);
+    }
+  }
+
 
   public void runTransaction(Consumer<OrmTransaction> handler) {
     try (OrmTransaction conn = beginTransaction()) {

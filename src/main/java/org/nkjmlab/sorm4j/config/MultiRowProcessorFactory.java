@@ -1,8 +1,8 @@
 package org.nkjmlab.sorm4j.config;
 
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.mapping.MultiRowProcessor;
 import org.nkjmlab.sorm4j.mapping.MultiRowInOneStatementProcessor;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessor;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public final class MultiRowProcessorFactory implements OrmConfig {
@@ -17,17 +17,22 @@ public final class MultiRowProcessorFactory implements OrmConfig {
 
   private final Function<TableMapping<?>, MultiRowProcessor<?>> multiRowProcessorFactory;
 
-  public MultiRowProcessorFactory() {
+  MultiRowProcessorFactory() {
     this(DEFAULT_MULTI_ROW_PROCESSOR);
   }
 
-  public MultiRowProcessorFactory(
+  MultiRowProcessorFactory(
       Function<TableMapping<?>, MultiRowProcessor<?>> multiRowProcessorFactory) {
     this.multiRowProcessorFactory = multiRowProcessorFactory;
   }
 
   public Function<TableMapping<?>, MultiRowProcessor<?>> getMultiRowProcessorFactory() {
     return multiRowProcessorFactory;
+  }
+
+  public static MultiRowProcessorFactory of(
+      Function<TableMapping<?>, MultiRowProcessor<?>> multiRowProcessorFactory) {
+    return new MultiRowProcessorFactory(multiRowProcessorFactory);
   }
 
 }

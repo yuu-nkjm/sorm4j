@@ -1,6 +1,9 @@
 package org.nkjmlab.sorm4j.mapping;
 
+import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
@@ -23,36 +26,17 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
     }, OrmException::new);
   }
 
-  /**
-   * Commits the {@link java.sql.Connection Connection} associated with this instance.
-   *
-   * @see java.sql.Connection#commit()
-   * @since 1.0
-   */
   @Override
   public void commit() {
     Try.runOrThrow(() -> getJdbcConnection().commit(), OrmException::new);
   }
 
-  /**
-   * Rollback the {@link java.sql.Connection Connection} associated with this instance.
-   *
-   * @see java.sql.Connection#rollback()
-   * @since 1.0
-   */
   @Override
   public void rollback() {
     Try.runOrThrow(() -> getJdbcConnection().rollback(), OrmException::new);
   }
 
 
-  /**
-   * Sets the auto commit behavior for the {@link java.sql.Connection Connection} associated with
-   * this instance.
-   *
-   * @see java.sql.Connection#setAutoCommit(boolean)
-   * @since 1.0
-   */
   @Override
   public void setAutoCommit(final boolean autoCommit) {
     Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), OrmException::new);
@@ -80,5 +64,21 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
     return new TypedOrmConnectionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
   }
 
+  @Override
+  public void runTransaction(Consumer<OrmConnection> handler) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    handler.accept(this);
+    rollback();
+  }
+
+  @Override
+  public <R> R executeTransaction(Function<OrmConnection, R> handler) {
+    setAutoCommit(false);
+    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    R ret = handler.apply(this);
+    rollback();
+    return ret;
+  }
 
 }

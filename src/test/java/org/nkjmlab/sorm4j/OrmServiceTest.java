@@ -15,7 +15,7 @@ class OrmServiceTest {
 
   @BeforeEach
   void setUp() {
-    srv = OrmTestUtils.createOrmService();
+    srv = OrmTestUtils.createSorm();
     OrmTestUtils.dropAndCreateTable(srv, Guest.class);
     OrmTestUtils.dropAndCreateTable(srv, Player.class);
   }

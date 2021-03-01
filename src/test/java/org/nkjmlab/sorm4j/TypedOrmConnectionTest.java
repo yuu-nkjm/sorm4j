@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ class TypedOrmConnectionTest {
 
   @BeforeEach
   void setUp() {
-    srv = OrmTestUtils.createOrmService();
+    srv = OrmTestUtils.createSorm();
     OrmTestUtils.dropAndCreateTable(srv, Guest.class);
     OrmTestUtils.dropAndCreateTable(srv, Player.class);
   }
@@ -103,7 +104,9 @@ class TypedOrmConnectionTest {
     srv.run(Player.class, m -> {
       Player a = OrmTestUtils.PLAYER_ALICE;
       Player b = OrmTestUtils.PLAYER_BOB;
-      m.insert(a, b);
+      m.insert(a);
+      assertThat(m.readAllLazy().one()).isEqualTo(a);
+      m.insert(b);
       assertThat(m.readAllLazy().stream().collect(Collectors.toList())).contains(a, b);
       assertThat(m.readAllLazy().toList()).contains(a, b);
       assertThat(m.readAllLazy().first()).isEqualTo(a);
@@ -232,4 +235,25 @@ class TypedOrmConnectionTest {
       assertThat(m.readByPrimaryKey(a.getId()).getAddress()).isEqualTo("UPDATED");
     });
   }
+
+  @Test
+  void testTransaction() {
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    srv.runTransaction(Guest.class, m -> {
+      m.insert(a);
+      Guest g = m.readFirst("SELECT * FROM GUESTS");
+      assertThat(g.getAddress()).isEqualTo(a.getAddress());
+    });
+  }
+
+  @Test
+  void testTransactionLevel() {
+    Guest a = OrmTestUtils.GUEST_ALICE;
+    srv.runTransaction(Guest.class, Connection.TRANSACTION_SERIALIZABLE, m -> {
+      m.insert(a);
+      Guest g = m.readFirst("SELECT * FROM GUESTS");
+      assertThat(g.getAddress()).isEqualTo(a.getAddress());
+    });
+  }
+
 }
