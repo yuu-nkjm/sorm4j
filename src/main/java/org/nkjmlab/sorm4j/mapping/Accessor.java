@@ -14,8 +14,10 @@ final class Accessor {
 
   Accessor(Column column, Field field, Method getter, Method setter) {
     this.column = column;
-    this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
-    this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
+    this.getter =
+        getter != null ? new GetterMethod(getter, column) : new FieldGetter(field, column);
+    this.setter =
+        setter != null ? new SetterMethod(setter, column) : new FieldSetter(field, column);
   }
 
   public SetterAccessor getSetter() {
@@ -31,6 +33,10 @@ final class Accessor {
     setter.set(object, value);
   }
 
+  public final Class<?> getSetterParameterType() {
+    return setter.getParameterType();
+  }
+
   @Override
   public String toString() {
     return "Accessor [getterAccessor=" + getter + ", setterAccessor=" + setter + ", column="
@@ -43,16 +49,18 @@ final class Accessor {
   }
 
 
-  private interface GetterAccessor {
+  private static interface GetterAccessor {
     Object get(Object object);
   }
 
-  private class GetterMethod implements GetterAccessor {
+  private static class GetterMethod implements GetterAccessor {
 
+    private final Column column;
     private final Method getter;
 
-    public GetterMethod(Method getter) {
+    public GetterMethod(Method getter, Column column) {
       this.getter = getter;
+      this.column = column;
     }
 
     @Override
@@ -73,12 +81,14 @@ final class Accessor {
   }
 
 
-  private class FieldGetter implements GetterAccessor {
+  private static class FieldGetter implements GetterAccessor {
 
+    private final Column column;
     private final Field field;
 
-    public FieldGetter(Field field) {
+    public FieldGetter(Field field, Column column) {
       this.field = field;
+      this.column = column;
     }
 
     @Override
@@ -99,18 +109,20 @@ final class Accessor {
 
   }
 
-  private interface SetterAccessor {
+  private static interface SetterAccessor {
     void set(Object object, Object value);
 
     Class<?> getParameterType();
   }
 
-  private class SetterMethod implements SetterAccessor {
+  private static class SetterMethod implements SetterAccessor {
 
+    private final Column column;
     private final Method setter;
 
-    public SetterMethod(Method setter) {
+    public SetterMethod(Method setter, Column column) {
       this.setter = setter;
+      this.column = column;
     }
 
     @Override
@@ -138,12 +150,14 @@ final class Accessor {
   }
 
 
-  private class FieldSetter implements SetterAccessor {
+  private static class FieldSetter implements SetterAccessor {
 
+    private final Column column;
     private Field field;
 
-    public FieldSetter(Field field) {
+    public FieldSetter(Field field, Column column) {
       this.field = field;
+      this.column = column;
     }
 
     @Override
@@ -169,11 +183,6 @@ final class Accessor {
     }
 
   }
-
-  public Class<?> getSetterParameterType() {
-    return setter.getParameterType();
-  }
-
 
 
 }

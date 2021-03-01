@@ -18,13 +18,13 @@ import org.nkjmlab.sorm4j.util.StringUtils;
 abstract class Mapping<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-  protected final ResultSetConverter sqlToJavaConverter;
   protected final Class<T> objectClass;
+  protected final ResultSetConverter resultSetConverter;
   protected final ColumnToAccessorMap columnToAccessorMap;
 
   public Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass,
-      ColumnFieldMapper nameGuesser) {
-    this(sqlToJavaConverter, objectClass, guessColumnNames(objectClass, nameGuesser), nameGuesser);
+      ColumnFieldMapper columnFieldMapper) {
+    this(sqlToJavaConverter, objectClass, guessColumnNames(objectClass, columnFieldMapper), columnFieldMapper);
   }
 
 
@@ -47,7 +47,7 @@ abstract class Mapping<T> {
 
   public Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass, List<Column> columns,
       ColumnFieldMapper nameGuesser) {
-    this.sqlToJavaConverter = sqlToJavaConverter;
+    this.resultSetConverter = sqlToJavaConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = new ColumnToAccessorMap(createAccessors(columns, nameGuesser));
   }

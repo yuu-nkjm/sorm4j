@@ -46,7 +46,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     List<String> columns = createColumns(resultSet);
     List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
     return createObject(columns,
-        sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes));
+        resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
   public final List<T> loadObjectList(ResultSet resultSet) {
@@ -57,7 +57,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       final List<T> ret = new ArrayList<>();
       while (resultSet.next()) {
         ret.add(createObject(columns,
-            sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes)));
+            resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes)));
       }
       return ret;
     } catch (IllegalArgumentException | SecurityException | SQLException e) {
