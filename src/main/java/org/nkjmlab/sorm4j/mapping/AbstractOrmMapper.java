@@ -146,6 +146,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     return (TableMapping<T>) getTableMapping(tableName, objectClass);
   }
 
+  @Override
   public Connection getJdbcConnection() {
     return connection;
   }
