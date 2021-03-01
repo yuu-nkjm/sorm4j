@@ -10,7 +10,6 @@ import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
 import org.nkjmlab.sorm4j.OrmMapper;
 import org.nkjmlab.sorm4j.SqlStatement;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 
 /**
@@ -33,10 +32,6 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
   public OrmMapperImpl(Connection connection, OrmConfigStore defaultConfigurations) {
     super(connection, defaultConfigurations);
-  }
-
-  public <T> TypedOrmConnection<T> toTyped(Class<T> objectClass) {
-    return TypedOrmConnection.of(objectClass, getJdbcConnection(), getConfigStore());
   }
 
 
