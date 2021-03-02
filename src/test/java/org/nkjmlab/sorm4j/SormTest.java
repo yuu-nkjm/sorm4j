@@ -1,9 +1,14 @@
 package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
+import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
@@ -21,15 +26,54 @@ class SormTest {
     OrmTestUtils.dropAndCreateTable(srv, Player.class);
   }
 
+
+  @Test
+  void testException() throws SQLException {
+    ConnectionSource mock = Mockito.spy(ConnectionSource.class);
+    Mockito.doThrow(new SQLException("Mock exception")).when(mock).getConnection();
+    Sorm sorm = Sorm.of(mock);
+    try {
+      sorm.getJdbcConnection();
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+
+  }
+
+  @Test
+  void testException1() throws SQLException {
+    Connection conMock = Mockito.spy(Connection.class);
+    Mockito.doThrow(new SQLException("Mock exception")).when(conMock).close();
+
+    ConnectionSource csMock =
+        Mockito.spy(new DataSourceConnectionSource(OrmTestUtils.createDataSourceHikari()));
+
+    Mockito.when(csMock.getConnection()).thenReturn(conMock);
+    Sorm sorm = Sorm.of(csMock);
+
+    try {
+      sorm.runWithJdbcConnection(con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+
+    try {
+      sorm.executeWithJdbcConnection(con -> 1);
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+  }
+
   @Test
   void testToString() {
     assertThat(srv.toString()).contains("OrmService");
 
     Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
-    Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
+    Sorm.withNewConfig(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
         OrmConfigStore.DEFAULT_CONFIGURATIONS);
 
-    Sorm.of(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
+    Sorm.withNewConfig(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
         .getConnectionSource();
 
   }

@@ -2,36 +2,18 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
-import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.mapping.OrmCache;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
-import org.nkjmlab.sorm4j.mapping.TableMapping;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 
 public final class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-  private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
-      new ConcurrentHashMap<>(); // key => Cache Name
-  private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
-      new ConcurrentHashMap<>(); // key => Cache Name
-
-
-  private static ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings(String cacheName) {
-    return columnsMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
-  }
-
-  private static ConcurrentMap<String, TableMapping<?>> getTableMappings(String cacheName) {
-    return tableMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
-  }
 
   private final ConnectionSource connectionSource;
   private final OrmConfigStore configStore;
@@ -41,28 +23,33 @@ public final class Sorm {
     this.connectionSource = connectionSource;
   }
 
-  public static Sorm of(ConnectionSource connectionSource, OrmConfigStore configs) {
-    return new Sorm(connectionSource, configs);
-  }
 
   public static Sorm of(ConnectionSource connectionSource) {
-    return of(connectionSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return new Sorm(connectionSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
   public static Sorm of(DataSource dataSource) {
-    return of(dataSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(ConnectionSource.of(dataSource));
   }
 
-  public static Sorm of(DataSource dataSource, OrmConfigStore configs) {
-    return of(new DataSourceConnectionSource(dataSource), configs);
-  }
 
   public static Sorm of(String jdbcUrl, String user, String password) {
-    return of(jdbcUrl, user, password, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(ConnectionSource.of(jdbcUrl, user, password));
   }
 
-  public static Sorm of(String jdbcUrl, String user, String password, OrmConfigStore configs) {
-    return of(new DriverManagerConnectionSource(jdbcUrl, user, password), configs);
+  public static Sorm withNewConfig(ConnectionSource connectionSource,
+      OrmConfigStore newConfigStore) {
+    OrmCache.refresh(newConfigStore.getCacheName());
+    return new Sorm(connectionSource, newConfigStore);
+  }
+
+  public static Sorm withNewConfig(DataSource dataSource, OrmConfigStore newConfigStore) {
+    return withNewConfig(ConnectionSource.of(dataSource), newConfigStore);
+  }
+
+  public static Sorm withNewConfig(String jdbcUrl, String user, String password,
+      OrmConfigStore newConfigStore) {
+    return withNewConfig(ConnectionSource.of(jdbcUrl, user, password), newConfigStore);
   }
 
   public static OrmConnection toOrmConnection(Connection conn) {

@@ -290,6 +290,15 @@ class TypedOrmConnectionTest {
 
       Player p = m.readLazy("select * from players").toList().get(0);
       assertThat(p).isEqualTo(a);
+
+      try {
+        m.readLazy("select * from players").iterator().remove();
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+
+
+
     });
   }
 
