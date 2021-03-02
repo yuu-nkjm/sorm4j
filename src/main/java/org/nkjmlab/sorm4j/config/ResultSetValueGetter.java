@@ -21,11 +21,11 @@ public interface ResultSetValueGetter extends OrmConfig {
    *
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
-   * @param type {@link java.lang.Class} of the object to be returned
+   * @param setterType {@link java.lang.Class} of the object to be returned
    * @throws SQLException
-   * 
+   *
    */
-  Object getValueByClass(ResultSet resultSet, int column, Class<?> type) throws SQLException;
+  Object getValueBySetterType(ResultSet resultSet, int column, Class<?> setterType) throws SQLException;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and return a
@@ -38,10 +38,10 @@ public interface ResultSetValueGetter extends OrmConfig {
    *
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column Column index in the result set (starting with 1)
-   * @param type type of the column (as defined in {@link java.sql.Types java.sql.Types})
+   * @param sqlType type of the column (as defined in {@link java.sql.Types java.sql.Types})
    * @throws SQLException
-   * 
+   *
    */
-  Object getValueBySqlType(ResultSet resultSet, int column, int type) throws SQLException;
+  Object getValueBySqlType(ResultSet resultSet, int column, int sqlType) throws SQLException;
 
 }

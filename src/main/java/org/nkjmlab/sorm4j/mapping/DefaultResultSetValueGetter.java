@@ -12,14 +12,14 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override
-  public Object getValueByClass(final ResultSet resultSet, final int column, final Class<?> type)
+  public Object getValueBySetterType(ResultSet resultSet, int column, Class<?> setterType)
       throws SQLException {
-    if (type.isEnum()) {
+    if (setterType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(type.getEnumConstants()).filter(o -> o.toString().equals(v)).findAny()
-          .orElse(null);
-    } else if (type.isArray()) {
-      final String name = type.getComponentType().getName();
+      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
+          .findAny().orElse(null);
+    } else if (setterType.isArray()) {
+      final String name = setterType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -35,7 +35,7 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
           return resultSet.getObject(column);
       }
     } else {
-      final String name = type.getName();
+      final String name = setterType.getName();
       switch (name) {
         case "boolean":
           return resultSet.getBoolean(column);
@@ -120,10 +120,10 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
   }
 
   @Override
-  public Object getValueBySqlType(final ResultSet resultSet, final int column, final int type)
+  public Object getValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
-    switch (type) {
+    switch (sqlType) {
       case java.sql.Types.ARRAY:
         return resultSet.getArray(column);
       case java.sql.Types.BIGINT: {
@@ -203,7 +203,7 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
       default:
         log.debug(
             "Could not get value for result set using type [{}] on column [{}]. ResultSet.getObject method will be used.",
-            sqlTypeToString(type), column);
+            sqlTypeToString(sqlType), column);
         return resultSet.getObject(column);
     }
   }

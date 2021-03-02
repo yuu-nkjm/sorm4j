@@ -18,6 +18,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.OrmMapper;
@@ -401,13 +402,15 @@ public class TestSimple {
     }
   }
 
+
+  @Disabled
   @Test
   public void testMappingSimple04() {
     // Simple04 has incompatible setter
     try (Connection conn = connectionPool.getConnection()) {
       OrmMapper simpleOrMapper = OrmMapper.of(conn);
       simpleOrMapper.insert(buildSimple());
-      simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
+      Simple04 ret = simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
       fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
       log.info(e);
