@@ -24,7 +24,8 @@ abstract class Mapping<T> {
 
   public Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass,
       ColumnFieldMapper columnFieldMapper) {
-    this(sqlToJavaConverter, objectClass, guessColumnNames(objectClass, columnFieldMapper), columnFieldMapper);
+    this(sqlToJavaConverter, objectClass, guessColumnNames(objectClass, columnFieldMapper),
+        columnFieldMapper);
   }
 
 
@@ -160,7 +161,7 @@ abstract class Mapping<T> {
       return acc.get(object);
     } else {
       throw new OrmException(StringUtils.format(
-          "Error getting value from [{}] because column [{}] does not have a corresponding setter method or field",
+          "Error getting value from [{}] because column [{}] does not have a corresponding getter method or field",
           object.getClass(), columnName));
     }
   }

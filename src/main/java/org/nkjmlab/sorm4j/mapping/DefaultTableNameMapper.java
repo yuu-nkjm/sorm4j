@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.config.TableNameMapper;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
-public final class DefaultTableNameGuesser implements TableNameMapper {
+public final class DefaultTableNameMapper implements TableNameMapper {
 
 
   @Override

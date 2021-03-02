@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j;
 
+import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Consumer;
@@ -8,6 +9,7 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmCache;
+import org.nkjmlab.sorm4j.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 
@@ -52,9 +54,6 @@ public final class Sorm {
     return withNewConfig(ConnectionSource.of(jdbcUrl, user, password), newConfigStore);
   }
 
-  public static OrmConnection toOrmConnection(Connection conn) {
-    return OrmConnection.of(conn);
-  }
 
   public static <T> TypedOrmConnection<T> toTypedOrmConnection(Class<T> objectClass,
       Connection conn) {
@@ -62,20 +61,23 @@ public final class Sorm {
   }
 
   public OrmTransaction beginTransaction() {
-    return OrmTransaction.of(getJdbcConnection(), configStore);
+    return new OrmTransaction(getJdbcConnection(), configStore,
+        OrmConfigStore.DEFAULT_ISOLATION_LEVEL);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), configStore);
+    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+        DEFAULT_ISOLATION_LEVEL);
   }
 
 
   public OrmTransaction beginTransaction(int isolationLevel) {
-    return OrmTransaction.of(getJdbcConnection(), isolationLevel, configStore);
+    return new OrmTransaction(getJdbcConnection(), configStore, isolationLevel);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), isolationLevel, configStore);
+    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+        isolationLevel);
   }
 
   public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> handler) {
@@ -119,7 +121,7 @@ public final class Sorm {
   }
 
   public OrmConnection getConnection() {
-    return OrmConnection.of(getJdbcConnection(), configStore);
+    return toOrmConnection(getJdbcConnection(), configStore);
   }
 
 
@@ -191,6 +193,14 @@ public final class Sorm {
     return this.connectionSource;
   }
 
+
+  public static OrmConnection toOrmConnection(Connection connection) {
+    return toOrmConnection(connection, DEFAULT_CONFIGURATIONS);
+  }
+
+  public static OrmConnection toOrmConnection(Connection connection, OrmConfigStore configStore) {
+    return new OrmConnectionImpl(connection, configStore);
+  }
 
 
 }

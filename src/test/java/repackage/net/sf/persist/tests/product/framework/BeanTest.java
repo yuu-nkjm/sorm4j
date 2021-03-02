@@ -15,9 +15,9 @@ public class BeanTest {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 
-  public static void test(OrmMapper persist, BeanMap beanMap) {
+  public static void test(Class<?> caller, OrmMapper persist, BeanMap beanMap) {
     Connection connection = persist.getJdbcConnection();
-    Class<?> cls = DynamicBean.createBeanClass(beanMap);
+    Class<?> cls = DynamicBean.createBeanClass(caller, beanMap);
 
     String tableName = dbName(beanMap.getClassName());
 

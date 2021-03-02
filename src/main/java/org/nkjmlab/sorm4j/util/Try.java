@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j.util;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -64,12 +62,12 @@ public final class Try {
 
 
   public static <T, R> Consumer<T> createConsumer(ThrowableConsumer<T> onTry,
-      BiConsumer<Throwable, T> onCatch) {
+      Consumer<Throwable> onCatch) {
     return x -> {
       try {
         onTry.accept(x);
       } catch (Throwable e) {
-        onCatch.accept(e, x);
+        onCatch.accept(e);
       }
     };
   }
@@ -77,25 +75,25 @@ public final class Try {
 
   public static <T, X extends RuntimeException> Consumer<T> createConsumerWithThrow(
       ThrowableConsumer<T> onTry, Function<Throwable, ? extends X> ex) throws X {
-    return createConsumer(onTry, (e, x) -> {
+    return createConsumer(onTry, e -> {
       throw ex.apply(e);
     });
   }
 
   public static <T, R> Function<T, R> createFunction(ThrowableFunction<T, R> onTry,
-      BiFunction<Throwable, T, R> onCatch) {
+      Function<Throwable, R> onCatch) {
     return x -> {
       try {
         return onTry.apply(x);
       } catch (Throwable e) {
-        return onCatch.apply(e, x);
+        return onCatch.apply(e);
       }
     };
   }
 
   public static <T, R, X extends RuntimeException> Function<T, R> createFunctionWithThrow(
       ThrowableFunction<T, R> onTry, Function<Throwable, ? extends X> ex) throws X {
-    return createFunction(onTry, (e, x) -> {
+    return createFunction(onTry, e -> {
       throw ex.apply(e);
     });
   }
@@ -103,7 +101,6 @@ public final class Try {
 
   public static <T> T getOrNull(ThrowableSupplier<T> onTry) {
     return createSupplier(onTry, e -> {
-      log.error(e.getMessage(), e);
       return null;
     }).get();
   }

@@ -21,15 +21,10 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   }
 
 
-  public List<String> getAllColumns() {
-    return getAllColumnsAux(objectClass);
+  @Override
+  public String getTableName() {
+    return getTableMapping(objectClass).getTableName();
   }
-
-  public List<String> getPrimaryKeys() {
-    return getPrimaryKeysAux(objectClass);
-  }
-
-
 
   @Override
   public T readByPrimaryKey(Object... primaryKeyValues) {

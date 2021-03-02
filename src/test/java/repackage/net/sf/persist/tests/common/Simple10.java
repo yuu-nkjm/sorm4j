@@ -17,11 +17,11 @@ public class Simple10 {
     this.id = id;
   }
 
-  // setter has no parameter -- will blow
   public String getStringCol() {
     return stringCol;
   }
 
+  // setter has no parameter -- will blow
   public void setStringCol() {}
 
   public long getLongCol() {

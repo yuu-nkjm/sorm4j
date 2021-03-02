@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
@@ -289,10 +290,69 @@ class OrmConnectionTest {
           .isEqualTo(a.getName());
 
 
+      try {
+        m.readMapLazy("select * from hoge").oneMap();
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+
+      try {
+        m.readFirst(Player.class, "select * from hoge");
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      try {
+        m.readMapFirst("select * from hoge");
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+
+      try {
+        m.readList(Player.class, "select * from hoge");
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      try {
+        m.readMapList("select * from hoge");
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+
+
+
       assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
-
-
       m.insert(b);
+
+      try {
+        assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      try {
+        assertThat(m.readMapLazy("select * from players").one()).isEqualTo(a);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      try {
+        assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      try {
+        assertThat(m.readMapOne("select * from players")).isEqualTo(a);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+
+      try {
+        DebugPointFactory.on();
+        assertThat(m.readList(Integer.class, "select * from players")).contains(1, 2);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+      DebugPointFactory.off();
+
+
       assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);
       assertThat(m.readAllLazy(Player.class).toList()).contains(a, b);
       assertThat(m.readAllLazy(Player.class).first()).isEqualTo(a);

@@ -14,19 +14,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 
-@Disabled
 public class TestMysql {
 
   private static final JdbcConnectionPool connectionPool = JdbcConnectionPool
-      .create("jdbc:h2:mem:persist;MODE=MySQL;DATABASE_TO_LOWER=TRUE", "persist", "persist");
+      .create("jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE", "persist", "persist");
 
   @BeforeAll
   static void beforAll() {
@@ -46,7 +45,7 @@ public class TestMysql {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = OrmMapper.of(conn);
+      OrmMapper persist = Sorm.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
@@ -64,7 +63,7 @@ public class TestMysql {
           .addField(new FieldMap("enumCol").setTypes(characterTypes).setSize(1));
       // .addField(new FieldMap("setCol").setTypes(characterTypes).setSize(1));
 
-      BeanTest.test(persist, beanMap);
+      BeanTest.test(getClass(), persist, beanMap);
     }
   }
 
@@ -72,7 +71,7 @@ public class TestMysql {
   public void testNumericTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = OrmMapper.of(conn);
+      OrmMapper persist = Sorm.toOrmConnection(conn);
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
       Class<?>[] byteTypes = new Class<?>[] {Byte.class, byte.class};
@@ -94,14 +93,14 @@ public class TestMysql {
               .addField(new FieldMap("doubleCol").setTypes(doubleTypes).setBoundaries(0, 9999))
               .addField(new FieldMap("decimalCol").setTypes(integerTypes));
 
-      BeanTest.test(persist, beanMap);
+      BeanTest.test(getClass(), persist, beanMap);
     }
   }
 
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = OrmMapper.of(conn);
+      OrmMapper persist = Sorm.toOrmConnection(conn);
 
       // not testing timestamp here, it doesn't support null values
       BeanMap beanMap = new BeanMap("DatetimeTypes")
@@ -115,14 +114,14 @@ public class TestMysql {
           .addField(new FieldMap("year4Col").setTypes(Short.class, short.class)
               .setBoundaries(1901, 1999).setSupportsCompareMapValue(false));
 
-      BeanTest.test(persist, beanMap);
+      BeanTest.test(getClass(), persist, beanMap);
     }
   }
 
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper persist = OrmMapper.of(conn);
+      OrmMapper persist = Sorm.toOrmConnection(conn);
 
       Class<?>[] binaryTypes =
           new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};
@@ -135,7 +134,7 @@ public class TestMysql {
           .addField(new FieldMap("mediumblobCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("longblobCol").setTypes(binaryTypes).setSize(16384));
 
-      BeanTest.test(persist, beanMap);
+      BeanTest.test(getClass(), persist, beanMap);
     }
   }
 

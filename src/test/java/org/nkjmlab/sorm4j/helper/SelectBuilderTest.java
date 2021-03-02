@@ -17,4 +17,11 @@ class SelectBuilderTest {
         .isEqualTo("SELECT * FROM customers WHERE id=1 ORDER BY id DESC LIMIT 1");
   }
 
+  @Test
+  void testBuild1() {
+    String sql = new SimpleSelectBuilder().select("*").from("customers").build();
+    org.assertj.core.api.Assertions.assertThat(sql).isEqualTo("SELECT * FROM customers");
+
+  }
+
 }

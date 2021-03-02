@@ -12,8 +12,9 @@ public class Simple08 {
   private String stringCol;
   private long intCol;
 
-  public long getId() {
-    return id;
+  // invalid return type
+  public void getId() {
+    return;
   }
 
   public void setId(long id) {
@@ -35,7 +36,8 @@ public class Simple08 {
     this.intCol = intCol;
   }
 
-  public String getStringCol() {
+  // invalid parameter
+  public String getStringCol(String str) {
     return stringCol;
   }
 

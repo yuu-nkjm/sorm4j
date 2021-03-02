@@ -19,13 +19,12 @@ public final class DebugPointFactory {
     modes.putAll(map);
   }
 
-
-  public static void onAll() {
+  public static void on() {
     Arrays.stream(Name.values()).forEach(name -> modes.put(name, true));
   }
 
 
-  public static void offAll() {
+  public static void off() {
     Arrays.stream(Name.values()).forEach(name -> modes.put(name, false));
   }
 

@@ -153,12 +153,6 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-
-  <T> List<String> getAllColumnsAux(Class<T> objectClass) {
-    return getTableMapping(objectClass).getAllColumns();
-  }
-
-
   @SuppressWarnings("unchecked")
   protected <T> TableMapping<T> getCastedTableMapping(Class<?> objectClass) {
     return (TableMapping<T>) getTableMapping(objectClass);
@@ -191,11 +185,6 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     return connection;
   }
 
-
-
-  <T> List<String> getPrimaryKeysAux(Class<T> objectClass) {
-    return getTableMapping(objectClass).getPrimaryKeys();
-  }
 
 
   public <T> TableMapping<T> getTableMapping(Class<T> objectClass) {

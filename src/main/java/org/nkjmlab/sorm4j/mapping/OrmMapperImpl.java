@@ -26,9 +26,6 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
    *
    * @param connection {@link java.sql.Connection} object to be used
    */
-  public OrmMapperImpl(Connection connection) {
-    this(connection, OrmConfigStore.DEFAULT_CONFIGURATIONS);
-  }
 
   public OrmMapperImpl(Connection connection, OrmConfigStore defaultConfigurations) {
     super(connection, defaultConfigurations);

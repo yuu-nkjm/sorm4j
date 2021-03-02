@@ -20,10 +20,6 @@ final class Accessor {
         setter != null ? new SetterMethod(setter, column) : new FieldSetter(field, column);
   }
 
-  public SetterAccessor getSetter() {
-    return setter;
-  }
-
 
   public Object get(Object object) {
     return getter.get(object);
@@ -76,8 +72,6 @@ final class Accessor {
     public String toString() {
       return getter.getReturnType().getSimpleName() + " " + getter.getName() + "()";
     }
-
-
   }
 
 

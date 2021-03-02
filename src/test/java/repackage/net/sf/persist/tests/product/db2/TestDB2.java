@@ -8,7 +8,6 @@ import java.sql.Clob;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.Sorm;
@@ -17,11 +16,10 @@ import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
-@Disabled
 public class TestDB2 {
 
-  private static final Sorm ormSrv = Sorm
-      .of(JdbcConnectionPool.create("jdbc:h2:mem:persist;MODE=DB2", "persist", "persist"));
+  private static final Sorm ormSrv =
+      Sorm.of(JdbcConnectionPool.create("jdbc:h2:mem:db2;MODE=DB2", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {
@@ -53,7 +51,7 @@ public class TestDB2 {
     // .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(16384)
     // .setSupportsQueryByValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -77,7 +75,7 @@ public class TestDB2 {
             .addField(new FieldMap("decimalCol").setTypes(integerTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("numericCol").setTypes(integerTypes).setBoundaries(0, 9999));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -88,7 +86,7 @@ public class TestDB2 {
         .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class)).addField(
             new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -112,7 +110,7 @@ public class TestDB2 {
         .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(16384)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
 }
