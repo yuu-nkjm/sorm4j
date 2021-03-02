@@ -76,7 +76,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testClose() {
-    Sorm.of(OrmTestUtils.createDataSourceH2()).getConnectionSource();
+    Sorm.create(OrmTestUtils.createDataSourceH2()).getConnectionSource();
 
     sorm.run(Guest.class, m -> {
       m.close();
@@ -445,7 +445,7 @@ class TypedOrmConnectionTest {
   @Test
   void testSormExeption() {
     try {
-      Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
+      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
           .getDataSource();
       fail("Should be fail");
     } catch (Exception e) {

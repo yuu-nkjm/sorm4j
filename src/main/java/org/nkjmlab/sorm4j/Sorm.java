@@ -26,32 +26,32 @@ public final class Sorm {
   }
 
 
-  public static Sorm of(ConnectionSource connectionSource) {
+  public static Sorm create(ConnectionSource connectionSource) {
     return new Sorm(connectionSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
-  public static Sorm of(DataSource dataSource) {
-    return of(ConnectionSource.of(dataSource));
+  public static Sorm create(DataSource dataSource) {
+    return create(ConnectionSource.of(dataSource));
   }
 
 
-  public static Sorm of(String jdbcUrl, String user, String password) {
-    return of(ConnectionSource.of(jdbcUrl, user, password));
+  public static Sorm create(String jdbcUrl, String user, String password) {
+    return create(ConnectionSource.of(jdbcUrl, user, password));
   }
 
-  public static Sorm withNewConfig(ConnectionSource connectionSource,
+  public static Sorm createWithNewConfig(ConnectionSource connectionSource,
       OrmConfigStore newConfigStore) {
     OrmCache.refresh(newConfigStore.getCacheName());
     return new Sorm(connectionSource, newConfigStore);
   }
 
-  public static Sorm withNewConfig(DataSource dataSource, OrmConfigStore newConfigStore) {
-    return withNewConfig(ConnectionSource.of(dataSource), newConfigStore);
+  public static Sorm createWithNewConfig(DataSource dataSource, OrmConfigStore newConfigStore) {
+    return createWithNewConfig(ConnectionSource.of(dataSource), newConfigStore);
   }
 
-  public static Sorm withNewConfig(String jdbcUrl, String user, String password,
+  public static Sorm createWithNewConfig(String jdbcUrl, String user, String password,
       OrmConfigStore newConfigStore) {
-    return withNewConfig(ConnectionSource.of(jdbcUrl, user, password), newConfigStore);
+    return createWithNewConfig(ConnectionSource.of(jdbcUrl, user, password), newConfigStore);
   }
 
 

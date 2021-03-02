@@ -19,7 +19,7 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 public class TestDB2 {
 
   private static final Sorm ormSrv =
-      Sorm.of(JdbcConnectionPool.create("jdbc:h2:mem:db2;MODE=DB2", "persist", "persist"));
+      Sorm.create(JdbcConnectionPool.create("jdbc:h2:mem:db2;MODE=DB2", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {

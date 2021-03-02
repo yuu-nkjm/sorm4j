@@ -31,7 +31,7 @@ class SormTest {
   void testException() throws SQLException {
     ConnectionSource mock = Mockito.spy(ConnectionSource.class);
     Mockito.doThrow(new SQLException("Mock exception")).when(mock).getConnection();
-    Sorm sorm = Sorm.of(mock);
+    Sorm sorm = Sorm.create(mock);
     try {
       sorm.getJdbcConnection();
       failBecauseExceptionWasNotThrown(OrmException.class);
@@ -49,7 +49,7 @@ class SormTest {
         Mockito.spy(new DataSourceConnectionSource(OrmTestUtils.createDataSourceHikari()));
 
     Mockito.when(csMock.getConnection()).thenReturn(conMock);
-    Sorm sorm = Sorm.of(csMock);
+    Sorm sorm = Sorm.create(csMock);
 
     try {
       sorm.runWithJdbcConnection(con -> {
@@ -69,11 +69,11 @@ class SormTest {
   void testToString() {
     assertThat(srv.toString()).contains("OrmService");
 
-    Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
-    Sorm.withNewConfig(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
+    Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
+    Sorm.createWithNewConfig(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
         OrmConfigStore.DEFAULT_CONFIGURATIONS);
 
-    Sorm.withNewConfig(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
+    Sorm.createWithNewConfig(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
         .getConnectionSource();
 
   }

@@ -21,7 +21,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.withNewConfig(ConnectionSource.of(jdbcUrl, user, password),
+    sorm = Sorm.createWithNewConfig(ConnectionSource.of(jdbcUrl, user, password),
         new OrmConfigStore.Builder().setMultiRowProcessorFactory(
             MultiRowProcessorFactory.of(t -> new SimpleBatchProcessor(t, 10))).build());
   }

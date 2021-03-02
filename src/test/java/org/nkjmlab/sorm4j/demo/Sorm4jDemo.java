@@ -43,7 +43,7 @@ public class Sorm4jDemo {
 
   private void demoOfSorm4J() {
 
-    Sorm service = Sorm.of(jdbcUrl, user, password);
+    Sorm service = Sorm.create(jdbcUrl, user, password);
     service.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
 
 

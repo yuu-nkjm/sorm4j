@@ -452,7 +452,7 @@ class OrmConnectionTest {
   @Test
   void testSormExeption() {
     try {
-      Sorm.of(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
+      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
           .getDataSource();
       fail("Should be fail");
     } catch (Exception e) {

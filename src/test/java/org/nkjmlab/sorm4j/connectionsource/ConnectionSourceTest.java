@@ -24,7 +24,7 @@ class ConnectionSourceTest {
       e.printStackTrace();
     }
 
-    Sorm.of(cs);
+    Sorm.create(cs);
   }
 
 }

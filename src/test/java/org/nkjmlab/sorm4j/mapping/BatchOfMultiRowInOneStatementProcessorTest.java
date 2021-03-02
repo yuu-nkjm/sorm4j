@@ -31,7 +31,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.withNewConfig(ConnectionSource.of(jdbcUrl, user, password),
+    sorm = Sorm.createWithNewConfig(ConnectionSource.of(jdbcUrl, user, password),
         new OrmConfigStore.Builder().setMultiRowProcessorFactory(MultiRowProcessorFactory
             .of(t -> new BatchOfMultiRowInOneStatementProcessor(t, 10, 10, 4))).build());
   }

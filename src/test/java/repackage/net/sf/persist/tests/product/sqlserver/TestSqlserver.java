@@ -19,7 +19,7 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestSqlserver {
   private static final Sorm ormSrv = Sorm
-      .of(JdbcConnectionPool.create("jdbc:h2:mem:sqlserver;MODE=MSSQLServer", "persist", "persist"));
+      .create(JdbcConnectionPool.create("jdbc:h2:mem:sqlserver;MODE=MSSQLServer", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {

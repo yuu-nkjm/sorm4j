@@ -20,7 +20,7 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestPostgreSQL {
   private static final Sorm ormSrv = Sorm
-      .of(JdbcConnectionPool.create("jdbc:h2:mem:postgre;MODE=PostgreSQL", "persist", "persist"));
+      .create(JdbcConnectionPool.create("jdbc:h2:mem:postgre;MODE=PostgreSQL", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {
