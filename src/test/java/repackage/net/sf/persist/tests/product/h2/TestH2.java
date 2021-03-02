@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
@@ -52,7 +53,7 @@ public class TestH2 {
   public void testStringTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = OrmMapper.of(conn);
+      OrmMapper simpleOrMapper = Sorm.toOrmConnection(conn);
 
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
       Class<?>[] clobTypes =
@@ -65,14 +66,14 @@ public class TestH2 {
           .addField(new FieldMap("varcharIgnorecaseCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(8192));
 
-      BeanTest.test(simpleOrMapper, beanMap);
+      BeanTest.test(getClass(), simpleOrMapper, beanMap);
     }
   }
 
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = OrmMapper.of(conn);
+      OrmMapper simpleOrMapper = Sorm.toOrmConnection(conn);
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -93,7 +94,7 @@ public class TestH2 {
               .addField(new FieldMap("doubleCol").setTypes(doubleTypes).setBoundaries(0, 9999))
               .addField(new FieldMap("realCol").setTypes(floatTypes).setBoundaries(0, 9999));
 
-      BeanTest.test(simpleOrMapper, beanMap);
+      BeanTest.test(getClass(), simpleOrMapper, beanMap);
     }
 
   }
@@ -101,7 +102,7 @@ public class TestH2 {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = OrmMapper.of(conn);
+      OrmMapper simpleOrMapper = Sorm.toOrmConnection(conn);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
@@ -109,7 +110,7 @@ public class TestH2 {
           .addField(new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class,
               java.util.Date.class));
 
-      BeanTest.test(simpleOrMapper, beanMap);
+      BeanTest.test(getClass(), simpleOrMapper, beanMap);
     }
 
   }
@@ -117,7 +118,7 @@ public class TestH2 {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = OrmMapper.of(conn);
+      OrmMapper simpleOrMapper = Sorm.toOrmConnection(conn);
 
       Class<?>[] binaryTypes =
           new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};
@@ -128,7 +129,7 @@ public class TestH2 {
           .addField(new FieldMap("blobCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("otherCol").setTypes(otherTypes).setSize(255));
 
-      BeanTest.test(simpleOrMapper, beanMap);
+      BeanTest.test(getClass(), simpleOrMapper, beanMap);
     }
   }
 

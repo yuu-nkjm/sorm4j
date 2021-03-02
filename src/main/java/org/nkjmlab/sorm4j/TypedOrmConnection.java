@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
-import org.nkjmlab.sorm4j.mapping.TypedOrmMapper;
 
 public interface TypedOrmConnection<T>
     extends TypedOrmMapper<T>, TransactionFunction, Closeable, AutoCloseable {

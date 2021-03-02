@@ -1,24 +1,25 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
 public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override
-  public Object getValueByClass(final ResultSet resultSet, final int column, final Class<?> type)
+  public Object getValueBySetterType(ResultSet resultSet, int column, Class<?> setterType)
       throws SQLException {
-    if (type.isEnum()) {
+    if (setterType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(type.getEnumConstants()).filter(o -> o.toString().equals(v)).findAny()
-          .orElse(null);
-    } else if (type.isArray()) {
-      final String name = type.getComponentType().getName();
+      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
+          .findAny().orElse(null);
+    } else if (setterType.isArray()) {
+      final String name = setterType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -27,98 +28,102 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         case "java.lang.Character":
           final String str = resultSet.getString(column);
           return (str == null) ? null : str.toCharArray();
+        default:
+          log.debug(
+              "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
+              name, column);
+          return resultSet.getObject(column);
+      }
+    } else {
+      final String name = setterType.getName();
+      switch (name) {
+        case "boolean":
+          return resultSet.getBoolean(column);
+        case "java.lang.Boolean": {
+          final boolean ret = resultSet.getBoolean(column);
+          return (!ret && resultSet.wasNull()) ? null : ret;
+        }
+        case "byte":
+          return resultSet.getByte(column);
+        case "java.lang.Byte": {
+          final byte ret = resultSet.getByte(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "short":
+          return resultSet.getShort(column);
+        case "java.lang.Short": {
+          final short ret = resultSet.getShort(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "int":
+          return resultSet.getInt(column);
+        case "java.lang.Integer": {
+          final int ret = resultSet.getInt(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "long":
+          return resultSet.getLong(column);
+        case "java.lang.Long": {
+          final long ret = resultSet.getLong(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "float":
+          return resultSet.getFloat(column);
+        case "java.lang.Float": {
+          final float ret = resultSet.getFloat(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "double":
+          return resultSet.getDouble(column);
+        case "java.lang.Double": {
+          final double ret = resultSet.getDouble(column);
+          return (ret == 0 && resultSet.wasNull()) ? null : ret;
+        }
+        case "java.math.BigDecimal":
+          return resultSet.getBigDecimal(column);
+        case "java.lang.String":
+          return resultSet.getString(column);
+        case "java.lang.Character":
+        case "char": {
+          final String str = resultSet.getString(column);
+          return (str == null || str.length() == 0) ? null : str.charAt(0);
+        }
+        case "java.sql.Date":
+          return resultSet.getDate(column);
+        case "java.sql.Time":
+          return resultSet.getTime(column);
+        case "java.sql.Timestamp":
+          return resultSet.getTimestamp(column);
+        case "java.io.InputStream":
+          return resultSet.getBinaryStream(column);
+        case "java.io.Reader":
+          return resultSet.getCharacterStream(column);
+        case "java.sql.Clob":
+          return resultSet.getClob(column);
+        case "java.sql.Blob":
+          return resultSet.getBlob(column);
+        case "java.time.LocalTime":
+          return resultSet.getTime(column).toLocalTime();
+        case "java.time.LocalDate":
+          return resultSet.getDate(column).toLocalDate();
+        case "java.time.LocalDateTime":
+          return resultSet.getTimestamp(column).toLocalDateTime();
+        case "java.lang.Object":
+          return resultSet.getObject(column);
+        default:
+          log.debug(
+              "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
+              name, column);
+          return resultSet.getObject(column);
       }
     }
-
-    final String name = type.getName();
-    switch (name) {
-      case "boolean":
-        return resultSet.getBoolean(column);
-      case "java.lang.Boolean": {
-        final boolean ret = resultSet.getBoolean(column);
-        return (!ret && resultSet.wasNull()) ? null : ret;
-      }
-      case "byte":
-        return resultSet.getByte(column);
-      case "java.lang.Byte": {
-        final byte ret = resultSet.getByte(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "short":
-        return resultSet.getShort(column);
-      case "java.lang.Short": {
-        final short ret = resultSet.getShort(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "int":
-        return resultSet.getInt(column);
-      case "java.lang.Integer": {
-        final int ret = resultSet.getInt(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "long":
-        return resultSet.getLong(column);
-      case "java.lang.Long": {
-        final long ret = resultSet.getLong(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "float":
-        return resultSet.getFloat(column);
-      case "java.lang.Float": {
-        final float ret = resultSet.getFloat(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "double":
-        return resultSet.getDouble(column);
-      case "java.lang.Double": {
-        final double ret = resultSet.getDouble(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
-      case "java.math.BigDecimal":
-        return resultSet.getBigDecimal(column);
-      case "java.lang.String":
-        return resultSet.getString(column);
-      case "java.lang.Character":
-      case "char": {
-        final String str = resultSet.getString(column);
-        return (str == null || str.length() == 0) ? null : str.charAt(0);
-      }
-      case "java.sql.Date":
-        return resultSet.getDate(column);
-      case "java.sql.Time":
-        return resultSet.getTime(column);
-      case "java.sql.Timestamp":
-        return resultSet.getTimestamp(column);
-      case "java.io.InputStream":
-        return resultSet.getBinaryStream(column);
-      case "java.io.Reader":
-        return resultSet.getCharacterStream(column);
-      case "java.sql.Clob":
-        return resultSet.getClob(column);
-      case "java.sql.Blob":
-        return resultSet.getBlob(column);
-      case "java.time.LocalTime":
-        return resultSet.getTime(column).toLocalTime();
-      case "java.time.LocalDate":
-        return resultSet.getDate(column).toLocalDate();
-      case "java.time.LocalDateTime":
-        return resultSet.getTimestamp(column).toLocalDateTime();
-      case "java.lang.Object":
-        return resultSet.getObject(column);
-      default:
-        log.warn(
-            "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
-            name, column);
-        return resultSet.getObject(column);
-    }
-
   }
 
   @Override
-  public Object getValueBySqlType(final ResultSet resultSet, final int column, final int type)
+  public Object getValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
-    switch (type) {
+    switch (sqlType) {
       case java.sql.Types.ARRAY:
         return resultSet.getArray(column);
       case java.sql.Types.BIGINT: {
@@ -196,9 +201,9 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
       case java.sql.Types.VARCHAR:
         return resultSet.getString(column);
       default:
-        log.warn(
+        log.debug(
             "Could not get value for result set using type [{}] on column [{}]. ResultSet.getObject method will be used.",
-            sqlTypeToString(type), column);
+            sqlTypeToString(sqlType), column);
         return resultSet.getObject(column);
     }
   }

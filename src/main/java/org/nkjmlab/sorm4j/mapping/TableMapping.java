@@ -188,7 +188,7 @@ public final class TableMapping<T> extends Mapping<T> {
         // Don't user type from metadata (metaData.getColumnType(1)) because object class of
         // container is prior.
         Class<?> classType = getSetterParamType(columnName);
-        final Object value = sqlToJavaConverter.getValueByClass(resultSet, 1, classType);
+        final Object value = resultSetConverter.getValueByClass(resultSet, 1, classType);
         setValue(object, columnName, value);
         ret.add(value);
       }

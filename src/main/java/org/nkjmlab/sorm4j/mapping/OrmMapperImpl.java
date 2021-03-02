@@ -26,9 +26,6 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
    *
    * @param connection {@link java.sql.Connection} object to be used
    */
-  public OrmMapperImpl(Connection connection) {
-    this(connection, OrmConfigStore.DEFAULT_CONFIGURATIONS);
-  }
 
   public OrmMapperImpl(Connection connection, OrmConfigStore defaultConfigurations) {
     super(connection, defaultConfigurations);
@@ -249,7 +246,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
 
   @Override
-  public <T> List<T> readAll(Class<T> objectClass) {
+  public final <T> List<T> readAll(Class<T> objectClass) {
     return readAllAux(objectClass);
   }
 

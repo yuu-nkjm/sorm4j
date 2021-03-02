@@ -8,30 +8,10 @@ public class TypedOrmTransaction<T> extends TypedOrmConnectionImpl<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 
-  TypedOrmTransaction(Class<T> objectClass, Connection connection, OrmConfigStore options,
+  public TypedOrmTransaction(Class<T> objectClass, Connection connection, OrmConfigStore options,
       int isolationLevel) {
     super(objectClass, connection, options);
     begin(isolationLevel);
-  }
-
-
-  public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection conn) {
-    return of(objectClass, conn, DEFAULT_ISOLATION_LEVEL, DEFAULT_CONFIGURATIONS);
-  }
-
-  public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection conn,
-      OrmConfigStore options) {
-    return of(objectClass, conn, DEFAULT_ISOLATION_LEVEL, options);
-  }
-
-  public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection conn,
-      int isolationLevel) {
-    return of(objectClass, conn, isolationLevel, DEFAULT_CONFIGURATIONS);
-  }
-
-  public static <T> TypedOrmTransaction<T> of(Class<T> objectClass, Connection connection,
-      int isolationLevel, OrmConfigStore options) {
-    return new TypedOrmTransaction<T>(objectClass, connection, options, isolationLevel);
   }
 
 

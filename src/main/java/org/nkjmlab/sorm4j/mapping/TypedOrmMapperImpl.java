@@ -8,28 +8,23 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
 import org.nkjmlab.sorm4j.SqlStatement;
+import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 
 public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 
   private Class<T> objectClass;
 
-  protected TypedOrmMapperImpl(Class<T> objectClass, Connection connection,
-      OrmConfigStore options) {
+  public TypedOrmMapperImpl(Class<T> objectClass, Connection connection, OrmConfigStore options) {
     super(connection, options);
     this.objectClass = objectClass;
   }
 
 
-  public List<String> getAllColumns() {
-    return getAllColumnsAux(objectClass);
+  @Override
+  public String getTableName() {
+    return getTableMapping(objectClass).getTableName();
   }
-
-  public List<String> getPrimaryKeys() {
-    return getPrimaryKeysAux(objectClass);
-  }
-
-
 
   @Override
   public T readByPrimaryKey(Object... primaryKeyValues) {
@@ -59,7 +54,7 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   }
 
   @Override
-  public List<T> readAll() {
+  public final List<T> readAll() {
     return readAllAux(objectClass);
   }
 

@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,9 +17,7 @@ import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.annotation.OrmColum;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.mapping.Column;
-import org.nkjmlab.sorm4j.mapping.ColumnOnTable;
-import org.nkjmlab.sorm4j.mapping.FieldName;
+import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 /**

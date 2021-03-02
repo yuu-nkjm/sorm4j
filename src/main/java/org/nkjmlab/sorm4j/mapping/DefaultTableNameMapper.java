@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
-import org.nkjmlab.sorm4j.mapping.TableName;
+import org.nkjmlab.sorm4j.config.TableNameMapper;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
-public final class DefaultTableNameGuesser implements TableNameMapper {
+public final class DefaultTableNameMapper implements TableNameMapper {
 
 
   @Override

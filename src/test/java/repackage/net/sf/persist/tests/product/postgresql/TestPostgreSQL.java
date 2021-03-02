@@ -10,7 +10,6 @@ import java.sql.Clob;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.Sorm;
@@ -19,10 +18,9 @@ import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
-@Disabled
 public class TestPostgreSQL {
   private static final Sorm ormSrv = Sorm
-      .of(JdbcConnectionPool.create("jdbc:h2:mem:persist;MODE=PostgreSQL", "persist", "persist"));
+      .of(JdbcConnectionPool.create("jdbc:h2:mem:postgre;MODE=PostgreSQL", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {
@@ -57,7 +55,7 @@ public class TestPostgreSQL {
         .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(8192)
             .setSupportsQueryByValue(false).setSupportsCompareMapValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -82,7 +80,7 @@ public class TestPostgreSQL {
                 new FieldMap("doublePrecisionCol").setTypes(doubleTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("booleanCol").setTypes(booleanTypes));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -93,7 +91,7 @@ public class TestPostgreSQL {
         .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class)).addField(
             new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -110,7 +108,7 @@ public class TestPostgreSQL {
         .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(8192)
             .setSupportsQueryByValue(false).setSupportsCompareMapValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
 

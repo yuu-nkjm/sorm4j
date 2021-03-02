@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.Sorm;
@@ -18,10 +17,9 @@ import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
-@Disabled
 public class TestSqlserver {
   private static final Sorm ormSrv = Sorm
-      .of(JdbcConnectionPool.create("jdbc:h2:mem:persist;MODE=MSSQLServer", "persist", "persist"));
+      .of(JdbcConnectionPool.create("jdbc:h2:mem:sqlserver;MODE=MSSQLServer", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {
@@ -54,7 +52,7 @@ public class TestSqlserver {
         .addField(new FieldMap("ntextCol").setTypes(clobTypes).setSize(4096)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -82,7 +80,7 @@ public class TestSqlserver {
             .addField(new FieldMap("floatCol").setTypes(floatTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("realCol").setTypes(floatTypes).setBoundaries(0, 9999));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -97,7 +95,7 @@ public class TestSqlserver {
             .setTypes(java.sql.Timestamp.class, java.util.Date.class)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
   @Test
@@ -111,7 +109,7 @@ public class TestSqlserver {
         .addField(new FieldMap("imageCol").setTypes(binaryTypes).setSize(16384)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
   }
 
 

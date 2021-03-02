@@ -46,10 +46,10 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     List<String> columns = createColumns(resultSet);
     List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
     return createObject(columns,
-        sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes));
+        resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
-  public List<T> loadObjectList(ResultSet resultSet) {
+  public final List<T> loadObjectList(ResultSet resultSet) {
     try {
       List<String> columns = createColumns(resultSet);
       List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
@@ -57,7 +57,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       final List<T> ret = new ArrayList<>();
       while (resultSet.next()) {
         ret.add(createObject(columns,
-            sqlToJavaConverter.toObjectsByClasses(resultSet, setterParamTypes)));
+            resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes)));
       }
       return ret;
     } catch (IllegalArgumentException | SecurityException | SQLException e) {
@@ -96,8 +96,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-  private static final Map<List<String>, List<Class<?>>> setterParamTypesMap =
-      new ConcurrentHashMap<>();
+  private final Map<List<String>, List<Class<?>>> setterParamTypesMap = new ConcurrentHashMap<>();
 
   private List<Class<?>> getSetterParamTypes(List<String> columns) {
     return setterParamTypesMap.computeIfAbsent(columns,

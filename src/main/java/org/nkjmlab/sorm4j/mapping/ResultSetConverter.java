@@ -37,7 +37,7 @@ public class ResultSetConverter {
     try {
       // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
       // is prior.
-      Object value = resultSetValueGetter.getValueByClass(resultSet, 1, objectClass);
+      Object value = resultSetValueGetter.getValueBySetterType(resultSet, 1, objectClass);
       @SuppressWarnings("unchecked")
       T valueT = (T) value;
       return valueT;
@@ -52,7 +52,7 @@ public class ResultSetConverter {
       final List<Object> values = new ArrayList<>(setterParamTypes.size());
       for (int i = 1; i <= setterParamTypes.size(); i++) {
         final Class<?> type = setterParamTypes.get(i - 1);
-        values.add(resultSetValueGetter.getValueByClass(resultSet, i, type));
+        values.add(resultSetValueGetter.getValueBySetterType(resultSet, i, type));
       }
       return values;
     } catch (IllegalArgumentException | SecurityException | SQLException e) {
@@ -61,7 +61,7 @@ public class ResultSetConverter {
   }
 
   public Object getValueByClass(ResultSet resultSet, int i, Class<?> classType) throws SQLException {
-    return resultSetValueGetter.getValueByClass(resultSet, i, classType);
+    return resultSetValueGetter.getValueBySetterType(resultSet, i, classType);
   }
 
 

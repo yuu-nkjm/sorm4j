@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.util.DataSourceHelper;
 import org.sql2o.Sql2o;
 import com.jamonapi.Monitor;
@@ -33,10 +34,10 @@ public class PerformanceH2 {
   private final String mode;
   private final File reportPath;
 
-  private final int inserts = 5000;
-  private final int batchInserts = 1000;
-  private final int reads = 1000;
-  private final int readLists = 5;
+  private final int inserts = 50;
+  private final int batchInserts = 10;
+  private final int reads = 10;
+  private final int readLists = 1;
   private final int batchSize = 32;
   private Sql2o sql2o;
 
@@ -45,11 +46,10 @@ public class PerformanceH2 {
     reportDir.mkdirs();
     this.mode = mode;
     this.reportPath = new File(reportDir, mode + "-report.html");
-    this.connectionHelper = new DataSourceHelper(getPackageNameToPath() + mode + ".h2.properties",
-        url -> user -> pwd -> DataSourceHelper.createDataSourceHikari(url, user, pwd));
+    this.connectionHelper =
+        new DataSourceHelper(getPackageNameToPath() + "h2." + mode + ".h2.properties",
+            url -> user -> pwd -> DataSourceHelper.createDataSourceHikari(url, user, pwd));
     this.sql2o = prepareSql2o(connectionHelper);
-
-
   }
 
   public static void main(String[] args) throws SQLException, IOException {
@@ -91,7 +91,7 @@ public class PerformanceH2 {
 
 
 
-  private void run() {
+  public void run() {
     dropAndCreateTable();
     profileMultiInsert();
     profileSingleInsert();
@@ -105,7 +105,7 @@ public class PerformanceH2 {
 
   private void dropAndCreateTable() {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper orm = OrmMapper.of(connection);
+      OrmMapper orm = Sorm.toOrmConnection(connection);
       connection.createStatement().execute("drop table if exists all_types");
       connection.createStatement().execute(
           "create table if not exists all_types ( int_col int, boolean_col boolean, tinyint_col tinyint, smallint_col smallint, bigint_col bigint, decimal_col decimal, double_col double, real_col real, time_col time, date_col date, timestamp_col timestamp, binary_col binary, blob_col blob, other_col other, uuid_col uuid, varchar_col varchar, varchar_ignorecase_col varchar_ignorecase, char_col char, clob_col clob, id int auto_increment primary key )");
@@ -160,7 +160,7 @@ public class PerformanceH2 {
 
   private void execOrmMultiRowInsert(AllTypes[] as) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper.of(connection).insert(as);
+      Sorm.toOrmConnection(connection).insert(as);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -283,7 +283,7 @@ public class PerformanceH2 {
 
   private void execOrmSingleInsert(AllTypes a) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper.of(connection).insert(a);
+      Sorm.toOrmConnection(connection).insert(a);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -320,7 +320,7 @@ public class PerformanceH2 {
 
   private void profileReadSingleByPrimaryKey() {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = OrmMapper.of(connection);
+      OrmMapper persist = Sorm.toOrmConnection(connection);
       // find a single id to be used by select by primary key
       int id = persist.readFirst(int.class, "select min(id) from all_types");
 
@@ -401,7 +401,7 @@ public class PerformanceH2 {
 
   private void execOrmSingleRead(int id) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper orm = OrmMapper.of(connection);
+      OrmMapper orm = Sorm.toOrmConnection(connection);
       orm.readByPrimaryKey(AllTypes.class, id);
     } catch (Exception e) {
       e.printStackTrace();
@@ -410,7 +410,7 @@ public class PerformanceH2 {
 
   private void execOrmMapSingleRead(String sql, int id) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = OrmMapper.of(connection);
+      OrmMapper persist = Sorm.toOrmConnection(connection);
       persist.readMapFirst(sql, id);
     } catch (Exception e) {
       e.printStackTrace();
@@ -480,7 +480,7 @@ public class PerformanceH2 {
   private void execOrmReadListAll(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all] orm");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = OrmMapper.of(connection);
+      OrmMapper persist = Sorm.toOrmConnection(connection);
       persist.readAll(AllTypes.class);
     } catch (Exception e) {
       e.printStackTrace();
@@ -491,7 +491,7 @@ public class PerformanceH2 {
   private void execOrmReadListAllLazy(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all lazy] orm");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = OrmMapper.of(connection);
+      OrmMapper persist = Sorm.toOrmConnection(connection);
       persist.readAllLazy(AllTypes.class).stream().collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
@@ -502,7 +502,7 @@ public class PerformanceH2 {
   private void execOrmMapReadListAll(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all] orm map");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = OrmMapper.of(connection);
+      OrmMapper persist = Sorm.toOrmConnection(connection);
       persist.readMapList("select * from all_types");
     } catch (Exception e) {
       e.printStackTrace();

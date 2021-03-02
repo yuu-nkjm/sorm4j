@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try;
@@ -83,7 +84,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public OrmConnection toUntyped() {
-    return OrmConnection.of(getJdbcConnection(), getConfigStore());
+    return Sorm.toOrmConnection(getJdbcConnection(), getConfigStore());
   }
 
 }

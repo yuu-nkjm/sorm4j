@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import org.nkjmlab.sorm4j.config.DefaultResultSetValueGetter;
-
 public final class ColumnOnTable extends Column {
 
   private int dataType;

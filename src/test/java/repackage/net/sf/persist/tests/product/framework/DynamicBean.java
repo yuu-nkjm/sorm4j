@@ -26,10 +26,11 @@ public class DynamicBean {
 
   private static final String DYNAMICBEAN_CLASS = DynamicBean.class.getName();
 
-  public static Class<?> createBeanClass(BeanMap beanMap) {
+  public static Class<?> createBeanClass(Class<?> caller, BeanMap beanMap) {
 
     ClassPool pool = ClassPool.getDefault();
-    CtClass cc = pool.makeClass(DynamicBean.class.getPackageName() + "." + beanMap.getClassName());
+    CtClass cc = pool.makeClass(DynamicBean.class.getPackageName() + "." + caller.getSimpleName()
+        + "." + beanMap.getClassName());
 
 
     try {

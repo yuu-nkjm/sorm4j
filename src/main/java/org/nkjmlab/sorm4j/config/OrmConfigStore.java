@@ -1,13 +1,17 @@
 package org.nkjmlab.sorm4j.config;
 
 import java.sql.Connection;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.mapping.DefaultResultSetValueGetter;
+import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 
 public final class OrmConfigStore {
 
   public static final String DEFAULT_CACHE = "DEFAULT_CACHE";
   public static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnFieldMapper();
-  public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameGuesser();
+  public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
   public static final ResultSetValueGetter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
       new DefaultResultSetValueGetter();
   public static final PreparedStatementParametersSetter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
@@ -44,11 +48,6 @@ public final class OrmConfigStore {
     this.resultSetValueGetter = sqlToJavaConverter;
     this.preparedStatementParametersSetter = javaToSqlConverter;
     this.multiProcessorFactory = batchConfig;
-  }
-
-
-  public String getConfigStoreName() {
-    return toString();
   }
 
   public String getCacheName() {

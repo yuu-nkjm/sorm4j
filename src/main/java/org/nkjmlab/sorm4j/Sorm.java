@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j;
 
+import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Consumer;
@@ -7,13 +8,14 @@ import java.util.function.Function;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
-import org.nkjmlab.sorm4j.connectionsource.DriverManagerConnectionSource;
+import org.nkjmlab.sorm4j.mapping.OrmCache;
+import org.nkjmlab.sorm4j.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 
 public final class Sorm {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+
 
   private final ConnectionSource connectionSource;
   private final OrmConfigStore configStore;
@@ -23,56 +25,59 @@ public final class Sorm {
     this.connectionSource = connectionSource;
   }
 
-  public static Sorm of(ConnectionSource connectionSource, OrmConfigStore configs) {
-    return new Sorm(connectionSource, configs);
-  }
 
   public static Sorm of(ConnectionSource connectionSource) {
-    return of(connectionSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return new Sorm(connectionSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
   }
 
   public static Sorm of(DataSource dataSource) {
-    return of(dataSource, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(ConnectionSource.of(dataSource));
   }
 
-  public static Sorm of(DataSource dataSource, OrmConfigStore configs) {
-    return of(new DataSourceConnectionSource(dataSource), configs);
-  }
 
   public static Sorm of(String jdbcUrl, String user, String password) {
-    return of(jdbcUrl, user, password, OrmConfigStore.DEFAULT_CONFIGURATIONS);
+    return of(ConnectionSource.of(jdbcUrl, user, password));
   }
 
-  public static Sorm of(String jdbcUrl, String user, String password, OrmConfigStore configs) {
-    return of(new DriverManagerConnectionSource(jdbcUrl, user, password), configs);
+  public static Sorm withNewConfig(ConnectionSource connectionSource,
+      OrmConfigStore newConfigStore) {
+    OrmCache.refresh(newConfigStore.getCacheName());
+    return new Sorm(connectionSource, newConfigStore);
   }
 
-  public static OrmConnection toOrmConnection(Connection conn) {
-    return OrmConnection.of(conn);
+  public static Sorm withNewConfig(DataSource dataSource, OrmConfigStore newConfigStore) {
+    return withNewConfig(ConnectionSource.of(dataSource), newConfigStore);
   }
+
+  public static Sorm withNewConfig(String jdbcUrl, String user, String password,
+      OrmConfigStore newConfigStore) {
+    return withNewConfig(ConnectionSource.of(jdbcUrl, user, password), newConfigStore);
+  }
+
 
   public static <T> TypedOrmConnection<T> toTypedOrmConnection(Class<T> objectClass,
       Connection conn) {
     return TypedOrmConnection.of(objectClass, conn);
   }
 
-
-
   public OrmTransaction beginTransaction() {
-    return OrmTransaction.of(getJdbcConnection(), configStore);
+    return new OrmTransaction(getJdbcConnection(), configStore,
+        OrmConfigStore.DEFAULT_ISOLATION_LEVEL);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), configStore);
+    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+        DEFAULT_ISOLATION_LEVEL);
   }
 
 
   public OrmTransaction beginTransaction(int isolationLevel) {
-    return OrmTransaction.of(getJdbcConnection(), isolationLevel, configStore);
+    return new OrmTransaction(getJdbcConnection(), configStore, isolationLevel);
   }
 
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
-    return TypedOrmTransaction.of(objectClass, getJdbcConnection(), isolationLevel, configStore);
+    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+        isolationLevel);
   }
 
   public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> handler) {
@@ -116,7 +121,7 @@ public final class Sorm {
   }
 
   public OrmConnection getConnection() {
-    return OrmConnection.of(getJdbcConnection(), configStore);
+    return toOrmConnection(getJdbcConnection(), configStore);
   }
 
 
@@ -188,6 +193,14 @@ public final class Sorm {
     return this.connectionSource;
   }
 
+
+  public static OrmConnection toOrmConnection(Connection connection) {
+    return toOrmConnection(connection, DEFAULT_CONFIGURATIONS);
+  }
+
+  public static OrmConnection toOrmConnection(Connection connection, OrmConfigStore configStore) {
+    return new OrmConnectionImpl(connection, configStore);
+  }
 
 
 }
