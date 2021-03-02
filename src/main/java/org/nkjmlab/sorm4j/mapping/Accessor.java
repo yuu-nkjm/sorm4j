@@ -53,7 +53,7 @@ final class Accessor {
     Object get(Object object);
   }
 
-  private static class GetterMethod implements GetterAccessor {
+  private static final class GetterMethod implements GetterAccessor {
 
     private final Column column;
     private final Method getter;
@@ -81,7 +81,7 @@ final class Accessor {
   }
 
 
-  private static class FieldGetter implements GetterAccessor {
+  private static final class FieldGetter implements GetterAccessor {
 
     private final Column column;
     private final Field field;
@@ -115,7 +115,7 @@ final class Accessor {
     Class<?> getParameterType();
   }
 
-  private static class SetterMethod implements SetterAccessor {
+  private static final class SetterMethod implements SetterAccessor {
 
     private final Column column;
     private final Method setter;
@@ -150,7 +150,7 @@ final class Accessor {
   }
 
 
-  private static class FieldSetter implements SetterAccessor {
+  private static final class FieldSetter implements SetterAccessor {
 
     private final Column column;
     private Field field;

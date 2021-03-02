@@ -412,7 +412,7 @@ public class TestSimple {
     } catch (Exception e) {
       log.info(e);
       org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
-          .contains("argument type mismatch");
+          .contains("Error setting value");
     }
   }
 
