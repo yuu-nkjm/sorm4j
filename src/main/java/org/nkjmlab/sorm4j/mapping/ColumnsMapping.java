@@ -96,8 +96,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-  private static final Map<List<String>, List<Class<?>>> setterParamTypesMap =
-      new ConcurrentHashMap<>();
+  private final Map<List<String>, List<Class<?>>> setterParamTypesMap = new ConcurrentHashMap<>();
 
   private List<Class<?>> getSetterParamTypes(List<String> columns) {
     return setterParamTypesMap.computeIfAbsent(columns,
