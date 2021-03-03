@@ -45,20 +45,16 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes));
   }
 
-  public final List<T> loadObjectList(ResultSet resultSet) {
-    try {
-      List<String> columns = createColumns(resultSet);
-      List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
+  public final List<T> loadObjectList(ResultSet resultSet) throws SQLException {
+    List<String> columns = createColumns(resultSet);
+    List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
 
-      final List<T> ret = new ArrayList<>();
-      while (resultSet.next()) {
-        ret.add(createObject(columns,
-            resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes)));
-      }
-      return ret;
-    } catch (IllegalArgumentException | SecurityException | SQLException e) {
-      throw new OrmException(e);
+    final List<T> ret = new ArrayList<>();
+    while (resultSet.next()) {
+      ret.add(createObject(columns,
+          resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes)));
     }
+    return ret;
   }
 
 
@@ -78,18 +74,14 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-  private static List<String> createColumns(ResultSet resultSet) {
-    try {
-      ResultSetMetaData metaData = resultSet.getMetaData();
-      int colNum = metaData.getColumnCount();
-      List<String> columns = new ArrayList<>(colNum);
-      for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnName(i));
-      }
-      return columns;
-    } catch (IllegalArgumentException | SecurityException | SQLException e) {
-      throw new OrmException(e);
+  private static List<String> createColumns(ResultSet resultSet) throws SQLException {
+    ResultSetMetaData metaData = resultSet.getMetaData();
+    int colNum = metaData.getColumnCount();
+    List<String> columns = new ArrayList<>(colNum);
+    for (int i = 1; i <= colNum; i++) {
+      columns.add(metaData.getColumnName(i));
     }
+    return columns;
   }
 
   private final Map<List<String>, List<Class<?>>> setterParamTypesMap = new ConcurrentHashMap<>();

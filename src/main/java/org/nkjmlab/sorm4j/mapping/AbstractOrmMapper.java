@@ -29,6 +29,7 @@ import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.StringUtils;
 import org.nkjmlab.sorm4j.util.Try;
+import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
 public abstract class AbstractOrmMapper implements SqlExecutor {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
@@ -98,7 +99,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   private <R> R execResultSet(String sql, Object[] parameters,
-      Function<ResultSet, R> sqlResultReader) {
+      ThrowableFunction<ResultSet, R> sqlResultReader) {
     try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       preparedParametersSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
@@ -111,7 +112,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
                 Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       String msg =
           (parameters == null || parameters.length == 0) ? StringUtils.format("Error in [{}]", sql)
               : StringUtils.format("Error in [{}] with {}", sql, parameters);
@@ -218,102 +219,80 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) {
-    try {
-      if (resultSet.next()) {
-        return toSingleObject(objectClass, resultSet);
-      }
-      return null;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+    if (resultSet.next()) {
+      return toSingleObject(objectClass, resultSet);
     }
+    return null;
   }
 
-  public Map<String, Object> loadFirstMap(ResultSet resultSet) {
-    try {
-      Map<String, Object> ret = null;
-      if (resultSet.next()) {
-        ret = toSingleMap(resultSet);
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  public Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
+    Map<String, Object> ret = null;
+    if (resultSet.next()) {
+      ret = toSingleMap(resultSet);
     }
+    return ret;
   }
 
-  public List<Map<String, Object>> loadMapList(ResultSet resultSet) {
-    try {
-      final List<Map<String, Object>> ret = new ArrayList<>();
-      ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
-      while (resultSet.next()) {
-        ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  public List<Map<String, Object>> loadMapList(ResultSet resultSet) throws SQLException {
+    final List<Map<String, Object>> ret = new ArrayList<>();
+    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+    while (resultSet.next()) {
+      ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
     }
+    return ret;
   }
 
 
-  private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet) {
-    try {
-      final Optional<DebugPoint> dp =
-          DebugPointFactory.createDebugPoint(DebugPointFactory.Name.LOAD_OBJECT);
-      final List<T> ret = new ArrayList<>();
-      while (resultSet.next()) {
-        ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
-      }
-      dp.ifPresent(sw -> {
-        try {
-          ResultSetMetaData metaData = resultSet.getMetaData();
-          if (metaData.getColumnCount() != 1) {
-            throw new OrmException("ResultSet returned [" + metaData.getColumnCount()
-                + "] columns but 1 column was expected to load data into an instance of ["
-                + objectClass.getName() + "]");
-          }
-        } catch (SQLException e) {
-          throw new OrmException(e);
+  private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
+      throws SQLException {
+    final Optional<DebugPoint> dp =
+        DebugPointFactory.createDebugPoint(DebugPointFactory.Name.LOAD_OBJECT);
+    final List<T> ret = new ArrayList<>();
+    while (resultSet.next()) {
+      ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
+    }
+    dp.ifPresent(sw -> {
+      try {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        if (metaData.getColumnCount() != 1) {
+          throw new OrmException("ResultSet returned [" + metaData.getColumnCount()
+              + "] columns but 1 column was expected to load data into an instance of ["
+              + objectClass.getName() + "]");
         }
-      });
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
-    }
+      } catch (SQLException e) {
+        throw new OrmException(e);
+      }
+    });
+    return ret;
 
   }
 
-  public <T> T loadOne(Class<T> objectClass, ResultSet resultSet) {
-    try {
-      T ret = null;
-      if (resultSet.next()) {
-        ret = toSingleObject(objectClass, resultSet);
-      }
-      if (resultSet.next()) {
-        throw new RuntimeException("Non-unique result returned");
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  public <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+    T ret = null;
+    if (resultSet.next()) {
+      ret = toSingleObject(objectClass, resultSet);
     }
+    if (resultSet.next()) {
+      throw new RuntimeException("Non-unique result returned");
+    }
+    return ret;
   }
 
 
-  public Map<String, Object> loadOneMap(ResultSet resultSet) {
-    try {
-      Map<String, Object> ret = null;
-      if (resultSet.next()) {
-        ret = toSingleMap(resultSet);
-      }
-      if (resultSet.next()) {
-        throw new OrmException("Non-unique result returned");
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  public Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
+    Map<String, Object> ret = null;
+    if (resultSet.next()) {
+      ret = toSingleMap(resultSet);
     }
+    if (resultSet.next()) {
+      throw new OrmException("Non-unique result returned");
+    }
+    return ret;
   }
 
-  public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet) {
+  public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
+      throws SQLException {
     ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
     return mapping.loadObjectList(resultSet);
   }
@@ -475,20 +454,16 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
             OrmException::new));
   }
 
-  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) {
-    try {
-      ResultSetMetaData metaData = resultSet.getMetaData();
-      int colNum = metaData.getColumnCount();
-      List<String> columns = new ArrayList<>(colNum);
-      List<Integer> columnTypes = new ArrayList<>(colNum);
-      for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnName(i));
-        columnTypes.add(metaData.getColumnType(i));
-      }
-      return new ColumnsAndTypes(columns, columnTypes);
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
+    ResultSetMetaData metaData = resultSet.getMetaData();
+    int colNum = metaData.getColumnCount();
+    List<String> columns = new ArrayList<>(colNum);
+    List<Integer> columnTypes = new ArrayList<>(colNum);
+    for (int i = 1; i <= colNum; i++) {
+      columns.add(metaData.getColumnName(i));
+      columnTypes.add(metaData.getColumnType(i));
     }
+    return new ColumnsAndTypes(columns, columnTypes);
   }
 
   private static class ColumnsAndTypes {

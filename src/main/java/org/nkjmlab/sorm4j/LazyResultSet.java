@@ -42,7 +42,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public T one() {
-    T ret = ormMapper.loadOne(objectClass, resultSet);
+    T ret = Try.getOrThrow(() -> ormMapper.loadOne(objectClass, resultSet), OrmException::new);
     close();
     return ret;
   }
@@ -53,7 +53,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public T first() {
-    T ret = ormMapper.loadFirst(objectClass, resultSet);
+    T ret = Try.getOrThrow(() -> ormMapper.loadFirst(objectClass, resultSet), OrmException::new);
     close();
     return ret;
   }
@@ -64,13 +64,15 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public List<T> toList() {
-    List<T> ret = ormMapper.loadPojoList(objectClass, resultSet);
+    List<T> ret =
+        Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), OrmException::new);
     close();
     return ret;
   }
 
   public Map<String, Object> oneMap() {
-    Map<String, Object> ret = ormMapper.loadOneMap(resultSet);
+    Map<String, Object> ret =
+        Try.getOrThrow(() -> ormMapper.loadOneMap(resultSet), OrmException::new);
     close();
     return ret;
   }
@@ -81,7 +83,8 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public Map<String, Object> firstMap() {
-    Map<String, Object> ret = ormMapper.loadFirstMap(resultSet);
+    Map<String, Object> ret =
+        Try.getOrThrow(() -> ormMapper.loadFirstMap(resultSet), OrmException::new);
     close();
     return ret;
   }
@@ -93,7 +96,8 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
    * @return
    */
   public List<Map<String, Object>> toMapList() {
-    List<Map<String, Object>> ret = ormMapper.loadMapList(resultSet);
+    List<Map<String, Object>> ret =
+        Try.getOrThrow(() -> ormMapper.loadMapList(resultSet), OrmException::new);
     close();
     return ret;
   }

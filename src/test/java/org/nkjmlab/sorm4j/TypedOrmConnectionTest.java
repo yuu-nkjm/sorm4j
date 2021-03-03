@@ -57,6 +57,12 @@ class TypedOrmConnectionTest {
     Guest a = SormTestUtils.GUEST_ALICE;
 
     sorm.run(Guest.class, conn -> {
+
+      conn.executeTransaction(tr -> {
+        return 1;
+      });
+
+
       OrmConnection orm = Sorm.toUntyped(conn);
       Sorm.toTyped(orm, Guest.class);
       orm.runTransaction(tr -> {
