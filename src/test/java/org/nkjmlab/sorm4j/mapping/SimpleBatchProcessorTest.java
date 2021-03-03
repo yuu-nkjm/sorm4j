@@ -2,20 +2,23 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.util.SormTestUtils.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
+import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class SimpleBatchProcessorTest {
 
   private static Sorm sorm;
-  private static final Player a = SormTestUtils.PLAYER_ALICE;
-  private static final Player b = SormTestUtils.PLAYER_BOB;
-  private static final Player c = SormTestUtils.PLAYER_CAROL;
+  private static final Player a = PLAYER_ALICE;
+  private static final Player b = PLAYER_BOB;
+  private static final Player c = PLAYER_CAROL;
 
   @BeforeAll
   static void setUp() {
@@ -27,7 +30,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeEach
   void setUpEach() {
-    SormTestUtils.dropAndCreateTable(sorm, Player.class);
+    SormTestUtils.dropAndCreateTableAll(sorm);
   }
 
   @Test
@@ -40,6 +43,12 @@ class SimpleBatchProcessorTest {
   @Test
   void testMultiRowInsert() {
     sorm.run(Player.class, conn -> conn.insert(a, b));
+  }
+
+  @Test
+  void testMultiRowInsertMany() {
+    sorm.run(Guest.class, conn -> conn
+        .insert(Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList())));
   }
 
   @Test

@@ -340,9 +340,6 @@ class TypedOrmConnectionTest {
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
-
-
-
     });
   }
 

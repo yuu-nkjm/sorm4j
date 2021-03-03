@@ -34,5 +34,4 @@ create table binary_types (
 );
 
 commit;
-exit;
 

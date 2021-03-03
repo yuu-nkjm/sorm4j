@@ -10,6 +10,8 @@ import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.mapping.DefaultResultSetValueGetter;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.SimpleBatchProcessor;
+import org.nkjmlab.sorm4j.util.Guest;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class OrmConfigStoreTest {
 
@@ -45,9 +47,15 @@ class OrmConfigStoreTest {
 
   @Test
   void testConfig() {
+    Sorm sorm = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTableAll(sorm);
+
+    sorm.run(Guest.class, con -> con.insert(new Guest[0]));
+
+
     Sorm.updateDefaultConfigStore(builder -> builder
         .setMultiRowProcessorFactory(t -> new SimpleBatchProcessor<>(t, 10)).build());
-    Sorm sorm = Sorm.create(ConnectionSource.of(jdbcUrl, user, password));
+    sorm = Sorm.create(ConnectionSource.of(jdbcUrl, user, password));
     assertThat(sorm.getConfigStore().getConfigName()).isEqualTo(OrmConfigStore.DEFAULT_CONFIG_NAME);
     Sorm.resetDefaultConfigStore();
   }
