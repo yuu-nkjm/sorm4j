@@ -28,6 +28,7 @@ public class Sorm4jDemo {
   private static final Customer c2_2 = new Customer(4, "Dave", "Nara");
 
   public static void main(String[] args) {
+    System.out.println(log.getName());
     Sorm4jDemo demo = new Sorm4jDemo();
     demo.createAndDropTable();
     demo.demoOfSorm4J();

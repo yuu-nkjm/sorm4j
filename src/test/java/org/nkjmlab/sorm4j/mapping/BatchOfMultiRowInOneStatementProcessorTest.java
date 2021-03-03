@@ -56,6 +56,22 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   }
 
   @Test
+  void testMultiRowInsertNull() {
+    try {
+      sorm.run(Player.class, conn -> conn.insert(a, b, c, a));
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Unique index or primary key violation");
+    }
+    try {
+      sorm.run(Player.class, conn -> conn.insert(a, b, null));
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Fail to get value from");
+    }
+  }
+
+  @Test
   void testMultiRowInsertMany() {
     sorm.run(Guest.class, conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));

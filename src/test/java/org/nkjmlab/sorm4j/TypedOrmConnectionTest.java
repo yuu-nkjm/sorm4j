@@ -355,11 +355,22 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
+      map = m.readMapFirst(SqlStatement.of("select * from players WHERE id=?", 100));
+      assertThat(map).isNull();
+
+
       Player p = m.readLazy("select * from players").toList().get(0);
       assertThat(p).isEqualTo(a);
 
       try {
         m.readLazy("select * from players").iterator().remove();
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+    });
+    sorm.run(Player.class, m -> {
+      try {
+        m.readLazy("select * from playersass");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }

@@ -37,10 +37,9 @@ public class TestSimple {
 
   @BeforeAll
   static void beforAll() {
-    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.TEMP, true,
-        DebugPointFactory.Name.MAPPING, true, DebugPointFactory.Name.READ, true,
-        DebugPointFactory.Name.LOAD_OBJECT, true, DebugPointFactory.Name.EXECUTE_BATCH, true,
-        DebugPointFactory.Name.EXECUTE_UPDATE, true));
+    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true,
+        DebugPointFactory.Name.READ, true, DebugPointFactory.Name.LOAD_OBJECT, true,
+        DebugPointFactory.Name.EXECUTE_BATCH, true, DebugPointFactory.Name.EXECUTE_UPDATE, true));
   }
 
   private static void dropAndCreateSimpleTable() {
