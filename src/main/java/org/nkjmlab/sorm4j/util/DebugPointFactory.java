@@ -10,12 +10,10 @@ public final class DebugPointFactory {
   private DebugPointFactory() {}
 
   public enum Name {
-    MAPPING, READ, LOAD_OBJECT, EXECUTE_BATCH, EXECUTE_UPDATE, TEMP;
+    MAPPING, READ, LOAD_OBJECT, EXECUTE_BATCH, EXECUTE_UPDATE;
   }
 
-
   private static final Map<Name, Boolean> modes = new EnumMap<>(Name.class);
-
 
   public static void setModes(Map<Name, Boolean> map) {
     modes.putAll(map);
@@ -28,10 +26,6 @@ public final class DebugPointFactory {
 
   public static void off() {
     Arrays.stream(Name.values()).forEach(name -> modes.put(name, false));
-  }
-
-  public static Optional<DebugPoint> createTempDebugPoint() {
-    return createDebugPoint(Name.TEMP);
   }
 
   public static Optional<DebugPoint> createDebugPoint(Name name) {

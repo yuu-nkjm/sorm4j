@@ -170,6 +170,10 @@ public final class TableMapping<T> extends Mapping<T> {
   }
 
   public Object[] getParameters(Object object, List<String> columns) {
+    if (object == null) {
+      throw new OrmException(StringUtils
+          .format("Fail to get value from a instance of [{}] but it is null.", objectClass));
+    }
     return columns.stream().map(columnName -> getValue(object, columnName)).toArray(Object[]::new);
   }
 
