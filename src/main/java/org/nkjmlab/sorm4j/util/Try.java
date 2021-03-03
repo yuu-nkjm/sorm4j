@@ -25,7 +25,7 @@ public final class Try {
 
   @FunctionalInterface
   public static interface ThrowableFunction<T, R> {
-    R apply(T t) throws Exception;
+    R apply(T t) throws Throwable;
   }
 
 

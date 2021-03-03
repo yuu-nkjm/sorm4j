@@ -29,7 +29,6 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-
     Sorm.configure("BATCH_CONF", builder -> builder.setMultiRowProcessorFactory(
         t -> new BatchOfMultiRowInOneStatementProcessor<>(t, 10, 10, 4)).build());
     sorm = Sorm.create(ConnectionSource.of(jdbcUrl, user, password), "BATCH_CONF");
@@ -46,6 +45,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
         .getTableMapping(Player.class).getFormattedString());
     assertThat(s).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
   }
+
 
   @Test
   void testMultiRowInsert() {

@@ -29,6 +29,11 @@ public final class OrmConfigStore {
   public static final MultiRowProcessorFactory DEFAULT_MULTI_ROW_PROCESSOR_FACTORY =
       new MultiRowProcessorFactory();
 
+  public static final OrmConfigStore INITIAL_DEFAULT_CONFIG_STORE =
+      new OrmConfigStore(DEFAULT_CONFIG_NAME, DEFAULT_COLUMN_FIELD_MAPPER,
+          DEFAULT_TABLE_NAME_MAPPER, DEFAULT_SQL_TO_JAVA_DATA_CONVERTER,
+          DEFAULT_JAVA_TO_SQL_DATA_CONVERTER, DEFAULT_MULTI_ROW_PROCESSOR_FACTORY);
+
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
@@ -40,10 +45,7 @@ public final class OrmConfigStore {
 
 
   static {
-    configStores.put(DEFAULT_CONFIG_NAME,
-        new OrmConfigStore(DEFAULT_CONFIG_NAME, DEFAULT_COLUMN_FIELD_MAPPER,
-            DEFAULT_TABLE_NAME_MAPPER, DEFAULT_SQL_TO_JAVA_DATA_CONVERTER,
-            DEFAULT_JAVA_TO_SQL_DATA_CONVERTER, DEFAULT_MULTI_ROW_PROCESSOR_FACTORY));
+    configStores.put(DEFAULT_CONFIG_NAME, INITIAL_DEFAULT_CONFIG_STORE);
   }
 
   OrmConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
@@ -137,15 +139,15 @@ public final class OrmConfigStore {
   }
 
 
-  public static OrmConfigStore put(OrmConfigStore newConfigStore) {
-    return configStores.put(newConfigStore.getConfigName(), newConfigStore);
+  public static OrmConfigStore put(OrmConfigStore configStore) {
+    return configStores.put(configStore.getConfigName(), configStore);
   }
 
-  public static OrmConfigStore get(String key) {
-    return configStores.get(key);
+  public static OrmConfigStore get(String configName) {
+    return configStores.get(configName);
   }
 
-  public static OrmConfigStore getDefaultConfig() {
+  public static OrmConfigStore getDefaultConfigStore() {
     return get(DEFAULT_CONFIG_NAME);
   }
 

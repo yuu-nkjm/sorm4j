@@ -61,7 +61,10 @@ public class Sorm4jDemo {
     Customer c2 = service.execute(conn -> conn.readByPrimaryKey(Customer.class, 1));
     log.debug("{}", c2);
 
-    service.run(Customer.class, conn -> conn.insert(new Customer(1, "Alice", "Kyoto")));
+    service.run(Customer.class, conn -> {
+      conn.insert(new Customer(1, "Alice", "Kyoto"));
+      conn.getJdbcConnection().commit();
+    });
     service.run(Customer.class, conn -> conn.insert(new Customer(2, "Bob", "Tokyo"),
         new Customer(3, "Carol", "Osaka"), new Customer(4, "Dave", "Nara")));
 

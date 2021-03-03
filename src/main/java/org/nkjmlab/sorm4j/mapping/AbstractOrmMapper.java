@@ -111,7 +111,10 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
         return ret;
       }
     } catch (Exception e) {
-      throw new OrmException(StringUtils.format("Error in [{}] with {}", sql, parameters), e);
+      String msg =
+          (parameters == null || parameters.length == 0) ? StringUtils.format("Error in [{}]", sql)
+              : StringUtils.format("Error in [{}] with {}", sql, parameters);
+      throw new OrmException(msg, e);
     }
   }
 

@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j;
 import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
@@ -27,14 +26,18 @@ public final class Sorm {
     return OrmConfigStore.put(newConfigStore);
   }
 
-  public static OrmConfigStore configureDefault(
+  public static OrmConfigStore configure(String configName,
+      Function<OrmConfigStore.Builder, OrmConfigStore> buildOrmConfigStore) {
+    return configure(buildOrmConfigStore.apply(new Builder(configName)));
+  }
+
+  public static OrmConfigStore updateDefaultConfigStore(
       Function<OrmConfigStore.Builder, OrmConfigStore> buildOrmConfigStore) {
     return configure(buildOrmConfigStore.apply(new Builder(DEFAULT_CONFIG_NAME)));
   }
 
-  public static OrmConfigStore configure(String configName,
-      Function<OrmConfigStore.Builder, OrmConfigStore> buildOrmConfigStore) {
-    return configure(buildOrmConfigStore.apply(new Builder(configName)));
+  public static OrmConfigStore resetDefaultConfigStore() {
+    return configure(OrmConfigStore.INITIAL_DEFAULT_CONFIG_STORE);
   }
 
 
@@ -64,7 +67,7 @@ public final class Sorm {
 
 
   public static OrmConnection getOrmConnection(Connection connection) {
-    return getOrmConnection(connection, OrmConfigStore.getDefaultConfig());
+    return getOrmConnection(connection, OrmConfigStore.getDefaultConfigStore());
   }
 
   private static OrmConnection getOrmConnection(Connection connection, OrmConfigStore configStore) {
@@ -77,7 +80,7 @@ public final class Sorm {
 
   public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
       Class<T> objectClass) {
-    return getTypedOrmConnection(conn, objectClass, OrmConfigStore.getDefaultConfig());
+    return getTypedOrmConnection(conn, objectClass, OrmConfigStore.getDefaultConfigStore());
   }
 
   public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
@@ -114,46 +117,62 @@ public final class Sorm {
     return new OrmTransaction(getJdbcConnection(), configStore, isolationLevel);
   }
 
-  public <T, R> R execute(Class<T> objectClass, Function<TypedOrmConnection<T>, R> handler) {
+  public <T, R> R execute(Class<T> objectClass,
+      OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       return handler.apply(conn);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public <R> R execute(Function<OrmConnection, R> handler) {
+  public <R> R execute(OrmFunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = getConnection()) {
       return handler.apply(conn);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
   public <T, R> R executeTransaction(Class<T> objectClass,
-      Function<TypedOrmTransaction<T>, R> handler) {
+      OrmFunctionHandler<TypedOrmTransaction<T>, R> handler) {
     try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
       return handler.apply(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
 
   public <T, R> R executeTransaction(Class<T> objectClass, int isolationLevel,
-      Function<TypedOrmTransaction<T>, R> handler) {
+      OrmFunctionHandler<TypedOrmTransaction<T>, R> handler) {
     try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       return handler.apply(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public <R> R executeTransaction(Function<OrmTransaction, R> handler) {
+  public <R> R executeTransaction(OrmFunctionHandler<OrmTransaction, R> handler) {
     try (OrmTransaction transaction = beginTransaction()) {
       return handler.apply(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public <R> R executeWithJdbcConnection(Function<Connection, R> handler) {
+  public <R> R executeWithJdbcConnection(OrmFunctionHandler<Connection, R> handler) {
     try (Connection conn = getJdbcConnection()) {
       return handler.apply(conn);
-    } catch (SQLException e) {
-      throw new OrmException(e);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
+
+  public OrmConfigStore getConfigStore() {
+    return this.configStore;
+  }
+
 
   public OrmConnection getConnection() {
     return getOrmConnection(getJdbcConnection(), configStore);
@@ -171,54 +190,69 @@ public final class Sorm {
     try {
       return connectionSource.getConnection();
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
 
-  public <T> void run(Class<T> objectClass, Consumer<TypedOrmConnection<T>> handler) {
+  public <T> void run(Class<T> objectClass, OrmConsumerHandler<TypedOrmConnection<T>> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
-      handler.accept(conn);
+      try {
+        handler.accept(conn);
+      } catch (Throwable e) {
+        throw OrmException.wrapIfNotOrmException(e);
+      }
     }
   }
 
-  public void run(Consumer<OrmConnection> handler) {
+  public void run(OrmConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = getConnection()) {
       handler.accept(conn);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public <T> void runTransaction(Class<T> objectClass, Consumer<TypedOrmTransaction<T>> handler) {
+  public <T> void runTransaction(Class<T> objectClass,
+      OrmConsumerHandler<TypedOrmTransaction<T>> handler) {
     try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
       handler.accept(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
   public <T> void runTransaction(Class<T> objectClass, int isolationLevel,
-      Consumer<TypedOrmTransaction<T>> handler) {
+      OrmConsumerHandler<TypedOrmTransaction<T>> handler) {
     try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       handler.accept(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
 
-  public void runTransaction(Consumer<OrmTransaction> handler) {
+  public void runTransaction(OrmConsumerHandler<OrmTransaction> handler) {
     try (OrmTransaction conn = beginTransaction()) {
       handler.accept(conn);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public void runTransaction(Consumer<OrmTransaction> handler, int isolationLevel) {
+  public void runTransaction(OrmConsumerHandler<OrmTransaction> handler, int isolationLevel) {
     try (OrmTransaction conn = beginTransaction(isolationLevel)) {
       handler.accept(conn);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
-  public void runWithJdbcConnection(Consumer<Connection> handler) {
+  public void runWithJdbcConnection(OrmConsumerHandler<Connection> handler) {
     try (Connection conn = getJdbcConnection()) {
       handler.accept(conn);
-    } catch (SQLException e) {
-      throw new OrmException(e);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
@@ -235,6 +269,20 @@ public final class Sorm {
   public static <T> TypedOrmConnection<T> toTyped(OrmConnection conn, Class<T> objectClass) {
     return getTypedOrmConnection(conn.getJdbcConnection(), objectClass,
         conn.getConfigStore().getConfigName());
+  }
+
+  @FunctionalInterface
+  public interface OrmConsumerHandler<T> {
+
+    void accept(T t) throws Throwable;
+
+  }
+
+  @FunctionalInterface
+  public interface OrmFunctionHandler<T, R> {
+
+    R apply(T t) throws Throwable;
+
   }
 
 
