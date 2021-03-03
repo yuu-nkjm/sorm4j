@@ -9,35 +9,34 @@ class ValuesObjectTest {
   @Test
   void testTableName() {
     System.out.println(LoggerFactory.class.getName());
+    TableName v1 = new TableName("test");
+    TableName v2 = new TableName("test");
+    verify(v1, v2);
 
-    TableName t1 = new TableName("test");
-    TableName t2 = new TableName("test");
-    assertThat(t1.toString()).isEqualTo("test");
-    assertThat(t1).isEqualTo(t1);
-    assertThat(t1).isEqualTo(t2);
-    assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
-    assertThat(t1).isNotEqualTo("test");
-    assertThat(t1.toString()).isEqualTo("test");
+  }
+
+  private void verify(Object v1, Object v2) {
+    assertThat(v1.toString().equals("test")).isTrue();
+    assertThat(v1.equals(v1)).isTrue();
+    assertThat(v1.equals(v2)).isTrue();
+    assertThat(v1.equals("test")).isFalse();
+    assertThat(v1.hashCode()).isEqualTo(v2.hashCode());
+
   }
 
   @Test
   void testFieldName() {
-    FieldName t1 = new FieldName("test");
-    FieldName t2 = new FieldName("test");
-    assertThat(t1.toString()).isEqualTo("test");
-    assertThat(t1).isEqualTo(t1);
-    assertThat(t1).isEqualTo(t2);
-    assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
+    FieldName v1 = new FieldName("test");
+    FieldName v2 = new FieldName("test");
+    verify(v1, v2);
   }
 
   @Test
   void testColumn() {
-    Column t1 = new Column("test");
-    Column t2 = new Column("test");
-    assertThat(t1.toString()).isEqualTo("test");
-    assertThat(t1).isEqualTo(t1);
-    assertThat(t1).isEqualTo(t2);
-    assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
+    Column v1 = new Column("test");
+    Column v2 = new Column("test");
+    verify(v1, v2);
+
   }
 
 }

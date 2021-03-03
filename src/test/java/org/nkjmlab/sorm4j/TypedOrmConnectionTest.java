@@ -48,7 +48,7 @@ class TypedOrmConnectionTest {
 
     try {
       sorm.run(Guest.class, m -> {
-        new DefaultTableNameMapper().toValidTableName("aaa", m.getJdbcConnection());
+        new DefaultTableNameMapper().toValidTableName("aaa", m.getJdbcConnection().getMetaData());
         failBecauseExceptionWasNotThrown(Exception.class);
       });
     } catch (Exception e) {
@@ -328,8 +328,7 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      map =
-          m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+      map = m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
