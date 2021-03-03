@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.config;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.util.OrmTestUtils.*;
+import static org.nkjmlab.sorm4j.util.SormTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;

@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
-import org.nkjmlab.sorm4j.util.OrmTestUtils;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
 class TableMappingTest {
@@ -16,10 +16,10 @@ class TableMappingTest {
 
   @BeforeEach
   void setUp() {
-    sorm = OrmTestUtils.createSorm();
-    OrmTestUtils.dropAndCreateTable(sorm, Guest.class);
-    OrmTestUtils.dropAndCreateTable(sorm, Player.class);
-    OrmTestUtils.dropAndCreateTable(sorm, Location.class);
+    sorm = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
+    SormTestUtils.dropAndCreateTable(sorm, Player.class);
+    SormTestUtils.dropAndCreateTable(sorm, Location.class);
   }
 
   @Test

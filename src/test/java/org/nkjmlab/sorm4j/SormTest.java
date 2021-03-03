@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.OrmTestUtils;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
 class SormTest {
@@ -20,9 +20,9 @@ class SormTest {
 
   @BeforeEach
   void setUp() {
-    srv = OrmTestUtils.createSorm();
-    OrmTestUtils.dropAndCreateTable(srv, Guest.class);
-    OrmTestUtils.dropAndCreateTable(srv, Player.class);
+    srv = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(srv, Guest.class);
+    SormTestUtils.dropAndCreateTable(srv, Player.class);
   }
 
 
@@ -45,7 +45,7 @@ class SormTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock).close();
 
     ConnectionSource csMock =
-        Mockito.spy(new DataSourceConnectionSource(OrmTestUtils.createDataSourceHikari()));
+        Mockito.spy(new DataSourceConnectionSource(SormTestUtils.createDataSourceHikari()));
 
     Mockito.when(csMock.getConnection()).thenReturn(conMock);
     Sorm sorm = Sorm.create(csMock);
@@ -68,7 +68,7 @@ class SormTest {
   void testToString() {
     assertThat(srv.toString()).contains("Sorm");
 
-    Sorm.create(OrmTestUtils.createDataSourceH2()).getConnectionSource();
+    Sorm.create(SormTestUtils.createDataSourceH2()).getConnectionSource();
 
   }
 
@@ -92,7 +92,7 @@ class SormTest {
     });
   }
 
-  Guest a = OrmTestUtils.GUEST_ALICE;
+  Guest a = SormTestUtils.GUEST_ALICE;
 
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {

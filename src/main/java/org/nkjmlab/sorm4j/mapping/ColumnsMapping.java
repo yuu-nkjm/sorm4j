@@ -18,24 +18,20 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 
 
-  public ColumnsMapping(ResultSetConverter sqlToJava, Class<T> objectClass,
-      ColumnFieldMapper nameGuesser) {
-    super(sqlToJava, objectClass, nameGuesser);
+  public ColumnsMapping(Class<T> objectClass, ResultSetConverter resultSetConverter,
+      ColumnFieldMapper columnFieldMapper) {
+    super(resultSetConverter, objectClass, columnFieldMapper);
     this.constructor =
         Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new)
             .get();
     this.constructor.setAccessible(true);
   }
 
-  public static <T> ColumnsMapping<T> createMapping(ResultSetConverter converter,
-      Class<T> objectClass, ColumnFieldMapper nameGuesser) {
-    return new ColumnsMapping<>(converter, objectClass, nameGuesser);
+  public static <T> ColumnsMapping<T> createMapping(Class<T> objectClass,
+      ResultSetConverter converter, ColumnFieldMapper nameGuesser) {
+    return new ColumnsMapping<>(objectClass, converter, nameGuesser);
   }
 
-  @Override
-  public String toString() {
-    return "ColumnsMapping [" + super.toString() + "]";
-  }
 
   public String getFormattedString() {
     return "Columns are mappted to class. " + System.lineSeparator()

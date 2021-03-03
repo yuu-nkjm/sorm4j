@@ -147,8 +147,8 @@ abstract class Mapping<T> {
   private static Map<FieldName, Method> extractedMethodStartWith(Class<?> objectClass,
       String prefix) {
     return Arrays.stream(objectClass.getDeclaredMethods())
-        .filter(
-            m -> m.getName().substring(0, prefix.length()).equals(prefix))
+        .filter(m -> m.getName().length() > prefix.length()
+            && m.getName().substring(0, prefix.length()).equals(prefix))
         .collect(Collectors.toMap(m -> new FieldName(
             m.getName().substring(prefix.length(), prefix.length() + 1).toLowerCase()
                 + m.getName().substring(prefix.length() + 1)),

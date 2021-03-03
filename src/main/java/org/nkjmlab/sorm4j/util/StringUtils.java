@@ -17,6 +17,10 @@ public final class StringUtils {
     return upper;
   }
 
+  public static String toLowerCase(String str) {
+    return str.toLowerCase(Locale.ENGLISH);
+  }
+
 
   /**
    * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)

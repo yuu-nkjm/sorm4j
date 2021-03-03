@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.util.OrmTestUtils.*;
+import static org.nkjmlab.sorm4j.util.SormTestUtils.*;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,15 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.OrmTestUtils;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 
   private static Sorm sorm;
-  private static final Player a = OrmTestUtils.PLAYER_ALICE;
-  private static final Player b = OrmTestUtils.PLAYER_BOB;
-  private static final Player c = OrmTestUtils.PLAYER_CAROL;
+  private static final Player a = SormTestUtils.PLAYER_ALICE;
+  private static final Player b = SormTestUtils.PLAYER_BOB;
+  private static final Player c = SormTestUtils.PLAYER_CAROL;
 
   @BeforeAll
   static void beforAll() {
@@ -36,7 +36,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeEach
   void setUpEach() {
-    OrmTestUtils.dropAndCreateTable(sorm, Player.class);
+    SormTestUtils.dropAndCreateTable(sorm, Player.class);
   }
 
   @Test

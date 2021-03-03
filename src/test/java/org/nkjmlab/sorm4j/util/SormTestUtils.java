@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.util;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 
-public class OrmTestUtils {
+public class SormTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
   public static final String user = "sa";
   public static final String password = "";

@@ -170,7 +170,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m =
-          ColumnsMapping.createMapping(resultSetConverter, objectClass, fieldMapper);
+          ColumnsMapping.createMapping(objectClass, resultSetConverter, fieldMapper);
       DebugPointFactory.createDebugPoint(DebugPointFactory.Name.MAPPING).ifPresent(dw -> log
           .debug("[{}] {}", dw.getName() + System.lineSeparator() + m.getFormattedString()));
       return m;

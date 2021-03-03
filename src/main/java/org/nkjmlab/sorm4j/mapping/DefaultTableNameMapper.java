@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
+import static org.nkjmlab.sorm4j.util.StringUtils.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -47,8 +48,9 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   }
 
   List<String> guessTableNameCandidates(Class<?> objectClass) {
-    return StringUtils
-        .addPluralSuffix(List.of(StringUtils.toUpperSnakeCase(objectClass.getSimpleName())));
+    String className = objectClass.getSimpleName();
+    return StringUtils.addPluralSuffix(
+        List.of(toUpperCase(className), toLowerCase(className), toUpperSnakeCase(className)));
   }
 
   /**
