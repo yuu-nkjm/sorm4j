@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentMap;
 
 public class OrmCache {
 
+  private OrmCache() {}
+
   private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
       new ConcurrentHashMap<>(); // key => Config Name
   private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =

@@ -43,6 +43,16 @@ class SimpleBatchProcessorTest {
   @Test
   void testMultiRowInsert() {
     sorm.run(Player.class, conn -> conn.insert(a, b));
+    sorm.runTransaction(tr -> {
+      try {
+        tr.insert(a, null);
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+        assertThat(e.getMessage()).contains("it is null");
+      }
+
+    });
+
   }
 
   @Test

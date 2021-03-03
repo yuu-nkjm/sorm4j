@@ -83,6 +83,14 @@ class TypedOrmConnectionTest {
         return 1;
       });
 
+      orm.runTransaction(tr -> {
+        try {
+          tr.insert(a, null);
+          failBecauseExceptionWasNotThrown(Exception.class);
+        } catch (Exception e) {
+          assertThat(e.getMessage()).contains("it is null");
+        }
+      });
 
 
     });
