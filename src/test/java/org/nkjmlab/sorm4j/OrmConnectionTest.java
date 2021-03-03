@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class OrmConnectionTest {
 

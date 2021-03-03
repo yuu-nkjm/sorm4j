@@ -328,6 +328,12 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
+      map =
+          m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+
       map = m.readMapFirst(SqlStatement.of("select * from players"));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
