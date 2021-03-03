@@ -11,8 +11,8 @@ import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class SormTest {
 
@@ -62,6 +62,91 @@ class SormTest {
       failBecauseExceptionWasNotThrown(OrmException.class);
     } catch (OrmException e) {
     }
+    try {
+      sorm.execute(con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.execute(Guest.class, con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.executeTransaction(con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.executeTransaction(Guest.class, con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.executeTransaction(1, con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.executeTransaction(Guest.class, 1, con -> {
+        return 1;
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.runWithJdbcConnection(con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.run(con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.run(Guest.class, con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.runTransaction(con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.runTransaction(Guest.class, con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.runTransaction(1, con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+    try {
+      sorm.runTransaction(Guest.class, 1, con -> {
+      });
+      failBecauseExceptionWasNotThrown(OrmException.class);
+    } catch (OrmException e) {
+    }
+
   }
 
   @Test

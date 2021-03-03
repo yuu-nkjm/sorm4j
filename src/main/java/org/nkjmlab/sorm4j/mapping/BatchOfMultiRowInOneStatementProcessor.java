@@ -3,11 +3,11 @@ package org.nkjmlab.sorm4j.mapping;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.PreparedStatementUtils;
+import org.nkjmlab.sorm4j.util.Try.ThrowableBiConsumer;
+import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
 public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
 
@@ -50,8 +50,8 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
    * @return
    */
   private final int[] procMultiRowOneStatementAndBatch(Connection con,
-      Function<Integer, PreparedStatement> multiRowStatementCreator,
-      BiConsumer<PreparedStatement, T[]> parametersSetter, T[] objects) {
+      ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
+      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter, T[] objects) {
 
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);
     final int[] result = new int[objsPartitions.size()];
@@ -78,7 +78,7 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
         result[lastPartition] = lastStmt.executeUpdate();
         return result;
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       rollbackIfRequired(con, origAutoCommit);
       throw new OrmException(e);
     } finally {

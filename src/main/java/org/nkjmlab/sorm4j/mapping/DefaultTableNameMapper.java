@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.util.StringUtils.*;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,34 +16,27 @@ public final class DefaultTableNameMapper implements TableNameMapper {
 
 
   @Override
-  public TableName toValidTableName(String tableName, Connection connection) {
-    try {
-      List<String> candidates = List.of(StringUtils.toUpperCase(tableName));
-      DatabaseMetaData metaData = connection.getMetaData();
-      return getTableNameOnDb(metaData, candidates).orElseThrow(() -> new OrmException(StringUtils
-          .format("[{}]  does not match a existing table in the db. Candidates Name are {}",
-              tableName, candidates)));
-    } catch (SQLException e) {
-      throw new OrmException(e);
-    }
+  public TableName toValidTableName(String tableName, DatabaseMetaData metaData)
+      throws SQLException {
+    List<String> candidates = List.of(StringUtils.toUpperCase(tableName));
+    return getTableNameOnDb(metaData, candidates).orElseThrow(() -> new OrmException(StringUtils
+        .format("[{}]  does not match a existing table in the db. Candidates Name are {}",
+            tableName, candidates)));
   }
 
 
   @Override
-  public TableName getTableName(final Class<?> objectClass, final Connection connection) {
-    try {
-      DatabaseMetaData metaData = connection.getMetaData();
-      final OrmTable tableAnnotation = objectClass.getAnnotation(OrmTable.class);
-      List<String> candidates = (tableAnnotation != null && !tableAnnotation.value().equals(""))
-          ? Arrays.asList(tableAnnotation.value())
-          : guessTableNameCandidates(objectClass);
-      return getTableNameOnDb(metaData, candidates)
-          .orElseThrow(() -> new OrmException(StringUtils.format(
-              "[{}]  does not match a existing table in the db. Use [{}] annotation correctly. Candidates Name are {}",
-              objectClass.getName(), OrmTable.class.getName(), candidates)));
-    } catch (SQLException e) {
-      throw new OrmException(e);
-    }
+  public TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData)
+      throws SQLException {
+
+    final OrmTable tableAnnotation = objectClass.getAnnotation(OrmTable.class);
+    List<String> candidates = (tableAnnotation != null && !tableAnnotation.value().equals(""))
+        ? Arrays.asList(tableAnnotation.value())
+        : guessTableNameCandidates(objectClass);
+    return getTableNameOnDb(metaData, candidates)
+        .orElseThrow(() -> new OrmException(StringUtils.format(
+            "[{}]  does not match a existing table in the db. Use [{}] annotation correctly. Candidates Name are {}",
+            objectClass.getName(), OrmTable.class.getName(), candidates)));
   }
 
   List<String> guessTableNameCandidates(Class<?> objectClass) {
@@ -56,9 +48,14 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   /**
    * Check if the given names corresponds to a table in the database and returns the corresponding
    * name returned by the database metadata
+   *
+   * @param metaData
+   * @param tableNameCandidates
+   * @return
+   * @throws SQLException
    */
-  Optional<TableName> getTableNameOnDb(DatabaseMetaData metaData,
-      List<String> tableNameCandidates) {
+  public Optional<TableName> getTableNameOnDb(DatabaseMetaData metaData,
+      List<String> tableNameCandidates) throws SQLException {
 
     try (
         ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
@@ -69,8 +66,6 @@ public final class DefaultTableNameMapper implements TableNameMapper {
         }
       }
       return Optional.empty();
-    } catch (SQLException e) {
-      throw new OrmException(e);
     }
   }
 

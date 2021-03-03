@@ -33,6 +33,13 @@ class DefaultResultSetValueGetterTest {
     sorm.run(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom()).limit(10000)
         .toArray(LocalDateTimeSample[]::new)));
 
+    try {
+      sorm.run(con -> con.update(a));
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("doesn't have them");
+    }
+
 
 
   }

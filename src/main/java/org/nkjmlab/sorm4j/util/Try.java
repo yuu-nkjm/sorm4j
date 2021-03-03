@@ -1,11 +1,14 @@
 package org.nkjmlab.sorm4j.util;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class Try {
-  //private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+
+  private Try() {}
 
   @FunctionalInterface
   public static interface ThrowableRunnable {
@@ -26,6 +29,11 @@ public final class Try {
   @FunctionalInterface
   public static interface ThrowableFunction<T, R> {
     R apply(T t) throws Throwable;
+  }
+
+  @FunctionalInterface
+  public static interface ThrowableBiConsumer<T, S> {
+    void accept(T t, S s) throws Throwable;
   }
 
 
@@ -91,9 +99,27 @@ public final class Try {
     };
   }
 
+  public static <T, S> BiConsumer<T, S> createBiConsumer(ThrowableBiConsumer<T, S> onTry,
+      Consumer<Throwable> onCatch) {
+    return (t, s) -> {
+      try {
+        onTry.accept(t, s);
+      } catch (Throwable e) {
+        onCatch.accept(e);
+      }
+    };
+  }
+
   public static <T, R, X extends RuntimeException> Function<T, R> createFunctionWithThrow(
       ThrowableFunction<T, R> onTry, Function<Throwable, ? extends X> ex) throws X {
     return createFunction(onTry, e -> {
+      throw ex.apply(e);
+    });
+  }
+
+  public static <T, S, X extends RuntimeException> BiConsumer<T, S> createBiConsumerWithThrow(
+      ThrowableBiConsumer<T, S> onTry, Function<Throwable, ? extends X> ex) throws X {
+    return createBiConsumer(onTry, e -> {
       throw ex.apply(e);
     });
   }
@@ -116,7 +142,7 @@ public final class Try {
       Function<Throwable, ? extends X> ex) throws X {
     createRunnable(onTry, e -> {
       throw ex.apply(e);
-    }).run();;
+    }).run();
   }
 
 

@@ -19,20 +19,16 @@ final class BatchHelper {
     this.stmt = stmt;
   }
 
-  public void addBatchAndExecuteIfReachedThreshold() {
+  public void addBatchAndExecuteIfReachedThreshold() throws SQLException {
     addBatch();
-    if (counter + 1 % batchSize == 0) {
+    if ((counter + 1) % batchSize == 0) {
       executeBatch();
     }
   }
 
-  private void addBatch() {
-    try {
-      stmt.addBatch();
-      counter++;
-    } catch (SQLException e) {
-      throw new OrmException(e);
-    }
+  private void addBatch() throws SQLException {
+    stmt.addBatch();
+    counter++;
   }
 
   public int[] finish() {

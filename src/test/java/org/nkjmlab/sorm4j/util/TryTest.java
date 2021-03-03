@@ -52,8 +52,24 @@ class TryTest {
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
-
   }
+
+  @Test
+  void testCreateBiConsumer() {
+    try {
+      Try.createBiConsumer((con1, con2) -> {
+        throw new RuntimeException("try");
+      }, e -> {
+      }).accept("a", "b");
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("try");
+    }
+    Try.createBiConsumer((con1, con2) -> {
+    }, e -> {
+    }).accept("a", "b");
+  }
+
+
 
   @Test
   void testCreateConsumerWithThrow() {
@@ -61,6 +77,19 @@ class TryTest {
       Try.createConsumerWithThrow(con -> {
         throw new RuntimeException("try");
       }, OrmException::new).accept("a");
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("try");
+    }
+    Try.createConsumerWithThrow(con -> {
+    }, OrmException::new).accept("a");
+  }
+
+  @Test
+  void testCreateBiConsumerWithThrow() {
+    try {
+      Try.createBiConsumerWithThrow((c1, c2) -> {
+        throw new RuntimeException("try");
+      }, OrmException::new).accept("a", "b");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
@@ -106,6 +135,9 @@ class TryTest {
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
+    Try.getOrThrow(() -> {
+      return null;
+    }, OrmException::new);
   }
 
   @Test
@@ -117,6 +149,8 @@ class TryTest {
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
+    Try.runOrThrow(() -> {
+    }, OrmException::new);
   }
 
 }

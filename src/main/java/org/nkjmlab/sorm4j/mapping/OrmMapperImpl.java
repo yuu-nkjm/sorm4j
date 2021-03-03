@@ -127,7 +127,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGetResult(getJdbcConnection(), objects),
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
         () -> InsertResult.empty());
   }
 
@@ -165,7 +165,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   public <T> InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects, tableName,
-        mapping -> mapping.insertAndGetResult(getJdbcConnection(), objects),
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
         () -> InsertResult.empty());
   }
 

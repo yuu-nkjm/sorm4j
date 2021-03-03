@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class OrmConnectionTest {
 
@@ -343,6 +343,9 @@ class OrmConnectionTest {
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
+
+      assertThat(m.readList(Integer.class, "select id from players")).contains(1, 2);
+
 
       try {
         DebugPointFactory.on();
