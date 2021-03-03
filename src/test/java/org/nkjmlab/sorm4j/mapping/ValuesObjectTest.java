@@ -8,6 +8,7 @@ class ValuesObjectTest {
   @Test
   void test() {
     assertThat(new TableName("test")).isEqualTo(new TableName("test"));
+    assertThat(new TableName("test").hashCode()).isEqualTo(new TableName("test").hashCode());
   }
 
 }

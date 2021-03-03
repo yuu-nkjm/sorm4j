@@ -105,7 +105,7 @@ public class PerformanceH2 {
 
   private void dropAndCreateTable() {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper orm = Sorm.toOrmConnection(connection);
+      OrmMapper orm = Sorm.getOrmConnection(connection);
       connection.createStatement().execute("drop table if exists all_types");
       connection.createStatement().execute(
           "create table if not exists all_types ( int_col int, boolean_col boolean, tinyint_col tinyint, smallint_col smallint, bigint_col bigint, decimal_col decimal, double_col double, real_col real, time_col time, date_col date, timestamp_col timestamp, binary_col binary, blob_col blob, other_col other, uuid_col uuid, varchar_col varchar, varchar_ignorecase_col varchar_ignorecase, char_col char, clob_col clob, id int auto_increment primary key )");
@@ -160,7 +160,7 @@ public class PerformanceH2 {
 
   private void execOrmMultiRowInsert(AllTypes[] as) {
     try (Connection connection = connectionHelper.getConnection()) {
-      Sorm.toOrmConnection(connection).insert(as);
+      Sorm.getOrmConnection(connection).insert(as);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -283,7 +283,7 @@ public class PerformanceH2 {
 
   private void execOrmSingleInsert(AllTypes a) {
     try (Connection connection = connectionHelper.getConnection()) {
-      Sorm.toOrmConnection(connection).insert(a);
+      Sorm.getOrmConnection(connection).insert(a);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -320,7 +320,7 @@ public class PerformanceH2 {
 
   private void profileReadSingleByPrimaryKey() {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = Sorm.toOrmConnection(connection);
+      OrmMapper persist = Sorm.getOrmConnection(connection);
       // find a single id to be used by select by primary key
       int id = persist.readFirst(int.class, "select min(id) from all_types");
 
@@ -401,7 +401,7 @@ public class PerformanceH2 {
 
   private void execOrmSingleRead(int id) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper orm = Sorm.toOrmConnection(connection);
+      OrmMapper orm = Sorm.getOrmConnection(connection);
       orm.readByPrimaryKey(AllTypes.class, id);
     } catch (Exception e) {
       e.printStackTrace();
@@ -410,7 +410,7 @@ public class PerformanceH2 {
 
   private void execOrmMapSingleRead(String sql, int id) {
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = Sorm.toOrmConnection(connection);
+      OrmMapper persist = Sorm.getOrmConnection(connection);
       persist.readMapFirst(sql, id);
     } catch (Exception e) {
       e.printStackTrace();
@@ -480,7 +480,7 @@ public class PerformanceH2 {
   private void execOrmReadListAll(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all] orm");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = Sorm.toOrmConnection(connection);
+      OrmMapper persist = Sorm.getOrmConnection(connection);
       persist.readAll(AllTypes.class);
     } catch (Exception e) {
       e.printStackTrace();
@@ -491,7 +491,7 @@ public class PerformanceH2 {
   private void execOrmReadListAllLazy(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all lazy] orm");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = Sorm.toOrmConnection(connection);
+      OrmMapper persist = Sorm.getOrmConnection(connection);
       persist.readAllLazy(AllTypes.class).stream().collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
@@ -502,7 +502,7 @@ public class PerformanceH2 {
   private void execOrmMapReadListAll(String sql) {
     Monitor mon = MonitorFactory.start("[" + mode + "]" + "[read list all] orm map");
     try (Connection connection = connectionHelper.getConnection()) {
-      OrmMapper persist = Sorm.toOrmConnection(connection);
+      OrmMapper persist = Sorm.getOrmConnection(connection);
       persist.readMapList("select * from all_types");
     } catch (Exception e) {
       e.printStackTrace();

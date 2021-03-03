@@ -9,9 +9,7 @@ import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.Try;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
@@ -24,11 +22,11 @@ public class TestDB2 {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.run(Try.createConsumerWithThrow(conn -> {
+      ormSrv.run(conn -> {
         String sql = String.join(System.lineSeparator(),
             Files.readAllLines(new File(TestDB2.class.getResource("db2.sql").toURI()).toPath()));
         conn.executeUpdate(sql);
-      }, OrmException::new));
+      });
     } catch (Exception e) {
       e.printStackTrace();
     }

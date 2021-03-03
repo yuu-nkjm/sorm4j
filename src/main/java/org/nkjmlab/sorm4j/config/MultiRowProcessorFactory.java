@@ -7,7 +7,6 @@ import org.nkjmlab.sorm4j.mapping.TableMapping;
 
 public final class MultiRowProcessorFactory implements OrmConfig {
 
-
   private static final int DEFAULT_BATCH_SIZE = 32;
   private static final int DEFAULT_MULTI_ROW_SIZE = 32;
 
@@ -29,6 +28,7 @@ public final class MultiRowProcessorFactory implements OrmConfig {
   public Function<TableMapping<?>, MultiRowProcessor<?>> getMultiRowProcessorFactory() {
     return multiRowProcessorFactory;
   }
+
 
   public static MultiRowProcessorFactory of(
       Function<TableMapping<?>, MultiRowProcessor<?>> multiRowProcessorFactory) {

@@ -258,7 +258,7 @@ public final class TableMapping<T> extends Mapping<T> {
    *
    */
 
-  public int[] update(Connection connection, T... objects) {
+  public int[] update(Connection connection, @SuppressWarnings("unchecked") T... objects) {
     throwExeptionIfPrimaryKeysIsNotExist();
     return batch(connection, sql.getUpdateSql(), obj -> getUpdateParameters(obj), objects);
   }

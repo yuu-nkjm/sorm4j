@@ -6,13 +6,12 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.mapping.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.OrmTestUtils;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
 
 class SormTest {
@@ -21,9 +20,9 @@ class SormTest {
 
   @BeforeEach
   void setUp() {
-    srv = OrmTestUtils.createSorm();
-    OrmTestUtils.dropAndCreateTable(srv, Guest.class);
-    OrmTestUtils.dropAndCreateTable(srv, Player.class);
+    srv = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(srv, Guest.class);
+    SormTestUtils.dropAndCreateTable(srv, Player.class);
   }
 
 
@@ -46,7 +45,7 @@ class SormTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock).close();
 
     ConnectionSource csMock =
-        Mockito.spy(new DataSourceConnectionSource(OrmTestUtils.createDataSourceHikari()));
+        Mockito.spy(new DataSourceConnectionSource(SormTestUtils.createDataSourceHikari()));
 
     Mockito.when(csMock.getConnection()).thenReturn(conMock);
     Sorm sorm = Sorm.create(csMock);
@@ -67,14 +66,9 @@ class SormTest {
 
   @Test
   void testToString() {
-    assertThat(srv.toString()).contains("OrmService");
+    assertThat(srv.toString()).contains("Sorm");
 
-    Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
-    Sorm.createWithNewConfig(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
-        OrmConfigStore.DEFAULT_CONFIGURATIONS);
-
-    Sorm.createWithNewConfig(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
-        .getConnectionSource();
+    Sorm.create(SormTestUtils.createDataSourceH2()).getConnectionSource();
 
   }
 
@@ -98,7 +92,7 @@ class SormTest {
     });
   }
 
-  Guest a = OrmTestUtils.GUEST_ALICE;
+  Guest a = SormTestUtils.GUEST_ALICE;
 
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
@@ -109,7 +103,7 @@ class SormTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -122,7 +116,7 @@ class SormTest {
       // auto-rollback
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmTransaction tr = srv.beginTransaction()) {
       tr.begin();
@@ -130,7 +124,7 @@ class SormTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(1);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
     });
   }
 

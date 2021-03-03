@@ -61,7 +61,10 @@ public class Sorm4jDemo {
     Customer c2 = service.execute(conn -> conn.readByPrimaryKey(Customer.class, 1));
     log.debug("{}", c2);
 
-    service.run(Customer.class, conn -> conn.insert(new Customer(1, "Alice", "Kyoto")));
+    service.run(Customer.class, conn -> {
+      conn.insert(new Customer(1, "Alice", "Kyoto"));
+      conn.getJdbcConnection().commit();
+    });
     service.run(Customer.class, conn -> conn.insert(new Customer(2, "Bob", "Tokyo"),
         new Customer(3, "Carol", "Osaka"), new Customer(4, "Dave", "Nara")));
 
@@ -76,7 +79,7 @@ public class Sorm4jDemo {
 
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
-      OrmConnection ormMapper = Sorm.toOrmConnection(conn);
+      OrmConnection ormMapper = Sorm.getOrmConnection(conn);
       ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");
