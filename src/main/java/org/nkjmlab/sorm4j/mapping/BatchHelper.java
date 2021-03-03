@@ -21,7 +21,7 @@ final class BatchHelper {
 
   public void addBatchAndExecuteIfReachedThreshold() {
     addBatch();
-    if (counter + 1 % batchSize == 0) {
+    if ((counter + 1) % batchSize == 0) {
       executeBatch();
     }
   }
