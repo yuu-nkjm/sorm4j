@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
 public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
@@ -103,11 +104,14 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         case "java.sql.Blob":
           return resultSet.getBlob(column);
         case "java.time.LocalTime":
-          return resultSet.getTime(column).toLocalTime();
+          return Optional.ofNullable(resultSet.getTime(column)).map(t -> t.toLocalTime())
+              .orElseGet(null);
         case "java.time.LocalDate":
-          return resultSet.getDate(column).toLocalDate();
+          return Optional.ofNullable(resultSet.getDate(column)).map(t -> t.toLocalDate())
+              .orElseGet(null);
         case "java.time.LocalDateTime":
-          return resultSet.getTimestamp(column).toLocalDateTime();
+          return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime())
+              .orElseGet(null);
         case "java.lang.Object":
           return resultSet.getObject(column);
         default:
@@ -131,27 +135,28 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         return (ret == 0 && resultSet.wasNull()) ? null : ret;
       }
       case java.sql.Types.BINARY:
-        return resultSet.getBytes(column);
-      case java.sql.Types.BIT: {
-        final boolean ret = resultSet.getBoolean(column);
-        return (!ret && resultSet.wasNull()) ? null : ret;
-      }
       case java.sql.Types.BLOB:
+      case java.sql.Types.VARBINARY:
+      case java.sql.Types.LONGVARBINARY:
         return resultSet.getBytes(column);
+      case java.sql.Types.BIT:
       case java.sql.Types.BOOLEAN: {
         final boolean ret = resultSet.getBoolean(column);
         return (!ret && resultSet.wasNull()) ? null : ret;
       }
       case java.sql.Types.CHAR:
-        return resultSet.getString(column);
       case java.sql.Types.CLOB:
+      case java.sql.Types.LONGVARCHAR:
+      case java.sql.Types.VARCHAR:
         return resultSet.getString(column);
       case java.sql.Types.DATALINK:
         return resultSet.getBinaryStream(column);
       case java.sql.Types.DATE:
         return resultSet.getDate(column);
       case java.sql.Types.DECIMAL:
+      case java.sql.Types.NUMERIC:
         return resultSet.getBigDecimal(column);
+      case java.sql.Types.REAL:
       case java.sql.Types.DOUBLE: {
         final double ret = resultSet.getDouble(column);
         return (ret == 0 && resultSet.wasNull()) ? null : ret;
@@ -164,22 +169,8 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         final int ret = resultSet.getInt(column);
         return (ret == 0 && resultSet.wasNull()) ? null : ret;
       }
-      case java.sql.Types.JAVA_OBJECT:
-        return resultSet.getObject(column);
-      case java.sql.Types.LONGVARBINARY:
-        return resultSet.getBytes(column);
-      case java.sql.Types.LONGVARCHAR:
-        return resultSet.getString(column);
       case java.sql.Types.NULL:
         return null;
-      case java.sql.Types.NUMERIC:
-        return resultSet.getBigDecimal(column);
-      case java.sql.Types.OTHER:
-        return resultSet.getObject(column);
-      case java.sql.Types.REAL: {
-        final double ret = resultSet.getDouble(column);
-        return (ret == 0 && resultSet.wasNull()) ? null : ret;
-      }
       case java.sql.Types.REF:
         return resultSet.getRef(column);
       case java.sql.Types.ROWID:
@@ -196,10 +187,9 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         final byte ret = resultSet.getByte(column);
         return (ret == 0 && resultSet.wasNull()) ? null : ret;
       }
-      case java.sql.Types.VARBINARY:
-        return resultSet.getBytes(column);
-      case java.sql.Types.VARCHAR:
-        return resultSet.getString(column);
+      case java.sql.Types.JAVA_OBJECT:
+      case java.sql.Types.OTHER:
+        return resultSet.getObject(column);
       default:
         log.debug(
             "Could not get value for result set using type [{}] on column [{}]. ResultSet.getObject method will be used.",
