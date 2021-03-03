@@ -126,9 +126,7 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
   private String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
-    if ("Oracle".equalsIgnoreCase(metaData.getDatabaseProductName())) {
-      return "%"; // oracle expects a pattern such as "%" to work
-    }
-    return null;
+    // oracle expects a pattern such as "%" to work
+    return "Oracle".equalsIgnoreCase(metaData.getDatabaseProductName()) ? "%" : null;
   }
 }

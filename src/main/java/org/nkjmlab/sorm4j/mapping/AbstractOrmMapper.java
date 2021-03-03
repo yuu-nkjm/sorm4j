@@ -157,7 +157,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
       preparedStatementParametersSetter.setParameters(stmt, parameters);
       return func.apply(stmt);
     } catch (Throwable e) {
-      throw new OrmException(e);
+      throw OrmException.wrapIfNotOrmException(e);
     }
   }
 
@@ -251,24 +251,18 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
 
   private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
-    final Optional<DebugPoint> dp =
-        DebugPointFactory.createDebugPoint(DebugPointFactory.Name.LOAD_OBJECT);
+    Try.runOrThrow(() -> {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      if (metaData.getColumnCount() != 1) {
+        throw new OrmException("ResultSet returned [" + metaData.getColumnCount()
+            + "] columns but 1 column was expected to load data into an instance of ["
+            + objectClass.getName() + "]");
+      }
+    }, OrmException::wrapIfNotOrmException);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
     }
-    dp.ifPresent(sw -> {
-      try {
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        if (metaData.getColumnCount() != 1) {
-          throw new OrmException("ResultSet returned [" + metaData.getColumnCount()
-              + "] columns but 1 column was expected to load data into an instance of ["
-              + objectClass.getName() + "]");
-        }
-      } catch (SQLException e) {
-        throw new OrmException(e);
-      }
-    });
     return ret;
 
   }

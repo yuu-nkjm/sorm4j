@@ -22,7 +22,8 @@ public class Simple04 {
   }
 
   public String getStringCol() {
-    return stringCol;
+    // return stringCol;
+    throw new RuntimeException("Sample4");
   }
 
   public void setStringCol(String stringCol) {

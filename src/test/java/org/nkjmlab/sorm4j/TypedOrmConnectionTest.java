@@ -30,6 +30,17 @@ class TypedOrmConnectionTest {
   }
 
   @Test
+  void testExecQ() {
+    sorm.run(m -> {
+      try {
+        m.executeQuery("selecttt");
+      } catch (Exception e) {
+        assertThat(e.getMessage()).contains("Syntax error in SQL statement");
+      }
+    });
+  }
+
+  @Test
   void testTableName() {
     sorm.run(Guest.class, m -> {
       assertThat(m.getTableName()).contains("GUESTS");

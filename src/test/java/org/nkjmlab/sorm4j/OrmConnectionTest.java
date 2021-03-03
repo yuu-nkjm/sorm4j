@@ -282,6 +282,7 @@ class OrmConnectionTest {
   void testReadAllLazy() {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_BOB;
+
     srv.run(m -> {
       m.insert(a);
 
@@ -349,9 +350,10 @@ class OrmConnectionTest {
 
       try {
         DebugPointFactory.on();
-        assertThat(m.readList(Integer.class, "select * from players")).contains(1, 2);
+        List<Integer> ret = m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
+        assertThat(e.getCause().getMessage()).contains("but 1 column was expected to load data into");
       }
       DebugPointFactory.off();
 

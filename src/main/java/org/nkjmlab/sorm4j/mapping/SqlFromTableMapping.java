@@ -111,14 +111,5 @@ public final class SqlFromTableMapping {
     return deleteAllSql;
   }
 
-  @Override
-  public String toString() {
-    return "Sql [selectSql=" + selectByPrimaryKeySql + ", selectAllSql=" + selectAllSql
-        + ", insertSql=" + insertSql + ", updateSql=" + updateSql + ", deleteSql=" + deleteSql
-        + ", mergeSql=" + mergeSql + ", insertSqlPrefix=" + insertSqlPrefix + ", mergeSqlPrefix="
-        + mergeSqlPrefix + ", insertOrMergePlaceholders=" + insertOrMergePlaceholders + "]";
-  }
-
-
 }
 
