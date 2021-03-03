@@ -48,9 +48,9 @@ class TypedOrmConnectionTest {
     }
     Guest a = OrmTestUtils.GUEST_ALICE;
 
-    sorm.run(Guest.class, m -> {
-      OrmConnection orm = m.toUntyped();
-      orm.toTyped(Guest.class);
+    sorm.run(Guest.class, conn -> {
+      OrmConnection orm = Sorm.toUntyped(conn);
+      Sorm.toTyped(orm, Guest.class);
       orm.runTransaction(tr -> {
         tr.insert(a);
         Guest g = tr.readFirst(Guest.class, "SELECT * FROM GUESTS");
@@ -445,18 +445,14 @@ class TypedOrmConnectionTest {
   @Test
   void testSormExeption() {
     try {
-      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
-          .getDataSource();
+      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password)
+          .getConnectionSource().getDataSource();
       fail("Should be fail");
     } catch (Exception e) {
 
     }
   }
 
-  @Test
-  void testToUntyped() {
-    sorm.getConnection(Guest.class).toUntyped();
-  }
 
   @Test
   void testTransaction() {
@@ -522,7 +518,7 @@ class TypedOrmConnectionTest {
     }
 
     try (Connection conn = sorm.getJdbcConnection()) {
-      Sorm.toOrmConnection(conn);
+      Sorm.getOrmConnection(conn);
     } catch (SQLException e) {
       e.printStackTrace();
     }

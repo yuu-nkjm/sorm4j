@@ -4,9 +4,7 @@ import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try;
@@ -79,12 +77,6 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   private void setTransactionIsolation(int isolationLevel) {
     Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
         OrmException::new);
-  }
-
-
-  @Override
-  public OrmConnection toUntyped() {
-    return Sorm.toOrmConnection(getJdbcConnection(), getConfigStore());
   }
 
 }

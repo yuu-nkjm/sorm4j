@@ -69,7 +69,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     this.tableNameMapper = configStore.getTableNameMapper();
     this.resultSetConverter = new ResultSetConverter(configStore.getSqlToJavaDataConverter());
     this.preparedParametersSetter = configStore.getJavaToSqlDataConverter();
-    String cacheName = configStore.getCacheName();
+    String cacheName = configStore.getConfigName();
     this.tableMappings = OrmCache.getTableMappings(cacheName);
     this.columnsMappings = OrmCache.getColumnsMappings(cacheName);
     this.classNameToValidTableNameMap = OrmCache.getClassNameToValidTableNameMap(cacheName);
@@ -176,7 +176,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  protected OrmConfigStore getConfigStore() {
+  public OrmConfigStore getConfigStore() {
     return configStore;
   }
 
@@ -184,8 +184,6 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   public Connection getJdbcConnection() {
     return connection;
   }
-
-
 
   public <T> TableMapping<T> getTableMapping(Class<T> objectClass) {
     TableName tableName = toTableName(objectClass);

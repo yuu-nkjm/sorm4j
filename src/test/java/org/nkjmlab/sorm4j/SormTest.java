@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
@@ -67,14 +66,9 @@ class SormTest {
 
   @Test
   void testToString() {
-    assertThat(srv.toString()).contains("OrmService");
+    assertThat(srv.toString()).contains("Sorm");
 
-    Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password);
-    Sorm.createWithNewConfig(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password,
-        OrmConfigStore.DEFAULT_CONFIGURATIONS);
-
-    Sorm.createWithNewConfig(OrmTestUtils.createDataSourceH2(), OrmConfigStore.DEFAULT_CONFIGURATIONS)
-        .getConnectionSource();
+    Sorm.create(OrmTestUtils.createDataSourceH2()).getConnectionSource();
 
   }
 
@@ -109,7 +103,7 @@ class SormTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -122,7 +116,7 @@ class SormTest {
       // auto-rollback
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmTransaction tr = srv.beginTransaction()) {
       tr.begin();
@@ -130,7 +124,7 @@ class SormTest {
       tr.commit();
     }
     srv.runWithJdbcConnection(con -> {
-      assertThat(Sorm.toTypedOrmConnection(Guest.class, con).readAll().size()).isEqualTo(1);
+      assertThat(Sorm.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
     });
   }
 

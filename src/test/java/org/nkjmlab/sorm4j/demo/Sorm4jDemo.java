@@ -76,7 +76,7 @@ public class Sorm4jDemo {
 
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
-      OrmConnection ormMapper = Sorm.toOrmConnection(conn);
+      OrmConnection ormMapper = Sorm.getOrmConnection(conn);
       ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");

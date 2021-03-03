@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.OrmTestUtils;
@@ -31,9 +29,10 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.createWithNewConfig(ConnectionSource.of(jdbcUrl, user, password),
-        new OrmConfigStore.Builder().setMultiRowProcessorFactory(MultiRowProcessorFactory
-            .of(t -> new BatchOfMultiRowInOneStatementProcessor(t, 10, 10, 4))).build());
+
+    Sorm.configure("BATCH_CONF", builder -> builder.setMultiRowProcessorFactory(
+        t -> new BatchOfMultiRowInOneStatementProcessor<>(t, 10, 10, 4)).build());
+    sorm = Sorm.create(ConnectionSource.of(jdbcUrl, user, password), "BATCH_CONF");
   }
 
   @BeforeEach

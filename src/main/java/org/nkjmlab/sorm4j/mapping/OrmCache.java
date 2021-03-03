@@ -6,9 +6,9 @@ import java.util.concurrent.ConcurrentMap;
 public class OrmCache {
 
   private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
-      new ConcurrentHashMap<>(); // key => Cache Name
+      new ConcurrentHashMap<>(); // key => Config Name
   private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
-      new ConcurrentHashMap<>(); // key => Cache Name
+      new ConcurrentHashMap<>();
 
   private static final ConcurrentMap<String, ConcurrentMap<Class<?>, TableName>> classNameToValidTableNameMapCaches =
       new ConcurrentHashMap<>();
@@ -25,22 +25,22 @@ public class OrmCache {
   }
 
   public static ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap(
-      String cacheName) {
-    return classNameToValidTableNameMapCaches.computeIfAbsent(cacheName,
+      String configName) {
+    return classNameToValidTableNameMapCaches.computeIfAbsent(configName,
         n -> new ConcurrentHashMap<>());
   }
 
   public static ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps(
-      String cacheName) {
-    return tableNameToValidTableNameMapCaches.computeIfAbsent(cacheName,
+      String configName) {
+    return tableNameToValidTableNameMapCaches.computeIfAbsent(configName,
         n -> new ConcurrentHashMap<>());
   }
 
-  public static void refresh(String cacheName) {
-    tableMappingsCaches.put(cacheName, new ConcurrentHashMap<>());
-    columnsMappingsCaches.put(cacheName, new ConcurrentHashMap<>());
-    classNameToValidTableNameMapCaches.put(cacheName, new ConcurrentHashMap<>());
-    tableNameToValidTableNameMapCaches.put(cacheName, new ConcurrentHashMap<>());
+  public static void refresh(String configName) {
+    tableMappingsCaches.put(configName, new ConcurrentHashMap<>());
+    columnsMappingsCaches.put(configName, new ConcurrentHashMap<>());
+    classNameToValidTableNameMapCaches.put(configName, new ConcurrentHashMap<>());
+    tableNameToValidTableNameMapCaches.put(configName, new ConcurrentHashMap<>());
   }
 
 

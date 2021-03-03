@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 
 class OrmConfigStoreTest {
 
-  private static final String DEFAULT_CACHE = "DEFAULT_CACHE";
+  private static final String NEW_CONFIG = "NEW_CONFIG";
 
   private static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnFieldMapper();
@@ -24,14 +24,14 @@ class OrmConfigStoreTest {
   @Test
   void testOrmConfigStore() {
 
-    OrmConfigStore confs = new OrmConfigStore.Builder().setCacheName(DEFAULT_CACHE)
-        .setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
-        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
-        .setSqlToJavaDataConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
-        .setJavaToSqlDataConverter(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER)
-        .setMultiRowProcessorFactory(DEFAULT_MULTI_ROW_PROCESSOR_FACTORY).build();
+    OrmConfigStore confs =
+        new OrmConfigStore.Builder(NEW_CONFIG).setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+            .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
+            .setSqlToJavaDataConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
+            .setJavaToSqlDataConverter(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER)
+            .setMultiRowProcessorFactory(DEFAULT_MULTI_ROW_PROCESSOR_FACTORY).build();
 
-    assertThat(confs.getCacheName()).isEqualTo(DEFAULT_CACHE);
+    assertThat(confs.getConfigName()).isEqualTo(NEW_CONFIG);
     assertThat(confs.getColumnFieldMapper()).isEqualTo(DEFAULT_COLUMN_FIELD_MAPPER);
     assertThat(confs.getTableNameMapper()).isEqualTo(DEFAULT_TABLE_NAME_MAPPER);
     assertThat(confs.getSqlToJavaDataConverter()).isEqualTo(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER);

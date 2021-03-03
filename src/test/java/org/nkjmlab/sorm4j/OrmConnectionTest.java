@@ -452,18 +452,14 @@ class OrmConnectionTest {
   @Test
   void testSormExeption() {
     try {
-      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password).getConnectionSource()
-          .getDataSource();
+      Sorm.create(OrmTestUtils.jdbcUrl, OrmTestUtils.user, OrmTestUtils.password)
+          .getConnectionSource().getDataSource();
       fail("Should be fail");
     } catch (Exception e) {
 
     }
   }
 
-  @Test
-  void testToUntyped() {
-    srv.getConnection(Guest.class).toUntyped();
-  }
 
   @Test
   void testTransaction() {
