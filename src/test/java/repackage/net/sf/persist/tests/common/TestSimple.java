@@ -515,7 +515,7 @@ public class TestSimple {
   }
 
   @Test
-  public void TestGuessColumn() {
+  public void TestUpperSnakeCase() {
     Set<String> guessed = Set.of(StringUtils.toUpperSnakeCase("name"));
     Set<String> expected = Set.of("NAME");
     assertEquals(expected, guessed);

@@ -1,6 +1,7 @@
 
 package org.nkjmlab.sorm4j.mapping;
 
+import static org.nkjmlab.sorm4j.util.StringUtils.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
@@ -26,7 +27,8 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   @Override
   public List<Column> guessColumnNameCandidates(FieldName fieldName) {
-    return List.of(new Column(StringUtils.toUpperSnakeCase(fieldName.getName())));
+    return List.of(new Column(toUpperSnakeCase(fieldName.getName())),
+        new Column(toUpperCase(fieldName.getName())));
   }
 
   @Override
