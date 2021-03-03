@@ -142,7 +142,7 @@ public final class Try {
       Function<Throwable, ? extends X> ex) throws X {
     createRunnable(onTry, e -> {
       throw ex.apply(e);
-    }).run();;
+    }).run();
   }
 
 

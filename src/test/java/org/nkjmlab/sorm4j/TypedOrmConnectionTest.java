@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -400,6 +401,27 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
+
+    sorm.run(Player.class, m -> {
+      Map<String, Object> map =
+          m.readMapLazy("select * from players").stream().collect(Collectors.toList()).get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+
+    sorm.run(Player.class, m -> {
+      LazyResultSet<Player> r = m.readLazy("select * from players");
+      Iterator<Player> it = r.iterator();
+      r.close();
+      try {
+        it.hasNext();
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+        assertThat(e.getMessage()).contains("already closed");
+      }
+    });
+
+
     sorm.run(Player.class, m -> {
       Map<String, Object> map = m.readMapList(SqlStatement.of("select * from players")).get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
