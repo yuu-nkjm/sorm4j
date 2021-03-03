@@ -6,7 +6,6 @@ public final class TableName {
 
   private final String name;
 
-
   public TableName(String name) {
     this.name = name;
   }

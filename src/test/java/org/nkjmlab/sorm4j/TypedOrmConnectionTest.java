@@ -13,8 +13,8 @@ import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class TypedOrmConnectionTest {
 
@@ -466,9 +466,12 @@ class TypedOrmConnectionTest {
   void testTransaction() {
     Guest a = SormTestUtils.GUEST_ALICE;
 
-    sorm.runTransaction(m -> {
+    sorm.runTransaction(Connection.TRANSACTION_READ_COMMITTED, m -> {
       m.insert(a);
-    }, Connection.TRANSACTION_READ_COMMITTED);
+    });
+
+    sorm.executeTransaction(m -> m.insert(a));
+    sorm.executeTransaction(Connection.TRANSACTION_READ_COMMITTED, m -> m.insert(a));
 
     sorm.runTransaction(Guest.class, m -> {
       m.insert(a);

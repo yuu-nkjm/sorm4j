@@ -144,6 +144,7 @@ public final class Sorm {
   }
 
 
+
   public <T, R> R executeTransaction(Class<T> objectClass, int isolationLevel,
       OrmFunctionHandler<TypedOrmTransaction<T>, R> handler) {
     try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
@@ -152,6 +153,16 @@ public final class Sorm {
       throw OrmException.wrapIfNotOrmException(e);
     }
   }
+
+  public <R> R executeTransaction(int isolationLevel,
+      OrmFunctionHandler<OrmTransaction, R> handler) {
+    try (OrmTransaction transaction = beginTransaction()) {
+      return handler.apply(transaction);
+    } catch (Throwable e) {
+      throw OrmException.wrapIfNotOrmException(e);
+    }
+  }
+
 
   public <R> R executeTransaction(OrmFunctionHandler<OrmTransaction, R> handler) {
     try (OrmTransaction transaction = beginTransaction()) {
@@ -240,7 +251,7 @@ public final class Sorm {
     }
   }
 
-  public void runTransaction(OrmConsumerHandler<OrmTransaction> handler, int isolationLevel) {
+  public void runTransaction(int isolationLevel, OrmConsumerHandler<OrmTransaction> handler) {
     try (OrmTransaction conn = beginTransaction(isolationLevel)) {
       handler.accept(conn);
     } catch (Throwable e) {

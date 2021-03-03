@@ -15,6 +15,11 @@ public final class FieldName {
     this.name = name;
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+
   public String getName() {
     return name;
   }
