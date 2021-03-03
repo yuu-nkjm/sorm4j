@@ -463,12 +463,16 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
 
   private TableName toTableName(Class<?> objectClass) {
     return classNameToValidTableNameMap.computeIfAbsent(objectClass,
-        k -> tableNameMapper.getTableName(objectClass, connection));
+        Try.createFunctionWithThrow(
+            k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()),
+            OrmException::new));
   }
 
   private TableName toTableName(String tableName) {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName,
-        k -> tableNameMapper.toValidTableName(tableName, connection));
+        Try.createFunctionWithThrow(
+            k -> tableNameMapper.toValidTableName(tableName, connection.getMetaData()),
+            OrmException::new));
   }
 
   private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) {
