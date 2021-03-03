@@ -21,7 +21,7 @@ class DefaultResultSetValueGetterTest {
   @Test
   void testGetValueBySetterType() {
     String sql =
-        "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry ARRAY)";
+        "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry ARRAY, fl FLOAT)";
     Sorm sorm = SormTestUtils.createSorm();
     sorm.run(con -> con.executeUpdate(sql));
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
@@ -41,6 +41,10 @@ class DefaultResultSetValueGetterTest {
     }
 
 
+    try {
+      sorm.execute(con -> con.readMapFirst("select * from LocalDateTimeSample"));
+    } catch (Exception e) {
+    }
 
   }
 
@@ -63,6 +67,7 @@ class DefaultResultSetValueGetterTest {
     LocalDate date;
     LocalDateTime dateTime;
     Object[] arry;
+    Float fl;
 
     public static LocalDateTimeSample buildRandom() {
       LocalDateTimeSample ret = new LocalDateTimeSample();
@@ -70,6 +75,7 @@ class DefaultResultSetValueGetterTest {
       ret.time = randomZonedDateTime().toLocalTime();
       ret.dateTime = randomZonedDateTime().toLocalDateTime();
       ret.arry = new Object[] {"a", 1};
+      ret.fl = null;
       return ret;
     }
 

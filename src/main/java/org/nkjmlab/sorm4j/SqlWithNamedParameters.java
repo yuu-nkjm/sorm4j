@@ -11,7 +11,7 @@ public final class SqlWithNamedParameters {
   private final String sql;
   private final Map<String, Object> namedParameters = new HashMap<>();
 
-  public SqlWithNamedParameters(String sql) {
+  private SqlWithNamedParameters(String sql) {
     this.sql = sql;
   }
 
@@ -29,7 +29,7 @@ public final class SqlWithNamedParameters {
     return toSqlStatement(sql, namedParameters);
   }
 
-  public static SqlWithNamedParameters of(String sql) {
+  public static SqlWithNamedParameters from(String sql) {
     return new SqlWithNamedParameters(sql);
   }
 

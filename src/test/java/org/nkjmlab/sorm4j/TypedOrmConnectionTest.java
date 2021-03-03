@@ -30,6 +30,17 @@ class TypedOrmConnectionTest {
   }
 
   @Test
+  void testExecQ() {
+    sorm.run(m -> {
+      try {
+        m.executeQuery("selecttt");
+      } catch (Exception e) {
+        assertThat(e.getMessage()).contains("Syntax error in SQL statement");
+      }
+    });
+  }
+
+  @Test
   void testTableName() {
     sorm.run(Guest.class, m -> {
       assertThat(m.getTableName()).contains("GUESTS");
@@ -83,6 +94,14 @@ class TypedOrmConnectionTest {
         return 1;
       });
 
+      orm.runTransaction(tr -> {
+        try {
+          tr.insert(a, null);
+          failBecauseExceptionWasNotThrown(Exception.class);
+        } catch (Exception e) {
+          assertThat(e.getMessage()).contains("it is null");
+        }
+      });
 
 
     });
@@ -355,11 +374,22 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
+      map = m.readMapFirst(SqlStatement.of("select * from players WHERE id=?", 100));
+      assertThat(map).isNull();
+
+
       Player p = m.readLazy("select * from players").toList().get(0);
       assertThat(p).isEqualTo(a);
 
       try {
         m.readLazy("select * from players").iterator().remove();
+        failBecauseExceptionWasNotThrown(Exception.class);
+      } catch (Exception e) {
+      }
+    });
+    sorm.run(Player.class, m -> {
+      try {
+        m.readLazy("select * from playersass");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }

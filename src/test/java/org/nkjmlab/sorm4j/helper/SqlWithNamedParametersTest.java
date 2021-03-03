@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.helper;
 
+import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.SqlStatement;
@@ -19,15 +20,15 @@ class SqlWithNamedParametersTest {
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
 
-    org.assertj.core.api.Assertions.assertThat(sp.toString())
+    assertThat(sp.toString())
         .isEqualTo("[select * from simple where id=? and name=?] with [2, foo]");
 
-
+    assertThat(SqlStatement.of("select * from test").toString()).contains("[select * from test]");
   }
 
   @Test
   void testBindAll() {
-    SqlStatement sp = new SqlWithNamedParameters(sql).bindAll(namedParams).toSqlStatement();
+    SqlStatement sp = SqlWithNamedParameters.from(sql).bindAll(namedParams).toSqlStatement();
     org.assertj.core.api.Assertions.assertThat(sp.getSql())
         .isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
@@ -37,7 +38,7 @@ class SqlWithNamedParametersTest {
   @Test
   void testBind() {
 
-    SqlStatement sp = new SqlWithNamedParameters(sql).bind("name", "foo").bind("id", 1)
+    SqlStatement sp = SqlWithNamedParameters.from(sql).bind("name", "foo").bind("id", 1)
         .bind("idid", 2).toSqlStatement();
 
     org.assertj.core.api.Assertions.assertThat(sp.getSql())

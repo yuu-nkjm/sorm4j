@@ -80,7 +80,7 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
       }
     } catch (Throwable e) {
       rollbackIfRequired(con, origAutoCommit);
-      throw new OrmException(e);
+      throw OrmException.wrapIfNotOrmException(e);
     } finally {
       commitIfRequired(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);

@@ -2,8 +2,6 @@ package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -67,7 +65,8 @@ public abstract class MultiRowProcessor<T> {
       final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
       for (int i = 0; i < objects.length; i++) {
         T obj = objects[i];
-        this.tableMapping.preparedStatementParametersSetter.setParameters(stmt, parameterCreator.apply(obj));
+        this.tableMapping.preparedStatementParametersSetter.setParameters(stmt,
+            parameterCreator.apply(obj));
         batchHelper.addBatchAndExecuteIfReachedThreshold();
       }
       result = batchHelper.finish();
@@ -82,7 +81,7 @@ public abstract class MultiRowProcessor<T> {
   }
 
 
-  @SuppressWarnings("unchecked")
+  // @SuppressWarnings("unchecked")
   int[] execIfValidObjects(Connection con, T[] objects, Function<T[], int[]> exec) {
     if (objects == null || objects.length == 0) {
       return new int[0];
@@ -90,9 +89,17 @@ public abstract class MultiRowProcessor<T> {
     Optional<DebugPoint> dp =
         DebugPointFactory.createDebugPoint(DebugPointFactory.Name.EXECUTE_BATCH);
 
-    T[] nonNullObjects =
-        (T[]) Arrays.stream(objects).filter(Objects::nonNull).toArray(Object[]::new);
-    int[] result = exec.apply(nonNullObjects);
+
+    // T[] nonNullObjects =
+    // (T[]) Arrays.stream(objects).filter(Objects::nonNull).toArray(Object[]::new);
+
+    for (Object o : objects) {
+      if (o == null) {
+        //throw new OrmException("insert parameter should not be null");
+      }
+    }
+
+    int[] result = exec.apply(objects);
 
     dp.ifPresent(sw -> log.debug("{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
         sw.getFormattedNameAndElapsedTime(), IntStream.of(result).sum(), objects.length,

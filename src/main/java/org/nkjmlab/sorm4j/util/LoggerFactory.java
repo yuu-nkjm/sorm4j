@@ -7,16 +7,9 @@ public final class LoggerFactory {
   private LoggerFactory() {}
 
   public static Logger getLogger() {
-    String className = getInvokerClassName(3);
+    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    String className = stackTrace[1].getClassName();
     return org.slf4j.LoggerFactory.getLogger(className);
   }
-
-  public static String getInvokerClassName(int depth) {
-    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    StackTraceElement e = stackTrace[stackTrace.length - 1];
-    return e.getClassName() != null ? e.getClassName() : "";
-  }
-
-
 
 }

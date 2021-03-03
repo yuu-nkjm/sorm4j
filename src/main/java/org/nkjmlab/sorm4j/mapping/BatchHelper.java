@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.OrmException;
 
 final class BatchHelper {
 
@@ -31,21 +30,17 @@ final class BatchHelper {
     counter++;
   }
 
-  public int[] finish() {
+  public int[] finish() throws SQLException {
     executeBatch();
     return result.stream().flatMapToInt(e -> IntStream.of(e)).toArray();
   }
 
-  private void executeBatch() {
-    try {
-      if (counter == 0) {
-        return;
-      }
-      int[] tmp = stmt.executeBatch();
-      result.add(tmp);
-      counter = 0;
-    } catch (SQLException e) {
-      throw new OrmException(e);
+  private void executeBatch() throws SQLException {
+    if (counter == 0) {
+      return;
     }
+    int[] tmp = stmt.executeBatch();
+    result.add(tmp);
+    counter = 0;
   }
 }
