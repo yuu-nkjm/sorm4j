@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.mapping;
 
 import java.util.Objects;
 
-public final class TableName implements Comparable<TableName> {
+public final class TableName {
 
   private final String name;
 
@@ -33,11 +33,6 @@ public final class TableName implements Comparable<TableName> {
       return false;
     TableName other = (TableName) obj;
     return Objects.equals(name, other.name);
-  }
-
-  @Override
-  public int compareTo(TableName o) {
-    return name.compareTo(o.name);
   }
 
 }

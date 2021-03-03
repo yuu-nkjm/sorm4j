@@ -24,6 +24,7 @@ public class Player {
   }
 
 
+  // not match address field
   public String readAddress() {
     return address;
   }
@@ -31,6 +32,10 @@ public class Player {
 
   public String getName() {
     return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override

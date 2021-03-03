@@ -62,6 +62,14 @@ class TableMappingTest {
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Error setting value");
     }
+    try {
+      sorm.run(Player.class, m -> {
+        TableMapping<Player> tm = getTableMapping(m, Player.class);
+        tm.setValue(new Player(), "name", 1);
+      });
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Error setting value");
+    }
   }
 
   @Test
