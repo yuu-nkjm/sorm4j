@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.mapping.AbstractOrmMapper;
+import org.nkjmlab.sorm4j.util.Try;
 
 /**
  * Represents a result set from database.
@@ -137,8 +138,11 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
     @SuppressWarnings("unchecked")
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(Map.class) ? () -> (S) orMapper.toSingleMap(resultSet)
-          : () -> orMapper.toSingleObject(objectClass, resultSet);
+      this.getFunction = objectClass.equals(Map.class)
+          ? Try.createSupplierWithThrow(() -> (S) orMapper.toSingleMap(resultSet),
+              OrmException::new)
+          : Try.createSupplierWithThrow(() -> orMapper.toSingleObject(objectClass, resultSet),
+              OrmException::new);
     }
 
     @Override

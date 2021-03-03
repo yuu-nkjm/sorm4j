@@ -441,19 +441,20 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     });
   }
 
-  public Map<String, Object> toSingleMap(ResultSet resultSet) {
+  public Map<String, Object> toSingleMap(ResultSet resultSet) throws SQLException {
     ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
     return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
 
   }
 
-  public <T> T toSingleObject(Class<T> objectClass, ResultSet resultSet) {
+  public <T> T toSingleObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     return isEnableToConvertNativeSqlType(objectClass)
         ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
         : toSinglePojo(objectClass, resultSet);
   }
 
-  private final <T> T toSinglePojo(final Class<T> objectClass, final ResultSet resultSet) {
+  private final <T> T toSinglePojo(final Class<T> objectClass, final ResultSet resultSet)
+      throws SQLException {
     ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
     return mapping.loadObject(resultSet);
   }

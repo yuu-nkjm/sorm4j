@@ -38,7 +38,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         + super.getColumnToAccessorString();
   }
 
-  public T loadObject(ResultSet resultSet) {
+  public T loadObject(ResultSet resultSet) throws SQLException {
     List<String> columns = createColumns(resultSet);
     List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
     return createObject(columns,
