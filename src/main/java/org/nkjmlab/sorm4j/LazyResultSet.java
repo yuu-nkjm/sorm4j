@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -142,7 +143,7 @@ public final class LazyResultSet<T> implements Iterable<T>, Closeable, AutoClose
     @SuppressWarnings("unchecked")
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(Map.class)
+      this.getFunction = objectClass.equals(LinkedHashMap.class)
           ? Try.createSupplierWithThrow(() -> (S) orMapper.toSingleMap(resultSet),
               OrmException::new)
           : Try.createSupplierWithThrow(() -> orMapper.toSingleObject(objectClass, resultSet),
