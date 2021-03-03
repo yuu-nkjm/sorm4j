@@ -7,6 +7,8 @@ import org.nkjmlab.sorm4j.OrmException;
 
 public final class PreparedStatementUtils {
 
+  private PreparedStatementUtils() {}
+
   public static PreparedStatement getPreparedStatement(Connection connection, String sql) {
     try {
       return connection.prepareStatement(sql);

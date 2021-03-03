@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public final class DebugPointFactory {
 
+  private DebugPointFactory() {}
+
   public enum Name {
     MAPPING, READ, LOAD_OBJECT, EXECUTE_BATCH, EXECUTE_UPDATE, TEMP;
   }

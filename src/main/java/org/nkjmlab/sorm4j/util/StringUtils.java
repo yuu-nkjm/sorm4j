@@ -10,6 +10,8 @@ import org.slf4j.helpers.MessageFormatter;
 
 public final class StringUtils {
 
+  private StringUtils() {};
+
   private static final ConcurrentMap<String, String> upperCaseCaches = new ConcurrentHashMap<>();
 
   public static String toUpperCase(String str) {

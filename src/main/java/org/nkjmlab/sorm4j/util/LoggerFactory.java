@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 
 public final class LoggerFactory {
 
+  private LoggerFactory() {}
+
   public static Logger getLogger() {
     String className = getInvokerClassName(3);
     return org.slf4j.LoggerFactory.getLogger(className);

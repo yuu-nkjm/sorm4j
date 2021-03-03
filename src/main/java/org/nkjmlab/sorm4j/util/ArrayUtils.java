@@ -7,6 +7,7 @@ import java.util.List;
 
 public final class ArrayUtils {
 
+  private ArrayUtils() {}
 
   @SafeVarargs
   public static <T> List<T[]> split(int size, T... objects) {

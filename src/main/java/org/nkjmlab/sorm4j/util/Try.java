@@ -5,7 +5,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class Try {
-  //private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+
+  private Try() {}
 
   @FunctionalInterface
   public static interface ThrowableRunnable {

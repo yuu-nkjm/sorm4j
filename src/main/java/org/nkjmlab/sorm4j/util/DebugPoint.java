@@ -2,17 +2,12 @@ package org.nkjmlab.sorm4j.util;
 
 public final class DebugPoint {
 
-  public final String name;
+  private final String name;
   private final long startTime;
 
   public DebugPoint(String name) {
     this.name = name;
     this.startTime = System.nanoTime();
-  }
-
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName() + "(" + name + ")";
   }
 
   public String getFormattedNameAndElapsedTime() {
