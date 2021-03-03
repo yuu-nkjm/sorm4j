@@ -159,8 +159,7 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   @Override
   public InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGetResult(getJdbcConnection(), objects),
-        () -> InsertResult.empty());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResult.empty());
   }
 
 
@@ -197,8 +196,7 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   public InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects, tableName,
-        mapping -> mapping.insertAndGetResult(getJdbcConnection(), objects),
-        () -> InsertResult.empty());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResult.empty());
   }
 
 

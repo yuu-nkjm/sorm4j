@@ -67,7 +67,7 @@ public abstract class MultiRowProcessor<T> {
       final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
       for (int i = 0; i < objects.length; i++) {
         T obj = objects[i];
-        this.tableMapping.javaToSqlConverter.setParameters(stmt, parameterCreator.apply(obj));
+        this.tableMapping.preparedStatementParametersSetter.setParameters(stmt, parameterCreator.apply(obj));
         batchHelper.addBatchAndExecuteIfReachedThreshold();
       }
       result = batchHelper.finish();

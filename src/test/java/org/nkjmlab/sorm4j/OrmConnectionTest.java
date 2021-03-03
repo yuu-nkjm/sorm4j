@@ -344,6 +344,9 @@ class OrmConnectionTest {
       } catch (Exception e) {
       }
 
+      assertThat(m.readList(Integer.class, "select id from players")).contains(1, 2);
+
+
       try {
         DebugPointFactory.on();
         assertThat(m.readList(Integer.class, "select * from players")).contains(1, 2);
