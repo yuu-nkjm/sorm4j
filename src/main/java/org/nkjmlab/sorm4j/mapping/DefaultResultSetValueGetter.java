@@ -115,9 +115,7 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
         case "java.lang.Object":
           return resultSet.getObject(column);
         default:
-          log.debug(
-              "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
-              name, column);
+          // Could not find corresponding converter. ResultSet.getObject method will be used.
           return resultSet.getObject(column);
       }
     }
@@ -191,9 +189,7 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
       case java.sql.Types.OTHER:
         return resultSet.getObject(column);
       default:
-        log.debug(
-            "Could not get value for result set using type [{}] on column [{}]. ResultSet.getObject method will be used.",
-            sqlTypeToString(sqlType), column);
+        // Could not find corresponding converter. ResultSet.getObject method will be used.
         return resultSet.getObject(column);
     }
   }

@@ -118,7 +118,7 @@ class TypedOrmConnectionTest {
       try {
         assertThat(m.getJdbcConnection().isClosed()).isTrue();
       } catch (SQLException e) {
-        e.printStackTrace();
+        fail();
       }
     });
   }
@@ -604,7 +604,7 @@ class TypedOrmConnectionTest {
     try (Connection conn = sorm.getJdbcConnection()) {
       Sorm.getOrmConnection(conn);
     } catch (SQLException e) {
-      e.printStackTrace();
+      fail();
     }
 
     sorm.run(Player.class, m -> m.runTransaction(conn -> {

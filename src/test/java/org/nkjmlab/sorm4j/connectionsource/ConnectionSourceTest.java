@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.connectionsource;
 
+import static org.junit.jupiter.api.Assertions.*;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class ConnectionSourceTest {
     try {
       org.assertj.core.api.Assertions.assertThat(cs.getConnection()).isNotNull();
     } catch (SQLException e) {
-      e.printStackTrace();
+      fail();
     }
 
     Sorm.create(cs);

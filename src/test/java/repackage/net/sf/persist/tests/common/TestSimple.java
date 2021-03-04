@@ -51,7 +51,7 @@ public class TestSimple {
       st.executeUpdate(
           "CREATE TABLE SIMPLE (ID LONG AUTO_INCREMENT PRIMARY KEY, STRING_COL VARCHAR, LONG_COL BIGINT)");
     } catch (SQLException e) {
-      e.printStackTrace();
+      fail();
     }
   }
 
@@ -483,8 +483,19 @@ public class TestSimple {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(new Simple11());
     } catch (Exception e) {
-      e.printStackTrace();
       assertThat(e.getCause().getMessage()).contains("does not match any field");
+    }
+  }
+
+  @Test
+  public void testMappingSimple12() {
+    // Simple10 has setter with no parameters
+    try (Connection conn = connectionPool.getConnection()) {
+      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      simpleOrMapper.insert(new Simple12(1));
+      simpleOrMapper.readAll(Simple12.class);
+    } catch (Exception e) {
+      assertThat(e.getCause().getMessage()).contains("default constructor");
     }
   }
 
