@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class DefaultResultSetValueGetterTest {
@@ -68,6 +69,18 @@ class DefaultResultSetValueGetterTest {
     LocalDateTime dateTime;
     Object[] arry;
     Float fl;
+
+    @OrmIgnore
+    int ignoreCol;
+
+    @OrmIgnore
+    public int getIgnoreCol() {
+      return ignoreCol;
+    }
+
+    public void setIgnoreCol(int i) {
+      this.ignoreCol = i;
+    }
 
     public static LocalDateTimeSample buildRandom() {
       LocalDateTimeSample ret = new LocalDateTimeSample();
