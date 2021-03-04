@@ -81,23 +81,16 @@ public abstract class MultiRowProcessor<T> {
   }
 
 
-  // @SuppressWarnings("unchecked")
+  /**
+   * Execute multirow sql function. objects when objects[0] is null,
+   * {@code NullPointerException} are throw.
+   */
   int[] execIfValidObjects(Connection con, T[] objects, Function<T[], int[]> exec) {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
     Optional<DebugPoint> dp =
         DebugPointFactory.createDebugPoint(DebugPointFactory.Name.EXECUTE_BATCH);
-
-
-    // T[] nonNullObjects =
-    // (T[]) Arrays.stream(objects).filter(Objects::nonNull).toArray(Object[]::new);
-
-    for (Object o : objects) {
-      if (o == null) {
-        //throw new OrmException("insert parameter should not be null");
-      }
-    }
 
     int[] result = exec.apply(objects);
 
