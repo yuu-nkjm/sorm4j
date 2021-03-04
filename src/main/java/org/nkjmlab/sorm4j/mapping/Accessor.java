@@ -1,9 +1,8 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.util.StringUtils;
 
 final class Accessor {
 
@@ -14,18 +13,18 @@ final class Accessor {
 
   Accessor(Column column, Field field, Method getter, Method setter) {
     this.column = column;
-    this.getter =
-        getter != null ? new GetterMethod(getter, column) : new FieldGetter(field, column);
-    this.setter =
-        setter != null ? new SetterMethod(setter, column) : new FieldSetter(field, column);
+    this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
+    this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
   }
 
 
-  public Object get(Object object) {
+  public Object get(Object object)
+      throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     return getter.get(object);
   }
 
-  public void set(Object object, Object value) {
+  public void set(Object object, Object value)
+      throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     setter.set(object, value);
   }
 
@@ -46,26 +45,22 @@ final class Accessor {
 
 
   private static interface GetterAccessor {
-    Object get(Object object);
+    Object get(Object object)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
   }
 
   private static final class GetterMethod implements GetterAccessor {
 
-    private final Column column;
     private final Method getter;
 
-    public GetterMethod(Method getter, Column column) {
+    public GetterMethod(Method getter) {
       this.getter = getter;
-      this.column = column;
     }
 
     @Override
-    public Object get(Object object) {
-      try {
-        return getter.invoke(object, new Object[] {});
-      } catch (Exception e) {
-        throw new OrmException("Could not access getter for column [" + column + "]", e);
-      }
+    public Object get(Object object)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      return getter.invoke(object, new Object[] {});
     }
 
     @Override
@@ -77,23 +72,15 @@ final class Accessor {
 
   private static final class FieldGetter implements GetterAccessor {
 
-    private final Column column;
     private final Field field;
 
-    public FieldGetter(Field field, Column column) {
+    public FieldGetter(Field field) {
       this.field = field;
-      this.column = column;
     }
 
     @Override
-    public Object get(Object object) {
-      try {
-        return field.get(object);
-      } catch (Exception e) {
-        throw new OrmException(
-            StringUtils.format("Could not access field for column [{}] with [{}]", column, this),
-            e);
-      }
+    public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
+      return field.get(object);
     }
 
     @Override
@@ -104,19 +91,19 @@ final class Accessor {
   }
 
   private static interface SetterAccessor {
-    void set(Object object, Object value);
+
+    void set(Object object, Object value)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 
     Class<?> getParameterType();
   }
 
   private static final class SetterMethod implements SetterAccessor {
 
-    private final Column column;
     private final Method setter;
 
-    public SetterMethod(Method setter, Column column) {
+    public SetterMethod(Method setter) {
       this.setter = setter;
-      this.column = column;
     }
 
     @Override
@@ -126,14 +113,9 @@ final class Accessor {
     }
 
     @Override
-    public void set(Object object, Object value) {
-      try {
-        setter.invoke(object, new Object[] {value});
-      } catch (Exception e) {
-        throw new OrmException(StringUtils.format(
-            "Error setting value [{} ({})]" + " from column [{}] using setter [{}]: {}", value,
-            value.getClass().getName(), column, this.toString(), e.getMessage(), e));
-      }
+    public void set(Object object, Object value)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      setter.invoke(object, new Object[] {value});
     }
 
     @Override
@@ -146,12 +128,10 @@ final class Accessor {
 
   private static final class FieldSetter implements SetterAccessor {
 
-    private final Column column;
-    private Field field;
+    private final Field field;
 
-    public FieldSetter(Field field, Column column) {
+    public FieldSetter(Field field) {
       this.field = field;
-      this.column = column;
     }
 
     @Override
@@ -161,14 +141,9 @@ final class Accessor {
     }
 
     @Override
-    public void set(Object object, Object value) {
-      try {
-        field.set(object, value);
-      } catch (Exception e) {
-        throw new OrmException(StringUtils.format(
-            "Error setting value [{}]" + " of type [{}]" + " from column [{}] using field [{}]: {}",
-            value, value.getClass().getName(), column, field, e.getMessage(), e));
-      }
+    public void set(Object object, Object value)
+        throws IllegalArgumentException, IllegalAccessException {
+      field.set(object, value);
     }
 
     @Override

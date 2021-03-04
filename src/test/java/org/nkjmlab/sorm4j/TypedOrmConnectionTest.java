@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
 import org.nkjmlab.sorm4j.util.Player;
@@ -42,6 +43,8 @@ class TypedOrmConnectionTest {
 
   @Test
   void testTableName() {
+    Guest a = SormTestUtils.GUEST_ALICE;
+
     sorm.run(Guest.class, m -> {
       assertThat(m.getTableName()).contains("GUESTS");
     });
@@ -64,9 +67,8 @@ class TypedOrmConnectionTest {
         failBecauseExceptionWasNotThrown(Exception.class);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("does not match a existing table");
+      assertThat(e.getMessage()).contains("does not match any existing table");
     }
-    Guest a = SormTestUtils.GUEST_ALICE;
 
     sorm.run(Guest.class, conn -> {
 
@@ -117,7 +119,7 @@ class TypedOrmConnectionTest {
       try {
         assertThat(m.getJdbcConnection().isClosed()).isTrue();
       } catch (SQLException e) {
-        e.printStackTrace();
+        fail();
       }
     });
   }
@@ -180,6 +182,7 @@ class TypedOrmConnectionTest {
   }
 
 
+
   @Test
   void testInsertAndGetOnStringT() {
     assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
@@ -191,8 +194,8 @@ class TypedOrmConnectionTest {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
       m.insertAndGet(new Guest[0]);
-
     });
+
     sorm.run(Guest.class, m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", a);
       assertThat(g.getObject().getId()).isEqualTo(1);
@@ -602,7 +605,7 @@ class TypedOrmConnectionTest {
     try (Connection conn = sorm.getJdbcConnection()) {
       Sorm.getOrmConnection(conn);
     } catch (SQLException e) {
-      e.printStackTrace();
+      fail();
     }
 
     sorm.run(Player.class, m -> m.runTransaction(conn -> {

@@ -1,15 +1,18 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class TableMappingTest {
   private Sorm sorm;
@@ -39,9 +42,25 @@ class TableMappingTest {
         tm.getValue(new String(), "id");
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("not access getter for");
+      assertThat(e.getMessage()).contains("Could not get a value");
     }
 
+  }
+
+  @Test
+  void testInsertAndGetEx() throws SQLException {
+    Connection conMock = Mockito.spy(Connection.class);
+    Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
+        .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
+    try {
+      sorm.run(Guest.class, m -> {
+        Guest a = SormTestUtils.GUEST_ALICE;
+        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        tm.insertAndGet(conMock, a);
+      });
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Fail to insert and get");
+    }
   }
 
   @Test
@@ -60,7 +79,7 @@ class TableMappingTest {
         tm.setValue(new Guest(), "id", "String");
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Error setting value");
+      assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
       sorm.run(Player.class, m -> {
@@ -68,7 +87,7 @@ class TableMappingTest {
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Error setting value");
+      assertThat(e.getMessage()).contains("Could not set a value");
     }
   }
 

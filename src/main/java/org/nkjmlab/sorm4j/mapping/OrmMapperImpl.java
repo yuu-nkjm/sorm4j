@@ -9,8 +9,8 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
 import org.nkjmlab.sorm4j.OrmMapper;
-import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 /**
  * The main class for the ORMapper engine.
@@ -48,14 +48,14 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGet(T object) {
     TableMapping<T> mapping = getCastedTableMapping(object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 
   @Override
   public <T> InsertResult<T> insertAndGetOn(String tableName, T object) {
     TableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 
@@ -135,28 +135,28 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
   @Override
   public <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return execSqlIfParameterExists(objects, tableName,
+    return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.delete(getJdbcConnection(), objects), () -> new int[0]);
   }
 
 
   @Override
   public <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return execSqlIfParameterExists(objects, tableName,
+    return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
   }
 
 
   @Override
   public <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return execSqlIfParameterExists(objects, tableName,
+    return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.merge(getJdbcConnection(), objects), () -> new int[0]);
   }
 
 
   @Override
   public <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return execSqlIfParameterExists(objects, tableName,
+    return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.insert(getJdbcConnection(), objects), () -> new int[0]);
   }
 
@@ -164,7 +164,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
-    return execSqlIfParameterExists(objects, tableName,
+    return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
         () -> InsertResult.empty());
   }

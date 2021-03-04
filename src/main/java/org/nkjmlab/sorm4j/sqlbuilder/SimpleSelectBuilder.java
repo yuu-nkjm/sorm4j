@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.helper;
+package org.nkjmlab.sorm4j.sqlbuilder;
 
 /**
  * Example:

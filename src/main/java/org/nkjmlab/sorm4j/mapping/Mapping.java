@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.mapping;
 
+import static org.nkjmlab.sorm4j.util.StringUtils.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,26 +159,38 @@ abstract class Mapping<T> {
 
   final Object getValue(Object object, String columnName) {
     final Accessor acc = columnToAccessorMap.get(columnName);
-    if (acc != null) {
-      return acc.get(object);
-    } else {
-      throw new OrmException(StringUtils.format(
-          "Error getting value from [{}] because column [{}] does not have a corresponding getter method or field",
+    if (acc == null) {
+      throw new OrmException(format(
+          "Error getting value from [{}] because column [{}] does not have a corresponding getter method or field access",
           object.getClass(), columnName));
+    }
+    try {
+      return acc.get(object);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new OrmException(format(
+          "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
+          (object == null ? "null" : object.getClass().getName()), columnName,
+          acc.getFormattedString(), object), e);
     }
   }
 
 
   final void setValue(Object object, String columnName, Object value) {
     final Accessor acc = columnToAccessorMap.get(columnName);
-    if (acc != null) {
-      acc.set(object, value);
-    } else {
-      throw new OrmException(StringUtils.format(
-          "Error setting value [{}]" + " of type [{}] in [{}]"
-              + " because column [{}] does not have a corresponding setter method or field =>[{}]",
-          value, value.getClass().getName(), object.getClass().getName(), columnName,
+    if (acc == null) {
+      throw new OrmException(StringUtils.format("Error setting value [{}]" + " of type [{}] in [{}]"
+          + " because column [{}] does not have a corresponding setter method or field access =>[{}]",
+          value, value.getClass().getSimpleName(), object.getClass().getName(), columnName,
           columnToAccessorMap.keySet()));
+    }
+    try {
+      acc.set(object, value);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new OrmException(format(
+          "Could not set a value for column [{}] to instance of [{}] with [{}]. The value is=[{}]",
+          columnName, object == null ? "null" : object.getClass().getSimpleName(),
+          acc.getFormattedString(), value), e);
+
     }
   }
 

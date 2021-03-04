@@ -89,6 +89,9 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
 
 
 
+  /**
+   * Execute sql function. objects when objects[0] is null, {@code NullPointerException} are throw.
+   */
   protected final <T, R> R execSqlIfParameterExists(T[] objects,
       Function<TableMapping<T>, R> sqlFunction, Supplier<R> notExists) {
     if (objects == null || objects.length == 0) {
@@ -99,7 +102,11 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  protected final <T, R> R execSqlIfParameterExists(T[] objects, String tableName,
+  /**
+   * Execute sql function with table name. objects when objects[0] is null,
+   * {@code NullPointerException} are throw.
+   */
+  protected final <T, R> R execSqlIfParameterExists(String tableName, T[] objects,
       Function<TableMapping<T>, R> sqlFunction, Supplier<R> notExists) {
     if (objects == null || objects.length == 0) {
       return notExists.get();

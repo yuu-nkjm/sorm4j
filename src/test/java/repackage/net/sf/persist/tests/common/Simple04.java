@@ -21,13 +21,14 @@ public class Simple04 {
     this.id = id;
   }
 
+  // throw
   public String getStringCol() {
-    // return stringCol;
     throw new RuntimeException("Sample4");
   }
 
+  // throw
   public void setStringCol(String stringCol) {
-    this.stringCol = stringCol;
+    throw new RuntimeException("Sample4");
   }
 
   // getter and setter have incompatible types. argument type mismatch. -- will blow

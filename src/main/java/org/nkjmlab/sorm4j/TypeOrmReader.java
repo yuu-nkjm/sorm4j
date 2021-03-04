@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.util.List;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 public interface TypeOrmReader<T> {
 

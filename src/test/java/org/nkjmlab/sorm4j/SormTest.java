@@ -36,7 +36,6 @@ class SormTest {
       failBecauseExceptionWasNotThrown(OrmException.class);
     } catch (OrmException e) {
     }
-
   }
 
   @Test

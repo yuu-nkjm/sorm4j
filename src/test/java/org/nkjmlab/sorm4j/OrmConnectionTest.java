@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Player;
@@ -32,7 +33,7 @@ class OrmConnectionTest {
       try {
         assertThat(m.getJdbcConnection().isClosed()).isTrue();
       } catch (SQLException e) {
-        e.printStackTrace();
+        fail();
       }
     });
   }
@@ -103,6 +104,12 @@ class OrmConnectionTest {
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
     srv.run(m -> {
+      InsertResult<Guest> g = m.insertAndGet(new Guest[] {});
+      assertThat(g.getRowsModified()[0]).isEqualTo(0);
+    });
+
+
+    srv.run(m -> {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
@@ -114,11 +121,14 @@ class OrmConnectionTest {
 
   @Test
   void testInsertAndGetOnList() {
-    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
+    srv.run(m -> {
+      InsertResult<Guest> g = m.insertAndGetOn("players1", List.of());
+      assertThat(g.getRowsModified()[0]).isEqualTo(0);
+    });
     srv.run(m -> {
       InsertResult<Guest> g = m.insertAndGet(List.of(a));
       assertThat(g.getObject().getId()).isEqualTo(1);
@@ -217,6 +227,11 @@ class OrmConnectionTest {
 
   @Test
   void testMergeOnT() {
+    srv.run(m -> {
+      m.mergeOn("players1", new Player[] {});
+      m.merge(new Player[] {});
+    });
+
     srv.run(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
@@ -353,7 +368,8 @@ class OrmConnectionTest {
         List<Integer> ret = m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
-        assertThat(e.getCause().getMessage()).contains("but 1 column was expected to load data into");
+        assertThat(e.getCause().getMessage())
+            .contains("but 1 column was expected to load data into");
       }
       DebugPointFactory.off();
 

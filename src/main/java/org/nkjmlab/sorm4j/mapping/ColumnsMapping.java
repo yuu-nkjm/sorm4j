@@ -21,9 +21,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   public ColumnsMapping(Class<T> objectClass, ResultSetConverter resultSetConverter,
       ColumnFieldMapper columnFieldMapper) {
     super(resultSetConverter, objectClass, columnFieldMapper);
-    this.constructor =
-        Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(), OrmException::new)
-            .get();
+    this.constructor = Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(),
+        e -> new OrmException(
+            "Container class for object relation mapping must have the public default constructor (with no arguments).",
+            e))
+        .get();
     this.constructor.setAccessible(true);
   }
 
@@ -60,17 +62,23 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   private T createObject(List<String> columns, List<Object> values) {
+    final T ret = createNewInstance();
+    for (int i = 0; i < columns.size(); i++) {
+      final String columnName = columns.get(i);
+      final Object value = values.get(i);
+      setValue(ret, columnName, value);
+    }
+    return ret;
+  }
+
+  private final T createNewInstance() {
     try {
-      final T ret = constructor.newInstance();
-      for (int i = 0; i < columns.size(); i++) {
-        final String columnName = columns.get(i);
-        final Object value = values.get(i);
-        setValue(ret, columnName, value);
-      }
-      return ret;
+      return constructor.newInstance();
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
-      throw new OrmException(e);
+      throw new OrmException(
+          "Container class for object relation mapping must have the public default constructor (with no arguments).",
+          e);
     }
   }
 

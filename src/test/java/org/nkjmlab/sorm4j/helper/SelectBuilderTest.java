@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.helper;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.sqlbuilder.SimpleSelectBuilder;
 
 class SelectBuilderTest {
 
