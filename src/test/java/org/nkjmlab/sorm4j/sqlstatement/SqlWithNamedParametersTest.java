@@ -1,10 +1,9 @@
 package org.nkjmlab.sorm4j.sqlstatement;
 
 import static org.assertj.core.api.Assertions.*;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
-import org.nkjmlab.sorm4j.sqlstatement.SqlWithNamedParameters;
 
 class SqlWithNamedParametersTest {
   private String sql = "select * from simple where id=:idid and name=:name";
@@ -14,11 +13,9 @@ class SqlWithNamedParametersTest {
   void testCreate() {
     SqlStatement sp = SqlWithNamedParameters.toSqlStatement(sql, namedParams);
 
-    org.assertj.core.api.Assertions.assertThat(sp.getSql())
-        .isEqualTo("select * from simple where id=? and name=?");
+    assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
-    org.assertj.core.api.Assertions.assertThat(sp.getParameters())
-        .isEqualTo(new Object[] {2, "foo"});
+    assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
 
     assertThat(sp.toString())
         .isEqualTo("[select * from simple where id=? and name=?] with [2, foo]");
@@ -29,8 +26,7 @@ class SqlWithNamedParametersTest {
   @Test
   void testBindAll() {
     SqlStatement sp = SqlWithNamedParameters.from(sql).bindAll(namedParams).toSqlStatement();
-    org.assertj.core.api.Assertions.assertThat(sp.getSql())
-        .isEqualTo("select * from simple where id=? and name=?");
+    assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
   }
@@ -40,12 +36,19 @@ class SqlWithNamedParametersTest {
 
     SqlStatement sp = SqlWithNamedParameters.from(sql).bind("name", "foo").bind("id", 1)
         .bind("idid", 2).toSqlStatement();
+    assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
-    org.assertj.core.api.Assertions.assertThat(sp.getSql())
-        .isEqualTo("select * from simple where id=? and name=?");
+    assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
+  }
 
-    org.assertj.core.api.Assertions.assertThat(sp.getParameters())
-        .isEqualTo(new Object[] {2, "foo"});
+  @Test
+  void testBindList() {
+
+    SqlStatement sp = SqlWithNamedParameters.from("select * from where ID in(:names)")
+        .bind("names", List.of("foo", "bar")).toSqlStatement();
+
+
+    assertThat(sp.getParameters()[0]).isEqualTo("'foo', 'bar'");
 
 
   }
