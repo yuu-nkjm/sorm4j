@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
-public final class ColumnOnTable extends Column {
+final class ColumnOnTable extends Column {
 
   private int dataType;
 

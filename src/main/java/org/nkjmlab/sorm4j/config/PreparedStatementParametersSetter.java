@@ -3,12 +3,18 @@ package org.nkjmlab.sorm4j.config;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * A setter for given {@link PreparedStatement}.
+ *
+ * @author nkjm
+ *
+ */
 public interface PreparedStatementParametersSetter extends OrmConfig {
   /**
    * Sets parameters in the given prepared statement. i.e. Convert From Java To Sql.
    *
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
-   * @param parameters parameters values
+   * @param parameter parameters values
    * @throws SQLException
    *
    */

@@ -67,8 +67,7 @@ public interface OrmReader {
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
-   * so on.
+   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    *
    * @param <T>
    * @param objectClass
@@ -78,8 +77,7 @@ public interface OrmReader {
   <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
-   * so on.
+   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement,Object[])}

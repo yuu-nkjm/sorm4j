@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.util.ArrayUtils;
-import org.nkjmlab.sorm4j.util.PreparedStatementUtils;
 import org.nkjmlab.sorm4j.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 

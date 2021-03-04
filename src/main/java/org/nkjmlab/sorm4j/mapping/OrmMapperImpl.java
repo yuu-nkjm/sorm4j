@@ -15,11 +15,8 @@ import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 /**
  * The main class for the ORMapper engine.
  *
- * A OrmMapper instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not
- * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
- *
  */
-public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
+class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
 
   /**
    * Creates a instance that will use the default cache for table-object and column-object mappings.
@@ -127,8 +124,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
-        () -> InsertResult.empty());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResult.empty());
   }
 
 
@@ -165,8 +161,7 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   public <T> InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
-        () -> InsertResult.empty());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResult.empty());
   }
 
 

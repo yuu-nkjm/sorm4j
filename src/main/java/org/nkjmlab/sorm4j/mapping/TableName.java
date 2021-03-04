@@ -2,6 +2,12 @@ package org.nkjmlab.sorm4j.mapping;
 
 import java.util.Objects;
 
+/**
+ * Value object of table name.
+ *
+ * @author nkjm
+ *
+ */
 public final class TableName {
 
   private final String name;

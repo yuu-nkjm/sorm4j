@@ -2,6 +2,12 @@ package org.nkjmlab.sorm4j.mapping;
 
 import java.util.Objects;
 
+/**
+ * Value object of column.
+ *
+ * @author nkjm
+ *
+ */
 public class Column implements Comparable<Column> {
 
   private final String name;

@@ -20,7 +20,7 @@ public interface OrmMapReader {
    * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
    *
    */
 
@@ -29,14 +29,14 @@ public interface OrmMapReader {
   Map<String, Object> readMapOne(String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet} instance containing data from the execution
-   * of the provided parametrized SQL and convert it to Stream, List, and so on.
+   * Returns an {@link org.nkjmlab.sorm4j.mapping.LazyResultSetImpl} instance containing data from
+   * the execution of the provided parametrized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
    *
    */
   LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
@@ -49,7 +49,7 @@ public interface OrmMapReader {
    * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link JavaTOSqlDataConverter#setParameters(PreparedStatement, int[], Object[])}
+   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
    *
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);

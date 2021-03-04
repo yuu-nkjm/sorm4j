@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.PreparedStatementUtils;
 import org.nkjmlab.sorm4j.util.Try;
 
 public abstract class MultiRowProcessor<T> {
