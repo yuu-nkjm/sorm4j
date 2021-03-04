@@ -3,8 +3,8 @@ package org.nkjmlab.sorm4j.helper;
 import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.SqlStatement;
-import org.nkjmlab.sorm4j.SqlWithNamedParameters;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlWithNamedParameters;
 
 class SqlWithNamedParametersTest {
   private String sql = "select * from simple where id=:idid and name=:name";

@@ -9,8 +9,8 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
 import org.nkjmlab.sorm4j.OrmMapper;
-import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 /**
  * The main class for the ORMapper engine.

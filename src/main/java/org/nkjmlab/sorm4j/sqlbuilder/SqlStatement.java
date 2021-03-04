@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.sqlbuilder;
 
 import java.util.Arrays;
 

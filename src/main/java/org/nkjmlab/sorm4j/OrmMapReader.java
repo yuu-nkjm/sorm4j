@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 public interface OrmMapReader {
   Map<String, Object> readMapOne(SqlStatement sql);

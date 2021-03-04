@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.OrmTransaction;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
 import org.nkjmlab.sorm4j.util.Player;

@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.InsertResult;
 import org.nkjmlab.sorm4j.LazyResultSet;
-import org.nkjmlab.sorm4j.SqlStatement;
 import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 

@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
 
 /**
  * The main interface of Reading functions of ORM reader.
