@@ -21,7 +21,7 @@ public class Simple10 {
     return stringCol;
   }
 
-  // setter has no parameter -- will blow
+  // wrong setter: has no parameter -- will use field directly
   public void setStringCol() {}
 
   public long getLongCol() {

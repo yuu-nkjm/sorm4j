@@ -42,6 +42,8 @@ class TypedOrmConnectionTest {
 
   @Test
   void testTableName() {
+    Guest a = SormTestUtils.GUEST_ALICE;
+
     sorm.run(Guest.class, m -> {
       assertThat(m.getTableName()).contains("GUESTS");
     });
@@ -64,9 +66,8 @@ class TypedOrmConnectionTest {
         failBecauseExceptionWasNotThrown(Exception.class);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("does not match a existing table");
+      assertThat(e.getMessage()).contains("does not match any existing table");
     }
-    Guest a = SormTestUtils.GUEST_ALICE;
 
     sorm.run(Guest.class, conn -> {
 

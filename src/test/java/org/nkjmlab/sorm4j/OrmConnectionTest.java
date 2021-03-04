@@ -218,6 +218,11 @@ class OrmConnectionTest {
   @Test
   void testMergeOnT() {
     srv.run(m -> {
+      m.mergeOn("players1", new Player[] {});
+      m.merge(new Player[] {});
+    });
+
+    srv.run(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.mergeOn("players1", a);
@@ -353,7 +358,8 @@ class OrmConnectionTest {
         List<Integer> ret = m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
-        assertThat(e.getCause().getMessage()).contains("but 1 column was expected to load data into");
+        assertThat(e.getCause().getMessage())
+            .contains("but 1 column was expected to load data into");
       }
       DebugPointFactory.off();
 

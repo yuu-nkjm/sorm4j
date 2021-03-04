@@ -1,5 +1,7 @@
 package repackage.net.sf.persist.tests.common;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -356,33 +358,29 @@ public class TestSimple {
 
   @Test
   public void testMappingSimple01() {
-
-    // Simple01 specifies an invalid column name
+    // Simple01 specifies an invalid column name but field is used.
     try (Connection conn = connectionPool.getConnection()) {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
       simpleOrMapper.readByPrimaryKey(Simple01.class, id);
     } catch (Exception e) {
-      log.info(e);
+      fail();
     }
   }
 
   @Test
   public void testMappingSimple02() {
-
     // Simple02 specifies an invalid table
     try (Connection conn = connectionPool.getConnection()) {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
       simpleOrMapper.readByPrimaryKey(Simple02.class, id);
-      fail("Object with invalid table name did not trigger exception");
+      failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
-      // assertEquals(e.getMessage(),
-      // "Class [net.sf.persist.tests.common.Simple02] specifies table [hello_world] that does not
-      // exist in the database");
-      log.info(e);
+      assertThat(e.getMessage()).contains("does not match any existing table");
+
     }
   }
 
@@ -393,11 +391,9 @@ public class TestSimple {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
       simpleOrMapper.readByPrimaryKey(Simple03.class, 1);
-      fail("Object lacking field did not trigger exception");
+      failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
-      log.info(e);
-      org.assertj.core.api.Assertions.assertThat(e.getMessage())
-          .contains("[LONG_COL] does not match any field");
+      assertThat(e.getMessage()).contains("[LONG_COL] does not match any field");
     }
   }
 
@@ -409,9 +405,21 @@ public class TestSimple {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
       Simple04 ret = simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
-      //fail("Object with incompatible getter and setter did not trigger exception");
+      fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
-      log.info(e);
+      org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
+          .contains("Error setting value");
+    }
+  }
+
+  @Test
+  public void testMappingSimple04_1() {
+    // Simple04 has incompatible setter
+    try (Connection conn = connectionPool.getConnection()) {
+      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      simpleOrMapper.insert(new Simple04());
+      // fail("Object with incompatible getter and setter did not trigger exception");
+    } catch (Exception e) {
       // org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
       // .contains("Error setting value");
     }
@@ -426,9 +434,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple05.class, 1);
       fail("Object with invalid table name did not trigger exception");
     } catch (Exception e) {
-      log.info(e);
-      org.assertj.core.api.Assertions.assertThat(e.getMessage())
-          .contains("does not match a existing table");
+      assertThat(e.getMessage()).contains("does not match any existing table");
     }
   }
 
@@ -439,8 +445,9 @@ public class TestSimple {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
       simpleOrMapper.readByPrimaryKey(Simple06.class, 1);
+      fail("Object without getter and setter did not trigger exception");
     } catch (Exception e) {
-      log.info(e);
+      assertThat(e.getMessage()).contains("does not match any field");
     }
   }
 
@@ -453,9 +460,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple07.class, 1);
       fail("Object without getter and setter did not trigger exception");
     } catch (Exception e) {
-      log.info(e);
-      org.assertj.core.api.Assertions.assertThat(e.getMessage())
-          .contains("[STRING_COL] does not match any field");
+      assertThat(e.getMessage()).contains("[STRING_COL] does not match any field");
     }
   }
 
@@ -468,10 +473,8 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple08.class, 1);
       fail("Object with conflicting annotations did not trigger exception");
     } catch (Exception e) {
-      // assertEquals(e.getMessage(),
-      // "Field [intCol] from class [net.sf.persist.tests.common.Simple08] has conflicting
-      // NoColumn and Column annotations");
-      log.info(e);
+      assertThat(e.getMessage()).contains("does not match any field");
+
     }
   }
 
@@ -481,13 +484,8 @@ public class TestSimple {
     try (Connection conn = connectionPool.getConnection()) {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.readByPrimaryKey(Simple10.class, 1);
-      // just print warning
-      // fail("Object with setter having no parameters did not trigger exception");
     } catch (Exception e) {
-      // assertEquals(e.getMessage(),
-      // "Setter [public void net.sf.persist.tests.common.Simple10.setStringCol()] should have a
-      // single parameter but has 0");
-      log.info(e);
+      fail();
     }
   }
 
@@ -496,20 +494,13 @@ public class TestSimple {
     try (Connection conn = connectionPool.getConnection()) {
       OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
-
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
-
-
-
       // Simple09 has getter which returns void
       try {
         simpleOrMapper.readByPrimaryKey(Simple09.class, id);
         fail("Object with getter returning void did not trigger exception");
       } catch (Exception e) {
-        // assertEquals(e.getMessage(),
-        // "Getter [public void net.sf.persist.tests.common.Simple09.getStringCol()] must have a
-        // return parameter");
-        log.info(e);
+        assertThat(e.getMessage()).contains("does not match any field");
       }
     }
   }
