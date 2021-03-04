@@ -19,8 +19,9 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   public TableName toValidTableName(String tableName, DatabaseMetaData metaData)
       throws SQLException {
     List<String> candidates = List.of(StringUtils.toUpperCase(tableName));
-    return getTableNameOnDb(metaData, candidates).orElseThrow(() -> new OrmException(StringUtils
-        .format("[{}]  does not match a existing table in the db. Candidates Name are {}",
+    return getTableNameOnDb(metaData, candidates)
+        .orElseThrow(() -> new OrmException(StringUtils.format(
+            "[{}] does not match any existing table in the database. Table Name candidates are {}",
             tableName, candidates)));
   }
 
@@ -35,7 +36,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
         : guessTableNameCandidates(objectClass);
     return getTableNameOnDb(metaData, candidates)
         .orElseThrow(() -> new OrmException(StringUtils.format(
-            "[{}]  does not match a existing table in the db. Use [{}] annotation correctly. Candidates Name are {}",
+            "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
             objectClass.getName(), OrmTable.class.getName(), candidates)));
   }
 
