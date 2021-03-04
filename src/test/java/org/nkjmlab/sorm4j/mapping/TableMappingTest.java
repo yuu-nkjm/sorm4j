@@ -1,9 +1,12 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.util.Guest;
@@ -42,6 +45,22 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("Could not get a value");
     }
 
+  }
+
+  @Test
+  void testInsertAndGetEx() throws SQLException {
+    Connection conMock = Mockito.spy(Connection.class);
+    Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
+        .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
+    try {
+      sorm.run(Guest.class, m -> {
+        Guest a = SormTestUtils.GUEST_ALICE;
+        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        tm.insertAndGet(conMock, a);
+      });
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Fail to insert and get");
+    }
   }
 
   @Test

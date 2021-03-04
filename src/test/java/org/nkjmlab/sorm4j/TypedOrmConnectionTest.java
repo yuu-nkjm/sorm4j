@@ -181,6 +181,7 @@ class TypedOrmConnectionTest {
   }
 
 
+
   @Test
   void testInsertAndGetOnStringT() {
     assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
@@ -192,8 +193,8 @@ class TypedOrmConnectionTest {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
       m.insertAndGet(new Guest[0]);
-
     });
+
     sorm.run(Guest.class, m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", a);
       assertThat(g.getObject().getId()).isEqualTo(1);

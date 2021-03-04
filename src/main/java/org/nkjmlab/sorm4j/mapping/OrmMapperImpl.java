@@ -48,14 +48,14 @@ public class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGet(T object) {
     TableMapping<T> mapping = getCastedTableMapping(object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 
   @Override
   public <T> InsertResult<T> insertAndGetOn(String tableName, T object) {
     TableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 

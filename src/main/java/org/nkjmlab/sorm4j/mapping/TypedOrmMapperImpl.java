@@ -75,14 +75,14 @@ public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrm
   @Override
   public InsertResult<T> insertAndGet(T object) {
     TableMapping<T> mapping = getCastedTableMapping(object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 
   @Override
   public InsertResult<T> insertAndGetOn(String tableName, T object) {
     TableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
-    return mapping.insertAndGetResult(getJdbcConnection(), object);
+    return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
 
