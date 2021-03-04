@@ -14,6 +14,13 @@ import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.util.Try;
 
+/**
+ * Holds mapping data from a given class and a table.
+ *
+ * @author nkjm
+ *
+ * @param <T>
+ */
 public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 

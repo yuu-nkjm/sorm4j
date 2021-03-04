@@ -1,9 +1,12 @@
-package org.nkjmlab.sorm4j.mapping;
+package org.nkjmlab.sorm4j.config;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.mapping.TableMapping;
+import org.nkjmlab.sorm4j.mapping.TableName;
 
-public class OrmCache {
+class OrmCache {
 
   private OrmCache() {}
 

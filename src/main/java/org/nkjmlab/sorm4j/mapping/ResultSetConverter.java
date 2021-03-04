@@ -9,15 +9,29 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
 
-public class ResultSetConverter {
+final class ResultSetConverter {
 
   private final ResultSetValueGetter resultSetValueGetter;
 
-  public ResultSetConverter(ResultSetValueGetter resultSetValueGetter) {
+  ResultSetConverter(ResultSetValueGetter resultSetValueGetter) {
     this.resultSetValueGetter = resultSetValueGetter;
   }
 
-  public Map<String, Object> toSingleMap(final ResultSet resultSet, List<String> columns,
+  Object getValueByClass(ResultSet resultSet, int i, Class<?> classType) throws SQLException {
+    return resultSetValueGetter.getValueBySetterType(resultSet, i, classType);
+  }
+
+  final List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterArgTypes)
+      throws SQLException {
+    final List<Object> values = new ArrayList<>(setterArgTypes.size());
+    for (int i = 1; i <= setterArgTypes.size(); i++) {
+      final Class<?> type = setterArgTypes.get(i - 1);
+      values.add(resultSetValueGetter.getValueBySetterType(resultSet, i, type));
+    }
+    return values;
+  }
+
+  Map<String, Object> toSingleMap(final ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) throws SQLException {
     final Map<String, Object> ret = new LinkedHashMap<>();
     for (int i = 1; i <= columns.size(); i++) {
@@ -28,28 +42,14 @@ public class ResultSetConverter {
     return ret;
   }
 
-  public final <T> T toSingleNativeObject(final ResultSet resultSet, final Class<T> objectClass) throws SQLException {
+  final <T> T toSingleNativeObject(final ResultSet resultSet, final Class<T> objectClass)
+      throws SQLException {
     // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
     // is prior.
     Object value = resultSetValueGetter.getValueBySetterType(resultSet, 1, objectClass);
     @SuppressWarnings("unchecked")
     T valueT = (T) value;
     return valueT;
-  }
-
-  public final List<Object> toObjectsByClasses(ResultSet resultSet,
-      List<Class<?>> setterParamTypes) throws SQLException {
-    final List<Object> values = new ArrayList<>(setterParamTypes.size());
-    for (int i = 1; i <= setterParamTypes.size(); i++) {
-      final Class<?> type = setterParamTypes.get(i - 1);
-      values.add(resultSetValueGetter.getValueBySetterType(resultSet, i, type));
-    }
-    return values;
-  }
-
-  public Object getValueByClass(ResultSet resultSet, int i, Class<?> classType)
-      throws SQLException {
-    return resultSetValueGetter.getValueBySetterType(resultSet, i, classType);
   }
 
 

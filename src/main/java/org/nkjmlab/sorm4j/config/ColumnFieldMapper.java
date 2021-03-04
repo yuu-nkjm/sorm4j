@@ -3,8 +3,9 @@ package org.nkjmlab.sorm4j.config;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import org.nkjmlab.sorm4j.mapping.Column;
-import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMap;
+import org.nkjmlab.sorm4j.mapping.FieldName;
 
 
 public interface ColumnFieldMapper extends OrmConfig {
@@ -16,9 +17,23 @@ public interface ColumnFieldMapper extends OrmConfig {
 
   List<String> getPrimaryKeys(DatabaseMetaData metaData, String tableName) throws SQLException;
 
-  ColumnToAccessorMap createColumnToAccessorMap(Class<?> objectClass, List<Column> columns);
 
-  ColumnToAccessorMap createColumnToAccessorMap(Class<?> objectClass);
+  /**
+   * Get field name corresponding to the column name.
+   *
+   * @param column column name
+   * @param fieldNames fieldNames exists in mapped object.
+   * @return
+   */
+  Optional<FieldName> getFieldNameByColumnName(Column column, List<FieldName> fieldNames);
+
+  /**
+   * Get column name candidates based the field names.
+   *
+   * @param fieldNames
+   * @return
+   */
+  List<Column> getColumnNameCandidates(List<FieldName> fieldNames);
 
 
 

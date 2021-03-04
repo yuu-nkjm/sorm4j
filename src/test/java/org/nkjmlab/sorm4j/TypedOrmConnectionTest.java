@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.mapping.OrmTransaction;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
@@ -595,11 +594,11 @@ class TypedOrmConnectionTest {
     sorm.executeTransaction(conn -> conn.insert(a));
     // auto-rolback
     sorm.runTransaction(conn -> conn.insert(a));
-    try (OrmTransaction trans = sorm.beginTransaction()) {
+    try (OrmConnection trans = sorm.beginTransaction()) {
       // auto-rolback
       trans.insert(a);
     }
-    try (OrmTransaction trans = sorm.beginTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+    try (OrmConnection trans = sorm.beginTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
       // auto-rolback
       trans.insert(a);
     }

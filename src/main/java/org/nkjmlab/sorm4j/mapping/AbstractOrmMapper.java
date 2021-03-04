@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.util.PreparedStatementUtils.*;
+import static org.nkjmlab.sorm4j.mapping.PreparedStatementUtils.*;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,7 +31,7 @@ import org.nkjmlab.sorm4j.util.StringUtils;
 import org.nkjmlab.sorm4j.util.Try;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
-public abstract class AbstractOrmMapper implements SqlExecutor {
+abstract class AbstractOrmMapper implements SqlExecutor {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 
@@ -71,11 +71,10 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
     this.tableNameMapper = configStore.getTableNameMapper();
     this.resultSetConverter = new ResultSetConverter(configStore.getSqlToJavaDataConverter());
     this.preparedStatementParametersSetter = configStore.getJavaToSqlDataConverter();
-    String cacheName = configStore.getConfigName();
-    this.tableMappings = OrmCache.getTableMappings(cacheName);
-    this.columnsMappings = OrmCache.getColumnsMappings(cacheName);
-    this.classNameToValidTableNameMap = OrmCache.getClassNameToValidTableNameMap(cacheName);
-    this.tableNameToValidTableNameMap = OrmCache.getTableNameToValidTableNameMaps(cacheName);
+    this.tableMappings = configStore.getTableMappings();
+    this.columnsMappings = configStore.getColumnsMappings();
+    this.classNameToValidTableNameMap = configStore.getClassNameToValidTableNameMap();
+    this.tableNameToValidTableNameMap = configStore.getTableNameToValidTableNameMaps();
   }
 
   public <T> int deleteAll(Class<T> objectClass) {
@@ -343,7 +342,7 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
       final PreparedStatement stmt = getPreparedStatement(connection, sql);
       preparedStatementParametersSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      return new LazyResultSet<T>(this, objectClass, stmt, resultSet);
+      return new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
     } catch (SQLException e) {
       throw new OrmException(e);
     }
@@ -377,8 +376,8 @@ public abstract class AbstractOrmMapper implements SqlExecutor {
       final ResultSet resultSet = stmt.executeQuery();
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
       LazyResultSet<Map<String, Object>> ret =
-          (LazyResultSet<Map<String, Object>>) new LazyResultSet(this, LinkedHashMap.class, stmt,
-              resultSet);
+          (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, LinkedHashMap.class,
+              stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw new OrmException(e);

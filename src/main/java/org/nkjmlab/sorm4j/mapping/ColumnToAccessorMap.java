@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class ColumnToAccessorMap {
+final class ColumnToAccessorMap {
   // key => UPPER COLUMN_NAME
   private final Map<String, Accessor> columnToAccessorMap;
 

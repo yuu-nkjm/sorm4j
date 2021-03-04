@@ -4,11 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.util.ArrayUtils;
-import org.nkjmlab.sorm4j.util.PreparedStatementUtils;
+import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
+/**
+ * A sql statement processor for multirow update and batch. This object could be set ormapper via
+ * {@link OrmConfigStore}
+ *
+ * @author nkjm
+ *
+ * @param <T>
+ */
 public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
 
   private final int multiRowSize;

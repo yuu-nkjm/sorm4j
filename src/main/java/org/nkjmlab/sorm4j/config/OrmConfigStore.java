@@ -4,13 +4,21 @@ import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import org.nkjmlab.sorm4j.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.mapping.DefaultResultSetValueGetter;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessor;
 import org.nkjmlab.sorm4j.mapping.TableMapping;
+import org.nkjmlab.sorm4j.mapping.TableName;
 
+/**
+ * A configuration store of sorm4j. A object keep
+ *
+ * @author nkjm
+ *
+ */
 public final class OrmConfigStore {
 
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
@@ -149,6 +157,26 @@ public final class OrmConfigStore {
 
   public static OrmConfigStore getDefaultConfigStore() {
     return get(DEFAULT_CONFIG_NAME);
+  }
+
+  public static void refresh(String configName) {
+    OrmCache.refresh(configName);
+  }
+
+  public ConcurrentMap<String, TableMapping<?>> getTableMappings() {
+    return OrmCache.getTableMappings(configName);
+  }
+
+  public ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings() {
+    return OrmCache.getColumnsMappings(configName);
+  }
+
+  public ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap() {
+    return OrmCache.getClassNameToValidTableNameMap(configName);
+  }
+
+  public ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps() {
+    return OrmCache.getTableNameToValidTableNameMaps(configName);
   }
 
 }

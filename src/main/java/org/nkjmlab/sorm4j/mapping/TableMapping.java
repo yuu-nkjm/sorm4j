@@ -19,10 +19,8 @@ import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.config.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.PreparedStatementUtils;
 import org.nkjmlab.sorm4j.util.StringUtils;
 import org.nkjmlab.sorm4j.util.Try;
 
