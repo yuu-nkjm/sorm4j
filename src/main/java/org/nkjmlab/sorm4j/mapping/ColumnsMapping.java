@@ -36,8 +36,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   public String getFormattedString() {
-    return "Columns are mappted to class. " + System.lineSeparator()
-        + super.getColumnToAccessorString();
+    return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
+        + System.lineSeparator() + super.getColumnToAccessorString();
   }
 
   public T loadObject(ResultSet resultSet) throws SQLException {

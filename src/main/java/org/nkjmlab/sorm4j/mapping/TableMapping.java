@@ -346,9 +346,9 @@ public final class TableMapping<T> extends Mapping<T> {
   }
 
   public String getFormattedString() {
-    return "TABLE [" + tableName + "] is mapped to [" + objectClass.getSimpleName() + "] class. "
-        + "PRIMARY KEY is " + primaryKeys + System.lineSeparator()
-        + super.getColumnToAccessorString() + System.lineSeparator() + "["
+    return "[" + TableMapping.class.getSimpleName() + "] TABLE [" + tableName + "] is mapped to ["
+        + objectClass.getSimpleName() + "] class. " + "PRIMARY KEY is " + primaryKeys
+        + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator() + "["
         + multiRowProcessor.getClass().getSimpleName() + "] is used for processing multirow.";
   }
 
