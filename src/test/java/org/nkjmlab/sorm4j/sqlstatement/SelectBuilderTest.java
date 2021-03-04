@@ -1,11 +1,10 @@
-package org.nkjmlab.sorm4j.helper;
+package org.nkjmlab.sorm4j.sqlstatement;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.Condition;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.OrderBy;
 import org.nkjmlab.sorm4j.util.Guest;
@@ -25,6 +24,14 @@ class SelectBuilderTest {
   }
 
   @Test
+  void testBuild3() {
+    SelectBuilder builder = SelectBuilder.create();
+    builder.groupBy("a");
+    builder.distinct();
+    builder.toString();
+  }
+
+  @Test
   void testBuild1() {
     SelectBuilder builder = SelectBuilder.create();
     builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
@@ -34,6 +41,8 @@ class SelectBuilderTest {
     String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).build();
     assertThat(sql).contains(
         "select avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
+
+    builder.toPrettyString();
   }
 
   @Test

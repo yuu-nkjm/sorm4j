@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.sqlstatement;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 
@@ -65,10 +64,6 @@ public class SelectBuilder {
 
   private String limit;
 
-  public SelectBuilder select(List<String> columns) {
-    return select(columns.toArray(String[]::new));
-  }
-
   public SelectBuilder select(String... columns) {
     this.columns = String.join(", ", Arrays.stream(columns).collect(Collectors.toList()));
     return this;
@@ -87,10 +82,6 @@ public class SelectBuilder {
   public SelectBuilder from(TypedOrmConnection<?> orm) {
     this.table = orm.getTableName();
     return this;
-  }
-
-  public SelectBuilder groupBy(List<String> columns) {
-    return groupBy(columns.toArray(String[]::new));
   }
 
   public SelectBuilder groupBy(String... columns) {
@@ -120,10 +111,6 @@ public class SelectBuilder {
   public SelectBuilder orderBy(String column, String ascOrDesc) {
     orderBy(new OrderBy(column, ascOrDesc));
     return this;
-  }
-
-  public SelectBuilder orderBy(List<OrderBy> orderBys) {
-    return orderBy(orderBys.toArray(OrderBy[]::new));
   }
 
   public SelectBuilder orderBy(OrderBy... orderBys) {
