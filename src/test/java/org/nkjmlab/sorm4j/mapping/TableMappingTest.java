@@ -8,8 +8,8 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 import org.nkjmlab.sorm4j.util.Player;
+import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class TableMappingTest {
   private Sorm sorm;
@@ -39,7 +39,7 @@ class TableMappingTest {
         tm.getValue(new String(), "id");
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("not access getter for");
+      assertThat(e.getMessage()).contains("Could not get a value");
     }
 
   }
@@ -60,7 +60,7 @@ class TableMappingTest {
         tm.setValue(new Guest(), "id", "String");
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Error setting value");
+      assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
       sorm.run(Player.class, m -> {
@@ -68,7 +68,7 @@ class TableMappingTest {
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Error setting value");
+      assertThat(e.getMessage()).contains("Could not set a value");
     }
   }
 

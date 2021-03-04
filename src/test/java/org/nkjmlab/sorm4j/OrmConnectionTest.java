@@ -103,6 +103,12 @@ class OrmConnectionTest {
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
     srv.run(m -> {
+      InsertResult<Guest> g = m.insertAndGet(new Guest[] {});
+      assertThat(g.getRowsModified()[0]).isEqualTo(0);
+    });
+
+
+    srv.run(m -> {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
     });

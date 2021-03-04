@@ -408,22 +408,10 @@ public class TestSimple {
       fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
       org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
-          .contains("Error setting value");
+          .contains("Could not set a value");
     }
   }
 
-  @Test
-  public void testMappingSimple04_1() {
-    // Simple04 has incompatible setter
-    try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
-      simpleOrMapper.insert(new Simple04());
-      // fail("Object with incompatible getter and setter did not trigger exception");
-    } catch (Exception e) {
-      // org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
-      // .contains("Error setting value");
-    }
-  }
 
   @Test
   public void testMappingSimple05() {
@@ -474,7 +462,6 @@ public class TestSimple {
       fail("Object with conflicting annotations did not trigger exception");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not match any field");
-
     }
   }
 
@@ -486,6 +473,18 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple10.class, 1);
     } catch (Exception e) {
       fail();
+    }
+  }
+
+  @Test
+  public void testMappingSimple11() {
+    // Simple10 has setter with no parameters
+    try (Connection conn = connectionPool.getConnection()) {
+      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      simpleOrMapper.insert(new Simple11());
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertThat(e.getCause().getMessage()).contains("does not match any field");
     }
   }
 
