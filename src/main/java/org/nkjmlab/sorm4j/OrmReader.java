@@ -3,7 +3,8 @@ package org.nkjmlab.sorm4j;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
-import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
+import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
 /**
  * The main interface of Reading functions of ORM reader.
@@ -66,7 +67,7 @@ public interface OrmReader {
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet}. It is able to convert to Stream, List, and
+   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
    * so on.
    *
    * @param <T>
@@ -77,7 +78,7 @@ public interface OrmReader {
   <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.LazyResultSet}. It is able to convert to Stream, List, and
+   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
    * so on.
    * <p>
    * Parameters will be set according with the correspondence defined in

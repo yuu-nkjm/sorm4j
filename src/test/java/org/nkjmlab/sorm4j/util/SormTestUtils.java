@@ -35,10 +35,10 @@ public class SormTestUtils {
 
   }
 
-  public static void dropAndCreateTableAll(Sorm srv) {
-    dropAndCreateGuestTable(srv);
-    dropAndCreatePlayerTable(srv);
-    dropAndCreateLocationTable(srv);
+  public static void dropAndCreateTableAll(Sorm sorm) {
+    dropAndCreateGuestTable(sorm);
+    dropAndCreatePlayerTable(sorm);
+    dropAndCreateLocationTable(sorm);
   }
 
   public static void dropAndCreateTable(Sorm srv, Class<?> clazz) {

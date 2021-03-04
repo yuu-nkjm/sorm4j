@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.result;
 
 import static java.util.Spliterator.*;
 import static java.util.Spliterators.*;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.mapping.AbstractOrmMapper;
 import org.nkjmlab.sorm4j.util.Try;
 

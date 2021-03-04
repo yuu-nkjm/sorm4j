@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.util.List;
+import org.nkjmlab.sorm4j.result.InsertResult;
 
 
 public interface OrmUpdater {

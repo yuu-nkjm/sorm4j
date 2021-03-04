@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import org.nkjmlab.sorm4j.sqlbuilder.SqlStatement;
+import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
 public interface SqlExecutor {
 
