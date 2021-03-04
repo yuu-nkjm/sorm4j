@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.helper;
+package org.nkjmlab.sorm4j.sqlstatement;
 
 import static org.assertj.core.api.Assertions.*;
 import java.util.Map;

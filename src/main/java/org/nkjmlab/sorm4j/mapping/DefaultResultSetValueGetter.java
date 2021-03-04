@@ -105,13 +105,16 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
           return resultSet.getBlob(column);
         case "java.time.LocalTime":
           return Optional.ofNullable(resultSet.getTime(column)).map(t -> t.toLocalTime())
-              .orElseGet(null);
+              .orElse(null);
         case "java.time.LocalDate":
           return Optional.ofNullable(resultSet.getDate(column)).map(t -> t.toLocalDate())
-              .orElseGet(null);
+              .orElse(null);
         case "java.time.LocalDateTime":
           return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime())
-              .orElseGet(null);
+              .orElse(null);
+        case "java.util.Date":
+          return Optional.ofNullable(resultSet.getTimestamp(column))
+              .map(t -> new java.util.Date(t.getTime())).orElse(null);
         case "java.lang.Object":
           return resultSet.getObject(column);
         default:

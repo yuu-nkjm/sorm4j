@@ -51,68 +51,77 @@ public final class DefaultPreparedStatementParametersSetter
       stmt.setClob(column, (Clob) parameter);
     } else if (parameter instanceof Blob) {
       stmt.setBlob(column, (Blob) parameter);
-    }
-    final String typeName = type.getName();
-    switch (typeName) {
-      case "java.lang.Boolean":
-      case "boolean":
-        stmt.setBoolean(column, (Boolean) parameter);
-        return;
-      case "java.lang.Byte":
-      case "byte":
-        stmt.setByte(column, (Byte) parameter);
-        return;
-      case "java.lang.Short":
-      case "short":
-        stmt.setShort(column, (Short) parameter);
-        return;
-      case "java.lang.Integer":
-      case "int":
-        stmt.setInt(column, (Integer) parameter);
-        return;
-      case "java.lang.Long":
-      case "long":
-        stmt.setLong(column, (Long) parameter);
-        return;
-      case "java.lang.Float":
-      case "float":
-        stmt.setFloat(column, (Float) parameter);
-        return;
-      case "java.lang.Double":
-      case "double":
-        stmt.setDouble(column, (Double) parameter);
-        return;
-      case "java.lang.Character":
-      case "char":
-        stmt.setString(column, parameter == null ? null : "" + (Character) parameter);
-        return;
-      case "java.lang.String":
-        stmt.setString(column, (String) parameter);
-        return;
-      case "java.math.BigDecimal":
-        stmt.setBigDecimal(column, (BigDecimal) parameter);
-        return;
-      case "java.sql.Date":
-        stmt.setDate(column, java.sql.Date.valueOf(parameter.toString()));
-        return;
-      case "java.sql.Time":
-        stmt.setTime(column, Time.valueOf(parameter.toString()));
-        return;
-      case "java.sql.Timestamp":
-        stmt.setTimestamp(column, (java.sql.Timestamp) parameter);
-        return;
-      case "java.time.LocalTime":
-        stmt.setTime(column, java.sql.Time.valueOf((java.time.LocalTime) parameter));
-        return;
-      case "java.time.LocalDate":
-        stmt.setDate(column, java.sql.Date.valueOf((java.time.LocalDate) parameter));
-        return;
-      case "java.time.LocalDateTime":
-        stmt.setTimestamp(column, Timestamp.valueOf((java.time.LocalDateTime) parameter));
-        return;
-      default:
-        stmt.setObject(column, parameter);
-        return;
+    } else {
+      final String typeName = type.getName();
+      switch (typeName) {
+        case "java.lang.Boolean":
+        case "boolean":
+          stmt.setBoolean(column, (Boolean) parameter);
+          return;
+        case "java.lang.Byte":
+        case "byte":
+          stmt.setByte(column, (Byte) parameter);
+          return;
+        case "java.lang.Short":
+        case "short":
+          stmt.setShort(column, (Short) parameter);
+          return;
+        case "java.lang.Integer":
+        case "int":
+          stmt.setInt(column, (Integer) parameter);
+          return;
+        case "java.lang.Long":
+        case "long":
+          stmt.setLong(column, (Long) parameter);
+          return;
+        case "java.lang.Float":
+        case "float":
+          stmt.setFloat(column, (Float) parameter);
+          return;
+        case "java.lang.Double":
+        case "double":
+          stmt.setDouble(column, (Double) parameter);
+          return;
+        case "java.lang.Character":
+        case "char":
+          stmt.setString(column, parameter == null ? null : "" + (Character) parameter);
+          return;
+        case "java.lang.String":
+          stmt.setString(column, (String) parameter);
+          return;
+        case "java.math.BigDecimal":
+          stmt.setBigDecimal(column, (BigDecimal) parameter);
+          return;
+        case "java.sql.Date":
+          stmt.setDate(column,
+              parameter == null ? null : java.sql.Date.valueOf(parameter.toString()));
+          return;
+        case "java.sql.Time":
+          stmt.setTime(column, parameter == null ? null : Time.valueOf(parameter.toString()));
+          return;
+        case "java.sql.Timestamp":
+          stmt.setTimestamp(column, (java.sql.Timestamp) parameter);
+          return;
+        case "java.time.LocalTime":
+          stmt.setTime(column,
+              parameter == null ? null : java.sql.Time.valueOf((java.time.LocalTime) parameter));
+          return;
+        case "java.time.LocalDate":
+          stmt.setDate(column,
+              parameter == null ? null : java.sql.Date.valueOf((java.time.LocalDate) parameter));
+          return;
+        case "java.time.LocalDateTime":
+          stmt.setTimestamp(column,
+              parameter == null ? null : Timestamp.valueOf((java.time.LocalDateTime) parameter));
+          return;
+        case "java.util.Date":
+          stmt.setTimestamp(column,
+              parameter == null ? null : new Timestamp(((java.util.Date) parameter).getTime()));
+          return;
+        default:
+          stmt.setObject(column, parameter);
+          return;
+      }
     }
   }
 
@@ -150,6 +159,7 @@ public final class DefaultPreparedStatementParametersSetter
       }
       default: {
         stmt.setObject(column, parameter);
+        return;
       }
     }
 
