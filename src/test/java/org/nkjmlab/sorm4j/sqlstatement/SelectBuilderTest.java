@@ -12,6 +12,14 @@ import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class SelectBuilderTest {
   @Test
+  void testSqlStatement() {
+    assertThat(SqlStatement.literal(null)).isEqualTo("null");
+    assertThat(SqlStatement.literal("?")).isEqualTo("?");
+    assertThat(SqlStatement.literal("test")).isEqualTo("'test'");
+
+  }
+
+  @Test
   void testBuildSorm() {
     Sorm sorm = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sorm);

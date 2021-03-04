@@ -30,7 +30,7 @@ public final class SqlWithOrderedParameters {
   }
 
   public SqlStatement toSqlStatement() {
-    return SqlStatement.of(sql, parameters);
+    return SqlStatement.of(sql, parameters.toArray());
   }
 
   public static SqlWithOrderedParameters from(String sql) {

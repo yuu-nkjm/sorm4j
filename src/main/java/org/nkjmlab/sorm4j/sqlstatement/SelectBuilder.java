@@ -33,10 +33,6 @@ public class SelectBuilder {
     return new Condition("or", conds);
   }
 
-  public static OrderBy order(String column) {
-    return order(column, "asc");
-  }
-
 
   public static OrderBy order(String column, String ascOrDesc) {
     return new OrderBy(column, ascOrDesc);
