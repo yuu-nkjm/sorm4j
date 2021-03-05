@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * @author nkjm
  *
  */
-public interface PreparedStatementParametersSetter extends OrmConfig {
+public interface SqlParameterSetter extends OrmExtension {
   /**
    * Sets parameters in the given prepared statement. i.e. Convert From Java To Sql.
    *

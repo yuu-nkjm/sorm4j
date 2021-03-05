@@ -1,12 +1,11 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
+import static org.nkjmlab.sorm4j.mapping.OrmConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try;
 
 /**

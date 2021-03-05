@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
-public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
 
   private final int multiRowSize;
 

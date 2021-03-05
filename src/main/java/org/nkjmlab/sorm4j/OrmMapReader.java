@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
-import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
+import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
@@ -17,10 +17,10 @@ public interface OrmMapReader {
    * {@link java.util.Map}.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetConverter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
    */
 
@@ -33,10 +33,10 @@ public interface OrmMapReader {
    * the execution of the provided parametrized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetConverter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
    */
   LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
@@ -46,10 +46,10 @@ public interface OrmMapReader {
    * {@link java.util.Map} containing data from the execution of the provided parametrized SQL and
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetValueGetter#getValueBySqlType(ResultSet, int, int)}.
+   * correspondence defined in {@link ResultSetConverter#getValueBySqlType(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);

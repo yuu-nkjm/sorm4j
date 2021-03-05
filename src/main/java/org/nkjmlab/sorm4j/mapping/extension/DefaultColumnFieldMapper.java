@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j.mapping;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import static org.nkjmlab.sorm4j.util.StringUtils.*;
 import java.sql.DatabaseMetaData;
@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.Column;
+import org.nkjmlab.sorm4j.mapping.FieldName;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 /**
@@ -106,6 +107,21 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
       }
     }
     return Optional.empty();
+  }
+
+  private static final class ColumnOnTable extends Column {
+
+    private int dataType;
+
+    public ColumnOnTable(String name, int dataType) {
+      super(name);
+      this.dataType = dataType;
+    }
+
+    @Override
+    public String toString() {
+      return getName() + "(" + DefaultResultSetConverter.sqlTypeToString(dataType) + ")";
+    }
   }
 
 }

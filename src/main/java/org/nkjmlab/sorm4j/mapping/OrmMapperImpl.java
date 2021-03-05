@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmMapper;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;

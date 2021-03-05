@@ -1,8 +1,9 @@
-package org.nkjmlab.sorm4j.connectionsource;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.ConnectionSource;
 
 public class DataSourceConnectionSource implements ConnectionSource {
 

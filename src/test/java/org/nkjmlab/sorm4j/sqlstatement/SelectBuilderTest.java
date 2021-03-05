@@ -21,10 +21,10 @@ class SelectBuilderTest {
 
   @Test
   void testBuildSorm() {
-    Sorm sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTableAll(sorm);
+    Sorm sormImpl = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTableAll(sormImpl);
 
-    sorm.run(Guest.class, con -> {
+    sormImpl.run(Guest.class, con -> {
       String sql = SelectBuilder.create().from(con).build();
       assertThat(sql).contains("select * from GUESTS");
     });

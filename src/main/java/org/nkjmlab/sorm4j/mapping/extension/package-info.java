@@ -1,10 +1,12 @@
 @RuntimeAnnotation
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import java.lang.annotation.Retention;
+
 /**
- * Provides the main API for sorm4j.
+ * Provides API for configurable part.
  */
+
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,10 +1,11 @@
-package org.nkjmlab.sorm4j.connectionsource;
+package org.nkjmlab.sorm4j.mapping;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.mapping.DataSourceConnectionSource;
 
 class ConnectionSourceTest {
 
@@ -25,7 +26,7 @@ class ConnectionSourceTest {
       fail();
     }
 
-    Sorm.create(cs);
+    SormFactory.create(cs);
   }
 
 }

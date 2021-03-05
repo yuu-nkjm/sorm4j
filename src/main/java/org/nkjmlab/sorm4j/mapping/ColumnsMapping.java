@@ -11,11 +11,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.extension.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.Try;
 
 /**
- * Holds mapping data from a given class and a table.
+ * Holds mapping data from a given class and a table. The object reads a query result in
+ * {@link ResultSet} via {@link DefaultResultSetConverter}.
  *
  * @author nkjm
  *
@@ -25,9 +28,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 
 
-  public ColumnsMapping(Class<T> objectClass, ResultSetConverter resultSetConverter,
+  ColumnsMapping(Class<T> objectClass, ResultSetConverter defaultResultSetConverter,
       ColumnFieldMapper columnFieldMapper) {
-    super(resultSetConverter, objectClass, columnFieldMapper);
+    super(defaultResultSetConverter, objectClass, columnFieldMapper);
     this.constructor = Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(),
         e -> new OrmException(
             "Container class for object relation mapping must have the public default constructor (with no arguments).",
@@ -36,40 +39,42 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     this.constructor.setAccessible(true);
   }
 
-  public static <T> ColumnsMapping<T> createMapping(Class<T> objectClass,
-      ResultSetConverter converter, ColumnFieldMapper nameGuesser) {
+  static <T> ColumnsMapping<T> createMapping(Class<T> objectClass, ResultSetConverter converter,
+      ColumnFieldMapper nameGuesser) {
     return new ColumnsMapping<>(objectClass, converter, nameGuesser);
   }
 
 
-  public String getFormattedString() {
+  String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
         + System.lineSeparator() + super.getColumnToAccessorString();
   }
 
-  public T loadObject(ResultSet resultSet) throws SQLException {
+
+  T loadPojo(ResultSet resultSet) throws SQLException {
     List<String> columns = createColumns(resultSet);
-    List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
-    return createObject(columns,
-        resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes));
+    return createPojo(columns, convertToObjects(resultSet, getSetterParameterTypes(columns)));
   }
 
-  public final List<T> loadObjectList(ResultSet resultSet) throws SQLException {
+  final List<T> loadPojoList(ResultSet resultSet) throws SQLException {
     List<String> columns = createColumns(resultSet);
-    List<Class<?>> setterParamTypes = getSetterParamTypes(columns);
+    List<Class<?>> setterParamTypes = getSetterParameterTypes(columns);
 
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(createObject(columns,
-          resultSetConverter.toObjectsByClasses(resultSet, setterParamTypes)));
+      ret.add(createPojo(columns, convertToObjects(resultSet, setterParamTypes)));
     }
     return ret;
   }
 
+  private final List<Object> convertToObjects(ResultSet resultSet,
+      List<Class<?>> setterParameterTypes) throws SQLException {
+    return defaultResultSetConverter.toObjectsByClasses(resultSet, setterParameterTypes);
+  }
 
 
-  private T createObject(List<String> columns, List<Object> values) {
-    final T ret = createNewInstance();
+  private T createPojo(List<String> columns, List<Object> values) {
+    final T ret = createNewPojoInstance();
     for (int i = 0; i < columns.size(); i++) {
       final String columnName = columns.get(i);
       final Object value = values.get(i);
@@ -78,7 +83,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     return ret;
   }
 
-  private final T createNewInstance() {
+  private final T createNewPojoInstance() {
     try {
       return constructor.newInstance();
     } catch (IllegalArgumentException | SecurityException | InstantiationException
@@ -99,10 +104,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     return columns;
   }
 
-  private final Map<List<String>, List<Class<?>>> setterParamTypesMap = new ConcurrentHashMap<>();
+  private final Map<List<String>, List<Class<?>>> setterParameterTypesMap =
+      new ConcurrentHashMap<>();
 
-  private List<Class<?>> getSetterParamTypes(List<String> columns) {
-    return setterParamTypesMap.computeIfAbsent(columns,
+  private List<Class<?>> getSetterParameterTypes(List<String> columns) {
+    return setterParameterTypesMap.computeIfAbsent(columns,
         k -> columns.stream().map(c -> columnToAccessorMap.get(c).getSetterParameterType())
             .collect(Collectors.toList()));
   }

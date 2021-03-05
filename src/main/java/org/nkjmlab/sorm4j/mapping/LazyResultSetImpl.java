@@ -71,7 +71,7 @@ final class LazyResultSetImpl<T>
   @Override
   public List<T> toList() {
     List<T> ret =
-        Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), OrmException::new);
+        Try.getOrThrow(() -> ormMapper.toPojoList(objectClass, resultSet), OrmException::new);
     close();
     return ret;
   }

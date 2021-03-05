@@ -1,26 +1,69 @@
-package org.nkjmlab.sorm4j.mapping;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.nkjmlab.sorm4j.config.ResultSetValueGetter;
 
-public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
+
+public final class DefaultResultSetConverter implements ResultSetConverter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
+
+
+  Object getValueByClass(ResultSet resultSet, int i, Class<?> classType) throws SQLException {
+    return getValueBySetterParameterType(resultSet, i, classType);
+  }
+
   @Override
-  public Object getValueBySetterType(ResultSet resultSet, int column, Class<?> setterType)
+  public final List<Object> toObjectsByClasses(ResultSet resultSet,
+      List<Class<?>> setterParameterTypes) throws SQLException {
+    final List<Object> values = new ArrayList<>(setterParameterTypes.size());
+    for (int i = 1; i <= setterParameterTypes.size(); i++) {
+      final Class<?> type = setterParameterTypes.get(i - 1);
+      values.add(getValueBySetterParameterType(resultSet, i, type));
+    }
+    return values;
+  }
+
+  @Override
+  public Map<String, Object> toSingleMap(final ResultSet resultSet, List<String> columns,
+      List<Integer> columnTypes) throws SQLException {
+    final Map<String, Object> ret = new LinkedHashMap<>();
+    for (int i = 1; i <= columns.size(); i++) {
+      int type = columnTypes.get(i - 1);
+      Object value = getValueBySqlType(resultSet, i, type);
+      ret.put(columns.get(i - 1), value);
+    }
+    return ret;
+  }
+
+  @Override
+  public final <T> T toSingleNativeObject(final ResultSet resultSet, final Class<T> objectClass)
       throws SQLException {
-    if (setterType.isEnum()) {
+    // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
+    // is prior.
+    Object value = getValueBySetterParameterType(resultSet, 1, objectClass);
+    @SuppressWarnings("unchecked")
+    T valueT = (T) value;
+    return valueT;
+  }
+
+  @Override
+  public Object getValueBySetterParameterType(ResultSet resultSet, int column,
+      Class<?> setterParameterType) throws SQLException {
+    if (setterParameterType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
-          .findAny().orElse(null);
-    } else if (setterType.isArray()) {
-      final String name = setterType.getComponentType().getName();
+      return Arrays.stream(setterParameterType.getEnumConstants())
+          .filter(o -> o.toString().equals(v)).findAny().orElse(null);
+    } else if (setterParameterType.isArray()) {
+      final String name = setterParameterType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -36,7 +79,7 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
           return resultSet.getObject(column);
       }
     } else {
-      final String name = setterType.getName();
+      final String name = setterParameterType.getName();
       switch (name) {
         case "boolean":
           return resultSet.getBoolean(column);
@@ -238,6 +281,5 @@ public final class DefaultResultSetValueGetter implements ResultSetValueGetter {
     typeStringMap.put(java.sql.Types.VARCHAR, "VARCHAR");
     return typeStringMap;
   }
-
 
 }

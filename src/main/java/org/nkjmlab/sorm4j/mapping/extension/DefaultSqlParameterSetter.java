@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.mapping;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -8,10 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
 
-public final class DefaultPreparedStatementParametersSetter
-    implements PreparedStatementParametersSetter {
+public final class DefaultSqlParameterSetter implements SqlParameterSetter {
   // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override

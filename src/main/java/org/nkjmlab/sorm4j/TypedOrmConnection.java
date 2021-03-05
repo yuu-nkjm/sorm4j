@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.io.Closeable;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
+import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
 
 public interface TypedOrmConnection<T>
     extends TypedOrmMapper<T>, TransactionFunction, Closeable, AutoCloseable {

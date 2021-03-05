@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.util;
 
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
 
 public class SormTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
@@ -29,8 +30,19 @@ public class SormTestUtils {
   private static final String SQL_CREATE_TABLE_PLAYERS1 =
       "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
+  public static Sorm preapare() {
+    Sorm sorm = createSorm();
+    dropAndCreateTableAll(sorm);
+    return sorm;
+  }
+
   public static Sorm createSorm() {
-    Sorm ret = Sorm.create(jdbcUrl, user, password);
+    Sorm ret = SormFactory.create(jdbcUrl, user, password);
+    return ret;
+  }
+
+  public static Sorm createSorm(String confName) {
+    Sorm ret = SormFactory.create(jdbcUrl, user, password, confName);
     return ret;
 
   }
@@ -80,6 +92,7 @@ public class SormTestUtils {
   public static DataSource createDataSourceHikari() {
     return DataSourceHelper.createDataSourceHikari(jdbcUrl, user, password);
   }
+
 
 
 }

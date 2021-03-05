@@ -18,19 +18,20 @@ import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.annotation.OrmColum;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.config.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 abstract class Mapping<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   protected final Class<T> objectClass;
-  protected final ResultSetConverter resultSetConverter;
+  protected final ResultSetConverter defaultResultSetConverter;
   protected final ColumnToAccessorMap columnToAccessorMap;
 
   Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass,
       ColumnFieldMapper columnFieldMapper) {
-    this.resultSetConverter = sqlToJavaConverter;
+    this.defaultResultSetConverter = sqlToJavaConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = createColumnToAccessorMap(columnFieldMapper, objectClass);
   }
@@ -38,7 +39,7 @@ abstract class Mapping<T> {
 
   Mapping(ResultSetConverter sqlToJavaConverter, Class<T> objectClass, List<Column> columns,
       ColumnFieldMapper columnFieldMapper) {
-    this.resultSetConverter = sqlToJavaConverter;
+    this.defaultResultSetConverter = sqlToJavaConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = createColumnToAccessorMap(columnFieldMapper, objectClass, columns);
   }

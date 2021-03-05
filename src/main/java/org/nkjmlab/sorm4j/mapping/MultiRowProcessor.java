@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Try;
 
-public abstract class MultiRowProcessor<T> {
+abstract class MultiRowProcessor<T> {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   final TableMapping<T> tableMapping;
@@ -64,7 +64,7 @@ public abstract class MultiRowProcessor<T> {
       final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
       for (int i = 0; i < objects.length; i++) {
         T obj = objects[i];
-        this.tableMapping.preparedStatementParametersSetter.setParameters(stmt,
+        this.tableMapping.sqlParameterSetter.setParameters(stmt,
             parameterCreator.apply(obj));
         batchHelper.addBatchAndExecuteIfReachedThreshold();
       }
@@ -81,8 +81,8 @@ public abstract class MultiRowProcessor<T> {
 
 
   /**
-   * Execute multirow sql function. objects when objects[0] is null,
-   * {@code NullPointerException} are throw.
+   * Execute multirow sql function. objects when objects[0] is null, {@code NullPointerException}
+   * are throw.
    */
   int[] execIfValidObjects(Connection con, T[] objects, Function<T[], int[]> exec) {
     if (objects == null || objects.length == 0) {
