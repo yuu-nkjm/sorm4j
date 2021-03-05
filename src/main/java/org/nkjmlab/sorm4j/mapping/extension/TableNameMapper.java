@@ -4,7 +4,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import org.nkjmlab.sorm4j.mapping.TableName;
 
-public interface TableNameMapper extends OrmExtension {
+/**
+ * A mapper from class or table name to a valid table name exists on database.
+ *
+ * @author nkjm
+ *
+ */
+public interface TableNameMapper {
 
   /**
    * Get table name corresponding with the object class.

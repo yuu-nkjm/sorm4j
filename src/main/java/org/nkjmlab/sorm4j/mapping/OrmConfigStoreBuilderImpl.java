@@ -11,6 +11,12 @@ import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
 
+/**
+ * A builder for configuration of or mapper.
+ *
+ * @author nkjm
+ *
+ */
 public class OrmConfigStoreBuilderImpl implements OrmConfigStoreBuilder {
 
   public static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =

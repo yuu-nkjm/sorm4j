@@ -8,6 +8,17 @@ import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.util.Try;
 
+/**
+ * A database connection with object-relation mapping function with type. The main class for the ORMapper
+ * engine.
+ *
+ * This instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not
+ * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
+ *
+ * @author nkjm
+ *
+ */
+
 public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     implements TypedOrmConnection<T> {
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();

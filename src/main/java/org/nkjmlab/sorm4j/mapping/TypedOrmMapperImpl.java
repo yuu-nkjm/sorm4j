@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
-public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
+class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 
   private Class<T> objectClass;
 

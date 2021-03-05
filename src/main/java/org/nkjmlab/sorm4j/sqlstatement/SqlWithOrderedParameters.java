@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * SQL with ordered parameters. The instance could be convert to {@link SqlStatement}. The class
+ * could treat {@link List} parameter.
+ *
+ * @author nkjm
+ *
+ */
 public final class SqlWithOrderedParameters {
 
   private final String sql;

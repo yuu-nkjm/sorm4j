@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.mapping.FieldName;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 /**
- * Defines how a class or field name should be mapped to a table or column.
+ * Defines how column name should be mapped to field.
  */
 public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();

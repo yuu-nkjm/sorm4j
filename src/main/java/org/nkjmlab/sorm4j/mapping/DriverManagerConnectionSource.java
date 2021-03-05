@@ -8,6 +8,13 @@ import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.util.Try;
 
+/**
+ * A database connection source wrapped a {@link DriverManager}
+ *
+ * @author nkjm
+ *
+ */
+
 public class DriverManagerConnectionSource implements ConnectionSource {
 
   private final String jdbcUrl;

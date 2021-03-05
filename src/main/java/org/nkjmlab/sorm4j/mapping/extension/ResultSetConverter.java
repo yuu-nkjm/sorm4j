@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public interface ResultSetConverter extends OrmExtension {
+public interface ResultSetConverter {
 
   List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterParameterTypes)
       throws SQLException;

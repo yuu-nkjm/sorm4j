@@ -8,6 +8,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * SQL with named parameters. The instance could be convert to {@link SqlStatement}.The class could
+ * treat {@link List} parameter.
+ *
+ * @author nkjm
+ *
+ */
 public final class SqlWithNamedParameters {
 
   private final String sql;
