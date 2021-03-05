@@ -34,6 +34,19 @@ class OrmConfigStoreTest {
   private static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
 
   @Test
+  void testOrmConfigFail() {
+
+    try {
+      OrmConfigStore confs =
+          SormFactory.createConfigStoreBuilder(NEW_CONFIG).setMultiRowProcessorType(null)
+              .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build();
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(NullPointerException.class);
+    }
+
+  }
+
+  @Test
   void testOrmConfigStore() {
 
     OrmConfigStore confs = SormFactory.createConfigStoreBuilder(NEW_CONFIG)
@@ -41,7 +54,8 @@ class OrmConfigStoreTest {
         .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
         .setResultSetConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
         .setSqlParameterSetter(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER)
-        .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).build();
+        .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10).setMultiRowSize(20)
+        .setBatchSizeWithMultiRow(30).build();
 
     assertThat(confs.getConfigName()).isEqualTo(NEW_CONFIG);
     assertThat(confs.getColumnFieldMapper()).isEqualTo(DEFAULT_COLUMN_FIELD_MAPPER);

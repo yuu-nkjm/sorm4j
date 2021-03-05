@@ -98,12 +98,12 @@ public class OrmConfigStoreBuilderImpl implements OrmConfigStoreBuilder {
   @Override
   public OrmConfigStoreBuilder setMultiRowSize(int size) {
     this.multiRowSize = size;
-    return null;
+    return this;
   }
 
   @Override
   public OrmConfigStoreBuilder setBatchSizeWithMultiRow(int size) {
     this.batchSizeWithMultiRow = size;
-    return null;
+    return this;
   }
 }
