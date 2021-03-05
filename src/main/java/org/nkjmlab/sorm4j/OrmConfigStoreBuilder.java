@@ -34,6 +34,9 @@ public interface OrmConfigStoreBuilder {
 
   OrmConfigStoreBuilder setBatchSizeWithMultiRow(int size);
 
+  /**
+   * Type of how to execute multi-row query.
+   */
   public enum MultiRowProcessorType {
     SIMPLE_BATCH, MULTI_ROW, MULTI_ROW_AND_BATCH
   }

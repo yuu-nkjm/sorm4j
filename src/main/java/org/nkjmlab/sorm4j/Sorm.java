@@ -4,7 +4,7 @@ import java.sql.Connection;
 import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
 
 /**
- * An interface of main entry point of object-relation mapping.
+ * An interface of executing object-relation mapping.
  *
  * @author nkjm
  *
