@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * @author nkjm
  *
  */
-public interface SqlParameterSetter extends OrmExtension {
+public interface SqlParameterSetter {
   /**
    * Sets parameters in the given prepared statement. i.e. Convert From Java To Sql.
    *

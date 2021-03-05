@@ -12,8 +12,8 @@ import org.nkjmlab.sorm4j.util.Try;
  * A database connection with object-relation mapping function. The main class for the ORMapper
  * engine.
  *
- * A OrmMapper instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not
- * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
+ * This instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not thread
+ * safe, in particular because {@link java.sql.Connection} objects are not thread safe.
  *
  * @author nkjm
  *

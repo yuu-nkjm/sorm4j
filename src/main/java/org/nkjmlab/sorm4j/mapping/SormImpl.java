@@ -10,6 +10,12 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 
+/**
+ * An entry point of object-relation mapping.
+ *
+ * @author nkjm
+ *
+ */
 public final class SormImpl implements Sorm {
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 

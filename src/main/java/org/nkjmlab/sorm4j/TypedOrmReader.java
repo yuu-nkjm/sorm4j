@@ -4,7 +4,14 @@ import java.util.List;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
-public interface TypeOrmReader<T> {
+/**
+ * The typed interface of reading functions of object-relation mapping.
+ *
+ * @author nkjm
+ *
+ */
+
+public interface TypedOrmReader<T> {
 
   List<T> readAll();
 

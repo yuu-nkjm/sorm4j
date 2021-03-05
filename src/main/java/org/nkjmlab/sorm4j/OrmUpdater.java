@@ -3,7 +3,12 @@ package org.nkjmlab.sorm4j;
 import java.util.List;
 import org.nkjmlab.sorm4j.result.InsertResult;
 
-
+/**
+ * A interface for updating database.
+ *
+ * @author nkjm
+ *
+ */
 public interface OrmUpdater {
 
   <T> int[] delete(List<T> objects);

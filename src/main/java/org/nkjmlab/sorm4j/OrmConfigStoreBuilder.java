@@ -7,6 +7,13 @@ import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
 
 
+/**
+ * Builder for {@link OrmConfigStore}. An instance of the class should be get from
+ * {@link SormFactory}.
+ *
+ * @author nkjm
+ *
+ */
 public interface OrmConfigStoreBuilder {
 
   OrmConfigStore build();
@@ -27,6 +34,9 @@ public interface OrmConfigStoreBuilder {
 
   OrmConfigStoreBuilder setBatchSizeWithMultiRow(int size);
 
+  /**
+   * Type of how to execute multi-row query.
+   */
   public enum MultiRowProcessorType {
     SIMPLE_BATCH, MULTI_ROW, MULTI_ROW_AND_BATCH
   }

@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.OrmMapper;
+import org.nkjmlab.sorm4j.OrmConnection;
 
 
 public class BeanTest {
@@ -15,7 +15,7 @@ public class BeanTest {
   private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 
-  public static void test(Class<?> caller, OrmMapper persist, BeanMap beanMap) {
+  public static void test(Class<?> caller, OrmConnection persist, BeanMap beanMap) {
     Connection connection = persist.getJdbcConnection();
     Class<?> cls = DynamicBean.createBeanClass(caller, beanMap);
 
@@ -42,7 +42,7 @@ public class BeanTest {
   /**
    * Perform tests using a bean with non-null values
    */
-  public static void testAll(OrmMapper persist, Class<?> cls, BeanMap beanMap) {
+  public static void testAll(OrmConnection persist, Class<?> cls, BeanMap beanMap) {
     Object obj = DynamicBean.createInstance(cls, beanMap, false);
     BeanTest.testInsert(persist, obj, beanMap);
     BeanTest.testSelectByFields(persist, obj, beanMap);
@@ -53,7 +53,7 @@ public class BeanTest {
   /**
    * Perform tests using a bean with null values
    */
-  public static void testAllNull(OrmMapper persist, Class<?> cls, BeanMap beanMap) {
+  public static void testAllNull(OrmConnection persist, Class<?> cls, BeanMap beanMap) {
     Object objNull = DynamicBean.createInstance(cls, beanMap, true);
     BeanTest.testInsert(persist, objNull, beanMap);
     BeanTest.testSelectByFieldsNull(persist, objNull, beanMap);
@@ -64,7 +64,7 @@ public class BeanTest {
   /**
    * tests insertion of a bean
    */
-  public static void testInsert(OrmMapper persist, Object obj, BeanMap beanMap) {
+  public static void testInsert(OrmConnection persist, Object obj, BeanMap beanMap) {
     Class<?> cls = obj.getClass();
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -90,7 +90,7 @@ public class BeanTest {
   /**
    * tests reading with NoTable class
    */
-  public static void testReadNoTable(OrmMapper persist, Object obj, Class<?> clsNoTable) {
+  public static void testReadNoTable(OrmConnection persist, Object obj, Class<?> clsNoTable) {
 
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -108,7 +108,7 @@ public class BeanTest {
    * For each field and each field type, execute a query in the format select * from tableName where
    * columnName=?
    */
-  public static void testSelectByFields(OrmMapper persist, Object obj, BeanMap beanMap) {
+  public static void testSelectByFields(OrmConnection persist, Object obj, BeanMap beanMap) {
     Class<?> cls = obj.getClass();
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -150,7 +150,7 @@ public class BeanTest {
   /**
    * For each field, execute a query in the format select * from tableName where columnName is null
    */
-  public static void testSelectByFieldsNull(OrmMapper persist, Object obj, BeanMap beanMap) {
+  public static void testSelectByFieldsNull(OrmConnection persist, Object obj, BeanMap beanMap) {
     Class<?> cls = obj.getClass();
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -181,7 +181,7 @@ public class BeanTest {
    * for each field, and for each field type perform a query in the form select columnName from
    * tableName
    */
-  public static void testSelectFields(OrmMapper persist, Object obj, BeanMap beanMap,
+  public static void testSelectFields(OrmConnection persist, Object obj, BeanMap beanMap,
       boolean useNulls) {
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -229,7 +229,7 @@ public class BeanTest {
   /**
    * perform [select * from tableName] and get the results as a map
    */
-  public static void testSelectMap(OrmMapper persist, Object obj, BeanMap beanMap) {
+  public static void testSelectMap(OrmConnection persist, Object obj, BeanMap beanMap) {
     String tableName = dbName(obj.getClass().getSimpleName());
 
     // read list of all data in the table as a map

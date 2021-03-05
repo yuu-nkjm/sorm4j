@@ -3,7 +3,12 @@ package org.nkjmlab.sorm4j;
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
 
-
+/**
+ * An interface of executing object-relation mapping.
+ *
+ * @author nkjm
+ *
+ */
 public interface Sorm {
 
   OrmConnection beginTransaction();
@@ -55,6 +60,12 @@ public interface Sorm {
 
   void runWithJdbcConnection(OrmConsumerHandler<Connection> handler);
 
+  /**
+   * Interface for object-relation handling without a return value. e.g.
+   * {@link Sorm#run(OrmConsumerHandler)}.
+   *
+   * @param <T>
+   */
   @FunctionalInterface
   public interface OrmConsumerHandler<T> {
 
@@ -62,6 +73,12 @@ public interface Sorm {
 
   }
 
+  /**
+   * Interface for object-relation handling with a return value. e.g.
+   * {@link Sorm#execute(OrmConsumerHandler)}.
+   *
+   * @param <T>
+   */
   @FunctionalInterface
   public interface OrmFunctionHandler<T, R> {
 

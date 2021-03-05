@@ -12,6 +12,13 @@ import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
+/**
+ * Default implementation of {@link TableNameMapper}
+ *
+ * @author nkjm
+ *
+ */
+
 public final class DefaultTableNameMapper implements TableNameMapper {
 
 

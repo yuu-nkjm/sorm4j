@@ -5,6 +5,12 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConnectionSource;
 
+/**
+ * A database connection source wrapped a {@link DataSource}
+ *
+ * @author nkjm
+ *
+ */
 public class DataSourceConnectionSource implements ConnectionSource {
 
   private final DataSource dataSource;

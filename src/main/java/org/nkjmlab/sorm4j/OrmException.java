@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 /**
- * Represents an exception thrown by Sorm.
+ * Represents an exception thrown by Sorm4j.
  */
 public final class OrmException extends RuntimeException {
 

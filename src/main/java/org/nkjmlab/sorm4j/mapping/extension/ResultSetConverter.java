@@ -6,7 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 
-public interface ResultSetConverter extends OrmExtension {
+/**
+ * Convert {@link ResultSet} from database to specified objects.
+ *
+ * @author nkjm
+ *
+ */
+public interface ResultSetConverter {
 
   List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterParameterTypes)
       throws SQLException;

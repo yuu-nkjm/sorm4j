@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 
+/**
+ * An builder of select SQL.
+ *
+ * @author nkjm
+ *
+ */
 public class SelectBuilder {
 
   private SelectBuilder() {}
@@ -172,6 +178,11 @@ public class SelectBuilder {
   }
 
 
+
+  /**
+   * Value object represents conditions of where clause or having clause.
+   */
+
   public static class Condition {
     private final Object condition;
 
@@ -194,6 +205,10 @@ public class SelectBuilder {
       return condition.toString();
     }
   }
+
+  /**
+   * Value object for order by clause.
+   */
   public static class OrderBy {
     private final String column;
     private final String ascOrDesc;

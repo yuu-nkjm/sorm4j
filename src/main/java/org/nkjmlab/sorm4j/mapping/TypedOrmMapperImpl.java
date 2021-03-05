@@ -5,24 +5,17 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.TypedOrmMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
-public class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
+class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 
-  private Class<T> objectClass;
+  protected Class<T> objectClass;
 
   public TypedOrmMapperImpl(Class<T> objectClass, Connection connection, OrmConfigStore options) {
     super(connection, options);
     this.objectClass = objectClass;
-  }
-
-
-  @Override
-  public String getTableName() {
-    return getTableMapping(objectClass).getTableName();
   }
 
   @Override

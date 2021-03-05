@@ -12,6 +12,12 @@ import org.nkjmlab.sorm4j.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.mapping.SormImpl;
 import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
 
+/**
+ * Main entry point of Som4j, which is factory for {@link Sorm} object.
+ *
+ * @author nkjm
+ *
+ */
 public class SormFactory {
 
   private SormFactory() {};
