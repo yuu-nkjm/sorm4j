@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * Convert {@link ResultSet} from database to specified objects.
+ *
+ * @author nkjm
+ *
+ */
 public interface ResultSetConverter {
 
   List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterParameterTypes)

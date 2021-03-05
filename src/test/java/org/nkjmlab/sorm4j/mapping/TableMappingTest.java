@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.TypedOrmMapper;
+import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Location;
 import org.nkjmlab.sorm4j.util.Player;
@@ -105,7 +105,8 @@ class TableMappingTest {
     });
   }
 
-  public static <T> TableMapping<T> getTableMapping(TypedOrmMapper<T> conn, Class<T> objectClass) {
+  public static <T> TableMapping<T> getTableMapping(TypedOrmConnection<T> conn,
+      Class<T> objectClass) {
     return ((AbstractOrmMapper) conn).getTableMapping(objectClass);
   }
 

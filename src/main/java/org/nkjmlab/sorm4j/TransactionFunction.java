@@ -1,5 +1,11 @@
 package org.nkjmlab.sorm4j;
 
+/**
+ * Functions of handling transaction.
+ *
+ * @author nkjm
+ *
+ */
 public interface TransactionFunction {
 
   /**

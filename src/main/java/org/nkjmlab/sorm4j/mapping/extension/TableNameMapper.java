@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import org.nkjmlab.sorm4j.mapping.TableName;
 
 /**
- * A mapper from class or table name to a valid table name exists on database.
+ * A mapper from a class or candidates of table name to a valid table name exists on database.
  *
  * @author nkjm
  *

@@ -9,6 +9,13 @@ import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
+
+/**
+ * A interface for getting result of query as {@link Map}.
+ *
+ * @author nkjm
+ *
+ */
 public interface OrmMapReader {
   Map<String, Object> readMapOne(SqlStatement sql);
 

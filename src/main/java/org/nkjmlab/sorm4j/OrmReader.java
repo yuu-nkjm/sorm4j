@@ -7,10 +7,7 @@ import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
 /**
- * The main interface of Reading functions of ORM reader.
- *
- * This interface based on <a href=
- * "https://github.com/r5v9/persist/blob/master/src/main/net/sf/persist/Persist.java">Persist.java</a>
+ * The interface of reading functions of object-relation mapping.
  *
  * @author nkjm
  *

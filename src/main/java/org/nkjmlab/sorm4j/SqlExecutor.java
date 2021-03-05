@@ -4,6 +4,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
+/**
+ * A interface for executing SQL with parameters.
+ *
+ * @author nkjm
+ *
+ */
 public interface SqlExecutor {
 
   boolean execute(String sql, Object... parameters);

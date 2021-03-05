@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Default implementation of {@link ResultSetConverter}
+ *
+ * @author nkjm
+ *
+ */
 
 public final class DefaultResultSetConverter implements ResultSetConverter {
 

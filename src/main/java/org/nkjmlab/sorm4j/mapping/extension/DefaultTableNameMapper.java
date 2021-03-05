@@ -13,8 +13,10 @@ import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.StringUtils;
 
 /**
- * Defines how a class or candidates of table name should be mapped to a valid table name exists on
- * database.
+ * Default implementation of {@link TableNameMapper}
+ *
+ * @author nkjm
+ *
  */
 
 public final class DefaultTableNameMapper implements TableNameMapper {

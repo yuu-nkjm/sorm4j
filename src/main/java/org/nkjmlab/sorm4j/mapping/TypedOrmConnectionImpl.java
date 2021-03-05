@@ -9,11 +9,11 @@ import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.util.Try;
 
 /**
- * A database connection with object-relation mapping function with type. The main class for the ORMapper
- * engine.
+ * A database connection with object-relation mapping function with type. The main class for the
+ * ORMapper engine.
  *
- * This instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not
- * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
+ * This instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not thread
+ * safe, in particular because {@link java.sql.Connection} objects are not thread safe.
  *
  * @author nkjm
  *
@@ -29,6 +29,10 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     super(objectClass, connection, options);
   }
 
+  @Override
+  public String getTableName() {
+    return getTableMapping(objectClass).getTableName();
+  }
 
   @Override
   public void close() {

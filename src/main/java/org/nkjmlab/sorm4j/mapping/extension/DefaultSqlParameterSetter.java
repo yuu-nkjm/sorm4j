@@ -9,6 +9,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+/**
+ * Default implementation of {@link SqlParameterSetter}
+ *
+ * @author nkjm
+ *
+ */
+
 public final class DefaultSqlParameterSetter implements SqlParameterSetter {
   // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 

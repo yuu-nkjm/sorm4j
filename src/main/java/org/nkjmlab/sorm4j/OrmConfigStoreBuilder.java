@@ -7,6 +7,13 @@ import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
 
 
+/**
+ * Builder for {@link OrmConfigStore}. An instance of the class should be get from
+ * {@link SormFactory}.
+ *
+ * @author nkjm
+ *
+ */
 public interface OrmConfigStoreBuilder {
 
   OrmConfigStore build();
