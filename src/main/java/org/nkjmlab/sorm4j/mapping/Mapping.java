@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.annotation.OrmColum;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
+import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
@@ -135,7 +136,9 @@ abstract class Mapping<T> {
 
   private static Map<FieldName, Method> extractedMethodStartWith(Class<?> objectClass,
       String prefix) {
+    Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
     return Arrays.stream(objectClass.getDeclaredMethods())
+        .filter(f -> Objects.isNull(f.getAnnotation(ignoreAnn)))
         .filter(m -> m.getName().length() > prefix.length()
             && m.getName().substring(0, prefix.length()).equals(prefix))
         .collect(Collectors.toMap(m -> new FieldName(
@@ -146,7 +149,9 @@ abstract class Mapping<T> {
 
 
   private static Map<FieldName, Field> getAllFields(final Class<?> objectClass) {
+    Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
     return Arrays.stream(objectClass.getDeclaredFields())
+        .filter(f -> Objects.isNull(f.getAnnotation(ignoreAnn)))
         .collect(Collectors.toMap(f -> new FieldName(f), f -> {
           f.setAccessible(true);
           return f;
