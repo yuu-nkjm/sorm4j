@@ -15,12 +15,6 @@ public final class DefaultResultSetConverter implements ResultSetConverter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-
-
-  Object getValueByClass(ResultSet resultSet, int i, Class<?> classType) throws SQLException {
-    return getValueBySetterParameterType(resultSet, i, classType);
-  }
-
   @Override
   public final List<Object> toObjectsByClasses(ResultSet resultSet,
       List<Class<?>> setterParameterTypes) throws SQLException {
