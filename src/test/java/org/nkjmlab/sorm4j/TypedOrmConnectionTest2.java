@@ -9,19 +9,19 @@ import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class TypedOrmConnectionTest2 {
 
-  private Sorm sorm;
+  private Sorm sormImpl;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
-    SormTestUtils.dropAndCreateTable(sorm, Player.class);
-    SormTestUtils.dropAndCreateTable(sorm, Location.class);
+    sormImpl = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(sormImpl, Guest.class);
+    SormTestUtils.dropAndCreateTable(sormImpl, Player.class);
+    SormTestUtils.dropAndCreateTable(sormImpl, Location.class);
   }
 
   @Test
   void testInsertArray() {
-    sorm.run(Player.class, m -> {
+    sormImpl.run(Player.class, m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);

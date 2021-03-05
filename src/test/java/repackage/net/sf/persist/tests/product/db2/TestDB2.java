@@ -10,14 +10,15 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestDB2 {
 
-  private static final Sorm ormSrv =
-      Sorm.create(JdbcConnectionPool.create("jdbc:h2:mem:db2;MODE=DB2", "persist", "persist"));
+  private static final Sorm ormSrv = SormFactory
+      .create(JdbcConnectionPool.create("jdbc:h2:mem:db2;MODE=DB2", "persist", "persist"));
 
   @BeforeAll
   static void beforAll() {

@@ -11,7 +11,7 @@ public final class DebugPoint {
   }
 
   public String getFormattedNameAndElapsedTime() {
-    return "[" + name + "]" + " ["
+    return "[" + getName() + "]" + " ["
         + String.format("%.3f", (double) (System.nanoTime() - startTime) / 1000 / 1000)
         + " msec] :";
   }

@@ -15,20 +15,20 @@ import org.nkjmlab.sorm4j.util.Player;
 import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class TableMappingTest {
-  private Sorm sorm;
+  private Sorm sormImpl;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
-    SormTestUtils.dropAndCreateTable(sorm, Player.class);
-    SormTestUtils.dropAndCreateTable(sorm, Location.class);
+    sormImpl = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(sormImpl, Guest.class);
+    SormTestUtils.dropAndCreateTable(sormImpl, Player.class);
+    SormTestUtils.dropAndCreateTable(sormImpl, Location.class);
   }
 
   @Test
   void testGetValue() {
     try {
-      sorm.run(Guest.class, m -> {
+      sormImpl.run(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new Guest(), "hoge");
       });
@@ -37,7 +37,7 @@ class TableMappingTest {
     }
 
     try {
-      sorm.run(Guest.class, m -> {
+      sormImpl.run(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new String(), "id");
       });
@@ -53,7 +53,7 @@ class TableMappingTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
         .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
     try {
-      sorm.run(Guest.class, m -> {
+      sormImpl.run(Guest.class, m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
@@ -66,7 +66,7 @@ class TableMappingTest {
   @Test
   void testSetValue() {
     try {
-      sorm.run(Guest.class, m -> {
+      sormImpl.run(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "hoge", 0);
       });
@@ -74,7 +74,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("does not have a corresponding");
     }
     try {
-      sorm.run(Guest.class, m -> {
+      sormImpl.run(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "id", "String");
       });
@@ -82,7 +82,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
-      sorm.run(Player.class, m -> {
+      sormImpl.run(Player.class, m -> {
         TableMapping<Player> tm = getTableMapping(m, Player.class);
         tm.setValue(new Player(), "name", 1);
       });
@@ -93,14 +93,14 @@ class TableMappingTest {
 
   @Test
   void testCol() {
-    sorm.run(Guest.class, m -> {
+    sormImpl.run(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getAllColumns())
           .containsAll(List.of("ID", "NAME", "ADDRESS"));
     });
-    sorm.run(Guest.class, m -> {
+    sormImpl.run(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getPrimaryKeys()).containsAll(List.of("ID"));
     });
-    sorm.run(Guest.class, m -> {
+    sormImpl.run(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
     });
   }

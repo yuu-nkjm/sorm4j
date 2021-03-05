@@ -1,9 +1,20 @@
-package org.nkjmlab.sorm4j.config;
+package org.nkjmlab.sorm4j.mapping.extension;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
-public interface ResultSetValueGetter extends OrmConfig {
+
+public interface ResultSetConverter extends OrmExtension {
+
+  List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterParameterTypes)
+      throws SQLException;
+
+  Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
+      List<Integer> columnTypes) throws SQLException;
+
+  <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass) throws SQLException;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
@@ -21,11 +32,12 @@ public interface ResultSetValueGetter extends OrmConfig {
    *
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
-   * @param setterType {@link java.lang.Class} of the object to be returned
+   * @param setterParameterType {@link java.lang.Class} of the object to be returned
    * @throws SQLException
    *
    */
-  Object getValueBySetterType(ResultSet resultSet, int column, Class<?> setterType) throws SQLException;
+  Object getValueBySetterParameterType(ResultSet resultSet, int column,
+      Class<?> setterParameterType) throws SQLException;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and return a
@@ -43,5 +55,6 @@ public interface ResultSetValueGetter extends OrmConfig {
    *
    */
   Object getValueBySqlType(ResultSet resultSet, int column, int sqlType) throws SQLException;
+
 
 }

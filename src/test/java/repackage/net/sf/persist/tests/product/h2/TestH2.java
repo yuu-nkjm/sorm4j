@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmMapper;
-import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
@@ -53,7 +53,7 @@ public class TestH2 {
   public void testStringTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      OrmMapper simpleOrMapper = SormFactory.getOrmConnection(conn);
 
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
       Class<?>[] clobTypes =
@@ -73,7 +73,7 @@ public class TestH2 {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      OrmMapper simpleOrMapper = SormFactory.getOrmConnection(conn);
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -102,7 +102,7 @@ public class TestH2 {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      OrmMapper simpleOrMapper = SormFactory.getOrmConnection(conn);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
@@ -118,7 +118,7 @@ public class TestH2 {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmMapper simpleOrMapper = Sorm.getOrmConnection(conn);
+      OrmMapper simpleOrMapper = SormFactory.getOrmConnection(conn);
 
       Class<?>[] binaryTypes =
           new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};

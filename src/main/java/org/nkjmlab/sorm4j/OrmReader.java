@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.config.PreparedStatementParametersSetter;
+import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
@@ -67,8 +67,7 @@ public interface OrmReader {
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
-   * so on.
+   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    *
    * @param <T>
    * @param objectClass
@@ -78,11 +77,10 @@ public interface OrmReader {
   <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
 
   /**
-   * Returns an {@link org.nkjmlab.sorm4j.result.LazyResultSet}. It is able to convert to Stream, List, and
-   * so on.
+   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement,Object[])}
+   * {@link SqlParameterSetter#setParameters(PreparedStatement,Object[])}
    *
    *
    */
@@ -107,7 +105,7 @@ public interface OrmReader {
    * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link PreparedStatementParametersSetter#setParameters(PreparedStatement, Object[])}
+   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object[])}
    *
    */
   <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);

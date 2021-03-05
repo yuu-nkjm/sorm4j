@@ -1,14 +1,23 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.config.OrmConfigStore.*;
+import static org.nkjmlab.sorm4j.mapping.OrmConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmException;
-import org.nkjmlab.sorm4j.config.OrmConfigStore;
 import org.nkjmlab.sorm4j.util.Try;
 
+/**
+ * A database connection with object-relation mapping function. The main class for the ORMapper
+ * engine.
+ *
+ * A OrmMapper instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not
+ * thread safe, in particular because {@link java.sql.Connection} objects are not thread safe.
+ *
+ * @author nkjm
+ *
+ */
 public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
   public OrmConnectionImpl(Connection connection, OrmConfigStore options) {

@@ -11,12 +11,13 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestSqlserver {
-  private static final Sorm ormSrv = Sorm.create(
+  private static final Sorm ormSrv = SormFactory.create(
       JdbcConnectionPool.create("jdbc:h2:mem:sqlserver;MODE=MSSQLServer", "persist", "persist"));
 
   @BeforeAll

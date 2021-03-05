@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 
-public final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
+final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
   public SimpleBatchProcessor(TableMapping<T> tableMapping, int batchSize) {
     super(tableMapping, batchSize);
   }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormFactory;
 
 public class Sorm4jDemo {
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
@@ -44,7 +45,7 @@ public class Sorm4jDemo {
 
   private void demoOfSorm4J() {
 
-    Sorm service = Sorm.create(jdbcUrl, user, password);
+    Sorm service = SormFactory.create(jdbcUrl, user, password);
     service.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
 
 
@@ -80,7 +81,7 @@ public class Sorm4jDemo {
 
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
-      OrmConnection ormMapper = Sorm.getOrmConnection(conn);
+      OrmConnection ormMapper = SormFactory.getOrmConnection(conn);
       ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
 
       List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");

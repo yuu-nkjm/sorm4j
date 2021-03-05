@@ -1,10 +1,10 @@
-package org.nkjmlab.sorm4j.util;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public final class PreparedStatementUtils {
+final class PreparedStatementUtils {
 
   private PreparedStatementUtils() {}
 

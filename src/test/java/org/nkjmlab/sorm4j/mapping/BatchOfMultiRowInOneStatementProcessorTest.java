@@ -8,8 +8,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.connectionsource.ConnectionSource;
+import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.util.Guest;
 import org.nkjmlab.sorm4j.util.Player;
@@ -22,19 +23,24 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   private static final Player b = SormTestUtils.PLAYER_BOB;
   private static final Player c = SormTestUtils.PLAYER_CAROL;
 
-  @BeforeAll
-  static void beforAll() {
-    DebugPointFactory.on();
-    DebugPointFactory.off();
-    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true));
-  }
 
 
   @BeforeAll
   static void setUp() {
-    Sorm.configure("BATCH_CONF", builder -> builder.setMultiRowProcessorFactory(
-        t -> new BatchOfMultiRowInOneStatementProcessor<>(t, 10, 10, 4)).build());
-    sorm = Sorm.create(ConnectionSource.of(jdbcUrl, user, password), "BATCH_CONF");
+    DebugPointFactory.on();
+    DebugPointFactory.off();
+    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true));
+    OrmConfigStore conf = SormFactory.configure("BATCH_CONF", builder -> builder
+        .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+        .build());
+
+    sorm = SormTestUtils.createSorm(conf.getConfigName());
+    SormTestUtils.dropAndCreateTableAll(sorm);
+    String s = sorm.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+        .getTableMapping(Player.class).getFormattedString());
+
+    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
+    sorm = SormFactory.create(jdbcUrl, user, password, "BATCH_CONF");
   }
 
   @BeforeEach
@@ -42,12 +48,6 @@ class BatchOfMultiRowInOneStatementProcessorTest {
     SormTestUtils.dropAndCreateTableAll(sorm);
   }
 
-  @Test
-  void testSetUp() {
-    String s = sorm.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
-    assertThat(s).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
-  }
 
 
   @Test

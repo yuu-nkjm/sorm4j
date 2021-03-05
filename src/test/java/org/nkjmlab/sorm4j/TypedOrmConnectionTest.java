@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.mapping.OrmTransaction;
+import org.nkjmlab.sorm4j.mapping.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
@@ -79,8 +78,8 @@ class TypedOrmConnectionTest {
       });
 
 
-      OrmConnection orm = Sorm.toUntyped(conn);
-      Sorm.toTyped(orm, Guest.class);
+      OrmConnection orm = SormFactory.toUntyped(conn);
+      SormFactory.toTyped(orm, Guest.class);
       orm.runTransaction(tr -> {
         tr.insert(a);
         Guest g = tr.readFirst(Guest.class, "SELECT * FROM GUESTS");
@@ -114,7 +113,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testClose() {
-    Sorm.create(SormTestUtils.createDataSourceH2()).getConnectionSource();
+    SormFactory.create(SormTestUtils.createDataSourceH2()).getConnectionSource();
 
     sorm.run(Guest.class, m -> {
       m.close();
@@ -529,7 +528,7 @@ class TypedOrmConnectionTest {
   @Test
   void testSormExeption() {
     try {
-      Sorm.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
+      SormFactory.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
           .getConnectionSource().getDataSource();
       fail("Should be fail");
     } catch (Exception e) {
@@ -595,17 +594,17 @@ class TypedOrmConnectionTest {
     sorm.executeTransaction(conn -> conn.insert(a));
     // auto-rolback
     sorm.runTransaction(conn -> conn.insert(a));
-    try (OrmTransaction trans = sorm.beginTransaction()) {
+    try (OrmConnection trans = sorm.beginTransaction()) {
       // auto-rolback
       trans.insert(a);
     }
-    try (OrmTransaction trans = sorm.beginTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+    try (OrmConnection trans = sorm.beginTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
       // auto-rolback
       trans.insert(a);
     }
 
     try (Connection conn = sorm.getJdbcConnection()) {
-      Sorm.getOrmConnection(conn);
+      SormFactory.getOrmConnection(conn);
     } catch (SQLException e) {
       fail();
     }

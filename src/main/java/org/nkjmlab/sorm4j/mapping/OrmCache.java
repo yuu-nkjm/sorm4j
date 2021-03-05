@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.mapping;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class OrmCache {
+class OrmCache {
 
   private OrmCache() {}
 

@@ -3,6 +3,13 @@ package org.nkjmlab.sorm4j.mapping;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+/**
+ * Value object of feild name.
+ *
+ * @author nkjm
+ *
+ */
+
 public final class FieldName {
 
   private final String name;
