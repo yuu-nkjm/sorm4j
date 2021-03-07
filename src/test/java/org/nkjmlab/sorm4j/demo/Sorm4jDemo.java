@@ -45,33 +45,33 @@ public class Sorm4jDemo {
 
   private void demoOfSorm4J() {
 
-    Sorm service = SormFactory.create(jdbcUrl, user, password);
-    service.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
+    Sorm sorm = SormFactory.create(jdbcUrl, user, password);
+    sorm.run(conn -> conn.execute(SQL_CREATE_TABLE_CUSTOMERS));
 
 
-    List<Customer> cs1 = service.execute(conn -> conn.readAll(Customer.class));
+    List<Customer> cs1 = sorm.execute(conn -> conn.readAll(Customer.class));
     log.debug("{}", cs1);
 
-    List<String> msgs = service.execute(conn -> conn.readAllLazy(Customer.class).stream()
+    List<String> msgs = sorm.execute(conn -> conn.readAllLazy(Customer.class).stream()
         .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
     log.debug("{}", msgs);
 
-    Customer c1 = service
+    Customer c1 = sorm
         .execute(conn -> conn.readFirst(Customer.class, "SELECT * FROM customers WHERE id=?", 1));
     log.debug("{}", c1);
 
-    Customer c2 = service.execute(conn -> conn.readByPrimaryKey(Customer.class, 1));
+    Customer c2 = sorm.execute(conn -> conn.readByPrimaryKey(Customer.class, 1));
     log.debug("{}", c2);
 
-    service.run(Customer.class, conn -> {
+    sorm.run(Customer.class, conn -> {
       conn.insert(new Customer(1, "Alice", "Kyoto"));
       conn.getJdbcConnection().commit();
     });
-    service.run(Customer.class, conn -> conn.insert(new Customer(2, "Bob", "Tokyo"),
+    sorm.run(Customer.class, conn -> conn.insert(new Customer(2, "Bob", "Tokyo"),
         new Customer(3, "Carol", "Osaka"), new Customer(4, "Dave", "Nara")));
 
 
-    System.out.println(service
+    System.out.println(sorm
         .execute(Customer.class, conn -> conn.readList("select * from customers where id=?", 1))
         .toString());
 
@@ -81,14 +81,14 @@ public class Sorm4jDemo {
 
     try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
-      OrmConnection ormMapper = SormFactory.getOrmConnection(conn);
-      ormMapper.execute(SQL_CREATE_TABLE_CUSTOMERS);
+      OrmConnection orm = SormFactory.getOrmConnection(conn);
+      orm.execute(SQL_CREATE_TABLE_CUSTOMERS);
 
-      List<Customer> cs1 = ormMapper.readList(Customer.class, "SELECT * FROM customers");
+      List<Customer> cs1 = orm.readList(Customer.class, "SELECT * FROM customers");
       log.debug("{}", cs1);
 
 
-      List<String> msgs = ormMapper.readAllLazy(Customer.class).stream()
+      List<String> msgs = orm.readAllLazy(Customer.class).stream()
           .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
       log.debug("{}", msgs);
 
