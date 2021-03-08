@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.sqlstatement.NamedParametersQuery;
+import org.nkjmlab.sorm4j.sqlstatement.OrderedParametersQuery;
+import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 import org.nkjmlab.sorm4j.util.Try;
 
 /**
@@ -92,5 +95,22 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
         OrmException::new);
   }
+
+  @Override
+  public SelectQuery<T> createSelectQuery() {
+    return new SelectQuery<T>(this);
+  }
+
+  @Override
+  public NamedParametersQuery<T> createNamedParametersQuery(String sql) {
+    return NamedParametersQuery.createFrom(this, sql);
+  }
+
+  @Override
+  public OrderedParametersQuery<T> createOrderedParametersQuery(String sql) {
+    return OrderedParametersQuery.createFrom(this, sql);
+  }
+
+
 
 }

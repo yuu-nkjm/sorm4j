@@ -18,7 +18,7 @@ class SqlWithNamedParametersTest {
     assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
 
     assertThat(sp.toString())
-        .isEqualTo("[select * from simple where id=? and name=?] with [2, foo]");
+        .isEqualTo("sql=[select * from simple where id=? and name=?], parameters=[2, foo]");
 
     assertThat(SqlStatement.of("select * from test").toString()).contains("[select * from test]");
   }

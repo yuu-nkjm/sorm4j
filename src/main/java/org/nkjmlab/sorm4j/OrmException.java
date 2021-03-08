@@ -23,6 +23,5 @@ public final class OrmException extends RuntimeException {
     return e instanceof OrmException ? (OrmException) e : new OrmException(e);
   }
 
-
 }
 

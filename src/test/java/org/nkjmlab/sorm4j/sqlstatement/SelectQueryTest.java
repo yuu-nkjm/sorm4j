@@ -4,40 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 
-class SelectBuilderTest {
-  @Test
-  void testSqlStatement() {
-    assertThat(SqlStatement.literal(null)).isEqualTo("null");
-    assertThat(SqlStatement.literal("?")).isEqualTo("?");
-    assertThat(SqlStatement.literal("test")).isEqualTo("'test'");
+class SelectQueryTest {
 
-  }
-
-  @Test
-  void testBuildSorm() {
-    Sorm sormImpl = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTableAll(sormImpl);
-
-    sormImpl.run(Guest.class, con -> {
-      String sql = SelectBuilder.create().from(con.getTableName()).buildSqlString();
-      assertThat(sql).contains("select * from GUESTS");
-    });
-
-  }
-
-  @Test
-  void testBuild3() {
-    SelectBuilder builder = SelectBuilder.create();
-    builder.groupBy("a");
-    builder.distinct();
-    builder.toString();
-  }
 
   @Test
   void testBuild1() {
@@ -45,6 +16,9 @@ class SelectBuilderTest {
     builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
     builder.groupBy("TEAM");
     builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
+    builder.groupBy("a");
+    builder.distinct();
+    builder.toString();
 
     String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
     assertThat(sql).contains(

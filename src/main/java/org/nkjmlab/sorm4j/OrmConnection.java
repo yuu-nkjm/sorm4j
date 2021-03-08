@@ -21,5 +21,4 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
 
   OrmConfigStore getConfigStore();
 
-
 }

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.mapping.PreparedStatementUtils.*;
+import static org.nkjmlab.sorm4j.util.StringUtils.*;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +27,6 @@ import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.util.DebugPoint;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.StringUtils;
 import org.nkjmlab.sorm4j.util.Try;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
@@ -145,10 +145,9 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         return ret;
       }
     } catch (Throwable e) {
-      String msg =
-          (parameters == null || parameters.length == 0) ? StringUtils.format("Error in [{}]", sql)
-              : StringUtils.format("Error in [{}] with {}", sql, parameters);
-      throw new OrmException(msg, e);
+      String msg = (parameters == null || parameters.length == 0) ? format("Error in sql=[{}]", sql)
+          : format("Fail to execute sql=[{}], parameters={}", sql, parameters);
+      throw new OrmException(msg + System.lineSeparator() + e.getMessage(), e);
     }
   }
 

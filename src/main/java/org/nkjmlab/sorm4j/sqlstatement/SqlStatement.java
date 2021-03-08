@@ -28,10 +28,8 @@ public final class SqlStatement {
 
   @Override
   public String toString() {
-    return "[" + sql + "]"
-        + ((parameters != null && parameters.length != 0)
-            ? " with " + Arrays.toString(parameters) + ""
-            : "");
+    return "sql=[" + sql + "]" + ((parameters == null || parameters.length == 0) ? ""
+        : ", parameters=" + Arrays.toString(parameters) + "");
   }
 
   public final String getSql() {
