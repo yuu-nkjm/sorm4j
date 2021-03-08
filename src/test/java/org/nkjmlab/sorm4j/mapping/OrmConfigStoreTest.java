@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.OrmConfigStoreBuilder.MultiRowProcessorType.*;
-import static org.nkjmlab.sorm4j.util.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
 import org.nkjmlab.sorm4j.OrmConfigStoreBuilder.MultiRowProcessorType;
@@ -16,9 +16,9 @@ import org.nkjmlab.sorm4j.mapping.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.Player;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Player;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class OrmConfigStoreTest {
 
@@ -69,7 +69,7 @@ class OrmConfigStoreTest {
     SormFactory.updateDefaultConfigStore(builder -> builder
         .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
         .build());
-    Sorm sorm = SormTestUtils.preapare();
+    Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
     String s = sorm.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
 

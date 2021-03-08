@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SelectBuilderTest {
   @Test
@@ -32,23 +32,16 @@ class SelectBuilderTest {
   }
 
   @Test
-  void testBuild3() {
-    SelectBuilder builder = SelectBuilder.create();
-    builder.groupBy("a");
-    builder.distinct();
-    builder.toString();
-  }
-
-  @Test
   void testBuild1() {
     SelectBuilder builder = SelectBuilder.create();
+    builder.distinct();
     builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
     builder.groupBy("TEAM");
     builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
 
     String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
     assertThat(sql).contains(
-        "select avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
+        "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
 
     builder.toPrettyString();
   }

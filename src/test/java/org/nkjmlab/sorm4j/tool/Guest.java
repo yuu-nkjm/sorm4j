@@ -1,19 +1,17 @@
-package org.nkjmlab.sorm4j.util;
+package org.nkjmlab.sorm4j.tool;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.OrmTable;
 
-@OrmTable("PLAYERS")
-public class Player {
+public class Guest {
 
   private int id;
   private String name;
   private String address;
 
-  public Player() {}
+  // Require public no arg constructor (default constructor)
+  public Guest() {}
 
-  public Player(int id, String name, String address) {
-    this.id = id;
+  public Guest(String name, String address) {
     this.name = name;
     this.address = address;
   }
@@ -24,8 +22,7 @@ public class Player {
   }
 
 
-  // not match address field
-  public String readAddress() {
+  public String getAddress() {
     return address;
   }
 
@@ -34,13 +31,9 @@ public class Player {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
   @Override
   public String toString() {
-    return "Player [id=" + id + ", address=" + address + ", name=" + name + "]";
+    return "Guest [id=" + id + ", address=" + address + ", name=" + name + "]";
   }
 
   @Override
@@ -52,9 +45,9 @@ public class Player {
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (!(obj instanceof Player))
+    if (!(obj instanceof Guest))
       return false;
-    Player other = (Player) obj;
+    Guest other = (Guest) obj;
     return Objects.equals(address, other.address) && id == other.id
         && Objects.equals(name, other.name);
   }

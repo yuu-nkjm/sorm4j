@@ -3,42 +3,85 @@ package org.nkjmlab.sorm4j.sqlstatement;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
+import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Player;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SelectQueryTest {
 
+  private Sorm sorm;
 
-  @Test
-  void testBuild1() {
-    SelectBuilder builder = SelectBuilder.create();
-    builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
-    builder.groupBy("TEAM");
-    builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
-    builder.groupBy("a");
-    builder.distinct();
-    builder.toString();
-
-    String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
-    assertThat(sql).contains(
-        "select avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
-
-    builder.toPrettyString();
+  @BeforeEach
+  void testBeforeEach() {
+    this.sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm.run(Player.class, con -> con.insert(SormTestUtils.PLAYER_ALICE));
   }
 
   @Test
-  void testBuild2() {
-    Condition where = or(and("ID=A", "NAME=B"), and("YEAR=C", "DATE=D"),
-        or(cond("ID", "=", q("test")), cond("NAME='Hello'")));
-    Condition having = and("aveage_age>0", "a>0");
-    OrderBy orderBy = order("age", "desc");
-
-    String sql = SelectBuilder.create().select(as("AVG(age)", "aveage_age"), "ID").from("GUESTS")
-        .where(where).having(having).orderBy(orderBy).limit(10, 30).buildSqlString();
-    assertThat(sql).contains(
-        "select AVG(age) as aveage_age, ID from GUESTS where ((ID=A and NAME=B) or (YEAR=C and DATE=D) or (ID='test' or NAME='Hello')) having (aveage_age>0 and a>0) order by age desc limit 10 offset 30");
+  void testExecBindQuery() {
+    sorm.run(Player.class,
+        con -> assertThat(con.createSelectQuery().where("id=:id").bind("id", 1).readLazy().one())
+            .isEqualTo(PLAYER_ALICE));
   }
+
+  @Test
+  void testExecBindAllQuery() {
+    sorm.run(Player.class,
+        con -> assertThat(
+            con.createSelectQuery().where("id=:id").bindAll(Map.of("id", 1)).readLazy().one())
+                .isEqualTo(PLAYER_ALICE));
+  }
+
+  @Test
+  void testExecAddQuery() {
+    sorm.run(Player.class,
+        con -> assertThat(con.createSelectQuery().where("id=?").add(1).readLazy().one())
+            .isEqualTo(PLAYER_ALICE));
+  }
+
+  @Test
+  void testExecAddAllQuery() {
+    sorm.run(Player.class,
+        con -> assertThat(con.createSelectQuery().where(and("id=?", "name=?"))
+            .add(PLAYER_ALICE.getId(), PLAYER_ALICE.getName()).readLazy().one())
+                .isEqualTo(PLAYER_ALICE));
+  }
+
+  @Test
+  void testCompareSelectBuilderAndSelectQuery() {
+    sorm.run(Guest.class, con -> {
+      SelectQuery<Guest> builder = con.createSelectQuery();
+      builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
+      builder.groupBy("TEAM");
+      builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
+      builder.groupBy("TEAM");
+      builder.distinct();
+      builder.toString();
+      String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
+      assertThat(sql).contains(
+          "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
+
+      SelectBuilder bs = SelectBuilder.create();
+      bs.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
+      bs.groupBy("TEAM");
+      bs.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
+      bs.groupBy("TEAM");
+      bs.distinct();
+      bs.toString();
+      String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
+
+      assertThat(sql).isEqualTo(sql2);
+      assertThat(builder.toPrettyString()).isEqualTo(bs.toPrettyString());
+      assertThat(builder.toPrettyString(true)).isEqualTo(bs.toPrettyString(true));
+    });
+
+  }
+
 
 
 }

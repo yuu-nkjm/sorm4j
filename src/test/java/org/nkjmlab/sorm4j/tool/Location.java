@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util;
+package org.nkjmlab.sorm4j.tool;
 
 public class Location {
 

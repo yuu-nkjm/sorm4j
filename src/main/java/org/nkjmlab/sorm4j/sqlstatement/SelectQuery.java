@@ -30,6 +30,7 @@ public class SelectQuery<T> extends AbstQuery<T>
     return ret;
   }
 
+  @Override
   public OrderedParametersQuery<T> add(Object parameter) {
     OrderedParametersQuery<T> ret = withOrderedParameter();
     ret.add(parameter);

@@ -41,12 +41,33 @@ public interface SelectBuilder {
     return new SelectBuilderImpl();
   }
 
+  /**
+   * <p>
+   * Creates AND condition with concatenating arguments.
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * and("id=?", "name=?") returns "id=? and name=?"
+   * </pre>
+   */
   public static Condition and(Object... conds) {
     return new Condition("and", conds);
   }
 
-  public static String as(String col, String aliase) {
-    return col + " as " + aliase;
+  /**
+   * <p>
+   * Creates AS alias.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
+   * </pre>
+   */
+  public static String as(String col, String alias) {
+    return col + " as " + alias;
   }
 
   public static Condition cond(String cond) {
@@ -58,6 +79,16 @@ public interface SelectBuilder {
   }
 
 
+  /**
+   * <p>
+   * Creates OR condition with concatenating arguments.
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * or("id=?", "name=?") returns "id=? or name=?"
+   * </pre>
+   */
   public static Condition or(Object... conds) {
     return new Condition("or", conds);
   }

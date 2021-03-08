@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.util.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.Player;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Player;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SimpleBatchProcessorTest {
 

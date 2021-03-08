@@ -11,10 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Player;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.Player;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
 
 class OrmConnectionTest {
 

@@ -13,6 +13,7 @@ public class OrderedParametersQueryImpl<T> extends AbstQuery<T>
   }
 
 
+  @Override
   public OrderedParametersQuery<T> add(Object parameter) {
     sqlWithOrderedParameters.add(parameter);
     return this;

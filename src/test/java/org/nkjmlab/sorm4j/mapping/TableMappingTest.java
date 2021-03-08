@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.util.Guest;
-import org.nkjmlab.sorm4j.util.Location;
-import org.nkjmlab.sorm4j.util.Player;
-import org.nkjmlab.sorm4j.util.SormTestUtils;
+import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Location;
+import org.nkjmlab.sorm4j.tool.Player;
+import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class TableMappingTest {
   private Sorm sormImpl;

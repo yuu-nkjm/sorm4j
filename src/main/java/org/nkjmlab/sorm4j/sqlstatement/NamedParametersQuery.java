@@ -13,7 +13,7 @@ public interface NamedParametersQuery<T> extends Query<T>, SqlWithNamedParameter
   @Override
   NamedParametersQuery<T> bind(String key, Object value);
 
-  public static <T> NamedParametersQuery<T> createFrom(TypedOrmReader<T> conn, String sql) {
+  static <T> NamedParametersQuery<T> createFrom(TypedOrmReader<T> conn, String sql) {
     return new NamedParametersQueryImpl<>(conn, sql);
   }
 
