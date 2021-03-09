@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.tool.SormTestUtils;
 class SelectBuilderTest {
   @Test
   void testSqlStatement() {
+    assertThat(SqlStatement.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
     assertThat(SqlStatement.literal(null)).isEqualTo("null");
     assertThat(SqlStatement.literal("?")).isEqualTo("?");
     assertThat(SqlStatement.literal("test")).isEqualTo("'test'");

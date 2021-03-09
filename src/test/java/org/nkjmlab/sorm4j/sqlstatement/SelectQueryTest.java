@@ -53,29 +53,51 @@ class SelectQueryTest {
   }
 
   @Test
+  void testSelectQueryCond() {
+    sorm.run(Guest.class, con -> {
+      SelectQuery<Guest> builder = con.createSelectQuery();
+      builder.orderBy(order("id", "asc"));
+      builder.having("avg(age)>100");
+      assertThat(builder.toString())
+          .isEqualTo("select * from GUESTS having avg(age)>100 order by id asc");
+
+      builder.having(cond("avg(age)>1000"));
+      assertThat(builder.toString())
+          .isEqualTo("select * from GUESTS having avg(age)>1000 order by id asc");
+
+      builder.limit(10, 30);
+      assertThat(builder.toString()).isEqualTo(
+          "select * from GUESTS having avg(age)>1000 order by id asc limit 10 offset 30");
+
+    });
+
+  }
+
+  @Test
   void testCompareSelectBuilderAndSelectQuery() {
     sorm.run(Guest.class, con -> {
       SelectQuery<Guest> builder = con.createSelectQuery();
       builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
-      builder.groupBy("TEAM");
       builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
       builder.groupBy("TEAM");
+      builder.having("avg(age)>0");
       builder.distinct();
-      builder.toString();
       String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
+      System.out.println(sql);
       assertThat(sql).contains(
-          "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
+          "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM having avg(age)>0 order by age desc limit 10");
 
       SelectBuilder bs = SelectBuilder.create();
       bs.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
-      bs.groupBy("TEAM");
       bs.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
       bs.groupBy("TEAM");
+      bs.having("avg(age)>0");
       bs.distinct();
       bs.toString();
       String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
 
       assertThat(sql).isEqualTo(sql2);
+      assertThat(builder.toSqlStatement().getSql()).isEqualTo(sql2);
       assertThat(builder.toPrettyString()).isEqualTo(bs.toPrettyString());
       assertThat(builder.toPrettyString(true)).isEqualTo(bs.toPrettyString(true));
     });

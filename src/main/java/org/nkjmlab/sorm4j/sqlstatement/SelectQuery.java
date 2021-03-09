@@ -122,6 +122,11 @@ public class SelectQuery<T> extends AbstQuery<T>
   }
 
   @Override
+  public String toString() {
+    return selectBuilder.buildSql();
+  }
+
+  @Override
   public String toPrettyString() {
     return selectBuilder.toPrettyString();
   }
