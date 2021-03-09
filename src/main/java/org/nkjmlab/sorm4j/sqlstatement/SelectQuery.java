@@ -16,11 +16,11 @@ public class SelectQuery<T> extends AbstQuery<T>
   }
 
   private NamedParametersQuery<T> withNamedParameter() {
-    return NamedParametersQuery.createFrom(conn, buildSqlString());
+    return NamedParametersQuery.createFrom(conn, buildSql());
   }
 
   private OrderedParametersQuery<T> withOrderedParameter() {
-    return OrderedParametersQuery.createFrom(conn, buildSqlString());
+    return OrderedParametersQuery.createFrom(conn, buildSql());
   }
 
   @Override
@@ -53,7 +53,7 @@ public class SelectQuery<T> extends AbstQuery<T>
 
   @Override
   public SqlStatement toSqlStatement() {
-    return SqlStatement.of(buildSqlString());
+    return SqlStatement.of(buildSql());
   }
 
   @Override
@@ -117,8 +117,8 @@ public class SelectQuery<T> extends AbstQuery<T>
   }
 
   @Override
-  public String buildSqlString() {
-    return selectBuilder.buildSqlString();
+  public String buildSql() {
+    return selectBuilder.buildSql();
   }
 
   @Override

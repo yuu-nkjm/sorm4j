@@ -25,7 +25,7 @@ class SelectBuilderTest {
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
     sormImpl.run(Guest.class, con -> {
-      String sql = SelectBuilder.create().from(con.getTableName()).buildSqlString();
+      String sql = SelectBuilder.create().from(con.getTableName()).buildSql();
       assertThat(sql).contains("select * from GUESTS");
     });
 
@@ -39,7 +39,7 @@ class SelectBuilderTest {
     builder.groupBy("TEAM");
     builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
 
-    String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
+    String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
     assertThat(sql).contains(
         "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
 
@@ -54,7 +54,7 @@ class SelectBuilderTest {
     OrderBy orderBy = order("age", "desc");
 
     String sql = SelectBuilder.create().select(as("AVG(age)", "aveage_age"), "ID").from("GUESTS")
-        .where(where).having(having).orderBy(orderBy).limit(10, 30).buildSqlString();
+        .where(where).having(having).orderBy(orderBy).limit(10, 30).buildSql();
     assertThat(sql).contains(
         "select AVG(age) as aveage_age, ID from GUESTS where ((ID=A and NAME=B) or (YEAR=C and DATE=D) or (ID='test' or NAME='Hello')) having (aveage_age>0 and a>0) order by age desc limit 10 offset 30");
   }

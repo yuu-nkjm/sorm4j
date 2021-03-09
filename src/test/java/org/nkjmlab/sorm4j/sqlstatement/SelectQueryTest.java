@@ -62,7 +62,7 @@ class SelectQueryTest {
       builder.groupBy("TEAM");
       builder.distinct();
       builder.toString();
-      String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
+      String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
       assertThat(sql).contains(
           "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM order by age desc limit 10");
 
@@ -73,7 +73,7 @@ class SelectQueryTest {
       bs.groupBy("TEAM");
       bs.distinct();
       bs.toString();
-      String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSqlString();
+      String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
 
       assertThat(sql).isEqualTo(sql2);
       assertThat(builder.toPrettyString()).isEqualTo(bs.toPrettyString());

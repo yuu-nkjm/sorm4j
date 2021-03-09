@@ -23,9 +23,7 @@ public class SelectBuilderImpl implements SelectBuilder {
 
   private String groupBy;
 
-
   private String having;
-
 
   private String orderBy;
 
@@ -92,7 +90,7 @@ public class SelectBuilderImpl implements SelectBuilder {
   }
 
   @Override
-  public String buildSqlString() {
+  public String buildSql() {
     return toPrettyString(false);
   }
 
@@ -155,7 +153,8 @@ public class SelectBuilderImpl implements SelectBuilder {
 
 
   /**
-   * Value object represents conditions of where clause or having clause.
+   * Value object represents conditions of where clause or having clause. This object could include
+   * AND and OR operators.
    */
 
   public static class Condition {
