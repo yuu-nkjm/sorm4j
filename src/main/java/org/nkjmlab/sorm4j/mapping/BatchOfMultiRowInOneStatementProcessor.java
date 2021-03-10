@@ -84,9 +84,12 @@ final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
         result[lastPartition] = lastStmt.executeUpdate();
         return result;
       }
-    } catch (Throwable e) {
+    } catch (Error e) {
       rollbackIfRequired(con, origAutoCommit);
-      throw OrmException.wrapIfNotOrmException(e);
+      throw e;
+    } catch (Exception e) {
+      rollbackIfRequired(con, origAutoCommit);
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     } finally {
       commitIfRequired(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);

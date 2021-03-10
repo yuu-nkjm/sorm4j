@@ -56,8 +56,8 @@ public final class SormImpl implements Sorm {
       OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -65,8 +65,8 @@ public final class SormImpl implements Sorm {
   public <R> R execute(OrmFunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = getConnection()) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -75,8 +75,8 @@ public final class SormImpl implements Sorm {
       OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -87,8 +87,8 @@ public final class SormImpl implements Sorm {
       OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -97,8 +97,8 @@ public final class SormImpl implements Sorm {
       OrmFunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection transaction = beginTransaction()) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -107,8 +107,8 @@ public final class SormImpl implements Sorm {
   public <R> R executeTransaction(OrmFunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection transaction = beginTransaction()) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -116,8 +116,8 @@ public final class SormImpl implements Sorm {
   public <R> R executeWithJdbcConnection(OrmFunctionHandler<Connection, R> handler) {
     try (Connection conn = getJdbcConnection()) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -147,7 +147,7 @@ public final class SormImpl implements Sorm {
     try {
       return connectionSource.getConnection();
     } catch (SQLException e) {
-      throw OrmException.wrapIfNotOrmException(e);
+      throw new OrmException(e);
     }
   }
 
@@ -157,8 +157,8 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       try {
         handler.accept(conn);
-      } catch (Throwable e) {
-        throw OrmException.wrapIfNotOrmException(e);
+      } catch (Exception e) {
+        throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
       }
     }
   }
@@ -167,8 +167,8 @@ public final class SormImpl implements Sorm {
   public void run(OrmConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = getConnection()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -177,8 +177,8 @@ public final class SormImpl implements Sorm {
       OrmConsumerHandler<TypedOrmConnection<T>> handler) {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
       handler.accept(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -187,8 +187,8 @@ public final class SormImpl implements Sorm {
       OrmConsumerHandler<TypedOrmConnection<T>> handler) {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       handler.accept(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -197,8 +197,8 @@ public final class SormImpl implements Sorm {
   public void runTransaction(OrmConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = beginTransaction()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -206,8 +206,8 @@ public final class SormImpl implements Sorm {
   public void runTransaction(int isolationLevel, OrmConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = beginTransaction(isolationLevel)) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -215,8 +215,8 @@ public final class SormImpl implements Sorm {
   public void runWithJdbcConnection(OrmConsumerHandler<Connection> handler) {
     try (Connection conn = getJdbcConnection()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 

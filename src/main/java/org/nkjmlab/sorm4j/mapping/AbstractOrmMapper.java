@@ -144,7 +144,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
                 Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
-    } catch (Throwable e) {
+    } catch (Exception e) {
       String msg = (parameters == null || parameters.length == 0) ? format("Error in sql=[{}]", sql)
           : format("Fail to execute sql=[{}], parameters={}", sql, parameters);
       throw new OrmException(msg + System.lineSeparator() + e.getMessage(), e);
@@ -158,8 +158,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       return func.apply(stmt);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
     }
   }
 
@@ -258,7 +258,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
             + "] columns but 1 column was expected to load data into an instance of ["
             + objectClass.getName() + "]");
       }
-    }, OrmException::wrapIfNotOrmException);
+    }, OrmException::wrapIfCheckedException);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));

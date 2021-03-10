@@ -69,7 +69,7 @@ public interface Sorm {
   @FunctionalInterface
   public interface OrmConsumerHandler<T> {
 
-    void accept(T t) throws Throwable;
+    void accept(T t) throws Exception;
 
   }
 
@@ -82,7 +82,7 @@ public interface Sorm {
   @FunctionalInterface
   public interface OrmFunctionHandler<T, R> {
 
-    R apply(T t) throws Throwable;
+    R apply(T t) throws Exception;
 
   }
 

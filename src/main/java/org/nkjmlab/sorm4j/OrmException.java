@@ -19,8 +19,8 @@ public final class OrmException extends RuntimeException {
     super(message, cause);
   }
 
-  public static OrmException wrapIfNotOrmException(Throwable e) {
-    return e instanceof OrmException ? (OrmException) e : new OrmException(e);
+  public static RuntimeException wrapIfCheckedException(Exception e) {
+    return e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
   }
 
 }
