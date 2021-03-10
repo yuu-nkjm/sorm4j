@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.mapping;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.util.Try;
 import org.nkjmlab.sorm4j.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
@@ -84,12 +84,9 @@ final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
         result[lastPartition] = lastStmt.executeUpdate();
         return result;
       }
-    } catch (Error e) {
+    } catch (Throwable e) {
       rollbackIfRequired(con, origAutoCommit);
-      throw e;
-    } catch (Exception e) {
-      rollbackIfRequired(con, origAutoCommit);
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     } finally {
       commitIfRequired(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);

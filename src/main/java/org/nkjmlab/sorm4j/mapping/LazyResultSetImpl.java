@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.util.Try;
 
@@ -46,7 +45,7 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public T one() {
-    T ret = Try.getOrThrow(() -> ormMapper.loadOne(objectClass, resultSet), OrmException::new);
+    T ret = Try.getOrThrow(() -> ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -58,7 +57,7 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public T first() {
-    T ret = Try.getOrThrow(() -> ormMapper.loadFirst(objectClass, resultSet), OrmException::new);
+    T ret = Try.getOrThrow(() -> ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -70,16 +69,14 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public List<T> toList() {
-    List<T> ret =
-        Try.getOrThrow(() -> ormMapper.toPojoList(objectClass, resultSet), OrmException::new);
+    List<T> ret = Try.getOrThrow(() -> ormMapper.toPojoList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
 
   @Override
   public Map<String, Object> oneMap() {
-    Map<String, Object> ret =
-        Try.getOrThrow(() -> ormMapper.loadOneMap(resultSet), OrmException::new);
+    Map<String, Object> ret = Try.getOrThrow(() -> ormMapper.loadOneMap(resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -91,8 +88,7 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public Map<String, Object> firstMap() {
-    Map<String, Object> ret =
-        Try.getOrThrow(() -> ormMapper.loadFirstMap(resultSet), OrmException::new);
+    Map<String, Object> ret = Try.getOrThrow(() -> ormMapper.loadFirstMap(resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -106,7 +102,7 @@ final class LazyResultSetImpl<T>
   @Override
   public List<Map<String, Object>> toMapList() {
     List<Map<String, Object>> ret =
-        Try.getOrThrow(() -> ormMapper.loadMapList(resultSet), OrmException::new);
+        Try.getOrThrow(() -> ormMapper.loadMapList(resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -153,10 +149,9 @@ final class LazyResultSetImpl<T>
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.getFunction = objectClass.equals(LinkedHashMap.class)
-          ? Try.createSupplierWithThrow(() -> (S) orMapper.toSingleMap(resultSet),
-              OrmException::new)
+          ? Try.createSupplierWithThrow(() -> (S) orMapper.toSingleMap(resultSet), Try::rethrow)
           : Try.createSupplierWithThrow(() -> orMapper.toSingleObject(objectClass, resultSet),
-              OrmException::new);
+              Try::rethrow);
     }
 
     @Override
@@ -169,7 +164,7 @@ final class LazyResultSetImpl<T>
         return hasNext;
       } catch (SQLException e) {
         close();
-        throw new OrmException(e);
+        throw Try.rethrow(e);
       }
     }
 

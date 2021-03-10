@@ -5,10 +5,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.util.Try;
 
 /**
  * An entry point of object-relation mapping.
@@ -57,7 +57,7 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       return handler.apply(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -66,7 +66,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection conn = getConnection()) {
       return handler.apply(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -76,7 +76,7 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
       return handler.apply(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -88,7 +88,7 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       return handler.apply(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -98,7 +98,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection transaction = beginTransaction()) {
       return handler.apply(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -108,7 +108,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection transaction = beginTransaction()) {
       return handler.apply(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -117,7 +117,7 @@ public final class SormImpl implements Sorm {
     try (Connection conn = getJdbcConnection()) {
       return handler.apply(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -147,7 +147,7 @@ public final class SormImpl implements Sorm {
     try {
       return connectionSource.getConnection();
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -158,7 +158,7 @@ public final class SormImpl implements Sorm {
       try {
         handler.accept(conn);
       } catch (Exception e) {
-        throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+        throw Try.rethrow(e);
       }
     }
   }
@@ -168,7 +168,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection conn = getConnection()) {
       handler.accept(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -178,7 +178,7 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
       handler.accept(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -188,7 +188,7 @@ public final class SormImpl implements Sorm {
     try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       handler.accept(transaction);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -198,7 +198,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection conn = beginTransaction()) {
       handler.accept(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -207,7 +207,7 @@ public final class SormImpl implements Sorm {
     try (OrmConnection conn = beginTransaction(isolationLevel)) {
       handler.accept(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -216,7 +216,7 @@ public final class SormImpl implements Sorm {
     try (Connection conn = getJdbcConnection()) {
       handler.accept(conn);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 

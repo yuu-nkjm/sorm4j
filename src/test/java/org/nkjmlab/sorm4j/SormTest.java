@@ -30,8 +30,8 @@ class SormTest {
     Sorm sormImpl = SormFactory.create(mock);
     try {
       sormImpl.getJdbcConnection();
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
   }
 
@@ -49,98 +49,98 @@ class SormTest {
     try {
       sormImpl.runWithJdbcConnection(con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
 
     try {
       sormImpl.executeWithJdbcConnection(con -> 1);
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.execute(con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.execute(Guest.class, con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.executeTransaction(con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.executeTransaction(Guest.class, con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.executeTransaction(1, con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.executeTransaction(Guest.class, 1, con -> {
         return 1;
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.runWithJdbcConnection(con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.run(con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.run(Guest.class, con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.runTransaction(con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.runTransaction(Guest.class, con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.runTransaction(1, con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
     try {
       sormImpl.runTransaction(Guest.class, 1, con -> {
       });
-      failBecauseExceptionWasNotThrown(OrmException.class);
-    } catch (OrmException e) {
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
     }
 
   }

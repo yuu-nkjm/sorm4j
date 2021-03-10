@@ -26,24 +26,24 @@ abstract class MultiRowProcessor<T> {
   public abstract int[] multiRowMerge(Connection con, @SuppressWarnings("unchecked") T... objects);
 
   void setAutoCommit(Connection connection, boolean autoCommit) {
-    Try.runOrThrow(() -> connection.setAutoCommit(autoCommit), OrmException::new);
+    Try.runOrThrow(() -> connection.setAutoCommit(autoCommit), Try::rethrow);
   }
 
   void commitIfRequired(Connection connection, boolean origAutoCommit) {
     if (origAutoCommit) {
-      Try.runOrThrow(() -> connection.commit(), OrmException::new);
+      Try.runOrThrow(() -> connection.commit(), Try::rethrow);
     }
   }
 
 
   void rollbackIfRequired(Connection connection, boolean origAutoCommit) {
     if (!origAutoCommit) {
-      Try.runOrThrow(() -> connection.rollback(), OrmException::new);
+      Try.runOrThrow(() -> connection.rollback(), Try::rethrow);
     }
   }
 
   boolean getAutoCommit(Connection connection) {
-    return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), OrmException::new).get();
+    return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), Try::rethrow).get();
   }
 
   public int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
@@ -64,15 +64,14 @@ abstract class MultiRowProcessor<T> {
       final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
       for (int i = 0; i < objects.length; i++) {
         T obj = objects[i];
-        this.tableMapping.sqlParameterSetter.setParameters(stmt,
-            parameterCreator.apply(obj));
+        this.tableMapping.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
         batchHelper.addBatchAndExecuteIfReachedThreshold();
       }
       result = batchHelper.finish();
       return result;
     } catch (Exception e) {
       rollbackIfRequired(con, origAutoCommit);
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     } finally {
       commitIfRequired(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);

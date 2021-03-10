@@ -159,7 +159,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       sqlParameterSetter.setParameters(stmt, parameters);
       return func.apply(stmt);
     } catch (Exception e) {
-      throw e instanceof RuntimeException ? (RuntimeException) e : new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -219,7 +219,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
               objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
           log.info(System.lineSeparator() + m.getFormattedString());
           return m;
-        }, OrmException::new));
+        }, Try::rethrow));
     return ret;
   }
 
@@ -258,7 +258,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
             + "] columns but 1 column was expected to load data into an instance of ["
             + objectClass.getName() + "]");
       }
-    }, OrmException::wrapIfCheckedException);
+    }, Try::rethrow);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
@@ -332,7 +332,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final ResultSet resultSet = stmt.executeQuery();
       return new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -368,7 +368,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
               stmt, resultSet);
       return ret;
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -428,17 +428,13 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   private TableName toTableName(Class<?> objectClass) {
-    return classNameToValidTableNameMap.computeIfAbsent(objectClass,
-        Try.createFunctionWithThrow(
-            k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()),
-            OrmException::new));
+    return classNameToValidTableNameMap.computeIfAbsent(objectClass, Try.createFunctionWithThrow(
+        k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()), Try::rethrow));
   }
 
   private TableName toTableName(String tableName) {
-    return tableNameToValidTableNameMap.computeIfAbsent(tableName,
-        Try.createFunctionWithThrow(
-            k -> tableNameMapper.toValidTableName(tableName, connection.getMetaData()),
-            OrmException::new));
+    return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
+        k -> tableNameMapper.toValidTableName(tableName, connection.getMetaData()), Try::rethrow));
   }
 
   private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {

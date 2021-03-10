@@ -145,6 +145,9 @@ public final class Try {
     }).run();
   }
 
-
+  @SuppressWarnings("unchecked")
+  public static <T extends Throwable> RuntimeException rethrow(Throwable throwable) throws T {
+    throw (T) throwable;
+  }
 
 }

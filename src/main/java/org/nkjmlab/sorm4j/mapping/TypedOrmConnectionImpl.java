@@ -44,22 +44,22 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
         return;
       }
       getJdbcConnection().close();
-    }, OrmException::new);
+    }, Try::rethrow);
   }
 
   @Override
   public void commit() {
-    Try.runOrThrow(() -> getJdbcConnection().commit(), OrmException::new);
+    Try.runOrThrow(() -> getJdbcConnection().commit(), Try::rethrow);
   }
 
   @Override
   public void rollback() {
-    Try.runOrThrow(() -> getJdbcConnection().rollback(), OrmException::new);
+    Try.runOrThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
   }
 
   @Override
   public void setAutoCommit(final boolean autoCommit) {
-    Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), OrmException::new);
+    Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   private void setTransactionIsolation(int isolationLevel) {
     Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
-        OrmException::new);
+        Try::rethrow);
   }
 
   @Override
