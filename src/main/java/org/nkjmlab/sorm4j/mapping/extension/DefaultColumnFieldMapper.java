@@ -58,14 +58,14 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
 
   @Override
-  public List<String> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
+  public List<Column> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
       throws SQLException {
-    final List<String> primaryKeysList = new ArrayList<>();
+    final List<Column> primaryKeysList = new ArrayList<>();
     try (ResultSet resultSet =
         metaData.getPrimaryKeys(null, getSchemaPattern(metaData), tableName)) {
       while (resultSet.next()) {
         final String columnName = resultSet.getString(4);
-        primaryKeysList.add(columnName);
+        primaryKeysList.add(new Column(columnName));
       }
       return primaryKeysList;
     }
@@ -78,12 +78,6 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
 
-  /**
-   * Get column name candidates based the field names.
-   *
-   * @param fieldNames
-   * @return
-   */
   @Override
   public List<Column> getColumnNameCandidates(List<FieldName> fieldNames) {
     return fieldNames.stream().flatMap(fieldName -> guessColumnNameCandidates(fieldName).stream())
@@ -95,13 +89,6 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
         new Column(toUpperCase(fieldName.getName())));
   }
 
-  /**
-   * Get field name corresponding to the column name.
-   *
-   * @param column column name
-   * @param fieldNames fieldNames exists in mapped object.
-   * @return
-   */
   @Override
   public Optional<FieldName> getFieldNameByColumnName(Column column, List<FieldName> fieldNames) {
     for (FieldName fieldName : fieldNames) {

@@ -25,7 +25,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public TableName toValidTableName(String tableName, DatabaseMetaData metaData)
       throws SQLException {
-    List<String> candidates = List.of(StringUtils.toUpperCase(tableName));
+    List<String> candidates = List.of(tableName);
     return getTableNameOnDb(metaData, candidates)
         .orElseThrow(() -> new OrmException(StringUtils.format(
             "[{}] does not match any existing table in the database. Table Name candidates are {}",
@@ -54,15 +54,15 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   }
 
   /**
-   * Check if the given names corresponds to a table in the database and returns the corresponding
-   * name returned by the database metadata
+   * Get the table name corresponding to the one of the given candidates from the database metadata.
+   * That is ignore case matching.
    *
    * @param metaData
    * @param tableNameCandidates
    * @return
    * @throws SQLException
    */
-  public Optional<TableName> getTableNameOnDb(DatabaseMetaData metaData,
+  protected Optional<TableName> getTableNameOnDb(DatabaseMetaData metaData,
       List<String> tableNameCandidates) throws SQLException {
 
     try (

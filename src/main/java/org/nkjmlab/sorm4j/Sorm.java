@@ -61,8 +61,7 @@ public interface Sorm {
   void runWithJdbcConnection(OrmConsumerHandler<Connection> handler);
 
   /**
-   * Interface for object-relation handling without a return value. e.g.
-   * {@link Sorm#run(OrmConsumerHandler)}.
+   * Interface for object-relation handling without a return value.
    *
    * @param <T>
    */
@@ -74,8 +73,7 @@ public interface Sorm {
   }
 
   /**
-   * Interface for object-relation handling with a return value. e.g.
-   * {@link Sorm#execute(OrmConsumerHandler)}.
+   * Interface for object-relation handling with a return value.
    *
    * @param <T>
    */
