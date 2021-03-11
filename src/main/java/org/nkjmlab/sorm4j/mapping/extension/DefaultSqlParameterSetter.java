@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  *
  */
 
-public final class DefaultSqlParameterSetter implements SqlParameterSetter {
+public class DefaultSqlParameterSetter implements SqlParameterSetter {
   // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override
@@ -37,8 +37,15 @@ public final class DefaultSqlParameterSetter implements SqlParameterSetter {
     }
   }
 
-  @Override
-  public void setParameter(PreparedStatement stmt, int column, Object parameter)
+  /**
+   * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.
+   *
+   * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
+   * @param parameter parameters values
+   * @throws SQLException
+   *
+   */
+  protected void setParameter(PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
     Class<?> type = parameter.getClass();
     if (type.isEnum()) {
@@ -50,7 +57,7 @@ public final class DefaultSqlParameterSetter implements SqlParameterSetter {
     }
   }
 
-  private final void procObject(Class<?> type, PreparedStatement stmt, int column, Object parameter)
+  protected void procObject(Class<?> type, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
     if (parameter instanceof Clob) {
       stmt.setClob(column, (Clob) parameter);
@@ -132,7 +139,7 @@ public final class DefaultSqlParameterSetter implements SqlParameterSetter {
 
 
 
-  private final void procArray(Class<?> type, PreparedStatement stmt, int column, Object parameter)
+  protected void procArray(Class<?> type, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
     final String name = type.getComponentType().getName();
     switch (name) {

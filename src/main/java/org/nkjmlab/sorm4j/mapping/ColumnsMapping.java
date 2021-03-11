@@ -69,8 +69,14 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   private final List<Object> convertToObjects(ResultSet resultSet,
       List<Class<?>> setterParameterTypes) throws SQLException {
-    return defaultResultSetConverter.toObjectsByClasses(resultSet, setterParameterTypes);
+    final List<Object> values = new ArrayList<>(setterParameterTypes.size());
+    for (int i = 1; i <= setterParameterTypes.size(); i++) {
+      final Class<?> type = setterParameterTypes.get(i - 1);
+      values.add(resultSetConverter.getValueBySetterParameterType(resultSet, i, type));
+    }
+    return values;
   }
+
 
 
   private T createPojo(List<String> columns, List<Object> values) {

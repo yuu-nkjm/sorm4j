@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.mapping.PreparedStatementUtils.*;
 import static org.nkjmlab.sorm4j.util.StringUtils.*;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -339,7 +337,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   final <T> List<T> readListAux(Class<T> objectClass, String sql, Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters,
-        resultSet -> isEnableToConvertNativeSqlType(objectClass)
+        resultSet -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
             ? loadNativeObjectList(objectClass, resultSet)
             : toPojoList(objectClass, resultSet));
   }
@@ -416,7 +414,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   public <T> T toSingleObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return isEnableToConvertNativeSqlType(objectClass)
+    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
         ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
         : toSinglePojo(objectClass, resultSet);
   }
@@ -434,7 +432,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private TableName toTableName(String tableName) {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
-        k -> tableNameMapper.toValidTableName(tableName, connection.getMetaData()), Try::rethrow));
+        k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
   }
 
   private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
@@ -467,18 +465,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       return columnTypes;
     }
 
-  }
-
-  private static final Set<Class<?>> nativeSqlTypes = Set.of(boolean.class, Boolean.class,
-      byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
-      Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
-      byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-      java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-      java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-      Object.class);
-
-  private static boolean isEnableToConvertNativeSqlType(final Class<?> type) {
-    return nativeSqlTypes.contains(type);
   }
 
 }

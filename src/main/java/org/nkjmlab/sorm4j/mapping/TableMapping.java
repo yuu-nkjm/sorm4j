@@ -184,7 +184,7 @@ public final class TableMapping<T> extends Mapping<T> {
         // container is prior.
         Class<?> classType = getSetterParamType(columnName);
         final Object value =
-            defaultResultSetConverter.getValueBySetterParameterType(resultSet, 1, classType);
+            resultSetConverter.getValueBySetterParameterType(resultSet, 1, classType);
         setValue(object, columnName, value);
         ret.add(value);
       }

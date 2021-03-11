@@ -23,8 +23,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
 
 
   @Override
-  public TableName toValidTableName(String tableName, DatabaseMetaData metaData)
-      throws SQLException {
+  public TableName getTableName(String tableName, DatabaseMetaData metaData) throws SQLException {
     List<String> candidates = List.of(tableName);
     return getTableNameOnDb(metaData, candidates)
         .orElseThrow(() -> new OrmException(StringUtils.format(
@@ -47,7 +46,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
             objectClass.getName(), OrmTable.class.getName(), candidates)));
   }
 
-  List<String> guessTableNameCandidates(Class<?> objectClass) {
+  protected List<String> guessTableNameCandidates(Class<?> objectClass) {
     String className = objectClass.getSimpleName();
     return StringUtils.addPluralSuffix(
         List.of(toUpperCase(className), toLowerCase(className), toUpperSnakeCase(className)));

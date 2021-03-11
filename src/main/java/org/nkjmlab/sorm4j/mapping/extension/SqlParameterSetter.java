@@ -10,16 +10,15 @@ import java.sql.SQLException;
  *
  */
 public interface SqlParameterSetter {
+
   /**
-   * Sets parameters in the given prepared statement. i.e. Convert From Java To Sql.
+   * Sets parameters into the given prepared statement. i.e. Convert from java objects to SQL.
    *
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
-   * @param parameter parameters values
+   * @param parameters parameters values
    * @throws SQLException
    *
    */
-  void setParameter(PreparedStatement stmt, int column, Object parameter) throws SQLException;
-
   void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException;
 
 

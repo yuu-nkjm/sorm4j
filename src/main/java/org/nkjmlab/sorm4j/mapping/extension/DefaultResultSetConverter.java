@@ -1,14 +1,15 @@
 package org.nkjmlab.sorm4j.mapping.extension;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Default implementation of {@link ResultSetConverter}
@@ -17,23 +18,12 @@ import java.util.Optional;
  *
  */
 
-public final class DefaultResultSetConverter implements ResultSetConverter {
+public class DefaultResultSetConverter implements ResultSetConverter {
 
   private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
   @Override
-  public final List<Object> toObjectsByClasses(ResultSet resultSet,
-      List<Class<?>> setterParameterTypes) throws SQLException {
-    final List<Object> values = new ArrayList<>(setterParameterTypes.size());
-    for (int i = 1; i <= setterParameterTypes.size(); i++) {
-      final Class<?> type = setterParameterTypes.get(i - 1);
-      values.add(getValueBySetterParameterType(resultSet, i, type));
-    }
-    return values;
-  }
-
-  @Override
-  public Map<String, Object> toSingleMap(final ResultSet resultSet, List<String> columns,
+  public final Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) throws SQLException {
     final Map<String, Object> ret = new LinkedHashMap<>();
     for (int i = 1; i <= columns.size(); i++) {
@@ -45,7 +35,7 @@ public final class DefaultResultSetConverter implements ResultSetConverter {
   }
 
   @Override
-  public final <T> T toSingleNativeObject(final ResultSet resultSet, final Class<T> objectClass)
+  public final <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass)
       throws SQLException {
     // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
     // is prior.
@@ -167,8 +157,7 @@ public final class DefaultResultSetConverter implements ResultSetConverter {
     }
   }
 
-  @Override
-  public Object getValueBySqlType(ResultSet resultSet, int column, int sqlType)
+  protected Object getValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
     switch (sqlType) {
@@ -240,11 +229,12 @@ public final class DefaultResultSetConverter implements ResultSetConverter {
     }
   }
 
-  public static final Map<Integer, String> typeStringMap = initalizeTypeStringMap();
 
-  public static String sqlTypeToString(final int type) {
+  public static final String sqlTypeToString(final int type) {
     return typeStringMap.getOrDefault(type, "");
   }
+
+  public static final Map<Integer, String> typeStringMap = initalizeTypeStringMap();
 
   private static Map<Integer, String> initalizeTypeStringMap() {
     Map<Integer, String> typeStringMap = new HashMap<>();
@@ -280,6 +270,19 @@ public final class DefaultResultSetConverter implements ResultSetConverter {
     typeStringMap.put(java.sql.Types.VARBINARY, "VARBINARY");
     typeStringMap.put(java.sql.Types.VARCHAR, "VARCHAR");
     return typeStringMap;
+  }
+
+  private static final Set<Class<?>> nativeSqlTypes = Set.of(boolean.class, Boolean.class,
+      byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
+      Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
+      byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
+      java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
+      java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
+      Object.class);
+
+  @Override
+  public boolean isEnableToConvertNativeObject(final Class<?> type) {
+    return nativeSqlTypes.contains(type);
   }
 
 }
