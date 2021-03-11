@@ -5,8 +5,15 @@ import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
 
+/**
+ * This class represents a select query. This class has functions as SQL select builder.
+ *
+ * @author nkjm
+ *
+ * @param <T>
+ */
 public class SelectQuery<T> extends AbstQuery<T>
-    implements SelectBuilder, SqlWithNamedParameters, SqlWithOrderedParameters, Query<T> {
+    implements SelectBuilder, NamedParameterSql, OrderedParameterSql, Query<T> {
   private SelectBuilder selectBuilder;
 
   public SelectQuery(TypedOrmConnection<T> conn) {
@@ -15,38 +22,38 @@ public class SelectQuery<T> extends AbstQuery<T>
     this.selectBuilder.from(conn.getTableName());
   }
 
-  private NamedParametersQuery<T> withNamedParameter() {
-    return NamedParametersQuery.createFrom(conn, buildSql());
+  private NamedParameterQuery<T> withNamedParameter() {
+    return NamedParameterQuery.createFrom(conn, buildSql());
   }
 
-  private OrderedParametersQuery<T> withOrderedParameter() {
-    return OrderedParametersQuery.createFrom(conn, buildSql());
+  private OrderedParameterQuery<T> withOrderedParameter() {
+    return OrderedParameterQuery.createFrom(conn, buildSql());
   }
 
   @Override
-  public OrderedParametersQuery<T> add(Object... parameters) {
-    OrderedParametersQuery<T> ret = withOrderedParameter();
+  public OrderedParameterQuery<T> add(Object... parameters) {
+    OrderedParameterQuery<T> ret = withOrderedParameter();
     ret.add(parameters);
     return ret;
   }
 
   @Override
-  public OrderedParametersQuery<T> add(Object parameter) {
-    OrderedParametersQuery<T> ret = withOrderedParameter();
+  public OrderedParameterQuery<T> add(Object parameter) {
+    OrderedParameterQuery<T> ret = withOrderedParameter();
     ret.add(parameter);
     return ret;
   }
 
   @Override
-  public NamedParametersQuery<T> bindAll(Map<String, Object> namedParams) {
-    NamedParametersQuery<T> ret = withNamedParameter();
+  public NamedParameterQuery<T> bindAll(Map<String, Object> namedParams) {
+    NamedParameterQuery<T> ret = withNamedParameter();
     ret.bindAll(namedParams);
     return ret;
   }
 
   @Override
-  public NamedParametersQuery<T> bind(String key, Object value) {
-    NamedParametersQuery<T> ret = withNamedParameter();
+  public NamedParameterQuery<T> bind(String key, Object value) {
+    NamedParameterQuery<T> ret = withNamedParameter();
     ret.bind(key, value);
     return ret;
   }

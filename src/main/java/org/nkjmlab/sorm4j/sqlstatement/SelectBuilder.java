@@ -4,6 +4,12 @@ import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
 
 
+/**
+ * API of cleate a select SQL statement.
+ *
+ * @author nkjm
+ *
+ */
 public interface SelectBuilder {
 
   /**

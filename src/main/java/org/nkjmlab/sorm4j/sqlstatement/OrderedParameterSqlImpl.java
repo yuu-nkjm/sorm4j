@@ -6,28 +6,28 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * SQL with ordered parameters. The instance could be convert to {@link SqlStatement}. The class
- * could treat {@link List} parameter.
+ * An implementation of {@link OrderedParameterSql}
  *
  * @author nkjm
  *
  */
-public final class SqlWithOrderedParametersImpl implements SqlWithOrderedParameters {
+public final class OrderedParameterSqlImpl implements OrderedParameterSql {
 
   private final String sql;
   private final List<Object> parameters = new ArrayList<>();
 
-  SqlWithOrderedParametersImpl(String sql) {
+  OrderedParameterSqlImpl(String sql) {
     this.sql = sql;
   }
 
   @Override
-  public SqlWithOrderedParameters add(Object... parameters) {
+  public OrderedParameterSql add(Object... parameters) {
     Arrays.asList(parameters).forEach(v -> add(v));
     return this;
   }
 
-  public SqlWithOrderedParameters add(Object parameter) {
+  @Override
+  public OrderedParameterSql add(Object parameter) {
     if (parameter instanceof List) {
       this.parameters.add(literal(parameter));
     } else {
