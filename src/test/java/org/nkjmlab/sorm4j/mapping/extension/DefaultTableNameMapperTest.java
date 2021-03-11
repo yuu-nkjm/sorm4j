@@ -20,13 +20,13 @@ class DefaultTableNameMapperTest {
 
   @Test
   void testToValidTableName() {
-    sorm.run(Guest.class, m -> {
+    sorm.apply(Guest.class, m -> {
       assertThat(new DefaultTableNameMapper().getTableName("guests",
           m.getJdbcConnection().getMetaData())).isEqualTo(new TableName("GUESTS"));
 
     });
     try {
-      sorm.run(Guest.class, m -> {
+      sorm.apply(Guest.class, m -> {
         new DefaultTableNameMapper().getTableName("aaa", m.getJdbcConnection().getMetaData());
         failBecauseExceptionWasNotThrown(Exception.class);
       });
@@ -37,7 +37,7 @@ class DefaultTableNameMapperTest {
 
   @Test
   void testGetTableName() {
-    sorm.run(Guest.class, m -> {
+    sorm.apply(Guest.class, m -> {
       TableName name = new DefaultTableNameMapper().getTableName(Guest.class,
           m.getJdbcConnection().getMetaData());
       assertThat(name).isEqualTo(new TableName("GUESTS"));

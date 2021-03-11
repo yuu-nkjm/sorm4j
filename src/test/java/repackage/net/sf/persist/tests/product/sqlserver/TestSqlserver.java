@@ -23,7 +23,7 @@ public class TestSqlserver {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.run(conn -> {
+      ormSrv.apply(conn -> {
         String sql = String.join(System.lineSeparator(), Files.readAllLines(
             new File(TestSqlserver.class.getResource("sqlserver.sql").toURI()).toPath()));
         conn.executeUpdate(sql);

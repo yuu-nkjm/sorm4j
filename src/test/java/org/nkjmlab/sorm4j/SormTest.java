@@ -47,97 +47,97 @@ class SormTest {
     Sorm sormImpl = SormFactory.create(csMock);
 
     try {
-      sormImpl.runWithJdbcConnection(con -> {
+      sormImpl.applyToJdbcConnection(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
 
     try {
-      sormImpl.executeWithJdbcConnection(con -> 1);
+      sormImpl.applyToJdbcConnectionAndGet(con -> 1);
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.execute(con -> {
+      sormImpl.applyAndGet(con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.execute(Guest.class, con -> {
+      sormImpl.applyAndGet(Guest.class, con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.executeTransaction(con -> {
+      sormImpl.applyTransactionAndGet(con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.executeTransaction(Guest.class, con -> {
+      sormImpl.applyTransactionAndGet(Guest.class, con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.executeTransaction(1, con -> {
+      sormImpl.applyTransactionAndGet(1, con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.executeTransaction(Guest.class, 1, con -> {
+      sormImpl.applyTransactionAndGet(Guest.class, 1, con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.runWithJdbcConnection(con -> {
+      sormImpl.applyToJdbcConnection(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.run(con -> {
+      sormImpl.apply(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.run(Guest.class, con -> {
+      sormImpl.apply(Guest.class, con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.runTransaction(con -> {
+      sormImpl.applyTransaction(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.runTransaction(Guest.class, con -> {
+      sormImpl.applyTransaction(Guest.class, con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.runTransaction(1, con -> {
+      sormImpl.applyTransaction(1, con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sormImpl.runTransaction(Guest.class, 1, con -> {
+      sormImpl.applyTransaction(Guest.class, 1, con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
@@ -157,19 +157,19 @@ class SormTest {
   @Test
   void testRunWithJdbcConnection() {
 
-    srv.runWithJdbcConnection(con -> {
+    srv.applyToJdbcConnection(con -> {
     });
 
   }
 
   @Test
   void testExecuteWithJdbcConnection() {
-    srv.executeWithJdbcConnection(con -> "test");
+    srv.applyToJdbcConnectionAndGet(con -> "test");
   }
 
   @Test
   void testRunTransactionConsumerOfOrmTransaction() {
-    srv.runWithJdbcConnection(t -> {
+    srv.applyToJdbcConnection(t -> {
     });
   }
 
@@ -183,7 +183,7 @@ class SormTest {
       tr.rollback();
       tr.commit();
     }
-    srv.runWithJdbcConnection(con -> {
+    srv.applyToJdbcConnection(con -> {
       assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
 
@@ -196,7 +196,7 @@ class SormTest {
       tr.insert(a);
       // auto-rollback
     }
-    srv.runWithJdbcConnection(con -> {
+    srv.applyToJdbcConnection(con -> {
       assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmConnection tr = srv.beginTransaction()) {
@@ -204,7 +204,7 @@ class SormTest {
       tr.insert(a);
       tr.commit();
     }
-    srv.runWithJdbcConnection(con -> {
+    srv.applyToJdbcConnection(con -> {
       assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
     });
   }

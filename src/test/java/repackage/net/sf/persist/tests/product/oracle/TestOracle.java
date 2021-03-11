@@ -24,7 +24,7 @@ public class TestOracle {
   static void beforAll() {
     try {
 
-      ormSrv.run(conn -> {
+      ormSrv.apply(conn -> {
         String sql = String.join(System.lineSeparator(), Files
             .readAllLines(new File(TestOracle.class.getResource("oracle.sql").toURI()).toPath()));
         conn.executeUpdate(sql);

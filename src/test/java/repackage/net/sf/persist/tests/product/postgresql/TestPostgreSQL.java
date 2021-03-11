@@ -24,7 +24,7 @@ public class TestPostgreSQL {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.run(conn -> {
+      ormSrv.apply(conn -> {
         String sql = String.join(System.lineSeparator(), Files.readAllLines(
             new File(TestPostgreSQL.class.getResource("postgresql.sql").toURI()).toPath()));
         conn.executeUpdate(sql);

@@ -38,15 +38,15 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testSetUp() {
-    String s = sormImpl.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sormImpl.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
     assertThat(s).contains(SimpleBatchProcessor.class.getSimpleName());
   }
 
   @Test
   void testMultiRowInsert() {
-    sormImpl.run(Player.class, conn -> conn.insert(a, b));
-    sormImpl.runTransaction(tr -> {
+    sormImpl.apply(Player.class, conn -> conn.insert(a, b));
+    sormImpl.applyTransaction(tr -> {
       try {
         tr.insert(a, null);
         failBecauseExceptionWasNotThrown(Exception.class);
@@ -60,13 +60,13 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sormImpl.run(Guest.class, conn -> conn
+    sormImpl.apply(Guest.class, conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sormImpl.run(Player.class, conn -> conn.merge(a, b, c));
+    sormImpl.apply(Player.class, conn -> conn.merge(a, b, c));
   }
 
 
