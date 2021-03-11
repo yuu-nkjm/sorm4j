@@ -2,8 +2,6 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
-import org.nkjmlab.sorm4j.mapping.SormImpl.OrmTransaction;
-import org.nkjmlab.sorm4j.mapping.SormImpl.TypedOrmTransaction;
 
 /**
  * An interface of executing object-relation mapping.
@@ -52,7 +50,7 @@ public interface Sorm {
   void apply(OrmConsumerHandler<OrmConnection> handler);
 
   /**
-   * Apply transaction
+   * Applies transaction
    *
    * @param <T>
    * @param objectClass

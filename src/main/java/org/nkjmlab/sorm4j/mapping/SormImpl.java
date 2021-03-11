@@ -5,9 +5,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.util.Try;
 
 /**
@@ -31,24 +33,24 @@ public final class SormImpl implements Sorm {
 
   @Override
   public OrmTransaction beginTransaction() {
-    return new OrmTransaction(getJdbcConnection(), configStore, DEFAULT_ISOLATION_LEVEL);
+    return new OrmTransactionImpl(getJdbcConnection(), configStore, DEFAULT_ISOLATION_LEVEL);
   }
 
   @Override
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
-    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+    return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), configStore,
         DEFAULT_ISOLATION_LEVEL);
   }
 
   @Override
   public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
-    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+    return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), configStore,
         isolationLevel);
   }
 
   @Override
   public OrmTransaction beginTransaction(int isolationLevel) {
-    return new OrmTransaction(getJdbcConnection(), configStore, isolationLevel);
+    return new OrmTransactionImpl(getJdbcConnection(), configStore, isolationLevel);
   }
 
   @Override
@@ -227,20 +229,13 @@ public final class SormImpl implements Sorm {
   }
 
 
-  public static final class OrmTransaction extends OrmConnectionImpl {
-    // private static final org.slf4j.Logger log =
-    // org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-    public OrmTransaction(Connection connection, OrmConfigStore options, int isolationLevel) {
+    public OrmTransactionImpl(Connection connection, OrmConfigStore options, int isolationLevel) {
       super(connection, options);
       begin(isolationLevel);
     }
 
-    /**
-     * ALWAYS rollback before closing the connection if there's any caught/uncaught exception, the
-     * transaction will be rolled back if everything is successful / commit is successful, the
-     * rollback will have no effect.
-     */
     @Override
     public void close() {
       rollback();
@@ -249,21 +244,15 @@ public final class SormImpl implements Sorm {
 
   }
 
-  public static class TypedOrmTransaction<T> extends TypedOrmConnectionImpl<T> {
-    // private static final org.slf4j.Logger log =
-    // org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
+      implements TypedOrmTransaction<T> {
 
-    public TypedOrmTransaction(Class<T> objectClass, Connection connection, OrmConfigStore options,
-        int isolationLevel) {
+    public TypedOrmTransactionImpl(Class<T> objectClass, Connection connection,
+        OrmConfigStore options, int isolationLevel) {
       super(objectClass, connection, options);
       begin(isolationLevel);
     }
 
-    /**
-     * ALWAYS rollback before closing the connection if there's any caught/uncaught exception, the
-     * transaction will be rolled back if everything is successful / commit is successful, the
-     * rollback will have no effect.
-     */
     @Override
     public void close() {
       rollback();

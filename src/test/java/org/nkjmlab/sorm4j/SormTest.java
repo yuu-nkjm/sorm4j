@@ -177,7 +177,7 @@ class SormTest {
 
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
-    try (TypedOrmConnection<Guest> tr = srv.beginTransaction(Guest.class)) {
+    try (TypedOrmTransaction<Guest> tr = srv.beginTransaction(Guest.class)) {
       tr.begin();
       tr.insert(a);
       tr.rollback();
