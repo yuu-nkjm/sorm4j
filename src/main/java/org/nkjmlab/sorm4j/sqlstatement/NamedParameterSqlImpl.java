@@ -15,27 +15,27 @@ import java.util.stream.Collectors;
  * @author nkjm
  *
  */
-public final class SqlWithNamedParametersImpl implements SqlWithNamedParameters {
+public final class NamedParameterSqlImpl implements NamedParameterSql {
 
   private final String sql;
   private final Map<String, Object> parameters = new HashMap<>();
   private final String prefix;
   private final String suffix;
 
-  SqlWithNamedParametersImpl(String sql, String prefix, String suffix) {
+  NamedParameterSqlImpl(String sql, String prefix, String suffix) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
   }
 
   @Override
-  public SqlWithNamedParameters bindAll(Map<String, Object> namedParams) {
+  public NamedParameterSql bindAll(Map<String, Object> namedParams) {
     namedParams.entrySet().stream().forEach(e -> bind(e.getKey(), e.getValue()));
     return this;
   }
 
   @Override
-  public SqlWithNamedParameters bind(String key, Object value) {
+  public NamedParameterSql bind(String key, Object value) {
     if (value instanceof List) {
       this.parameters.put(key, literal(value));
     } else {

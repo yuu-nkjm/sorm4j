@@ -21,6 +21,13 @@ public interface TableNameMapper {
    */
   TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData) throws SQLException;
 
-  TableName toValidTableName(String tableName, DatabaseMetaData metaData) throws SQLException;
+  /**
+   * Get table name corresponding with the table name.
+   *
+   * @param tableName object class mapping to table
+   * @param metaData
+   * @return table name exists in database.
+   */
+  TableName getTableName(String tableName, DatabaseMetaData metaData) throws SQLException;
 
 }

@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.util;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmException;
 
 class TryTest {
 
@@ -35,7 +34,7 @@ class TryTest {
     try {
       Try.createSupplierWithThrow(() -> {
         throw new RuntimeException("try");
-      }, OrmException::new).get();
+      }, Try::rethrow).get();
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
@@ -76,12 +75,12 @@ class TryTest {
     try {
       Try.createConsumerWithThrow(con -> {
         throw new RuntimeException("try");
-      }, OrmException::new).accept("a");
+      }, Try::rethrow).accept("a");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
     Try.createConsumerWithThrow(con -> {
-    }, OrmException::new).accept("a");
+    }, Try::rethrow).accept("a");
   }
 
   @Test
@@ -89,7 +88,7 @@ class TryTest {
     try {
       Try.createBiConsumerWithThrow((c1, c2) -> {
         throw new RuntimeException("try");
-      }, OrmException::new).accept("a", "b");
+      }, Try::rethrow).accept("a", "b");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
@@ -112,7 +111,7 @@ class TryTest {
     try {
       Try.createFunctionWithThrow(con -> {
         throw new RuntimeException("try");
-      }, OrmException::new).apply("a");
+      }, Try::rethrow).apply("a");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
@@ -131,13 +130,13 @@ class TryTest {
     try {
       Try.getOrThrow(() -> {
         throw new RuntimeException("try");
-      }, OrmException::new);
+      }, Try::rethrow);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
     Try.getOrThrow(() -> {
       return null;
-    }, OrmException::new);
+    }, Try::rethrow);
   }
 
   @Test
@@ -145,12 +144,12 @@ class TryTest {
     try {
       Try.runOrThrow(() -> {
         throw new RuntimeException("try");
-      }, OrmException::new);
+      }, Try::rethrow);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("try");
     }
     Try.runOrThrow(() -> {
-    }, OrmException::new);
+    }, Try::rethrow);
   }
 
 }

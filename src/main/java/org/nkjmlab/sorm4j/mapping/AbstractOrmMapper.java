@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.mapping.PreparedStatementUtils.*;
 import static org.nkjmlab.sorm4j.util.StringUtils.*;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -144,7 +142,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
                 Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
-    } catch (Throwable e) {
+    } catch (Exception e) {
       String msg = (parameters == null || parameters.length == 0) ? format("Error in sql=[{}]", sql)
           : format("Fail to execute sql=[{}], parameters={}", sql, parameters);
       throw new OrmException(msg + System.lineSeparator() + e.getMessage(), e);
@@ -158,8 +156,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       return func.apply(stmt);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
@@ -219,7 +217,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
               objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
           log.info(System.lineSeparator() + m.getFormattedString());
           return m;
-        }, OrmException::new));
+        }, Try::rethrow));
     return ret;
   }
 
@@ -258,7 +256,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
             + "] columns but 1 column was expected to load data into an instance of ["
             + objectClass.getName() + "]");
       }
-    }, OrmException::wrapIfNotOrmException);
+    }, Try::rethrow);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
@@ -332,14 +330,14 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final ResultSet resultSet = stmt.executeQuery();
       return new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
 
   final <T> List<T> readListAux(Class<T> objectClass, String sql, Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters,
-        resultSet -> isEnableToConvertNativeSqlType(objectClass)
+        resultSet -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
             ? loadNativeObjectList(objectClass, resultSet)
             : toPojoList(objectClass, resultSet));
   }
@@ -368,7 +366,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
               stmt, resultSet);
       return ret;
     } catch (SQLException e) {
-      throw new OrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
@@ -416,7 +414,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   public <T> T toSingleObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return isEnableToConvertNativeSqlType(objectClass)
+    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
         ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
         : toSinglePojo(objectClass, resultSet);
   }
@@ -428,17 +426,13 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   private TableName toTableName(Class<?> objectClass) {
-    return classNameToValidTableNameMap.computeIfAbsent(objectClass,
-        Try.createFunctionWithThrow(
-            k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()),
-            OrmException::new));
+    return classNameToValidTableNameMap.computeIfAbsent(objectClass, Try.createFunctionWithThrow(
+        k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()), Try::rethrow));
   }
 
   private TableName toTableName(String tableName) {
-    return tableNameToValidTableNameMap.computeIfAbsent(tableName,
-        Try.createFunctionWithThrow(
-            k -> tableNameMapper.toValidTableName(tableName, connection.getMetaData()),
-            OrmException::new));
+    return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
+        k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
   }
 
   private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
@@ -471,18 +465,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       return columnTypes;
     }
 
-  }
-
-  private static final Set<Class<?>> nativeSqlTypes = Set.of(boolean.class, Boolean.class,
-      byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
-      Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
-      byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-      java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-      java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-      Object.class);
-
-  private static boolean isEnableToConvertNativeSqlType(final Class<?> type) {
-    return nativeSqlTypes.contains(type);
   }
 
 }

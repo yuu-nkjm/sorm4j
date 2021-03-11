@@ -30,7 +30,7 @@ public class DriverManagerConnectionSource implements ConnectionSource {
   @Override
   public Connection getConnection() throws SQLException {
     return Try.getOrThrow(() -> DriverManager.getConnection(jdbcUrl, user, password),
-        OrmException::new);
+        Try::rethrow);
   }
 
   @Override

@@ -11,7 +11,7 @@ class SqlWithNamedParametersTest {
 
   @Test
   void testCreate() {
-    SqlStatement sp = SqlWithNamedParameters.toSqlStatement(sql, namedParams);
+    SqlStatement sp = NamedParameterSql.toSqlStatement(sql, namedParams);
 
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
@@ -25,7 +25,7 @@ class SqlWithNamedParametersTest {
 
   @Test
   void testBindAll() {
-    SqlStatement sp = SqlWithNamedParameters.from(sql).bindAll(namedParams).toSqlStatement();
+    SqlStatement sp = NamedParameterSql.from(sql).bindAll(namedParams).toSqlStatement();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
@@ -34,7 +34,7 @@ class SqlWithNamedParametersTest {
   @Test
   void testBind() {
 
-    SqlStatement sp = SqlWithNamedParameters.from(sql).bind("name", "foo").bind("id", 1)
+    SqlStatement sp = NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1)
         .bind("idid", 2).toSqlStatement();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
@@ -44,7 +44,7 @@ class SqlWithNamedParametersTest {
   @Test
   void testBindList() {
 
-    SqlStatement sp = SqlWithNamedParameters.from("select * from where ID in(:names)")
+    SqlStatement sp = NamedParameterSql.from("select * from where ID in(:names)")
         .bind("names", List.of("foo", "bar")).toSqlStatement();
 
 

@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
 import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParametersQuery;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParametersQuery;
+import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
 
 /**
  * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},
@@ -29,9 +29,9 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
 
   SelectQuery<T> createSelectQuery();
 
-  NamedParametersQuery<T> createNamedParametersQuery(String sql);
+  NamedParameterQuery<T> createNamedParametersQuery(String sql);
 
-  OrderedParametersQuery<T> createOrderedParametersQuery(String sql);
+  OrderedParameterQuery<T> createOrderedParametersQuery(String sql);
 
 
 }

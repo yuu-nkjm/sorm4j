@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.TypedOrmTransaction;
+import org.nkjmlab.sorm4j.util.Try;
 
 /**
  * An entry point of object-relation mapping.
@@ -30,94 +32,94 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public OrmConnection beginTransaction() {
-    return new OrmTransaction(getJdbcConnection(), configStore, DEFAULT_ISOLATION_LEVEL);
+  public OrmTransaction beginTransaction() {
+    return new OrmTransactionImpl(getJdbcConnection(), configStore, DEFAULT_ISOLATION_LEVEL);
   }
 
   @Override
-  public <T> TypedOrmConnection<T> beginTransaction(Class<T> objectClass) {
-    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+  public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass) {
+    return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), configStore,
         DEFAULT_ISOLATION_LEVEL);
   }
 
   @Override
-  public <T> TypedOrmConnection<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
-    return new TypedOrmTransaction<T>(objectClass, getJdbcConnection(), configStore,
+  public <T> TypedOrmTransaction<T> beginTransaction(Class<T> objectClass, int isolationLevel) {
+    return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), configStore,
         isolationLevel);
   }
 
   @Override
-  public OrmConnection beginTransaction(int isolationLevel) {
-    return new OrmTransaction(getJdbcConnection(), configStore, isolationLevel);
+  public OrmTransaction beginTransaction(int isolationLevel) {
+    return new OrmTransactionImpl(getJdbcConnection(), configStore, isolationLevel);
   }
 
   @Override
-  public <T, R> R execute(Class<T> objectClass,
+  public <T, R> R applyAndGet(Class<T> objectClass,
       OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <R> R execute(OrmFunctionHandler<OrmConnection, R> handler) {
+  public <R> R applyAndGet(OrmFunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = getConnection()) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <T, R> R executeTransaction(Class<T> objectClass,
-      OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
-    try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
+  public <T, R> R applyTransactionAndGet(Class<T> objectClass,
+      OrmFunctionHandler<TypedOrmTransaction<T>, R> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
 
 
   @Override
-  public <T, R> R executeTransaction(Class<T> objectClass, int isolationLevel,
-      OrmFunctionHandler<TypedOrmConnection<T>, R> handler) {
-    try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
+  public <T, R> R applyTransactionAndGet(Class<T> objectClass, int isolationLevel,
+      OrmFunctionHandler<TypedOrmTransaction<T>, R> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <R> R executeTransaction(int isolationLevel,
-      OrmFunctionHandler<OrmConnection, R> handler) {
-    try (OrmConnection transaction = beginTransaction()) {
+  public <R> R applyTransactionAndGet(int isolationLevel,
+      OrmFunctionHandler<OrmTransaction, R> handler) {
+    try (OrmTransaction transaction = beginTransaction()) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
 
   @Override
-  public <R> R executeTransaction(OrmFunctionHandler<OrmConnection, R> handler) {
-    try (OrmConnection transaction = beginTransaction()) {
+  public <R> R applyTransactionAndGet(OrmFunctionHandler<OrmTransaction, R> handler) {
+    try (OrmTransaction transaction = beginTransaction()) {
       return handler.apply(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <R> R executeWithJdbcConnection(OrmFunctionHandler<Connection, R> handler) {
+  public <R> R applyToJdbcConnectionAndGet(OrmFunctionHandler<Connection, R> handler) {
     try (Connection conn = getJdbcConnection()) {
       return handler.apply(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
@@ -147,76 +149,76 @@ public final class SormImpl implements Sorm {
     try {
       return connectionSource.getConnection();
     } catch (SQLException e) {
-      throw OrmException.wrapIfNotOrmException(e);
+      throw Try.rethrow(e);
     }
   }
 
 
   @Override
-  public <T> void run(Class<T> objectClass, OrmConsumerHandler<TypedOrmConnection<T>> handler) {
+  public <T> void apply(Class<T> objectClass, OrmConsumerHandler<TypedOrmConnection<T>> handler) {
     try (TypedOrmConnection<T> conn = getConnection(objectClass)) {
       try {
         handler.accept(conn);
-      } catch (Throwable e) {
-        throw OrmException.wrapIfNotOrmException(e);
+      } catch (Exception e) {
+        throw Try.rethrow(e);
       }
     }
   }
 
   @Override
-  public void run(OrmConsumerHandler<OrmConnection> handler) {
+  public void apply(OrmConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = getConnection()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <T> void runTransaction(Class<T> objectClass,
-      OrmConsumerHandler<TypedOrmConnection<T>> handler) {
-    try (TypedOrmConnection<T> transaction = beginTransaction(objectClass)) {
+  public <T> void applyTransaction(Class<T> objectClass,
+      OrmConsumerHandler<TypedOrmTransaction<T>> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass)) {
       handler.accept(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <T> void runTransaction(Class<T> objectClass, int isolationLevel,
-      OrmConsumerHandler<TypedOrmConnection<T>> handler) {
-    try (TypedOrmConnection<T> transaction = beginTransaction(objectClass, isolationLevel)) {
+  public <T> void applyTransaction(Class<T> objectClass, int isolationLevel,
+      OrmConsumerHandler<TypedOrmTransaction<T>> handler) {
+    try (TypedOrmTransaction<T> transaction = beginTransaction(objectClass, isolationLevel)) {
       handler.accept(transaction);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
 
   @Override
-  public void runTransaction(OrmConsumerHandler<OrmConnection> handler) {
-    try (OrmConnection conn = beginTransaction()) {
+  public void applyTransaction(OrmConsumerHandler<OrmTransaction> handler) {
+    try (OrmTransaction conn = beginTransaction()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public void runTransaction(int isolationLevel, OrmConsumerHandler<OrmConnection> handler) {
-    try (OrmConnection conn = beginTransaction(isolationLevel)) {
+  public void applyTransaction(int isolationLevel, OrmConsumerHandler<OrmTransaction> handler) {
+    try (OrmTransaction conn = beginTransaction(isolationLevel)) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
   @Override
-  public void runWithJdbcConnection(OrmConsumerHandler<Connection> handler) {
+  public void applyToJdbcConnection(OrmConsumerHandler<Connection> handler) {
     try (Connection conn = getJdbcConnection()) {
       handler.accept(conn);
-    } catch (Throwable e) {
-      throw OrmException.wrapIfNotOrmException(e);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
     }
   }
 
@@ -227,20 +229,13 @@ public final class SormImpl implements Sorm {
   }
 
 
-  private static final class OrmTransaction extends OrmConnectionImpl {
-    // private static final org.slf4j.Logger log =
-    // org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-    public OrmTransaction(Connection connection, OrmConfigStore options, int isolationLevel) {
+    public OrmTransactionImpl(Connection connection, OrmConfigStore options, int isolationLevel) {
       super(connection, options);
       begin(isolationLevel);
     }
 
-    /**
-     * ALWAYS rollback before closing the connection if there's any caught/uncaught exception, the
-     * transaction will be rolled back if everything is successful / commit is successful, the
-     * rollback will have no effect.
-     */
     @Override
     public void close() {
       rollback();
@@ -249,21 +244,15 @@ public final class SormImpl implements Sorm {
 
   }
 
-  private static class TypedOrmTransaction<T> extends TypedOrmConnectionImpl<T> {
-    // private static final org.slf4j.Logger log =
-    // org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
+      implements TypedOrmTransaction<T> {
 
-    public TypedOrmTransaction(Class<T> objectClass, Connection connection, OrmConfigStore options,
-        int isolationLevel) {
+    public TypedOrmTransactionImpl(Class<T> objectClass, Connection connection,
+        OrmConfigStore options, int isolationLevel) {
       super(objectClass, connection, options);
       begin(isolationLevel);
     }
 
-    /**
-     * ALWAYS rollback before closing the connection if there's any caught/uncaught exception, the
-     * transaction will be rolled back if everything is successful / commit is successful, the
-     * rollback will have no effect.
-     */
     @Override
     public void close() {
       rollback();

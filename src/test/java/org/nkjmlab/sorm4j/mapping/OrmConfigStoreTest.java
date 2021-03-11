@@ -70,7 +70,7 @@ class OrmConfigStoreTest {
         .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
         .build());
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    String s = sorm.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sorm.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
 
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
@@ -85,7 +85,7 @@ class OrmConfigStoreTest {
     Sorm sormImpl = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
-    sormImpl.run(Guest.class, con -> con.insert(new Guest[0]));
+    sormImpl.apply(Guest.class, con -> con.insert(new Guest[0]));
 
 
     sormImpl = SormFactory.create(jdbcUrl, user, password);

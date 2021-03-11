@@ -14,13 +14,6 @@ import java.util.Map;
  */
 public interface ResultSetConverter {
 
-  List<Object> toObjectsByClasses(ResultSet resultSet, List<Class<?>> setterParameterTypes)
-      throws SQLException;
-
-  Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException;
-
-  <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass) throws SQLException;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
@@ -46,21 +39,38 @@ public interface ResultSetConverter {
       Class<?> setterParameterType) throws SQLException;
 
   /**
-   * Reads a column from the current row in the provided {@link java.sql.ResultSet} and return a
-   * value correspondent to the SQL type provided (as defined in {@link java.sql.Types
-   * java.sql.Types}). null's are respected for all types. This means that if a column is of type
-   * LONG and its value comes from the database as null, this method will return null for it.
+   * Returns the given type could be converted to the native object or not.
    *
-   * This method is used for "SEARCH AND READ TO MAP". i.e. Convert from Sql to Java by the
-   * specified Sql.Types.
-   *
-   * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
-   * @param column Column index in the result set (starting with 1)
-   * @param sqlType type of the column (as defined in {@link java.sql.Types java.sql.Types})
-   * @throws SQLException
-   *
+   * @param type
+   * @return
    */
-  Object getValueBySqlType(ResultSet resultSet, int column, int sqlType) throws SQLException;
+  boolean isEnableToConvertNativeObject(Class<?> type);
+
+  /**
+   * Converts the result from database to a map objects. The data of the column is extracted by
+   * corresponding column types.
+   *
+   * @param resultSet
+   * @param columns
+   * @param columnTypes SQL types from {@link java.sql.Types}
+   * @return
+   * @throws SQLException
+   */
+  Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
+      List<Integer> columnTypes) throws SQLException;
+
+
+  /**
+   * Converts to a single native object of the given object class.
+   *
+   * @param <T>
+   * @param resultSet
+   * @param objectClass
+   * @return
+   * @throws SQLException
+   */
+  <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass) throws SQLException;
+
 
 
 }

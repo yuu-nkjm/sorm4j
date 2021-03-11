@@ -19,7 +19,7 @@ class OrderedParametersQueryTest {
 
   @Test
   void testAddObjectArray() {
-    sorm.run(Player.class, conn -> {
+    sorm.apply(Player.class, conn -> {
       conn.insert(PLAYER_ALICE);
       Player ret = conn.createOrderedParametersQuery("select * from PLAYERS where ID=?").add(1)
           .readList().get(0);

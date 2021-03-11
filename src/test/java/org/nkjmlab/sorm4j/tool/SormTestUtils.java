@@ -70,20 +70,20 @@ public class SormTestUtils {
   }
 
   private static void dropAndCreateLocationTable(Sorm srv) {
-    srv.run(conn -> conn.execute("DROP TABLE location IF EXISTS"));
-    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_LOCATIONS));
+    srv.apply(conn -> conn.execute("DROP TABLE location IF EXISTS"));
+    srv.apply(conn -> conn.execute(SQL_CREATE_TABLE_LOCATIONS));
   }
 
   private static void dropAndCreateGuestTable(Sorm srv) {
-    srv.run(conn -> conn.execute("DROP TABLE guests IF EXISTS"));
-    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_GUESTS));
+    srv.apply(conn -> conn.execute("DROP TABLE guests IF EXISTS"));
+    srv.apply(conn -> conn.execute(SQL_CREATE_TABLE_GUESTS));
   }
 
   private static void dropAndCreatePlayerTable(Sorm srv) {
-    srv.run(conn -> conn.execute("DROP TABLE players IF EXISTS"));
-    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
-    srv.run(conn -> conn.execute("DROP TABLE players1 IF EXISTS"));
-    srv.run(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS1));
+    srv.apply(conn -> conn.execute("DROP TABLE players IF EXISTS"));
+    srv.apply(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS));
+    srv.apply(conn -> conn.execute("DROP TABLE players1 IF EXISTS"));
+    srv.apply(conn -> conn.execute(SQL_CREATE_TABLE_PLAYERS1));
   }
 
   public static DataSource createDataSourceH2() {

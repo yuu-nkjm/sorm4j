@@ -36,7 +36,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
     sorm = SormTestUtils.createSorm(conf.getConfigName());
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.execute(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sorm.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
 
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
@@ -52,19 +52,19 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsert() {
-    sorm.run(Player.class, conn -> conn.insert(a, b));
+    sorm.apply(Player.class, conn -> conn.insert(a, b));
   }
 
   @Test
   void testMultiRowInsertNull() {
     try {
-      sorm.run(Player.class, conn -> conn.insert(a, b, c, a));
+      sorm.apply(Player.class, conn -> conn.insert(a, b, c, a));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Unique index or primary key violation");
     }
     try {
-      sorm.run(Player.class, conn -> conn.insert(a, b, null));
+      sorm.apply(Player.class, conn -> conn.insert(a, b, null));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Fail to get value from");
@@ -73,13 +73,13 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sorm.run(Guest.class, conn -> conn
+    sorm.apply(Guest.class, conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.run(Player.class, conn -> conn.merge(a, b, c));
+    sorm.apply(Player.class, conn -> conn.merge(a, b, c));
   }
 
 
