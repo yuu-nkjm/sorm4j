@@ -5,12 +5,14 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.core.util.DebugPoint;
-import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
+import org.nkjmlab.sorm4j.OrmLogger;
+import org.nkjmlab.sorm4j.core.util.LogPoint;
+import org.nkjmlab.sorm4j.core.util.LogPointFactory;
 import org.nkjmlab.sorm4j.core.util.Try;
 
 abstract class MultiRowProcessor<T> {
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log =
+      org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
   final TableMapping<T> tableMapping;
   private final int batchSize;
@@ -86,8 +88,7 @@ abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<DebugPoint> dp =
-        DebugPointFactory.createDebugPoint(DebugPointFactory.Name.EXECUTE_BATCH);
+    Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_BATCH);
 
     int[] result = exec.apply(objects);
 

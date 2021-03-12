@@ -21,10 +21,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
 import org.nkjmlab.sorm4j.result.InsertResult;
 
@@ -38,8 +38,9 @@ public class TestSimple {
 
   @BeforeAll
   static void beforAll() {
-    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.READ, true,
-        DebugPointFactory.Name.EXECUTE_BATCH, true, DebugPointFactory.Name.EXECUTE_UPDATE, true));
+    OrmLogger.setLogMode(
+        Map.of(OrmLogger.Category.READ, true, OrmLogger.Category.EXECUTE_BATCH, true,
+            OrmLogger.Category.EXECUTE_UPDATE, true));
   }
 
   private static void dropAndCreateSimpleTable() {

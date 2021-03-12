@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.core.InsertResultImpl;
-import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 import org.nkjmlab.sorm4j.tool.Guest;
@@ -203,10 +202,6 @@ class OrmConnectionTest {
     String sql = "select * from players where id=?";
     sorm.accept(m -> {
       m.insert(a);
-      m.execute(sql, 1);
-      m.executeQuery(sql, 1);
-      m.execute(SqlStatement.of(sql, 1));
-      m.executeQuery(SqlStatement.of(sql, 1));
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
       m.executeUpdate(SqlStatement.of("DROP TABLE IF EXISTS PLAYERS1"));
 
@@ -366,14 +361,14 @@ class OrmConnectionTest {
 
 
       try {
-        DebugPointFactory.on();
+        OrmLogger.onAll();
         List<Integer> ret = m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getCause().getMessage())
             .contains("but 1 column was expected to load data into");
       }
-      DebugPointFactory.off();
+      OrmLogger.offAll();
 
 
       assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);

@@ -2,7 +2,6 @@
 package org.nkjmlab.sorm4j.core;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -122,7 +121,8 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.emptyInsertResult());
   }
 
 
@@ -159,7 +159,8 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   public <T> InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.emptyInsertResult());
   }
 
 
@@ -257,16 +258,6 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   @Override
   public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
     return readLazyAux(objectClass, sql, parameters);
-  }
-
-  @Override
-  public boolean execute(SqlStatement sql) {
-    return execute(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public ResultSet executeQuery(SqlStatement sql) {
-    return executeQuery(sql.getSql(), sql.getParameters());
   }
 
   @Override

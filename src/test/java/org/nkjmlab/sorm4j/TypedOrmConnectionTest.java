@@ -36,7 +36,7 @@ class TypedOrmConnectionTest {
   void testException() {
     sorm.accept(m -> {
       try {
-        m.executeQuery("selecttt");
+        m.executeUpdate("selecttt");
       } catch (Exception e) {
         assertThat(e.getMessage()).contains("Syntax error in SQL statement");
       }
@@ -292,10 +292,6 @@ class TypedOrmConnectionTest {
     String sql = "select * from players where id=?";
     sorm.accept(Player.class, m -> {
       m.insert(a);
-      m.execute(sql, 1);
-      m.executeQuery(sql, 1);
-      m.execute(SqlStatement.of(sql, 1));
-      m.executeQuery(SqlStatement.of(sql, 1));
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
       m.executeUpdate(SqlStatement.of("DROP TABLE IF EXISTS PLAYERS1"));
 

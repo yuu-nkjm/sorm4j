@@ -16,10 +16,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.core.util.DebugPoint;
-import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
+import org.nkjmlab.sorm4j.core.util.LogPoint;
+import org.nkjmlab.sorm4j.core.util.LogPointFactory;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.core.util.Try.ThrowableFunction;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
@@ -115,18 +116,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   @Override
-  public boolean execute(String sql, Object... parameters) {
-    return execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
-        stmt -> stmt.execute());
-  }
-
-  @Override
-  public ResultSet executeQuery(String sql, Object... parameters) {
-    return execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
-        stmt -> stmt.executeQuery());
-  }
-
-  @Override
   public int executeUpdate(String sql, Object... parameters) {
     return execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
         stmt -> stmt.executeUpdate());
@@ -138,7 +127,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
-        Optional<DebugPoint> dp = DebugPointFactory.createDebugPoint(DebugPointFactory.Name.READ);
+        Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.READ);
         dp.ifPresent(sw -> log.debug("[{}] with {} ", sql, parameters));
         R ret = sqlResultReader.apply(resultSet);
         dp.ifPresent(
@@ -183,7 +172,10 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m =
           ColumnsMapping.createMapping(objectClass, resultSetConverter, fieldMapper);
-      log.info(System.lineSeparator() + m.getFormattedString());
+
+      LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING)
+          .ifPresent(lp -> log.info(System.lineSeparator() + m.getFormattedString()));
+
       return m;
     });
     return ret;
@@ -220,7 +212,8 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = TableMapping.createMapping(resultSetConverter, sqlParameterSetter,
               objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
-          log.info(System.lineSeparator() + m.getFormattedString());
+          LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING)
+              .ifPresent(lp -> log.info(System.lineSeparator() + m.getFormattedString()));
           return m;
         }, Try::rethrow));
     return ret;
@@ -300,7 +293,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   final <T> List<T> readAllAux(final Class<T> objectClass) {
     final TableMapping<T> mapping = getTableMapping(objectClass);
     final String sql = mapping.getSql().getSelectAllSql();
-    Optional<DebugPoint> dp = DebugPointFactory.createDebugPoint(DebugPointFactory.Name.READ);
+    Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.READ);
     List<T> result = readListAux(objectClass, sql);
     dp.ifPresent(sw -> log.debug("{} Read [{}] objects of [{}]",
         sw.getFormattedNameAndElapsedTime(), result.size(), objectClass.getSimpleName()));

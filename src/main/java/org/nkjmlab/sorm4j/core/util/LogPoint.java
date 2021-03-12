@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j.core.util;
 
-public final class DebugPoint {
+public final class LogPoint {
 
   private final String name;
   private final long startTime;
 
-  public DebugPoint(String name) {
+  public LogPoint(String name) {
     this.name = name;
     this.startTime = System.nanoTime();
   }

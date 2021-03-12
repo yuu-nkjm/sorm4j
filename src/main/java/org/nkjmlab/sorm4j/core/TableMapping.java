@@ -15,9 +15,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.core.util.DebugPoint;
-import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
+import org.nkjmlab.sorm4j.core.util.LogPoint;
+import org.nkjmlab.sorm4j.core.util.LogPointFactory;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.extension.Column;
@@ -31,7 +32,8 @@ import org.nkjmlab.sorm4j.result.InsertResult;
  */
 public final class TableMapping<T> extends Mapping<T> {
 
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log =
+      org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
   private final Map<String, Class<?>> setterParamTypeMap = new ConcurrentHashMap<>();
 
   final SqlParameterSetter sqlParameterSetter;
@@ -206,8 +208,8 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
-    final Optional<DebugPoint> dp =
-        DebugPointFactory.createDebugPoint(DebugPointFactory.Name.EXECUTE_UPDATE);
+    final Optional<LogPoint> dp =
+        LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
     int ret = AbstractOrmMapper.execPreparedStatementAndClose(sqlParameterSetter, connection, sql,
         parameters, stmt -> stmt.executeUpdate());
     dp.ifPresent(

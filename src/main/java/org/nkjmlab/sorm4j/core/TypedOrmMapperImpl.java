@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.core;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -151,7 +150,8 @@ class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<
   @Override
   public InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.emptyInsertResult());
   }
 
 
@@ -188,7 +188,8 @@ class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<
   public InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.emptyInsertResult());
   }
 
 
@@ -255,16 +256,6 @@ class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<
   @Override
   public int[] update(List<T> objects) {
     return applytoArray(objects, array -> update(array));
-  }
-
-  @Override
-  public boolean execute(SqlStatement sql) {
-    return execute(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public ResultSet executeQuery(SqlStatement sql) {
-    return executeQuery(sql.getSql(), sql.getParameters());
   }
 
   @Override
