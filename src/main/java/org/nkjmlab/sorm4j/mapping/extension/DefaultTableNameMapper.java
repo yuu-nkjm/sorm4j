@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.util.StringUtils;
@@ -26,7 +26,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   public TableName getTableName(String tableName, DatabaseMetaData metaData) throws SQLException {
     List<String> candidates = List.of(tableName);
     return getTableNameOnDb(metaData, candidates)
-        .orElseThrow(() -> new OrmException(StringUtils.format(
+        .orElseThrow(() -> new SormException(StringUtils.format(
             "[{}] does not match any existing table in the database. Table Name candidates are {}",
             tableName, candidates)));
   }
@@ -41,7 +41,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
         ? Arrays.asList(tableAnnotation.value())
         : guessTableNameCandidates(objectClass);
     return getTableNameOnDb(metaData, candidates)
-        .orElseThrow(() -> new OrmException(StringUtils.format(
+        .orElseThrow(() -> new SormException(StringUtils.format(
             "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
             objectClass.getName(), OrmTable.class.getName(), candidates)));
   }

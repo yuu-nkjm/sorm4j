@@ -19,19 +19,19 @@ class SelectQueryTest {
   @BeforeEach
   void testBeforeEach() {
     this.sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    sorm.apply(Player.class, con -> con.insert(SormTestUtils.PLAYER_ALICE));
+    sorm.accept(Player.class, con -> con.insert(SormTestUtils.PLAYER_ALICE));
   }
 
   @Test
   void testExecBindQuery() {
-    sorm.apply(Player.class,
+    sorm.accept(Player.class,
         con -> assertThat(con.createSelectQuery().where("id=:id").bind("id", 1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
   }
 
   @Test
   void testExecBindAllQuery() {
-    sorm.apply(Player.class,
+    sorm.accept(Player.class,
         con -> assertThat(
             con.createSelectQuery().where("id=:id").bindAll(Map.of("id", 1)).readLazy().one())
                 .isEqualTo(PLAYER_ALICE));
@@ -39,14 +39,14 @@ class SelectQueryTest {
 
   @Test
   void testExecAddQuery() {
-    sorm.apply(Player.class,
+    sorm.accept(Player.class,
         con -> assertThat(con.createSelectQuery().where("id=?").add(1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
   }
 
   @Test
   void testExecAddAllQuery() {
-    sorm.apply(Player.class,
+    sorm.accept(Player.class,
         con -> assertThat(con.createSelectQuery().where(and("id=?", "name=?"))
             .add(PLAYER_ALICE.getId(), PLAYER_ALICE.getName()).readLazy().one())
                 .isEqualTo(PLAYER_ALICE));
@@ -54,7 +54,7 @@ class SelectQueryTest {
 
   @Test
   void testSelectQueryCond() {
-    sorm.apply(Guest.class, con -> {
+    sorm.accept(Guest.class, con -> {
       SelectQuery<Guest> builder = con.createSelectQuery();
       builder.orderBy(order("id", "asc"));
       builder.having("avg(age)>100");
@@ -75,7 +75,7 @@ class SelectQueryTest {
 
   @Test
   void testCompareSelectBuilderAndSelectQuery() {
-    sorm.apply(Guest.class, con -> {
+    sorm.accept(Guest.class, con -> {
       SelectQuery<Guest> builder = con.createSelectQuery();
       builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
       builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));

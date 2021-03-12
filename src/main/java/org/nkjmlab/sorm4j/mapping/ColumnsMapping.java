@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.mapping.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
@@ -32,7 +32,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       ColumnFieldMapper columnFieldMapper) {
     super(defaultResultSetConverter, objectClass, columnFieldMapper);
     this.constructor = Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(),
-        e -> new OrmException(
+        e -> new SormException(
             "Container class for object relation mapping must have the public default constructor (with no arguments).",
             e))
         .get();
@@ -94,7 +94,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       return constructor.newInstance();
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
-      throw new OrmException(
+      throw new SormException(
           "Container class for object relation mapping must have the public default constructor (with no arguments).",
           e);
     }

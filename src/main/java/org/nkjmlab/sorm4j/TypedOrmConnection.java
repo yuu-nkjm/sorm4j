@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.io.Closeable;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
+import org.nkjmlab.sorm4j.mapping.ConfigStore;
 import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
@@ -23,7 +23,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
 
   <R> R executeTransaction(Function<TypedOrmConnection<T>, R> handler);
 
-  OrmConfigStore getConfigStore();
+  ConfigStore getConfigStore();
 
   String getTableName();
 

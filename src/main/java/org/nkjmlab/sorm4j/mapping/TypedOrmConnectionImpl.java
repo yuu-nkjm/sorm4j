@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.mapping.OrmConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.OrmException;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
@@ -27,8 +25,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
 
-  public TypedOrmConnectionImpl(Class<T> objectClass, Connection connection,
-      OrmConfigStore options) {
+  public TypedOrmConnectionImpl(Class<T> objectClass, Connection connection, ConfigStore options) {
     super(objectClass, connection, options);
   }
 
@@ -63,15 +60,15 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   }
 
   @Override
-  public void begin(int isolationLevel) {
+  public void begin(int transactionIsolationLevel) {
     setAutoCommit(false);
-    setTransactionIsolation(isolationLevel);
+    setTransactionIsolation(transactionIsolationLevel);
   }
 
   @Override
   public void runTransaction(Consumer<TypedOrmConnection<T>> handler) {
     setAutoCommit(false);
-    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    setTransactionIsolation(getTransactionIsolationLevel());
     handler.accept(this);
     rollback();
   }
@@ -79,7 +76,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   @Override
   public <R> R executeTransaction(Function<TypedOrmConnection<T>, R> handler) {
     setAutoCommit(false);
-    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    setTransactionIsolation(getTransactionIsolationLevel());
     R ret = handler.apply(this);
     rollback();
     return ret;
@@ -88,12 +85,11 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public void begin() {
-    begin(DEFAULT_ISOLATION_LEVEL);
+    begin(getTransactionIsolationLevel());
   }
 
-  private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
-        Try::rethrow);
+  private void setTransactionIsolation(int level) {
+    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(level), Try::rethrow);
   }
 
   @Override

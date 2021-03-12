@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
+import org.nkjmlab.sorm4j.ConfigStoreBuilder;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.tool.Guest;
@@ -23,9 +23,9 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    SormFactory.configure("SIMPLE_BATCH",
+    SormFactory.registerNewConfigStore("SIMPLE_BATCH",
         builder -> builder
-            .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.SIMPLE_BATCH)
+            .setMultiRowProcessorType(ConfigStoreBuilder.MultiRowProcessorType.SIMPLE_BATCH)
             .build());
     sormImpl = SormFactory.create(jdbcUrl, user, password, "SIMPLE_BATCH");
   }
@@ -38,15 +38,15 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testSetUp() {
-    String s = sormImpl.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sormImpl.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
     assertThat(s).contains(SimpleBatchProcessor.class.getSimpleName());
   }
 
   @Test
   void testMultiRowInsert() {
-    sormImpl.apply(Player.class, conn -> conn.insert(a, b));
-    sormImpl.applyTransaction(tr -> {
+    sormImpl.accept(Player.class, conn -> conn.insert(a, b));
+    sormImpl.acceptTransactionHandler(tr -> {
       try {
         tr.insert(a, null);
         failBecauseExceptionWasNotThrown(Exception.class);
@@ -60,13 +60,13 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sormImpl.apply(Guest.class, conn -> conn
+    sormImpl.accept(Guest.class, conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sormImpl.apply(Player.class, conn -> conn.merge(a, b, c));
+    sormImpl.accept(Player.class, conn -> conn.merge(a, b, c));
   }
 
 

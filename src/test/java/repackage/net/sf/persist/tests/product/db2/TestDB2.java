@@ -23,7 +23,7 @@ public class TestDB2 {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.apply(conn -> {
+      ormSrv.accept(conn -> {
         String sql = String.join(System.lineSeparator(),
             Files.readAllLines(new File(TestDB2.class.getResource("db2.sql").toURI()).toPath()));
         conn.executeUpdate(sql);
@@ -50,7 +50,7 @@ public class TestDB2 {
     // .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(16384)
     // .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -74,7 +74,7 @@ public class TestDB2 {
             .addField(new FieldMap("decimalCol").setTypes(integerTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("numericCol").setTypes(integerTypes).setBoundaries(0, 9999));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -85,7 +85,7 @@ public class TestDB2 {
         .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class)).addField(
             new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -109,7 +109,7 @@ public class TestDB2 {
         .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(16384)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
 }

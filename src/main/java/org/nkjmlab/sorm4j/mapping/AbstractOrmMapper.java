@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
@@ -44,7 +44,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private final MultiRowProcessorGeneratorFactory batchConfig;
 
-  private final OrmConfigStore configStore;
+  private final ConfigStore configStore;
 
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
 
@@ -54,13 +54,15 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
 
+  private final int transactionIsolationLevel;
+
 
   /**
    * Creates a instance
    *
    * @param connection {@link java.sql.Connection} object to be used
    */
-  public AbstractOrmMapper(Connection connection, OrmConfigStore configStore) {
+  public AbstractOrmMapper(Connection connection, ConfigStore configStore) {
     this.connection = connection;
     this.configStore = configStore;
     this.batchConfig = configStore.getMultiProcessorFactory();
@@ -72,6 +74,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     this.columnsMappings = configStore.getColumnsMappings();
     this.classNameToValidTableNameMap = configStore.getClassNameToValidTableNameMap();
     this.tableNameToValidTableNameMap = configStore.getTableNameToValidTableNameMaps();
+    this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
   }
 
   public <T> int deleteAll(Class<T> objectClass) {
@@ -145,7 +148,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     } catch (Exception e) {
       String msg = (parameters == null || parameters.length == 0) ? format("Error in sql=[{}]", sql)
           : format("Fail to execute sql=[{}], parameters={}", sql, parameters);
-      throw new OrmException(msg + System.lineSeparator() + e.getMessage(), e);
+      throw new SormException(msg + System.lineSeparator() + e.getMessage(), e);
     }
   }
 
@@ -185,7 +188,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  public OrmConfigStore getConfigStore() {
+  public ConfigStore getConfigStore() {
     return configStore;
   }
 
@@ -252,7 +255,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     Try.runOrThrow(() -> {
       ResultSetMetaData metaData = resultSet.getMetaData();
       if (metaData.getColumnCount() != 1) {
-        throw new OrmException("ResultSet returned [" + metaData.getColumnCount()
+        throw new SormException("ResultSet returned [" + metaData.getColumnCount()
             + "] columns but 1 column was expected to load data into an instance of ["
             + objectClass.getName() + "]");
       }
@@ -283,7 +286,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       ret = toSingleMap(resultSet);
     }
     if (resultSet.next()) {
-      throw new OrmException("Non-unique result returned");
+      throw new SormException("Non-unique result returned");
     }
     return ret;
   }
@@ -382,7 +385,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         ret = resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
       }
       if (resultSet.next()) {
-        throw new OrmException("Non-unique result returned");
+        throw new SormException("Non-unique result returned");
       }
       return ret;
     });
@@ -395,7 +398,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         ret = toSingleObject(objectClass, resultSet);
       }
       if (resultSet.next()) {
-        throw new OrmException("Non-unique result returned");
+        throw new SormException("Non-unique result returned");
       }
       return ret;
     });
@@ -465,6 +468,10 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       return columnTypes;
     }
 
+  }
+
+  protected int getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
   }
 
 }

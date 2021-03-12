@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.OrmConfigStoreBuilder.MultiRowProcessorType.*;
+import static org.nkjmlab.sorm4j.ConfigStoreBuilder.MultiRowProcessorType.*;
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
-import org.nkjmlab.sorm4j.OrmConfigStoreBuilder.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.ConfigStoreBuilder;
+import org.nkjmlab.sorm4j.ConfigStoreBuilder.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
@@ -37,9 +37,9 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      OrmConfigStore confs =
-          SormFactory.createConfigStoreBuilder(NEW_CONFIG).setMultiRowProcessorType(null)
-              .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build();
+      ConfigStore confs =
+          SormFactory.registerNewConfigStore(NEW_CONFIG, b -> b.setMultiRowProcessorType(null)
+              .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
@@ -49,13 +49,13 @@ class OrmConfigStoreTest {
   @Test
   void testOrmConfigStore() {
 
-    OrmConfigStore confs = SormFactory.createConfigStoreBuilder(NEW_CONFIG)
-        .setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
-        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
-        .setResultSetConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
-        .setSqlParameterSetter(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER)
-        .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10).setMultiRowSize(20)
-        .setBatchSizeWithMultiRow(30).build();
+    ConfigStore confs = SormFactory.registerNewConfigStore(NEW_CONFIG,
+        b -> b.setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+            .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
+            .setResultSetConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
+            .setSqlParameterSetter(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER)
+            .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10)
+            .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
 
     assertThat(confs.getConfigName()).isEqualTo(NEW_CONFIG);
     assertThat(confs.getColumnFieldMapper()).isEqualTo(DEFAULT_COLUMN_FIELD_MAPPER);
@@ -67,10 +67,10 @@ class OrmConfigStoreTest {
   @Test
   void testConfigUpdate() {
     SormFactory.updateDefaultConfigStore(builder -> builder
-        .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+        .setMultiRowProcessorType(ConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
         .build());
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    String s = sorm.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
 
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
@@ -85,12 +85,12 @@ class OrmConfigStoreTest {
     Sorm sormImpl = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
-    sormImpl.apply(Guest.class, con -> con.insert(new Guest[0]));
+    sormImpl.accept(Guest.class, con -> con.insert(new Guest[0]));
 
 
     sormImpl = SormFactory.create(jdbcUrl, user, password);
     assertThat(sormImpl.getConfigStore().getConfigName())
-        .isEqualTo(OrmConfigStore.DEFAULT_CONFIG_NAME);
+        .isEqualTo(ConfigStore.DEFAULT_CONFIG_NAME);
     SormFactory.resetDefaultConfigStore();
   }
 

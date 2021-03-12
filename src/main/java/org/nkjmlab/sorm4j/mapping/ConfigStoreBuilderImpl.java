@@ -1,12 +1,7 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.OrmConfigStoreBuilder.MultiRowProcessorType.*;
-import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
+import org.nkjmlab.sorm4j.ConfigStoreBuilder;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.mapping.extension.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.mapping.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.mapping.extension.DefaultSqlParameterSetter;
-import org.nkjmlab.sorm4j.mapping.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
@@ -17,16 +12,7 @@ import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
  * @author nkjm
  *
  */
-public class OrmConfigStoreBuilderImpl implements OrmConfigStoreBuilder {
-
-  public static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
-      new DefaultColumnFieldMapper();
-  public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
-  public static final ResultSetConverter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
-      new DefaultResultSetConverter();
-  public static final SqlParameterSetter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
-      new DefaultSqlParameterSetter();
-  public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
+public class ConfigStoreBuilderImpl implements ConfigStoreBuilder {
 
   private final String configName;
   private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
@@ -37,15 +23,30 @@ public class OrmConfigStoreBuilderImpl implements OrmConfigStoreBuilder {
   private int batchSize = 32;
   private int multiRowSize = 32;
   private int batchSizeWithMultiRow = 5;
+  private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
 
-  public OrmConfigStoreBuilderImpl(String configName) {
+  public ConfigStoreBuilderImpl(String configName) {
     this.configName = configName;
   }
 
+  public ConfigStoreBuilderImpl(String configName, ConfigStore configStore) {
+    this(configName);
+    this.columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
+    this.tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
+    this.resultSetConverter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
+    this.sqlParameterSetter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
+    this.multiRowProcessorType = DEFAULT_MULTI_ROW_PROCESSOR;
+    this.batchSize = 32;
+    this.multiRowSize = 32;
+    this.batchSizeWithMultiRow = 5;
+    this.transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
+
+  }
+
   @Override
-  public OrmConfigStore build() {
-    return new OrmConfigStore(configName, columnFieldMapper, tableNameMapper, resultSetConverter,
-        sqlParameterSetter, createMultiRowProcessorFactory());
+  public ConfigStore build() {
+    return new ConfigStore(configName, columnFieldMapper, tableNameMapper, resultSetConverter,
+        sqlParameterSetter, createMultiRowProcessorFactory(), transactionIsolationLevel);
   }
 
   private MultiRowProcessorGeneratorFactory createMultiRowProcessorFactory() {
@@ -65,51 +66,57 @@ public class OrmConfigStoreBuilderImpl implements OrmConfigStoreBuilder {
   }
 
   @Override
-  public OrmConfigStoreBuilder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
+  public ConfigStoreBuilder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
     this.columnFieldMapper = fieldNameMapper;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setTableNameMapper(TableNameMapper tableNameMapper) {
+  public ConfigStoreBuilder setTableNameMapper(TableNameMapper tableNameMapper) {
     this.tableNameMapper = tableNameMapper;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setResultSetConverter(ResultSetConverter resultSetConverter) {
+  public ConfigStoreBuilder setResultSetConverter(ResultSetConverter resultSetConverter) {
     this.resultSetConverter = resultSetConverter;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setSqlParameterSetter(SqlParameterSetter sqlParameterSetter) {
+  public ConfigStoreBuilder setSqlParameterSetter(SqlParameterSetter sqlParameterSetter) {
     this.sqlParameterSetter = sqlParameterSetter;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setMultiRowProcessorType(
-      MultiRowProcessorType multiRowProcessorType) {
+  public ConfigStoreBuilder setMultiRowProcessorType(MultiRowProcessorType multiRowProcessorType) {
     this.multiRowProcessorType = multiRowProcessorType;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setBatchSize(int size) {
+  public ConfigStoreBuilder setBatchSize(int size) {
     this.batchSize = size;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setMultiRowSize(int size) {
+  public ConfigStoreBuilder setMultiRowSize(int size) {
     this.multiRowSize = size;
     return this;
   }
 
   @Override
-  public OrmConfigStoreBuilder setBatchSizeWithMultiRow(int size) {
+  public ConfigStoreBuilder setBatchSizeWithMultiRow(int size) {
     this.batchSizeWithMultiRow = size;
     return this;
   }
+
+  @Override
+  public ConfigStoreBuilder setTransactionIsolationLevel(int level) {
+    this.transactionIsolationLevel = level;
+    return this;
+  }
+
 }

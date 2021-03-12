@@ -1,12 +1,13 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.mapping.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.mapping.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.util.StringUtils;
 
 /**
  * A configuration store of sorm4j.
@@ -14,16 +15,16 @@ import org.nkjmlab.sorm4j.mapping.extension.TableNameMapper;
  * @author nkjm
  *
  */
-public final class OrmConfigStore {
+public final class ConfigStore {
 
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-  private static final ConcurrentMap<String, OrmConfigStore> configStores =
-      new ConcurrentHashMap<>();
+
+  private static final ConcurrentMap<String, ConfigStore> configStores = new ConcurrentHashMap<>();
 
   public static final String DEFAULT_CONFIG_NAME = "DEFAULT_CONFIG";
-  public static final OrmConfigStore INITIAL_DEFAULT_CONFIG_STORE =
-      new OrmConfigStoreBuilderImpl(DEFAULT_CONFIG_NAME).build();
+  public static final ConfigStore INITIAL_DEFAULT_CONFIG_STORE =
+      new ConfigStoreBuilderImpl(DEFAULT_CONFIG_NAME).build();
 
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;
@@ -31,23 +32,25 @@ public final class OrmConfigStore {
   private final ResultSetConverter resultSetConverter;
   private final SqlParameterSetter sqlParameterSetter;
   private final MultiRowProcessorGeneratorFactory multiProcessorFactory;
+  private final int transactionIsolationLevel;
 
-  public static final int DEFAULT_ISOLATION_LEVEL = Connection.TRANSACTION_READ_COMMITTED;
 
 
   static {
     configStores.put(DEFAULT_CONFIG_NAME, INITIAL_DEFAULT_CONFIG_STORE);
   }
 
-  public OrmConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
+  public ConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
       TableNameMapper tableNameMapper, ResultSetConverter resultSetConverter,
-      SqlParameterSetter javaToSqlConverter, MultiRowProcessorGeneratorFactory batchConfig) {
+      SqlParameterSetter javaToSqlConverter, MultiRowProcessorGeneratorFactory batchConfig,
+      int transactionIsolationLevel) {
     this.configName = cacheName;
     this.columnFieldMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
     this.resultSetConverter = resultSetConverter;
     this.sqlParameterSetter = javaToSqlConverter;
     this.multiProcessorFactory = batchConfig;
+    this.transactionIsolationLevel = transactionIsolationLevel;
   }
 
 
@@ -82,17 +85,23 @@ public final class OrmConfigStore {
   }
 
 
-  public static OrmConfigStore refreshAndRegister(OrmConfigStore configStore) {
+  public static ConfigStore refreshAndRegister(ConfigStore configStore) {
     refresh(configStore.getConfigName());
     configStores.put(configStore.getConfigName(), configStore);
     return configStore;
   }
 
-  public static OrmConfigStore get(String configName) {
-    return configStores.get(configName);
+  public static ConfigStore get(String configName) {
+    ConfigStore ret = configStores.get(configName);
+    if (ret != null) {
+      return ret;
+    }
+    throw new SormException(
+        StringUtils.format("Config name [{}] is not registered yet. Registered config names = {}",
+            configName, configStores.keySet()));
   }
 
-  public static OrmConfigStore getDefaultConfigStore() {
+  public static ConfigStore getDefaultConfigStore() {
     return get(DEFAULT_CONFIG_NAME);
   }
 
@@ -118,6 +127,11 @@ public final class OrmConfigStore {
 
   public ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps() {
     return OrmCache.getTableNameToValidTableNameMaps(configName);
+  }
+
+
+  public int getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
   }
 
 }

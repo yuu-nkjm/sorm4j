@@ -1,13 +1,13 @@
 package org.nkjmlab.sorm4j;
 
-import static org.nkjmlab.sorm4j.mapping.OrmConfigStore.*;
+import static org.nkjmlab.sorm4j.mapping.ConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Function;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.mapping.ConfigStore;
+import org.nkjmlab.sorm4j.mapping.ConfigStoreBuilderImpl;
 import org.nkjmlab.sorm4j.mapping.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.mapping.DriverManagerConnectionSource;
-import org.nkjmlab.sorm4j.mapping.OrmConfigStore;
-import org.nkjmlab.sorm4j.mapping.OrmConfigStoreBuilderImpl;
 import org.nkjmlab.sorm4j.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.mapping.SormImpl;
 import org.nkjmlab.sorm4j.mapping.TypedOrmConnectionImpl;
@@ -22,22 +22,27 @@ public class SormFactory {
 
   private SormFactory() {};
 
-  private static OrmConfigStore configure(OrmConfigStore newConfigStore) {
-    return OrmConfigStore.refreshAndRegister(newConfigStore);
+  private static ConfigStore configure(ConfigStore newConfigStore) {
+    return ConfigStore.refreshAndRegister(newConfigStore);
   }
 
-  public static OrmConfigStore configure(String configName,
-      Function<OrmConfigStoreBuilderImpl, OrmConfigStore> buildOrmConfigStore) {
-    return configure(buildOrmConfigStore.apply(new OrmConfigStoreBuilderImpl(configName)));
+  public static ConfigStore registerNewConfigStore(String configName,
+      Function<ConfigStoreBuilder, ConfigStore> buildFunction) {
+    return configure(buildFunction.apply(new ConfigStoreBuilderImpl(configName)));
   }
 
-  public static OrmConfigStore updateDefaultConfigStore(
-      Function<OrmConfigStoreBuilderImpl, OrmConfigStore> buildOrmConfigStore) {
-    return configure(buildOrmConfigStore.apply(new OrmConfigStoreBuilderImpl(DEFAULT_CONFIG_NAME)));
+  public static ConfigStore registerNewModifiedConfigStore(String configName,
+      ConfigStore srcConfigStore, Function<ConfigStoreBuilder, ConfigStore> buildFunction) {
+    return configure(buildFunction.apply(new ConfigStoreBuilderImpl(configName, srcConfigStore)));
   }
 
-  public static OrmConfigStore resetDefaultConfigStore() {
-    return configure(OrmConfigStore.INITIAL_DEFAULT_CONFIG_STORE);
+  public static ConfigStore updateDefaultConfigStore(
+      Function<ConfigStoreBuilderImpl, ConfigStore> buildOrmConfigStore) {
+    return configure(buildOrmConfigStore.apply(new ConfigStoreBuilderImpl(DEFAULT_CONFIG_NAME)));
+  }
+
+  public static ConfigStore resetDefaultConfigStore() {
+    return configure(ConfigStore.INITIAL_DEFAULT_CONFIG_STORE);
   }
 
 
@@ -46,7 +51,7 @@ public class SormFactory {
   }
 
   public static Sorm create(ConnectionSource connectionSource, String configName) {
-    return new SormImpl(connectionSource, OrmConfigStore.get(configName));
+    return new SormImpl(connectionSource, ConfigStore.get(configName));
   }
 
   public static Sorm create(DataSource dataSource) {
@@ -67,29 +72,29 @@ public class SormFactory {
 
 
   public static OrmConnection getOrmConnection(Connection connection) {
-    return getOrmConnection(connection, OrmConfigStore.getDefaultConfigStore());
+    return getOrmConnection(connection, ConfigStore.getDefaultConfigStore());
   }
 
-  public static OrmConnection getOrmConnection(Connection connection, OrmConfigStore configStore) {
+  public static OrmConnection getOrmConnection(Connection connection, ConfigStore configStore) {
     return new OrmConnectionImpl(connection, configStore);
   }
 
   public static OrmConnection getOrmConnection(Connection connection, String configName) {
-    return getOrmConnection(connection, OrmConfigStore.get(configName));
+    return getOrmConnection(connection, ConfigStore.get(configName));
   }
 
   public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
       Class<T> objectClass) {
-    return getTypedOrmConnection(conn, objectClass, OrmConfigStore.getDefaultConfigStore());
+    return getTypedOrmConnection(conn, objectClass, ConfigStore.getDefaultConfigStore());
   }
 
   public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
       Class<T> objectClass, String configName) {
-    return getTypedOrmConnection(conn, objectClass, OrmConfigStore.get(configName));
+    return getTypedOrmConnection(conn, objectClass, ConfigStore.get(configName));
   }
 
   public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection connection,
-      Class<T> objectClass, OrmConfigStore options) {
+      Class<T> objectClass, ConfigStore options) {
     return new TypedOrmConnectionImpl<T>(objectClass, connection, options);
   }
 
@@ -103,9 +108,6 @@ public class SormFactory {
         conn.getConfigStore().getConfigName());
   }
 
-  public static OrmConfigStoreBuilder createConfigStoreBuilder(String newConfig) {
-    return new OrmConfigStoreBuilderImpl(newConfig);
-  }
 
   static ConnectionSource getConnectionSource(String jdbcUrl, String user, String password) {
     return new DriverManagerConnectionSource(jdbcUrl, user, password);

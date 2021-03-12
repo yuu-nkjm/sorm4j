@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.OrmException;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColum;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
@@ -49,14 +49,14 @@ abstract class Mapping<T> {
   final Object getValue(Object object, String columnName) {
     final Accessor acc = columnToAccessorMap.get(columnName);
     if (acc == null) {
-      throw new OrmException(format(
+      throw new SormException(format(
           "Error getting value from [{}] because column [{}] does not have a corresponding getter method or field access",
           object.getClass(), columnName));
     }
     try {
       return acc.get(object);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new OrmException(format(
+      throw new SormException(format(
           "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
           (object == null ? "null" : object.getClass().getName()), columnName,
           acc.getFormattedString(), object), e);
@@ -67,7 +67,7 @@ abstract class Mapping<T> {
   final void setValue(Object object, String columnName, Object value) {
     final Accessor acc = columnToAccessorMap.get(columnName);
     if (acc == null) {
-      throw new OrmException(StringUtils.format("Error setting value [{}]" + " of type [{}] in [{}]"
+      throw new SormException(StringUtils.format("Error setting value [{}]" + " of type [{}] in [{}]"
           + " because column [{}] does not have a corresponding setter method or field access =>[{}]",
           value, value.getClass().getSimpleName(), object.getClass().getName(), columnName,
           columnToAccessorMap.keySet()));
@@ -75,7 +75,7 @@ abstract class Mapping<T> {
     try {
       acc.set(object, value);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new OrmException(format(
+      throw new SormException(format(
           "Could not set a value for column [{}] to instance of [{}] with [{}]. The value is=[{}]",
           columnName, object == null ? "null" : object.getClass().getSimpleName(),
           acc.getFormattedString(), value), e);

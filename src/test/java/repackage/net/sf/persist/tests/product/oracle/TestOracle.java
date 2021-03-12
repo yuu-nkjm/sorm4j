@@ -24,7 +24,7 @@ public class TestOracle {
   static void beforAll() {
     try {
 
-      ormSrv.apply(conn -> {
+      ormSrv.accept(conn -> {
         String sql = String.join(System.lineSeparator(), Files
             .readAllLines(new File(TestOracle.class.getResource("oracle.sql").toURI()).toPath()));
         conn.executeUpdate(sql);
@@ -52,7 +52,7 @@ public class TestOracle {
         .addField(new FieldMap("nvarchar2Col").setTypes(stringTypes).setSize(255))
         .addField(new FieldMap("varchar2Col").setTypes(stringTypes).setSize(255));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class TestOracle {
             .addField(new FieldMap("binaryFloatCol").setTypes(floatTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("binaryDoubleCol").setTypes(doubleTypes).setBoundaries(0, 9999));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -81,7 +81,7 @@ public class TestOracle {
         .addField(
             new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -100,7 +100,7 @@ public class TestOracle {
         .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(1024)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
 }

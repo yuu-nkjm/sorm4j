@@ -91,7 +91,7 @@ public interface OrmMapReader {
 
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
-   * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link OrmException}
+   * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
    * is thrown.
    */
   Map<String, Object> readMapOne(String sql, Object... parameters);

@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.mapping;
 
-import static org.nkjmlab.sorm4j.mapping.OrmConfigStore.*;
 import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -19,7 +18,7 @@ import org.nkjmlab.sorm4j.util.Try;
  */
 public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
-  public OrmConnectionImpl(Connection connection, OrmConfigStore options) {
+  public OrmConnectionImpl(Connection connection, ConfigStore options) {
     super(connection, options);
   }
 
@@ -57,18 +56,17 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
   @Override
   public void begin() {
-    begin(OrmConfigStore.DEFAULT_ISOLATION_LEVEL);
+    begin(getTransactionIsolationLevel());
   }
 
   private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
-        Try::rethrow);
+    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
   }
 
   @Override
   public void runTransaction(Consumer<OrmConnection> handler) {
     setAutoCommit(false);
-    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    setTransactionIsolation(getTransactionIsolationLevel());
     handler.accept(this);
     rollback();
   }
@@ -76,7 +74,7 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   @Override
   public <R> R executeTransaction(Function<OrmConnection, R> handler) {
     setAutoCommit(false);
-    setTransactionIsolation(DEFAULT_ISOLATION_LEVEL);
+    setTransactionIsolation(getTransactionIsolationLevel());
     R ret = handler.apply(this);
     rollback();
     return ret;

@@ -18,18 +18,18 @@ import org.nkjmlab.sorm4j.util.DebugPointFactory;
 
 class OrmConnectionTest {
 
-  private Sorm srv;
+  private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    srv = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(srv, Guest.class);
-    SormTestUtils.dropAndCreateTable(srv, Player.class);
+    sorm = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
+    SormTestUtils.dropAndCreateTable(sorm, Player.class);
   }
 
   @Test
   void testClose() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.close();
       try {
         assertThat(m.getJdbcConnection().isClosed()).isTrue();
@@ -43,20 +43,20 @@ class OrmConnectionTest {
   @Test
   void testCommint() {
     Guest a = SormTestUtils.GUEST_ALICE;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.begin();
       m.insert(a);
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
       // auto roll-back;
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.begin();
       m.insert(a);
       m.commit();
       m.close();
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
     });
@@ -64,7 +64,7 @@ class OrmConnectionTest {
 
   @Test
   void testDeleteOnStringT() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insertOn("players1", a);
@@ -77,7 +77,7 @@ class OrmConnectionTest {
 
   @Test
   void testDeleteT() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
@@ -104,17 +104,17 @@ class OrmConnectionTest {
 
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGet(new Guest[] {});
       assertThat(g.getRowsModified()[0]).isEqualTo(0);
     });
 
 
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", a);
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
@@ -126,15 +126,15 @@ class OrmConnectionTest {
 
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", List.of());
       assertThat(g.getRowsModified()[0]).isEqualTo(0);
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGet(List.of(a));
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", List.of(a));
       assertThat(g.getObject().getId()).isEqualTo(1);
     });
@@ -144,7 +144,7 @@ class OrmConnectionTest {
   void testInsertAndGetOnStringT0() {
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGet(a, b);
       assertThat(g.getObject().getId()).isEqualTo(2);
     });
@@ -154,7 +154,7 @@ class OrmConnectionTest {
   void testInsertAndGetOnStringT1() {
     Guest a = SormTestUtils.GUEST_ALICE;
     Guest b = SormTestUtils.GUEST_BOB;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", a, b);
       assertThat(g.getObject().getId()).isEqualTo(2);
     });
@@ -164,7 +164,7 @@ class OrmConnectionTest {
 
   @Test
   void testInsertAndRead() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Guest a = SormTestUtils.GUEST_ALICE;
       m.insert(a);
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
@@ -177,7 +177,7 @@ class OrmConnectionTest {
 
   @Test
   void testInsertOnStringT() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insertOn("players1", a, b);
@@ -185,7 +185,7 @@ class OrmConnectionTest {
       m.deleteAllOn("players1");
       assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insertOn("players1", List.of(a, b));
@@ -200,7 +200,7 @@ class OrmConnectionTest {
   void testExec() {
     Player a = SormTestUtils.PLAYER_ALICE;
     String sql = "select * from players where id=?";
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.insert(a);
       m.execute(sql, 1);
       m.executeQuery(sql, 1);
@@ -216,24 +216,24 @@ class OrmConnectionTest {
   @Test
   void testMergeError() {
     try {
-      srv.apply(m -> {
+      sorm.accept(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         m.merge(a);
-        failBecauseExceptionWasNotThrown(OrmException.class);
+        failBecauseExceptionWasNotThrown(SormException.class);
       });
-    } catch (OrmException e) {
+    } catch (SormException e) {
       assertThat(e.getMessage()).contains("autogenerated");
     }
   }
 
   @Test
   void testMergeOnT() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.mergeOn("players1", new Player[] {});
       m.merge(new Player[] {});
     });
 
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.mergeOn("players1", a);
@@ -248,20 +248,20 @@ class OrmConnectionTest {
   @Test
   void testMergesError() {
     try {
-      srv.apply(m -> {
+      sorm.accept(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         Guest b = SormTestUtils.GUEST_BOB;
         m.merge(a, b);
-        failBecauseExceptionWasNotThrown(OrmException.class);
+        failBecauseExceptionWasNotThrown(SormException.class);
       });
-    } catch (OrmException e) {
+    } catch (SormException e) {
       assertThat(e.getMessage()).contains("autogenerated");
     }
   }
 
   @Test
   void testMergeT() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.merge(a);
@@ -278,7 +278,7 @@ class OrmConnectionTest {
   void testReadLazy() {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_BOB;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.insert(List.of(a, b));
       Map<String, Object> map =
           m.readLazy(Player.class, SqlStatement.of("select * from players")).toMapList().get(0);
@@ -299,7 +299,7 @@ class OrmConnectionTest {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_BOB;
 
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.insert(a);
 
       Map<String, Object> map = m.readAllLazy(Player.class).oneMap();
@@ -389,34 +389,34 @@ class OrmConnectionTest {
       assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
           .isEqualTo(a.readAddress());
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Map<String, Object> map = m.readMapLazy("select * from players").toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Map<String, Object> map = m.readMapList(SqlStatement.of("select * from players")).get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Map<String, Object> map =
           m.readMapOne(SqlStatement.of("select * from players where id=?", 1));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Map<String, Object> map =
           m.readMapLazy(SqlStatement.of("select * from players")).toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
 
-    srv.apply(m -> {
+    sorm.accept(m -> {
       try {
         m.readAllLazy(Player.class).oneMap();
-        failBecauseExceptionWasNotThrown(OrmException.class);
-      } catch (OrmException e) {
+        failBecauseExceptionWasNotThrown(SormException.class);
+      } catch (SormException e) {
         assertThat(e.getMessage()).contains("Non-unique");
       }
     });
@@ -426,7 +426,7 @@ class OrmConnectionTest {
 
   @Test
   void testReadByPrimaryKey() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Guest a = SormTestUtils.GUEST_ALICE;
       m.insert(a);
       Guest g = m.readByPrimaryKey(Guest.class, 1);
@@ -437,7 +437,7 @@ class OrmConnectionTest {
 
   @Test
   void testReadList() {
-    srv.apply(m -> {
+    sorm.accept(m -> {
       Player a = SormTestUtils.PLAYER_ALICE;
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
@@ -454,7 +454,7 @@ class OrmConnectionTest {
   @Test
   void testReadOne() {
     try {
-      srv.apply(m -> {
+      sorm.accept(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         Guest b = SormTestUtils.GUEST_BOB;
         m.insert(a);
@@ -463,9 +463,9 @@ class OrmConnectionTest {
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(Guest.class, SqlStatement.of("select * from guests"));
-        failBecauseExceptionWasNotThrown(OrmException.class);
+        failBecauseExceptionWasNotThrown(SormException.class);
       });
-    } catch (OrmException e) {
+    } catch (SormException e) {
       assertThat(e.getCause().getMessage()).contains("Non-unique");
     }
 
@@ -486,7 +486,7 @@ class OrmConnectionTest {
   @Test
   void testTransaction() {
     Guest a = SormTestUtils.GUEST_ALICE;
-    srv.applyTransaction(m -> {
+    sorm.acceptTransactionHandler(m -> {
       m.insert(a);
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
@@ -497,11 +497,24 @@ class OrmConnectionTest {
 
   @Test
   void testTransactionLevel() {
-    Guest a = SormTestUtils.GUEST_ALICE;
-    srv.applyTransaction(Guest.class, Connection.TRANSACTION_SERIALIZABLE, m -> {
-      m.insert(a);
-      Guest g = m.readFirst("SELECT * FROM GUESTS");
-      assertThat(g.getAddress()).isEqualTo(a.getAddress());
+
+    SormFactory.registerNewModifiedConfigStore("isolev", sorm.getConfigStore(),
+        b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build());
+
+    try {
+      sorm.createWith("isole").acceptTransactionHandler(Guest.class, m -> {
+      });
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("is not registered");
+    }
+    sorm.createWith("isolev").acceptTransactionHandler(Guest.class, m -> {
+      assertThat(m.getJdbcConnection().getTransactionIsolation())
+          .isEqualTo(Connection.TRANSACTION_SERIALIZABLE);
+    });
+    sorm.acceptTransactionHandler(Guest.class, m -> {
+      assertThat(m.getJdbcConnection().getTransactionIsolation())
+          .isEqualTo(Connection.TRANSACTION_READ_COMMITTED);
     });
   }
 
@@ -510,7 +523,7 @@ class OrmConnectionTest {
   void testUpdateOnT() {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_ALICE;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.insert(a);
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"));
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"),
@@ -528,7 +541,7 @@ class OrmConnectionTest {
   void testUpdateT() {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_ALICE;
-    srv.apply(m -> {
+    sorm.accept(m -> {
       m.insert(a);
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"));
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"),

@@ -1,5 +1,8 @@
 package org.nkjmlab.sorm4j.mapping.extension;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -8,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import org.nkjmlab.sorm4j.util.Try;
 
 /**
  * Default implementation of {@link SqlParameterSetter}
@@ -43,6 +47,7 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameter parameters values
    * @throws SQLException
+   * @throws IOException
    *
    */
   protected void setParameter(PreparedStatement stmt, int column, Object parameter)
@@ -63,6 +68,12 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
       stmt.setClob(column, (Clob) parameter);
     } else if (parameter instanceof Blob) {
       stmt.setBlob(column, (Blob) parameter);
+    } else if (parameter instanceof java.io.Reader) {
+      final java.io.Reader reader = (java.io.Reader) parameter;
+      stmt.setCharacterStream(column, reader, getSize(reader));
+    } else if (parameter instanceof java.io.InputStream) {
+      final java.io.InputStream inputStream = (java.io.InputStream) parameter;
+      stmt.setBinaryStream(column, inputStream, getSize(inputStream));
     } else {
       final String typeName = type.getName();
       switch (typeName) {
@@ -138,6 +149,34 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
   }
 
 
+
+  private static final int getSize(InputStream inputStream) {
+    try {
+      int size = 0;
+      inputStream.reset();
+      while (inputStream.read() != -1) {
+        size++;
+      }
+      inputStream.reset();
+      return size;
+    } catch (IOException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  private static final int getSize(Reader reader) {
+    try {
+      int size = 0;
+      reader.reset();
+      while (reader.read() != -1) {
+        size++;
+      }
+      reader.reset();
+      return size;
+    } catch (IOException e) {
+      throw Try.rethrow(e);
+    }
+  }
 
   protected void procArray(Class<?> type, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {

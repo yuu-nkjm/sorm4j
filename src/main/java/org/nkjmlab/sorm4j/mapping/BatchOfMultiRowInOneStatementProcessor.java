@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.util.Try.ThrowableFunction;
 
 /**
  * A sql statement processor for multirow update and batch. This object could be set ormapper via
- * {@link OrmConfigStore}
+ * {@link ConfigStore}
  *
  * @author nkjm
  *

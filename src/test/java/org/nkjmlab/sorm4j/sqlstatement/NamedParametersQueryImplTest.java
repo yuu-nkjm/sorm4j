@@ -20,7 +20,7 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testToSqlStatement() {
-    sorm.apply(Player.class, con -> {
+    sorm.accept(Player.class, con -> {
       con.insert(PLAYER_ALICE);
       SqlStatement ret =
           con.createNamedParametersQuery("select * from players where id=:id and name=:name")
@@ -32,7 +32,7 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testBindAll() {
-    sorm.apply(Player.class, con -> {
+    sorm.accept(Player.class, con -> {
       con.insert(PLAYER_ALICE);
       Player ret =
           con.createNamedParametersQuery("select * from players where id=:id and name=:name")
@@ -43,7 +43,7 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testBind() {
-    sorm.apply(Player.class, con -> {
+    sorm.accept(Player.class, con -> {
       con.insert(PLAYER_ALICE);
       Player ret = con.createNamedParametersQuery("select * from players where id=:id")
           .bind("id", 1).readFirst();

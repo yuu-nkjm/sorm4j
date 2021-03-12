@@ -28,7 +28,7 @@ class TableMappingTest {
   @Test
   void testGetValue() {
     try {
-      sormImpl.apply(Guest.class, m -> {
+      sormImpl.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new Guest(), "hoge");
       });
@@ -37,7 +37,7 @@ class TableMappingTest {
     }
 
     try {
-      sormImpl.apply(Guest.class, m -> {
+      sormImpl.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new String(), "id");
       });
@@ -53,20 +53,20 @@ class TableMappingTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
         .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
     try {
-      sormImpl.apply(Guest.class, m -> {
+      sormImpl.accept(Guest.class, m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Fail to insert and get");
+      assertThat(e.getMessage()).contains("Mock exception");
     }
   }
 
   @Test
   void testSetValue() {
     try {
-      sormImpl.apply(Guest.class, m -> {
+      sormImpl.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "hoge", 0);
       });
@@ -74,7 +74,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("does not have a corresponding");
     }
     try {
-      sormImpl.apply(Guest.class, m -> {
+      sormImpl.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "id", "String");
       });
@@ -82,7 +82,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
-      sormImpl.apply(Player.class, m -> {
+      sormImpl.accept(Player.class, m -> {
         TableMapping<Player> tm = getTableMapping(m, Player.class);
         tm.setValue(new Player(), "name", 1);
       });
@@ -93,14 +93,14 @@ class TableMappingTest {
 
   @Test
   void testCol() {
-    sormImpl.apply(Guest.class, m -> {
+    sormImpl.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getAllColumns())
           .containsAll(List.of("ID", "NAME", "ADDRESS"));
     });
-    sormImpl.apply(Guest.class, m -> {
+    sormImpl.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getPrimaryKeys()).containsAll(List.of("ID"));
     });
-    sormImpl.apply(Guest.class, m -> {
+    sormImpl.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
     });
   }

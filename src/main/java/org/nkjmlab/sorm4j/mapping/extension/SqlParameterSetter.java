@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.mapping.extension;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -17,6 +18,7 @@ public interface SqlParameterSetter {
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameters parameters values
    * @throws SQLException
+   * @throws IOException
    *
    */
   void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException;

@@ -13,7 +13,7 @@ class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<
 
   protected Class<T> objectClass;
 
-  public TypedOrmMapperImpl(Class<T> objectClass, Connection connection, OrmConfigStore options) {
+  public TypedOrmMapperImpl(Class<T> objectClass, Connection connection, ConfigStore options) {
     super(connection, options);
     this.objectClass = objectClass;
   }

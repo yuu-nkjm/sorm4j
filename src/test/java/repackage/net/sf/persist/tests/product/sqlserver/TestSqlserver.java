@@ -23,7 +23,7 @@ public class TestSqlserver {
   @BeforeAll
   static void beforAll() {
     try {
-      ormSrv.apply(conn -> {
+      ormSrv.accept(conn -> {
         String sql = String.join(System.lineSeparator(), Files.readAllLines(
             new File(TestSqlserver.class.getResource("sqlserver.sql").toURI()).toPath()));
         conn.executeUpdate(sql);
@@ -51,7 +51,7 @@ public class TestSqlserver {
         .addField(new FieldMap("ntextCol").setTypes(clobTypes).setSize(4096)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -79,7 +79,7 @@ public class TestSqlserver {
             .addField(new FieldMap("floatCol").setTypes(floatTypes).setBoundaries(0, 9999))
             .addField(new FieldMap("realCol").setTypes(floatTypes).setBoundaries(0, 9999));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -94,7 +94,7 @@ public class TestSqlserver {
             .setTypes(java.sql.Timestamp.class, java.util.Date.class)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
   @Test
@@ -108,7 +108,7 @@ public class TestSqlserver {
         .addField(new FieldMap("imageCol").setTypes(binaryTypes).setSize(16384)
             .setSupportsQueryByValue(false));
 
-    BeanTest.test(getClass(), ormSrv.getConnection(), beanMap);
+    BeanTest.test(getClass(), ormSrv.openConnection(), beanMap);
   }
 
 

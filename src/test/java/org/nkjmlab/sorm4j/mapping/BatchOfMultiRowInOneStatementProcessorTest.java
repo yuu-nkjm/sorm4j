@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmConfigStoreBuilder;
+import org.nkjmlab.sorm4j.ConfigStoreBuilder;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.tool.Guest;
@@ -30,13 +30,13 @@ class BatchOfMultiRowInOneStatementProcessorTest {
     DebugPointFactory.on();
     DebugPointFactory.off();
     DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true));
-    OrmConfigStore conf = SormFactory.configure("BATCH_CONF", builder -> builder
-        .setMultiRowProcessorType(OrmConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+    ConfigStore conf = SormFactory.registerNewConfigStore("BATCH_CONF", builder -> builder
+        .setMultiRowProcessorType(ConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
         .build());
 
     sorm = SormTestUtils.createSorm(conf.getConfigName());
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.applyAndGet(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
 
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
@@ -52,19 +52,19 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsert() {
-    sorm.apply(Player.class, conn -> conn.insert(a, b));
+    sorm.accept(Player.class, conn -> conn.insert(a, b));
   }
 
   @Test
   void testMultiRowInsertNull() {
     try {
-      sorm.apply(Player.class, conn -> conn.insert(a, b, c, a));
+      sorm.accept(Player.class, conn -> conn.insert(a, b, c, a));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Unique index or primary key violation");
     }
     try {
-      sorm.apply(Player.class, conn -> conn.insert(a, b, null));
+      sorm.accept(Player.class, conn -> conn.insert(a, b, null));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Fail to get value from");
@@ -73,13 +73,13 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sorm.apply(Guest.class, conn -> conn
+    sorm.accept(Guest.class, conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.apply(Player.class, conn -> conn.merge(a, b, c));
+    sorm.accept(Player.class, conn -> conn.merge(a, b, c));
   }
 
 
