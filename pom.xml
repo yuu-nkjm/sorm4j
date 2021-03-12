@@ -149,24 +149,11 @@
       <version>1.4.200</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.sql2o/sql2o -->
-    <dependency>
-      <groupId>org.sql2o</groupId>
-      <artifactId>sql2o</artifactId>
-      <version>1.6.0</version>
-      <scope>test</scope>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
       <version>4.0.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sf</groupId>
-      <artifactId>persist</artifactId>
-      <version>20110501-with-src</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
