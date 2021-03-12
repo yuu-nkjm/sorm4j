@@ -5,8 +5,6 @@ import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.Condition;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.OrderBy;
 import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 

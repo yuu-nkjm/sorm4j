@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConnectionSource;
-import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.core.util.Try;
 
 /**

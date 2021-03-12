@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.core.util.DebugPoint;
 import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.core.util.Try;

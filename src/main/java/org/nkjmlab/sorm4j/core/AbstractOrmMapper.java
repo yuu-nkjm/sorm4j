@@ -30,7 +30,8 @@ import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 
 abstract class AbstractOrmMapper implements SqlExecutor {
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log =
+      org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
 
   private final ColumnFieldMapper fieldMapper;
@@ -364,7 +365,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final PreparedStatement stmt = getPreparedStatement(connection, sql);
       sqlParameterSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      @SuppressWarnings({"unchecked", "rawtypes", "resource"})
+      @SuppressWarnings({"unchecked", "rawtypes"})
       LazyResultSet<Map<String, Object>> ret =
           (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, LinkedHashMap.class,
               stmt, resultSet);

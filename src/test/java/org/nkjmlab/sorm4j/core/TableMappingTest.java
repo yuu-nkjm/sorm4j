@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.core.AbstractOrmMapper;
-import org.nkjmlab.sorm4j.core.TableMapping;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Location;
 import org.nkjmlab.sorm4j.tool.Player;

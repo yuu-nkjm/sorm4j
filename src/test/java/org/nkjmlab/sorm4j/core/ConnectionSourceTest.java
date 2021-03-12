@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.core.DataSourceConnectionSource;
 
 class ConnectionSourceTest {
 

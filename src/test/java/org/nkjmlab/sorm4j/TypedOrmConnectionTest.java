@@ -505,10 +505,6 @@ class TypedOrmConnectionTest {
 
   }
 
-  @Test
-  void testTransactionLevel() {
-    Guest a = SormTestUtils.GUEST_ALICE;
-  }
 
   @Test
   void testEnum() {

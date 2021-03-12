@@ -5,8 +5,6 @@ import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.Condition;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.OrderBy;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
