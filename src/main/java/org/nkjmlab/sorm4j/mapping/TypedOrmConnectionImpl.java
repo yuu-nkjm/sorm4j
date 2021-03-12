@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
@@ -64,24 +62,6 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     setAutoCommit(false);
     setTransactionIsolation(transactionIsolationLevel);
   }
-
-  @Override
-  public void runTransaction(Consumer<TypedOrmConnection<T>> handler) {
-    setAutoCommit(false);
-    setTransactionIsolation(getTransactionIsolationLevel());
-    handler.accept(this);
-    rollback();
-  }
-
-  @Override
-  public <R> R executeTransaction(Function<TypedOrmConnection<T>, R> handler) {
-    setAutoCommit(false);
-    setTransactionIsolation(getTransactionIsolationLevel());
-    R ret = handler.apply(this);
-    rollback();
-    return ret;
-  }
-
 
   @Override
   public void begin() {

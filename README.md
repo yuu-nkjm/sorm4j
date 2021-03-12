@@ -16,12 +16,15 @@ You can get the binary using Maven from [Central Repository](http://mvnrepositor
 <dependency>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>1.0.0-rc2</version>
+  <version>1.0.0-rc4</version>
 </dependency>
 ```
 
 ## Website
 Check out the [Sorm4j website](https://scrapbox.io/sorm4j/) for quick start guide and examples.
+
+## Versioning
+This project uses [Semantic Versioning](https://semver.org/).
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).

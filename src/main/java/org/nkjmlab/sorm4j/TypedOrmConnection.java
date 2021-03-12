@@ -1,12 +1,10 @@
 package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import org.nkjmlab.sorm4j.mapping.ConfigStore;
-import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 
 /**
  * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},
@@ -19,19 +17,15 @@ import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
 public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
     SqlExecutor, TransactionFunction, Closeable, AutoCloseable {
 
-  void runTransaction(Consumer<TypedOrmConnection<T>> handler);
+  NamedParameterQuery<T> createNamedParametersQuery(String sql);
 
-  <R> R executeTransaction(Function<TypedOrmConnection<T>, R> handler);
+  OrderedParameterQuery<T> createOrderedParametersQuery(String sql);
+
+  SelectQuery<T> createSelectQuery();
 
   ConfigStore getConfigStore();
 
   String getTableName();
-
-  SelectQuery<T> createSelectQuery();
-
-  NamedParameterQuery<T> createNamedParametersQuery(String sql);
-
-  OrderedParameterQuery<T> createOrderedParametersQuery(String sql);
 
 
 }

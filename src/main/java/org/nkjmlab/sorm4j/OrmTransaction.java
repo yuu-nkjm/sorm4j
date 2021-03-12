@@ -1,5 +1,11 @@
 package org.nkjmlab.sorm4j;
 
+/**
+ * An transaction with object relation mapping.
+ *
+ * @author nkjm
+ *
+ */
 public interface OrmTransaction extends OrmConnection {
 
   /**

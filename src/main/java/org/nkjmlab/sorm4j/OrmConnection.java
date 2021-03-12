@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import org.nkjmlab.sorm4j.mapping.ConfigStore;
 
 /**
@@ -14,10 +12,6 @@ import org.nkjmlab.sorm4j.mapping.ConfigStore;
  */
 public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlExecutor,
     TransactionFunction, Closeable, AutoCloseable {
-
-  void runTransaction(Consumer<OrmConnection> handler);
-
-  <R> R executeTransaction(Function<OrmConnection, R> handler);
 
   ConfigStore getConfigStore();
 

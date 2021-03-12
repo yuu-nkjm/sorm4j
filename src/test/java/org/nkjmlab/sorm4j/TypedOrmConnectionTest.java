@@ -114,38 +114,6 @@ class TypedOrmConnectionTest {
 
     sorm.accept(Guest.class, conn -> {
 
-      conn.executeTransaction(tr -> {
-        return 1;
-      });
-
-
-      OrmConnection orm = SormFactory.toUntyped(conn);
-      SormFactory.toTyped(orm, Guest.class);
-      orm.runTransaction(tr -> {
-        tr.insert(GUEST_ALICE);
-        Guest g = tr.readFirst(Guest.class, "SELECT * FROM GUESTS");
-        assertThat(g.getAddress()).isEqualTo(GUEST_ALICE.getAddress());
-        g = tr.readFirst(Guest.class, SqlStatement.of("SELECT * FROM GUESTS"));
-        assertThat(g.getAddress()).isEqualTo(GUEST_ALICE.getAddress());
-      });
-      orm.executeTransaction(tr -> {
-        tr.insert(GUEST_ALICE);
-        Guest g = tr.readFirst(Guest.class, "SELECT * FROM GUESTS");
-        assertThat(g.getAddress()).isEqualTo(GUEST_ALICE.getAddress());
-        g = tr.readFirst(Guest.class, SqlStatement.of("SELECT * FROM GUESTS"));
-        assertThat(g.getAddress()).isEqualTo(GUEST_ALICE.getAddress());
-        tr.commit();
-        return 1;
-      });
-
-      orm.runTransaction(tr -> {
-        try {
-          tr.insert(GUEST_ALICE, null);
-          failBecauseExceptionWasNotThrown(Exception.class);
-        } catch (Exception e) {
-          assertThat(e.getMessage()).contains("it is null");
-        }
-      });
 
 
     });
@@ -569,11 +537,6 @@ class TypedOrmConnectionTest {
     } catch (SQLException e) {
       fail();
     }
-
-    sorm.accept(Player.class, m -> m.runTransaction(conn -> {
-      m.insert(a);
-      // auto-rolback
-    }));
 
 
     sorm.accept(Player.class, m -> {

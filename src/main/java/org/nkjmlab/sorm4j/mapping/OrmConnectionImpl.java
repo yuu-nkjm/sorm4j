@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.Connection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.util.Try;
 
@@ -63,21 +61,5 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
     Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
   }
 
-  @Override
-  public void runTransaction(Consumer<OrmConnection> handler) {
-    setAutoCommit(false);
-    setTransactionIsolation(getTransactionIsolationLevel());
-    handler.accept(this);
-    rollback();
-  }
-
-  @Override
-  public <R> R executeTransaction(Function<OrmConnection, R> handler) {
-    setAutoCommit(false);
-    setTransactionIsolation(getTransactionIsolationLevel());
-    R ret = handler.apply(this);
-    rollback();
-    return ret;
-  }
 
 }

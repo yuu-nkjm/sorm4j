@@ -10,7 +10,7 @@ public final class DebugPointFactory {
   private DebugPointFactory() {}
 
   public enum Name {
-    MAPPING, READ, LOAD_OBJECT, EXECUTE_BATCH, EXECUTE_UPDATE;
+    READ, EXECUTE_BATCH, EXECUTE_UPDATE;
   }
 
   private static final Map<Name, Boolean> modes = new EnumMap<>(Name.class);

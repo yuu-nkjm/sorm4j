@@ -98,17 +98,6 @@ public class SormFactory {
     return new TypedOrmConnectionImpl<T>(objectClass, connection, options);
   }
 
-  public static OrmConnection toUntyped(TypedOrmConnection<?> conn) {
-    return SormFactory.getOrmConnection(conn.getJdbcConnection(),
-        conn.getConfigStore().getConfigName());
-  }
-
-  public static <T> TypedOrmConnection<T> toTyped(OrmConnection conn, Class<T> objectClass) {
-    return SormFactory.getTypedOrmConnection(conn.getJdbcConnection(), objectClass,
-        conn.getConfigStore().getConfigName());
-  }
-
-
   static ConnectionSource getConnectionSource(String jdbcUrl, String user, String password) {
     return new DriverManagerConnectionSource(jdbcUrl, user, password);
   }

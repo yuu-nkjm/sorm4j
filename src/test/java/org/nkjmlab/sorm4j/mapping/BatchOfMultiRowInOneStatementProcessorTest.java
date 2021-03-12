@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,10 +28,10 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   static void setUp() {
     DebugPointFactory.on();
     DebugPointFactory.off();
-    DebugPointFactory.setModes(Map.of(DebugPointFactory.Name.MAPPING, true));
-    ConfigStore conf = SormFactory.registerNewConfigStore("BATCH_CONF", builder -> builder
-        .setMultiRowProcessorType(ConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
-        .build());
+    ConfigStore conf = SormFactory.registerNewConfigStore("BATCH_CONF",
+        builder -> builder
+            .setMultiRowProcessorType(ConfigStoreBuilder.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+            .build());
 
     sorm = SormTestUtils.createSorm(conf.getConfigName());
     SormTestUtils.dropAndCreateTableAll(sorm);

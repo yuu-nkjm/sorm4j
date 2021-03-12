@@ -1,5 +1,7 @@
 package org.nkjmlab.sorm4j;
 
+import org.nkjmlab.sorm4j.mapping.ConfigStore;
+
 /**
  * Functions of handling transaction.
  *
@@ -7,6 +9,20 @@ package org.nkjmlab.sorm4j;
  *
  */
 public interface TransactionFunction {
+
+  /**
+   * Begin transaction. The isolation level is corresponding to
+   * {@link ConfigStore#getTransactionIsolationLevel()}.
+   */
+  void begin();
+
+  /**
+   * Begins transaction with the given transaction isolation level.
+   *
+   * @param isolationLevel
+   */
+
+  void begin(int isolationLevel);
 
   /**
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
@@ -40,10 +56,6 @@ public interface TransactionFunction {
    *
    */
   void setAutoCommit(boolean autoCommit);
-
-  void begin(int isolationLevel);
-
-  void begin();
 
 
 }
