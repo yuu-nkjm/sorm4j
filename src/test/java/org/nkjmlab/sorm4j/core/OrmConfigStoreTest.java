@@ -37,8 +37,8 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      SormFactory.registerNewConfig(NEW_CONFIG, b -> b.setMultiRowProcessorType(null)
-          .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30));
+      SormFactory.registerConfig(NEW_CONFIG, b -> b.setMultiRowProcessorType(null).setBatchSize(10)
+          .setMultiRowSize(20).setBatchSizeWithMultiRow(30));
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
@@ -48,7 +48,7 @@ class OrmConfigStoreTest {
   @Test
   void testOrmConfigStore() {
 
-    SormFactory.registerNewConfig(NEW_CONFIG,
+    SormFactory.registerConfig(NEW_CONFIG,
         b -> b.setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
             .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
             .setResultSetConverter(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER)
@@ -76,8 +76,6 @@ class OrmConfigStoreTest {
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
 
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
-    SormFactory.resetDefaultConfig();
-    assertThat(s.toString()).contains(MultiRowInOneStatementProcessor.class.getSimpleName());
   }
 
   @Test
@@ -91,7 +89,6 @@ class OrmConfigStoreTest {
     sormImpl = SormFactory.create(jdbcUrl, user, password);
     assertThat(sormImpl.getConfigStore().getConfigName())
         .isEqualTo(ConfigStore.DEFAULT_CONFIG_NAME);
-    SormFactory.resetDefaultConfig();
   }
 
 }

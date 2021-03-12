@@ -138,8 +138,8 @@ public interface Sorm {
 
   /**
    * Creates a Sorm object with the given config name. The config name should be registered by
-   * {@link SormFactory#registerNewConfig(String, java.util.function.Consumer)} or
-   * {@link SormFactory#registerNewModifiedConfig(String, Sorm, java.util.function.Consumer)}
+   * {@link SormFactory#registerConfig(String, java.util.function.Consumer)} or
+   * {@link SormFactory#registerModifiedConfig(String, Sorm, java.util.function.Consumer)}
    *
    * @param configName
    * @return
@@ -152,6 +152,7 @@ public interface Sorm {
    * @return
    */
   ConfigStore getConfigStore();
+
 
   /**
    * Gets {@link ConnectionSource}.
@@ -207,7 +208,6 @@ public interface Sorm {
    * @return
    */
   <T> TypedOrmTransaction<T> openTransaction(Class<T> objectClass);
-
 
 
 }

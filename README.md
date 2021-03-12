@@ -8,7 +8,7 @@ Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM 
 Sorm4j instance wraps a `java.sql.Connection` object. Sorm4j has only one dependency on a logging facade (SLF4J). Sorm4j is tested and evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. It means this tool is flexible and can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
 
 
-## Quickstart
+## Central maven repository
 
 You can get the binary using Maven from [Central Repository](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j)
 
@@ -23,8 +23,20 @@ You can get the binary using Maven from [Central Repository](http://mvnrepositor
 ## Website
 Check out the [Sorm4j website](https://scrapbox.io/sorm4j/) for quick start guide and examples.
 
+- [Quickstart](https://scrapbox.io/sorm4j/Quickstart)
+- [Examples](https://scrapbox.io/sorm4j/Examples)
+- [Performance](https://scrapbox.io/sorm4j/Performance)
+
 ## Versioning
 This project uses [Semantic Versioning](https://semver.org/).
+
+The interfaces and classes are public API.
+
+ - org.nkjmlab.sorm4j	
+ - org.nkjmlab.sorm4j.annotation	
+ - org.nkjmlab.sorm4j.extension	
+ - org.nkjmlab.sorm4j.result	
+ - org.nkjmlab.sorm4j.sqlstatement	
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).

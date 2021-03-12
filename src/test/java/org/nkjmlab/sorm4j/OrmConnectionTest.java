@@ -499,7 +499,7 @@ class OrmConnectionTest {
   @Test
   void testTransactionLevel() {
 
-    SormFactory.registerNewModifiedConfig("isolev", sorm,
+    SormFactory.registerModifiedConfig("isolev", sorm,
         b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
     try {

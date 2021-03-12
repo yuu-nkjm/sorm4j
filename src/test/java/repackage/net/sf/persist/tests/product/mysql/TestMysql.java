@@ -45,7 +45,7 @@ public class TestMysql {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection persist = SormFactory.getOrmConnection(conn);
+      OrmConnection persist = SormFactory.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
@@ -71,7 +71,7 @@ public class TestMysql {
   public void testNumericTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection persist = SormFactory.getOrmConnection(conn);
+      OrmConnection persist = SormFactory.toOrmConnection(conn);
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
       Class<?>[] byteTypes = new Class<?>[] {Byte.class, byte.class};
@@ -100,7 +100,7 @@ public class TestMysql {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection persist = SormFactory.getOrmConnection(conn);
+      OrmConnection persist = SormFactory.toOrmConnection(conn);
 
       // not testing timestamp here, it doesn't support null values
       BeanMap beanMap = new BeanMap("DatetimeTypes")
@@ -121,7 +121,7 @@ public class TestMysql {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection persist = SormFactory.getOrmConnection(conn);
+      OrmConnection persist = SormFactory.toOrmConnection(conn);
 
       Class<?>[] binaryTypes =
           new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};

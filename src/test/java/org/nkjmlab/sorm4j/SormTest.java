@@ -158,7 +158,7 @@ class SormTest {
       tr.commit();
     }
     srv.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -171,7 +171,7 @@ class SormTest {
       // auto-rollback
     }
     srv.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmConnection tr = srv.openTransaction()) {
       tr.begin();
@@ -179,7 +179,7 @@ class SormTest {
       tr.commit();
     }
     srv.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.getTypedOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
+      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
     });
   }
 

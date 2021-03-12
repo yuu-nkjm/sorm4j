@@ -21,56 +21,11 @@ import org.nkjmlab.sorm4j.core.TypedOrmConnectionImpl;
  */
 public final class SormFactory {
 
-  private SormFactory() {};
-
-  private static void configure(ConfigStore newConfigStore) {
-    ConfigStore.refreshAndRegister(newConfigStore);
-  }
-
-  /**
-   * Registers new configuration.
-   *
-   * @param configName
-   * @param configurator
-   */
-  public static void registerNewConfig(String configName, Consumer<Configurator> configurator) {
-    ConfiguratorImpl conf = new ConfiguratorImpl(configName);
-    configurator.accept(conf);
-    configure(conf.build());
-  }
-
-  /**
-   * Registers new configuration from the current configuration.
-   *
-   * @param configName
-   * @param sorm
-   * @param configurator
-   */
-  public static void registerNewModifiedConfig(String configName, Sorm sorm,
-      Consumer<Configurator> configurator) {
-    ConfiguratorImpl conf = new ConfiguratorImpl(configName, sorm.getConfigStore());
-    configurator.accept(conf);
-    configure(conf.build());
-  }
-
-  /**
-   * Updates default configuration by configurator.
-   *
-   * @param configurator
-   */
-  public static void updateDefaultConfig(Consumer<Configurator> configurator) {
-    ConfiguratorImpl conf = new ConfiguratorImpl(DEFAULT_CONFIG_NAME);
-    configurator.accept(conf);
-    configure(conf.build());
-  }
-
-  /**
-   * Resets default configuration.
-   */
-  public static void resetDefaultConfig() {
-    configure(ConfigStore.INITIAL_DEFAULT_CONFIG_STORE);
-  }
-
+  private static void configure(ConfiguratorImpl configurator,
+      Consumer<Configurator> configuratorConsumer) {
+    configuratorConsumer.accept(configurator);
+    ConfigStore.refreshAndRegister(configurator.build());
+  };
 
   /**
    * Create a {@link Sorm} object which uses {@link ConnectionSource}.
@@ -127,6 +82,7 @@ public final class SormFactory {
     return create(jdbcUrl, user, password, DEFAULT_CONFIG_NAME);
   }
 
+
   /**
    * Create a {@link Sorm} object which uses {@link DriverManager} and the configurations
    * corresponding to the given configName.
@@ -141,6 +97,46 @@ public final class SormFactory {
     return create(createConnectionSource(jdbcUrl, user, password), configName);
   }
 
+  private static ConnectionSource createConnectionSource(DataSource dataSource) {
+    return new DataSourceConnectionSource(dataSource);
+  }
+
+  private static ConnectionSource createConnectionSource(String jdbcUrl, String user,
+      String password) {
+    return new DriverManagerConnectionSource(jdbcUrl, user, password);
+  }
+
+  /**
+   * Registers configuration under the given name.
+   *
+   * @param configName
+   * @param configuratorConsumer
+   */
+  public static void registerConfig(String configName,
+      Consumer<Configurator> configuratorConsumer) {
+    configure(new ConfiguratorImpl(configName), configuratorConsumer);
+  }
+
+  /**
+   * Registers modified configuration of the given Sorm object under the given name.
+   *
+   * @param configName
+   * @param sorm
+   * @param configuratorConsumer
+   */
+  public static void registerModifiedConfig(String configName, Sorm sorm,
+      Consumer<Configurator> configuratorConsumer) {
+    configure(new ConfiguratorImpl(configName, sorm.getConfigStore()), configuratorConsumer);
+  }
+
+  /**
+   * Updates default configuration.
+   *
+   * @param configuratorConsumer
+   */
+  public static void updateDefaultConfig(Consumer<Configurator> configuratorConsumer) {
+    configure(new ConfiguratorImpl(DEFAULT_CONFIG_NAME), configuratorConsumer);
+  }
 
   /**
    * Create a {@link OrmConnection} wrapping the given JDBC Connection
@@ -148,24 +144,8 @@ public final class SormFactory {
    * @param connection
    * @return
    */
-  public static OrmConnection getOrmConnection(Connection connection) {
-    return getOrmConnection(connection, ConfigStore.getDefaultConfigStore());
-  }
-
-  private static OrmConnection getOrmConnection(Connection connection, ConfigStore configStore) {
-    return new OrmConnectionImpl(connection, configStore);
-  }
-
-  /**
-   * Create a {@link OrmConnection} wrapping the given JDBC Connection with the specified
-   * configurations
-   *
-   * @param connection
-   * @param configName
-   * @return
-   */
-  public static OrmConnection getOrmConnection(Connection connection, String configName) {
-    return getOrmConnection(connection, ConfigStore.get(configName));
+  public static OrmConnection toOrmConnection(Connection connection) {
+    return toOrmConnection(connection, ConfigStore.getDefaultConfigStore());
   }
 
   /**
@@ -176,9 +156,13 @@ public final class SormFactory {
    * @param objectClass
    * @return
    */
-  public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
-      Class<T> objectClass) {
-    return getTypedOrmConnection(conn, objectClass, ConfigStore.getDefaultConfigStore());
+  public static <T> TypedOrmConnection<T> toOrmConnection(Connection conn, Class<T> objectClass) {
+    return toOrmConnection(conn, objectClass, ConfigStore.getDefaultConfigStore());
+  }
+
+  private static <T> TypedOrmConnection<T> toOrmConnection(Connection connection,
+      Class<T> objectClass, ConfigStore configStore) {
+    return new TypedOrmConnectionImpl<T>(objectClass, connection, configStore);
   }
 
   /**
@@ -191,22 +175,27 @@ public final class SormFactory {
    * @param configName
    * @return
    */
-  public static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection conn,
-      Class<T> objectClass, String configName) {
-    return getTypedOrmConnection(conn, objectClass, ConfigStore.get(configName));
+  public static <T> TypedOrmConnection<T> toOrmConnection(Connection conn, Class<T> objectClass,
+      String configName) {
+    return toOrmConnection(conn, objectClass, ConfigStore.get(configName));
   }
 
-  private static <T> TypedOrmConnection<T> getTypedOrmConnection(Connection connection,
-      Class<T> objectClass, ConfigStore configStore) {
-    return new TypedOrmConnectionImpl<T>(objectClass, connection, configStore);
+  private static OrmConnection toOrmConnection(Connection connection, ConfigStore configStore) {
+    return new OrmConnectionImpl(connection, configStore);
   }
 
-  private static ConnectionSource createConnectionSource(String jdbcUrl, String user,
-      String password) {
-    return new DriverManagerConnectionSource(jdbcUrl, user, password);
+  /**
+   * Create a {@link OrmConnection} wrapping the given JDBC Connection with the specified
+   * configurations
+   *
+   * @param connection
+   * @param configName
+   * @return
+   */
+  public static OrmConnection toOrmConnection(Connection connection, String configName) {
+    return toOrmConnection(connection, ConfigStore.get(configName));
   }
 
-  private static ConnectionSource createConnectionSource(DataSource dataSource) {
-    return new DataSourceConnectionSource(dataSource);
-  }
+  private SormFactory() {}
+
 }

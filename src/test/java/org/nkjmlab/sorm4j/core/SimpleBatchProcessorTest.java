@@ -23,7 +23,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    SormFactory.registerNewConfig("SIMPLE_BATCH", builder -> builder
+    SormFactory.registerConfig("SIMPLE_BATCH", builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.SIMPLE_BATCH));
     sormImpl = SormFactory.create(jdbcUrl, user, password, "SIMPLE_BATCH");
   }

@@ -534,7 +534,7 @@ class TypedOrmConnectionTest {
     }
 
     try (Connection conn = sorm.getJdbcConnection()) {
-      SormFactory.getOrmConnection(conn);
+      SormFactory.toOrmConnection(conn);
     } catch (SQLException e) {
       fail();
     }

@@ -28,7 +28,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   static void setUp() {
     DebugPointFactory.on();
     DebugPointFactory.off();
-    SormFactory.registerNewConfig("BATCH_CONF", builder -> builder
+    SormFactory.registerConfig("BATCH_CONF", builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
 
     sorm = SormTestUtils.createSorm("BATCH_CONF");
