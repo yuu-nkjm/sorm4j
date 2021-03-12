@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 public interface OrmUpdater {
 
   /**
-   * Deletes objects.
+   * Deletes objects from the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -21,7 +21,7 @@ public interface OrmUpdater {
   <T> int[] delete(List<T> objects);
 
   /**
-   * Delete object.
+   * Deletes an object from the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param object
@@ -86,7 +86,7 @@ public interface OrmUpdater {
   int deleteAllOn(String tableName);
 
   /**
-   * Inserts objects.
+   * Inserts objects on the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -94,50 +94,223 @@ public interface OrmUpdater {
    */
   <T> int[] insert(List<T> objects);
 
+  /**
+   * Inserts object on the table corresponding to the class of the given object.
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
   <T> int insert(T object);
 
+  /**
+   * Insert objects on the table corresponding to the class of the given objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] insert(@SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> InsertResult<T> insertAndGet(List<T> objects);
 
+  /**
+   * Inserts an object and get the result.
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
   <T> InsertResult<T> insertAndGet(T object);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> InsertResult<T> insertAndGetOn(String tableName, List<T> objects);
 
+  /**
+   * Inserts an object and get the insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param object
+   * @return
+   */
   <T> InsertResult<T> insertAndGetOn(String tableName, T object);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> InsertResult<T> insertAndGetOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] insertOn(String tableName, List<T> objects);
 
+  /**
+   * Inserts an object and get the insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param object
+   * @return
+   */
   <T> int insertOn(String tableName, T object);
 
+  /**
+   * Inserts objects and get the last insert result.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Merges by objects on the table corresponding to the class of the given objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] merge(List<T> objects);
 
+  /**
+   * Merges by an object on the table corresponding to the class of the given object.
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
   <T> int merge(T object);
 
+  /**
+   * Merges by objects on the table corresponding to the class of the given objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] merge(@SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Merges by objects on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] mergeOn(String tableName, List<T> objects);
 
+  /**
+   * Merges by an object on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param object
+   * @return
+   */
   <T> int mergeOn(String tableName, T object);
 
+  /**
+   * Merges by objects on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Updates by objects on the table corresponding to the class of the given objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] update(List<T> objects);
 
+  /**
+   * Updates by an object on the table corresponding to the class of the given object.
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
   <T> int update(T object);
 
+  /**
+   * Updates by objects on the table corresponding to the class of the given objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Updates by objects on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] updateOn(String tableName, List<T> objects);
 
+  /**
+   * Updates by an object on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param object
+   * @return
+   */
   <T> int updateOn(String tableName, T object);
 
+  /**
+   * Updates by objects on the table corresponding to the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
 }
