@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j;
 
-import org.nkjmlab.sorm4j.mapping.ConfigStore;
+import org.nkjmlab.sorm4j.core.ConfigStore;
 
 /**
  * Functions of handling transaction.

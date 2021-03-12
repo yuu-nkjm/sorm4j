@@ -17,11 +17,9 @@ import java.util.stream.Stream;
 public interface LazyResultSet<T> {
 
   /**
-   * Returns the row in the result set and close. If the row is not unique, Exception is thrown.
-   *
-   * @return
+   * Close this result set. After call this method, operations to this object is invalid.
    */
-  T one();
+  void close();
 
   /**
    * Returns the first row in the result set and close.
@@ -31,27 +29,11 @@ public interface LazyResultSet<T> {
   T first();
 
   /**
-   * Returns results in a List.
-   *
-   * @return
-   */
-  List<T> toList();
-
-  Map<String, Object> oneMap();
-
-  /**
    * Returns the first row in the result set and close.
    *
    * @return
    */
   Map<String, Object> firstMap();
-
-  /**
-   * Returns results in a List of {@code Map<String, Object>}.
-   *
-   * @return
-   */
-  List<Map<String, Object>> toMapList();
 
   /**
    * Iterates all the rows of the result set. The Iterator must be closed to release database
@@ -60,11 +42,38 @@ public interface LazyResultSet<T> {
   Iterator<T> iterator();
 
   /**
+   * Returns the object of one row from query and close. If the row is not unique, Exception is
+   * thrown.
+   *
+   * @return
+   */
+  T one();
+
+  /**
+   * Returns the map of one row from query and close. If the row is not unique, Exception is
+   *
+   * @return
+   */
+  Map<String, Object> oneMap();
+
+  /**
    * Streams all the rows of the result set. The stream must be closed to release database
    * resources.
    */
   Stream<T> stream();
 
-  void close();
+  /**
+   * Returns results in a List.
+   *
+   * @return
+   */
+  List<T> toList();
+
+  /**
+   * Returns results in a List of {@code Map<String, Object>}.
+   *
+   * @return
+   */
+  List<Map<String, Object>> toMapList();
 
 }

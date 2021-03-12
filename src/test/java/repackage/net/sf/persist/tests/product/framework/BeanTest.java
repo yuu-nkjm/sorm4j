@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.OrmConnection;
 
 public class BeanTest {
 
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
 
   public static void test(Class<?> caller, OrmConnection persist, BeanMap beanMap) {

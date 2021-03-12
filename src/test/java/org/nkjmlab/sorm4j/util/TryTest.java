@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.util;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.core.util.Try;
 
 class TryTest {
 

@@ -5,8 +5,8 @@ import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
+import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.Condition;
+import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.OrderBy;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
@@ -49,10 +49,10 @@ class SelectBuilderTest {
 
   @Test
   void testBuild2() {
-    Condition where = or(and("ID=A", "NAME=B"), and("YEAR=C", "DATE=D"),
-        or(cond("ID", "=", q("test")), cond("NAME='Hello'")));
-    Condition having = and("aveage_age>0", "a>0");
-    OrderBy orderBy = order("age", "desc");
+    SelectBuilder.Condition where = or(and("ID=A", "NAME=B"), and("YEAR=C", "DATE=D"),
+        or(cond("ID", "=", quote("test")), cond("NAME='Hello'")));
+    SelectBuilder.Condition having = and("aveage_age>0", "a>0");
+    SelectBuilder.OrderBy orderBy = order("age", "desc");
 
     String sql = SelectBuilder.create().select(as("AVG(age)", "aveage_age"), "ID").from("GUESTS")
         .where(where).having(having).orderBy(orderBy).limit(10, 30).buildSql();

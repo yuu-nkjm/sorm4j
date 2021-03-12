@@ -9,12 +9,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.core.InsertResultImpl;
+import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
-import org.nkjmlab.sorm4j.util.DebugPointFactory;
 
 class OrmConnectionTest {
 
@@ -99,7 +100,7 @@ class OrmConnectionTest {
 
   @Test
   void testInsertAndGetOnStringT() {
-    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
+    assertThat(InsertResultImpl.emptyInsertResult().getRowsModified()[0]).isEqualTo(0);
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
@@ -498,8 +499,8 @@ class OrmConnectionTest {
   @Test
   void testTransactionLevel() {
 
-    SormFactory.registerNewModifiedConfigStore("isolev", sorm.getConfigStore(),
-        b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build());
+    SormFactory.registerNewModifiedConfig("isolev", sorm,
+        b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
     try {
       sorm.createWith("isole").acceptTransactionHandler(Guest.class, m -> {

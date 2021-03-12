@@ -1,7 +1,8 @@
 package org.nkjmlab.sorm4j.sqlstatement;
 
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.Condition;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.core.sqlstatement.SelectBuilderImpl;
 
 
 /**
@@ -13,18 +14,152 @@ import org.nkjmlab.sorm4j.sqlstatement.SelectBuilderImpl.OrderBy;
 public interface SelectBuilder {
 
   /**
-   * Create select clause.
+   * Value object represents conditions of where clause or having clause. This object could include
+   * AND and OR operators.
+   */
+
+  class Condition {
+    private final Object condition;
+
+    public Condition(Object expr) {
+      this.condition = expr;
+    }
+
+    public Condition(String op, Object... conds) {
+      this("(" + String.join(" " + op + " ",
+          Arrays.stream(conds).map(c -> c.toString()).collect(Collectors.toList())) + ")");
+    }
+
+    public Condition(String left, String op, String right) {
+      this.condition = left + op + right;
+    }
+
+
+    @Override
+    public String toString() {
+      return condition.toString();
+    }
+  }
+
+  /**
+   * Value object for order by clause.
+   */
+  class OrderBy {
+    private final String column;
+    private final String ascOrDesc;
+
+    public OrderBy(String column, String ascOrDesc) {
+      this.column = column;
+      this.ascOrDesc = ascOrDesc;
+    }
+
+    @Override
+    public String toString() {
+      return column + " " + ascOrDesc;
+    }
+  }
+
+  /**
+   * <p>
+   * Creates AND condition with concatenating arguments.
    * <p>
    * For example,
    *
    * <pre>
-   * select("id","name","age") returns "select id, name, age"
+   * and("id=?", "name=?") returns "id=? and name=?"
    * </pre>
    *
-   * @param columns
+   * @param conds condition in String or Condition
    * @return
    */
-  SelectBuilder select(String... columns);
+  public static SelectBuilder.Condition and(Object... conds) {
+    return new SelectBuilder.Condition("and", conds);
+  }
+
+  /**
+   * <p>
+   * Creates AS alias.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
+   * </pre>
+   */
+  public static String as(String col, String alias) {
+    return col + " as " + alias;
+  }
+
+  /**
+   * <p>
+   * Creates {@link SelectBuilder.Condition} instance.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * and(cond("id=?"), "name=?")  returns "id=? and name=?"
+   * </pre>
+   */
+  public static SelectBuilder.Condition cond(String cond) {
+    return new SelectBuilder.Condition(cond);
+  }
+
+  public static SelectBuilder.Condition cond(String left, String op, String right) {
+    return new SelectBuilder.Condition(left, op, right);
+  }
+
+  /**
+   * Create {@link SelectBuilder} object.
+   *
+   * @return
+   */
+  public static SelectBuilder create() {
+    return new SelectBuilderImpl();
+  }
+
+  /**
+   * <p>
+   * Creates OR condition with concatenating arguments.
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * or("id=?", "name=?") returns "id=? or name=?"
+   * </pre>
+   */
+  public static SelectBuilder.Condition or(Object... conds) {
+    return new SelectBuilder.Condition("or", conds);
+  }
+
+  /**
+   * Create {@link SelectBuilder.OrderBy} objects.
+   *
+   * @param column
+   * @param ascOrDesc
+   * @return
+   */
+  public static SelectBuilder.OrderBy order(String column, String ascOrDesc) {
+    return new SelectBuilder.OrderBy(column, ascOrDesc);
+  }
+
+  /**
+   * Returns single quoted string.
+   *
+   * @param expr
+   * @return
+   */
+  public static String quote(String expr) {
+    return "'" + expr + "'";
+  }
+
+  /**
+   * Creates a select SQL statement from the objects.
+   *
+   * @return
+   */
+  String buildSql();
 
   /**
    * Add distinct keyword to SQL.
@@ -53,12 +188,13 @@ public interface SelectBuilder {
   SelectBuilder groupBy(String... columns);
 
   /**
-   * Create having clause with the given {@link Condition}.
+   * Create having clause with the given {@link SelectBuilder.Condition}.
    *
    * @param condition
    * @return
    */
-  SelectBuilder having(Condition condition);
+  SelectBuilder having(SelectBuilder.Condition condition);
+
 
   /**
    * Create having clause.
@@ -76,6 +212,7 @@ public interface SelectBuilder {
    */
   SelectBuilder limit(int limit);
 
+
   /**
    * Create limit clause with offset.
    *
@@ -84,16 +221,36 @@ public interface SelectBuilder {
    */
   SelectBuilder limit(int limit, int offset);
 
-  SelectBuilder orderBy(String column, String ascOrDesc);
-
-  SelectBuilder orderBy(OrderBy... orderBys);
-
   /**
-   * Creates a select SQL statement from the objects.
+   * Create order by clause.
    *
+   * @param orderBys
    * @return
    */
-  String buildSql();
+  SelectBuilder orderBy(SelectBuilder.OrderBy... orderBys);
+
+  /**
+   * Create order by clause.
+   *
+   * @param column
+   * @param ascOrDesc
+   * @return
+   */
+  SelectBuilder orderBy(String column, String ascOrDesc);
+
+  /**
+   * Create select clause.
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * select("id","name","age") returns "select id, name, age"
+   * </pre>
+   *
+   * @param columns
+   * @return
+   */
+  SelectBuilder select(String... columns);
 
   /**
    * Create prettified string.
@@ -101,6 +258,7 @@ public interface SelectBuilder {
    * @return
    */
   String toPrettyString();
+
 
   /**
    * Create prettified or plain string.
@@ -117,7 +275,7 @@ public interface SelectBuilder {
    * @param condition
    * @return
    */
-  SelectBuilder where(Condition condition);
+  SelectBuilder where(SelectBuilder.Condition condition);
 
   /**
    * Create where clause.
@@ -126,102 +284,4 @@ public interface SelectBuilder {
    * @return
    */
   SelectBuilder where(String expr);
-
-
-  /**
-   * Create {@link SelectBuilder} object.
-   *
-   * @return
-   */
-  public static SelectBuilder create() {
-    return new SelectBuilderImpl();
-  }
-
-  /**
-   * <p>
-   * Creates AND condition with concatenating arguments.
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * and("id=?", "name=?") returns "id=? and name=?"
-   * </pre>
-   *
-   * @param conds condition in String or Condition
-   * @return
-   */
-  public static Condition and(Object... conds) {
-    return new Condition("and", conds);
-  }
-
-  /**
-   * <p>
-   * Creates AS alias.
-   *
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
-   * </pre>
-   */
-  public static String as(String col, String alias) {
-    return col + " as " + alias;
-  }
-
-  /**
-   * <p>
-   * Creates {@link Condition} instance.
-   *
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * and(cond("id=?"), "name=?")  returns "id=? and name=?"
-   * </pre>
-   */
-  public static Condition cond(String cond) {
-    return new Condition(cond);
-  }
-
-  public static Condition cond(String left, String op, String right) {
-    return new Condition(left, op, right);
-  }
-
-
-  /**
-   * <p>
-   * Creates OR condition with concatenating arguments.
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * or("id=?", "name=?") returns "id=? or name=?"
-   * </pre>
-   */
-  public static Condition or(Object... conds) {
-    return new Condition("or", conds);
-  }
-
-
-  /**
-   * Create {@link OrderBy} objects.
-   *
-   * @param column
-   * @param ascOrDesc
-   * @return
-   */
-  public static OrderBy order(String column, String ascOrDesc) {
-    return new OrderBy(column, ascOrDesc);
-  }
-
-  /**
-   * Returns single quoted string.
-   *
-   * @param expr
-   * @return
-   */
-  public static String q(String expr) {
-    return "'" + expr + "'";
-  }
 }

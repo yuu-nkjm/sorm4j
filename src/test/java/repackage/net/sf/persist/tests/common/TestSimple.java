@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
+import org.nkjmlab.sorm4j.core.util.DebugPointFactory;
+import org.nkjmlab.sorm4j.core.util.StringUtils;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.util.DebugPointFactory;
-import org.nkjmlab.sorm4j.util.StringUtils;
 
 public class TestSimple {
 

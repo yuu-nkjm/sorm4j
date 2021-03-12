@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.core.InsertResultImpl;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
@@ -195,7 +196,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testInsertAndGetOnStringT() {
-    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
+    assertThat(InsertResultImpl.emptyInsertResult().getRowsModified()[0]).isEqualTo(0);
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
@@ -214,7 +215,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testInsertAndGetOnList() {
-    assertThat(InsertResult.empty().getRowsModified()[0]).isEqualTo(0);
+    assertThat(InsertResultImpl.emptyInsertResult().getRowsModified()[0]).isEqualTo(0);
 
 
     Guest a = SormTestUtils.GUEST_ALICE;

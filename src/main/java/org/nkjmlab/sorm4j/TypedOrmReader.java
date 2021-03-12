@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.mapping.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 

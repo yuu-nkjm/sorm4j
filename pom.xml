@@ -388,6 +388,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.2.0</version>
         <configuration>
+          <excludePackageNames>org.nkjmlab.sorm4j.core:org.nkjmlab.sorm4j.core.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
         </configuration>

@@ -11,22 +11,87 @@ import org.nkjmlab.sorm4j.result.InsertResult;
  */
 public interface OrmUpdater {
 
+  /**
+   * Deletes objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] delete(List<T> objects);
 
+  /**
+   * Delete object.
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
   <T> int delete(T object);
 
+  /**
+   * Deletes objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] delete(@SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Deletes objects on the table of the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] deleteOn(String tableName, List<T> objects);
 
+  /**
+   * Deletes object on the table of the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param object
+   * @return
+   */
   <T> int deleteOn(String tableName, T object);
 
+  /**
+   * Deletes objects on the table of the given table name.
+   *
+   * @param <T>
+   * @param tableName
+   * @param objects
+   * @return
+   */
   <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  /**
+   * Deletes all objects on the table corresponding to the given class.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
   <T> int deleteAll(Class<T> objectClass);
 
+  /**
+   * Deletes all objects on the table corresponding to the given table name.
+   *
+   * @param tableName
+   * @return
+   */
   int deleteAllOn(String tableName);
 
+  /**
+   * Inserts objects.
+   *
+   * @param <T>
+   * @param objects
+   * @return
+   */
   <T> int[] insert(List<T> objects);
 
   <T> int insert(T object);

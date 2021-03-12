@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
-import org.nkjmlab.sorm4j.mapping.ConfigStore;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
@@ -17,14 +16,34 @@ import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
 public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
     SqlExecutor, TransactionFunction, Closeable, AutoCloseable {
 
-  NamedParameterQuery<T> createNamedParametersQuery(String sql);
+  /**
+   * Create {@link NamedParameterQuery} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  NamedParameterQuery<T> createNamedParameterQuery(String sql);
 
-  OrderedParameterQuery<T> createOrderedParametersQuery(String sql);
+  /**
+   * Create {@link OrderedParameterQuery} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  OrderedParameterQuery<T> createOrderedParameterQuery(String sql);
 
+  /**
+   * Create {@link SelectQuery}.
+   *
+   * @return
+   */
   SelectQuery<T> createSelectQuery();
 
-  ConfigStore getConfigStore();
-
+  /**
+   * Gets the table name mapping to this objects.
+   *
+   * @return
+   */
   String getTableName();
 
 

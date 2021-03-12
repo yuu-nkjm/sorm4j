@@ -1,14 +1,38 @@
 package org.nkjmlab.sorm4j.sqlstatement;
 
 import java.util.Map;
+import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterSqlImpl;
 
-
+/**
+ * A SQL statement with named parameters.
+ *
+ * @author nkjm
+ *
+ */
 public interface NamedParameterSql {
 
-  NamedParameterSql bindAll(Map<String, Object> namedParams);
+  /**
+   * Binds key-value pairs to named parameters in a SQL statement.
+   *
+   * @param keyValuePairOfNamedParameters
+   * @return
+   */
+  NamedParameterSql bindAll(Map<String, Object> keyValuePairOfNamedParameters);
 
+  /**
+   * Binds a key-value pair to named parameters in a SQL statement.
+   *
+   * @param key
+   * @param value
+   * @return
+   */
   NamedParameterSql bind(String key, Object value);
 
+  /**
+   * Convert {@link SqlStatement} objects.
+   *
+   * @return
+   */
   SqlStatement toSqlStatement();
 
   static NamedParameterSql from(String sql, String prefix, String suffix) {
