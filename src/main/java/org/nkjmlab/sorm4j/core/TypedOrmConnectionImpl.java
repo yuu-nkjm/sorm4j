@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.core;
 
 import java.sql.Connection;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterQueryImpl;
@@ -88,6 +89,16 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   @Override
   public OrderedParameterQuery<T> createOrderedParameterQuery(String sql) {
     return OrderedParameterQueryImpl.createFrom(this, sql);
+  }
+
+  @Override
+  public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
+    return new TypedOrmConnectionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+  }
+
+  @Override
+  public OrmConnection untype() {
+    return new OrmConnectionImpl(getJdbcConnection(), getConfigStore());
   }
 
 

@@ -15,4 +15,6 @@ public interface OrmTransaction extends OrmConnection {
   @Override
   void close();
 
+  <T> TypedOrmTransaction<T> type(Class<T> objectClass);
+
 }

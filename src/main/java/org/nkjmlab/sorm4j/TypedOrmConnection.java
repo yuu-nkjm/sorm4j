@@ -46,5 +46,9 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    */
   String getTableName();
 
+  <S> TypedOrmConnection<S> type(Class<S> objectClass);
+
+  OrmConnection untype();
+
 
 }

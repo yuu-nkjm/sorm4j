@@ -192,6 +192,11 @@ public final class SormImpl implements Sorm {
       super.close();
     }
 
+    @Override
+    public <T> TypedOrmTransaction<T> type(Class<T> objectClass) {
+      return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+    }
+
   }
 
   public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
@@ -208,6 +213,17 @@ public final class SormImpl implements Sorm {
       rollback();
       super.close();
     }
+
+    @Override
+    public <S> TypedOrmTransaction<S> type(Class<S> objectClass) {
+      return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+    }
+
+    @Override
+    public OrmTransaction untype() {
+      return new OrmTransactionImpl(getJdbcConnection(), getConfigStore());
+    }
+
   }
 
   @Override

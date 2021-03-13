@@ -16,4 +16,10 @@ public interface TypedOrmTransaction<T> extends TypedOrmConnection<T> {
    */
   @Override
   void close();
+
+  @Override
+  <S> TypedOrmTransaction<S> type(Class<S> objectClass);
+
+  @Override
+  OrmTransaction untype();
 }
