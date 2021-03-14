@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.core.util.SqlTypeUtils;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
 
 /**
@@ -113,7 +114,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
     @Override
     public String toString() {
-      return getName() + "(" + DefaultResultSetConverter.sqlTypeToString(dataType) + ")";
+      return getName() + "(" + SqlTypeUtils.sqlTypeToString(dataType) + ")";
     }
   }
 
