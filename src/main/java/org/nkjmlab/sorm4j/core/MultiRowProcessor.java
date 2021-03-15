@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.core.util.LogPoint;
 import org.nkjmlab.sorm4j.core.util.LogPointFactory;
+import org.nkjmlab.sorm4j.core.util.PreparedStatementUtils;
 import org.nkjmlab.sorm4j.core.util.Try;
 
 abstract class MultiRowProcessor<T> {
@@ -60,7 +61,7 @@ abstract class MultiRowProcessor<T> {
     int[] result = new int[0];
     boolean origAutoCommit = getAutoCommit(con);
 
-    try (PreparedStatement stmt = PreparedStatementUtils.getPreparedStatement(con, sql)) {
+    try (PreparedStatement stmt = con.prepareStatement(sql)) {
       setAutoCommit(con, false);
       final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
       for (int i = 0; i < objects.length; i++) {

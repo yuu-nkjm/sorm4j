@@ -1,11 +1,11 @@
-package org.nkjmlab.sorm4j.core;
+package org.nkjmlab.sorm4j.core.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-final class ArrayUtils {
+public final class ArrayUtils {
 
   private ArrayUtils() {}
 

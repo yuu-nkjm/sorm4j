@@ -3,6 +3,8 @@ package org.nkjmlab.sorm4j.core;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.core.util.ArrayUtils;
+import org.nkjmlab.sorm4j.core.util.PreparedStatementUtils;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.core.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.core.util.Try.ThrowableFunction;
@@ -23,8 +25,7 @@ final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
   public final int[] multiRowInsert(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con,
-                tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> con.prepareStatement(tableMapping.getSql().getMultirowInsertSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 
@@ -33,8 +34,7 @@ final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
   public final int[] multiRowMerge(Connection con, T... objects) {
     return execIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> PreparedStatementUtils.getPreparedStatement(con,
-                tableMapping.getSql().getMultirowMergeSql(num)),
+            num -> con.prepareStatement(tableMapping.getSql().getMultirowMergeSql(num)),
             (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
   }
 

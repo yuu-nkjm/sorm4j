@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.core;
 
-import static org.nkjmlab.sorm4j.core.PreparedStatementUtils.*;
+import static org.nkjmlab.sorm4j.core.util.PreparedStatementUtils.*;
 import static org.nkjmlab.sorm4j.core.util.StringUtils.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -124,7 +124,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private <R> R execStatementAndReadResultSet(String sql, Object[] parameters,
       ThrowableFunction<ResultSet, R> sqlResultReader) {
-    try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
         Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.READ);
@@ -147,7 +147,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   static final <R> R execPreparedStatementAndClose(SqlParameterSetter sqlParameterSetter,
       Connection connection, String sql, Object[] parameters,
       ThrowableFunction<PreparedStatement, R> func) {
-    try (PreparedStatement stmt = getPreparedStatement(connection, sql)) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       return func.apply(stmt);
     } catch (Exception e) {
@@ -323,7 +323,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   final <T> LazyResultSet<T> readLazyAux(Class<T> objectClass, String sql, Object... parameters) {
     try {
-      final PreparedStatement stmt = getPreparedStatement(connection, sql);
+      final PreparedStatement stmt = connection.prepareStatement(sql);
       sqlParameterSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
       return new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
@@ -355,7 +355,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
     try {
-      final PreparedStatement stmt = getPreparedStatement(connection, sql);
+      final PreparedStatement stmt = connection.prepareStatement(sql);
       sqlParameterSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
       @SuppressWarnings({"unchecked", "rawtypes"})
