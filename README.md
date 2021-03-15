@@ -24,13 +24,14 @@ You can get the binary using Maven from [Central Repository](http://mvnrepositor
 Check out the [Sorm4j website](https://scrapbox.io/sorm4j/) for quick start guide and examples.
 
 - [Quickstart](https://scrapbox.io/sorm4j/Quickstart)
-- [Examples](https://scrapbox.io/sorm4j/Examples)
-- [Performance](https://scrapbox.io/sorm4j/Performance)
+- [Examples](https://scrapbox.io/sorm4j/Examples): Sample codes are in [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample)
+- [Performance](https://scrapbox.io/sorm4j/Performance): Benchmark codes are in [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh)
+- [Developer Guide](https://scrapbox.io/sorm4j/Developer_Guide)
 
 ## Versioning
 This project uses [Semantic Versioning](https://semver.org/).
 
-The interfaces and classes are public API.
+The interfaces and classes in the following packages are public API.
 
  - org.nkjmlab.sorm4j	
  - org.nkjmlab.sorm4j.annotation	
