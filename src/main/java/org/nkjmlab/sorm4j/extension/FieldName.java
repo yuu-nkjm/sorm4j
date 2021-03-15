@@ -23,9 +23,20 @@ public final class FieldName {
   }
 
   @Override
-  public String toString() {
-    return name;
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!(obj instanceof FieldName))
+      return false;
+    FieldName other = (FieldName) obj;
+    return Objects.equals(name, other.name);
   }
+
+  /**
+   * Gets name of this object.
+   *
+   * @return
+   */
 
   public String getName() {
     return name;
@@ -37,13 +48,8 @@ public final class FieldName {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof FieldName))
-      return false;
-    FieldName other = (FieldName) obj;
-    return Objects.equals(name, other.name);
+  public String toString() {
+    return name;
   }
 
 }

@@ -17,8 +17,8 @@ public class Column implements Comparable<Column> {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(name);
+  public int compareTo(Column o) {
+    return name.compareTo(o.name);
   }
 
   @Override
@@ -31,17 +31,22 @@ public class Column implements Comparable<Column> {
     return Objects.equals(name, other.name);
   }
 
+  /**
+   * Gets name of this object.
+   *
+   * @return
+   */
+  public String getName() {
+    return name;
+  }
+
   @Override
-  public int compareTo(Column o) {
-    return name.compareTo(o.name);
+  public int hashCode() {
+    return Objects.hash(name);
   }
 
   @Override
   public String toString() {
-    return name;
-  }
-
-  public String getName() {
     return name;
   }
 
