@@ -144,15 +144,6 @@ public interface SelectBuilder {
     return new SelectBuilder.OrderBy(column, ascOrDesc);
   }
 
-  /**
-   * Returns single quoted string.
-   *
-   * @param expr
-   * @return
-   */
-  public static String quote(String expr) {
-    return "'" + expr + "'";
-  }
 
   /**
    * Creates a select SQL statement from the objects.

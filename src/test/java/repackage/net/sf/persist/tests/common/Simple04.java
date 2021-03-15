@@ -10,6 +10,7 @@ import org.nkjmlab.sorm4j.annotation.OrmTable;
 public class Simple04 {
 
   private long id;
+  @SuppressWarnings("unused")
   private String stringCol;
   private long longCol;
 

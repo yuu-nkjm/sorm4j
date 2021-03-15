@@ -1,12 +1,12 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
-import static org.nkjmlab.sorm4j.sqlstatement.SqlStatement.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.core.util.SqlUtils;
 import org.nkjmlab.sorm4j.sqlstatement.NamedParameterSql;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
 
@@ -39,7 +39,7 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
   @Override
   public NamedParameterSql bind(String key, Object value) {
     if (value instanceof List) {
-      this.parameters.put(key, literal(value));
+      this.parameters.put(key, SqlUtils.literal(value));
     } else {
       this.parameters.put(key, value);
     }

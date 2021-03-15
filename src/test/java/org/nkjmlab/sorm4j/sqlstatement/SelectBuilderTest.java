@@ -3,18 +3,20 @@ package org.nkjmlab.sorm4j.sqlstatement;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
+import static org.nkjmlab.sorm4j.sqlstatement.SqlStatement.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.core.util.SqlUtils;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SelectBuilderTest {
   @Test
   void testSqlStatement() {
-    assertThat(SqlStatement.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
-    assertThat(SqlStatement.literal(null)).isEqualTo("null");
-    assertThat(SqlStatement.literal("?")).isEqualTo("?");
-    assertThat(SqlStatement.literal("test")).isEqualTo("'test'");
+    assertThat(SqlUtils.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
+    assertThat(SqlUtils.literal(null)).isEqualTo("null");
+    assertThat(SqlUtils.literal("?")).isEqualTo("?");
+    assertThat(SqlUtils.literal("test")).isEqualTo("'test'");
 
   }
 

@@ -219,7 +219,7 @@ abstract class Mapping<T> {
       return null;
     }
     if (getter.getReturnType() == void.class) {
-      log.warn("Getter [{}] must have return a parameter.");
+      log.warn("Getter [{}] must have return a parameter.", getter);
     }
 
     return getter;
