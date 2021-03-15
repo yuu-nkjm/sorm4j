@@ -1,8 +1,7 @@
 package org.nkjmlab.sorm4j.sqlstatement;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.core.sqlstatement.SqlStatementImpl;
+import org.nkjmlab.sorm4j.core.util.SqlUtils;
 
 
 /**
@@ -36,7 +35,7 @@ public interface SqlStatement {
    * @param parameters
    * @return
    */
-  public static SqlStatement of(String sql, Object... parameters) {
+  static SqlStatement of(String sql, Object... parameters) {
     return new SqlStatementImpl(sql, parameters);
   }
 
@@ -46,36 +45,18 @@ public interface SqlStatement {
    * @param element
    * @return
    */
-  public static String literal(Object element) {
-    if (element == null) {
-      return "null";
-    } else if (element instanceof Number || element instanceof Boolean) {
-      return element.toString();
-    } else if (element instanceof List) {
-      return joinCommaAndSpace(
-          ((List<?>) element).stream().map(e -> literal(e)).collect(Collectors.toList()));
-    }
-    String str = element.toString();
-    switch (str) {
-      case "?":
-        return str;
-      default:
-        return escapeAndWrapSingleQuote(str);
-    }
+  static String literal(Object element) {
+    return SqlUtils.literal(element);
   }
 
-  private static String joinCommaAndSpace(List<String> elements) {
-    return String.join(", ", elements);
+  /**
+   * Returns single quoted expression. If it includes single quotations, they will be escaped.
+   *
+   * @param expr
+   * @return
+   */
+  static String quote(String expr) {
+    return SqlUtils.quote(expr);
   }
-
-
-  private static String escapeAndWrapSingleQuote(String str) {
-    return wrapSingleQuote(str.contains("'") ? str.replaceAll("'", "''") : str);
-  }
-
-  private static String wrapSingleQuote(String str) {
-    return "'" + str + "'";
-  }
-
 
 }
