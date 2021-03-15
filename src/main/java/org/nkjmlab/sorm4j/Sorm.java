@@ -14,25 +14,39 @@ public interface Sorm {
   /**
    * Interface for object-relation handling without a return value.
    *
+   * This interface is only designed for {@link Sorm} interface.
+   *
    * @param <T>
    */
   @FunctionalInterface
-  public interface ConsumerHandler<T> {
-
+  interface ConsumerHandler<T> {
+    /**
+     * Will be invoked with an open connection. The handle may be closed when this callback returns.
+     *
+     * @param t
+     * @throws Exception
+     */
     void accept(T t) throws Exception;
-
   }
 
   /**
    * Interface for object-relation handling with a return value.
    *
+   * This interface is only designed for {@link Sorm} interface.
+   *
    * @param <T>
    */
   @FunctionalInterface
-  public interface FunctionHandler<T, R> {
+  interface FunctionHandler<T, R> {
 
+    /**
+     * Will be invoked with an open connection. The handle may be closed when this callback returns.
+     *
+     * @param t
+     * @return
+     * @throws Exception
+     */
     R apply(T t) throws Exception;
-
   }
 
   /**
