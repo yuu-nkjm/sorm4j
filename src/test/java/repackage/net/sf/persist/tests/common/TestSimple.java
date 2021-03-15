@@ -21,8 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
@@ -30,17 +30,13 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 
 public class TestSimple {
 
-  private static org.apache.logging.log4j.Logger log =
-      org.apache.logging.log4j.LogManager.getLogger();
-
   private static final JdbcConnectionPool connectionPool =
       JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
 
   @BeforeAll
   static void beforAll() {
-    OrmLogger.setLogMode(
-        Map.of(OrmLogger.Category.EXECUTE_QUERY, true, OrmLogger.Category.BATCH, true,
-            OrmLogger.Category.EXECUTE_UPDATE, true));
+    OrmLogger.setLogMode(Map.of(OrmLogger.Category.EXECUTE_QUERY, true, OrmLogger.Category.BATCH,
+        true, OrmLogger.Category.EXECUTE_UPDATE, true));
   }
 
   private static void dropAndCreateSimpleTable() {
@@ -404,7 +400,7 @@ public class TestSimple {
     try (Connection conn = connectionPool.getConnection()) {
       OrmConnection simpleOrMapper = SormFactory.toOrmConnection(conn);
       simpleOrMapper.insert(buildSimple());
-      Simple04 ret = simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
+      simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
       fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
       org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())

@@ -200,7 +200,6 @@ class TypedOrmConnectionTest {
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
-    Guest b = SormTestUtils.GUEST_BOB;
     sorm.accept(Guest.class, m -> {
       InsertResult<Guest> g = m.insertAndGet(a);
       assertThat(g.getObject().getId()).isEqualTo(1);
@@ -219,7 +218,6 @@ class TypedOrmConnectionTest {
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
-    Guest b = SormTestUtils.GUEST_BOB;
     sorm.accept(Guest.class, m -> {
       InsertResult<Guest> g = m.insertAndGet(List.of(a));
       assertThat(g.getObject().getId()).isEqualTo(1);
@@ -289,7 +287,6 @@ class TypedOrmConnectionTest {
   @Test
   void testExec() {
     Player a = SormTestUtils.PLAYER_ALICE;
-    String sql = "select * from players where id=?";
     sorm.accept(Player.class, m -> {
       m.insert(a);
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");

@@ -11,7 +11,6 @@ import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
-import org.nkjmlab.sorm4j.core.mapping.multirow.SimpleBatchProcessor;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;

@@ -78,7 +78,7 @@ public class DynamicBean {
   public static Object createInstance(Class<?> cls, BeanMap beanMap, boolean useNulls) {
     Object obj = null;
     try {
-      obj = cls.newInstance();
+      obj = cls.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

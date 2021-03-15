@@ -103,7 +103,6 @@ class OrmConnectionTest {
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
-    Guest b = SormTestUtils.GUEST_BOB;
     sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGet(new Guest[] {});
       assertThat(g.getRowsModified()[0]).isEqualTo(0);
@@ -125,7 +124,6 @@ class OrmConnectionTest {
 
 
     Guest a = SormTestUtils.GUEST_ALICE;
-    Guest b = SormTestUtils.GUEST_BOB;
     sorm.accept(m -> {
       InsertResult<Guest> g = m.insertAndGetOn("players1", List.of());
       assertThat(g.getRowsModified()[0]).isEqualTo(0);
@@ -199,7 +197,6 @@ class OrmConnectionTest {
   @Test
   void testExec() {
     Player a = SormTestUtils.PLAYER_ALICE;
-    String sql = "select * from players where id=?";
     sorm.accept(m -> {
       m.insert(a);
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
@@ -362,7 +359,7 @@ class OrmConnectionTest {
 
       try {
         OrmLogger.onAll();
-        List<Integer> ret = m.readList(Integer.class, "select * from players");
+        m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getCause().getMessage())

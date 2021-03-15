@@ -4,7 +4,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,8 +38,8 @@ public class TestDB2 {
     Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
     Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
     Class<?>[] longStringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
-    Class<?>[] clobTypes =
-        new Class<?>[] {String.class, char[].class, Character[].class, Clob.class};
+    // Class<?>[] clobTypes =
+    // new Class<?>[] {String.class, char[].class, Character[].class, Clob.class};
 
     BeanMap beanMap = new BeanMap("StringTypes")
         .addField(new FieldMap("charCol").setTypes(characterTypes).setSize(1))

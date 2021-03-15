@@ -3,6 +3,7 @@ package repackage.net.sf.persist.tests.common;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 
 @OrmTable("SIMPLE")
+@SuppressWarnings("unused")
 public class Simple12 {
 
   private long id;
