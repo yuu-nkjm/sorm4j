@@ -38,5 +38,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    */
   SelectBuilder createSelectBuilder();
 
+  <S> TypedOrmConnection<S> type(Class<S> objectClass);
 
 }

@@ -39,7 +39,7 @@ public class TestSimple {
   @BeforeAll
   static void beforAll() {
     OrmLogger.setLogMode(
-        Map.of(OrmLogger.Category.READ, true, OrmLogger.Category.EXECUTE_BATCH, true,
+        Map.of(OrmLogger.Category.EXECUTE_QUERY, true, OrmLogger.Category.BATCH, true,
             OrmLogger.Category.EXECUTE_UPDATE, true));
   }
 

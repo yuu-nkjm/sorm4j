@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import org.nkjmlab.sorm4j.core.ConfigStore;
+import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
 
 /**
  * An interface of executing object-relation mapping.

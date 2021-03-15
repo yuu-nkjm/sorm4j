@@ -10,13 +10,13 @@ public final class LogPoint {
     this.startTime = System.nanoTime();
   }
 
-  public String getFormattedNameAndElapsedTime() {
-    return "[" + getName() + "]" + " ["
+  public String getTagAndElapsedTime() {
+    return "[" + getTag() + "]" + " ["
         + String.format("%.3f", (double) (System.nanoTime() - startTime) / 1000 / 1000)
         + " msec] :";
   }
 
-  public String getName() {
-    return name;
+  public String getTag() {
+    return name + ":" + (hashCode() / 10000);
   }
 }

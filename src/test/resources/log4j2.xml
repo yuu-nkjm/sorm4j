@@ -2,17 +2,13 @@
 <!DOCTYPE configuration>
 <configuration status="OFF">
   <Properties>
-    <property name="log_level">INFO</property>
-    <property name="root_log_level">INFO</property>
+    <property name="sorm4j_log_level">WARN</property>
     <property name="log_pattern">${log_pattern_loc}</property>
     <property name="log_pattern_loc">
       %d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %c.%M(%F:%L) %m%n
     </property>
     <property name="log_pattern_noloc">
       %d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %c{3.} %m%n
-    </property>
-    <property name="log_pattern_suppress">
-      %m%n
     </property>
   </Properties>
   <Appenders>
@@ -30,15 +26,8 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Root level="${root_log_level}">
+    <Logger name="org.nkjmlab.sorm4j" level="${sorm4j_log_level}" additivity="false">
       <AppenderRef ref="stdout" />
-      <AppenderRef ref="stderr" />
-    </Root>
-    <Logger name="org.nkjmlab" level="${log_level}" additivity="false">
-      <AppenderRef ref="stdout" />
-      <AppenderRef ref="stderr" />
-    </Logger>
-    <Logger name="org.sql2o" level="${log_level}" additivity="false">
       <AppenderRef ref="stderr" />
     </Logger>
   </Loggers>

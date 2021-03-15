@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import static org.nkjmlab.sorm4j.OrmLogger.Category.*;
 import java.util.Arrays;
 import java.util.Map;
 import org.nkjmlab.sorm4j.core.util.LogPointFactory;
@@ -10,7 +9,8 @@ public final class OrmLogger {
   private OrmLogger() {}
 
   static {
-    on(MAPPING);
+    //on(MAPPING);
+    onAll();
   }
 
   /**
@@ -18,7 +18,7 @@ public final class OrmLogger {
    *
    */
   public enum Category {
-    MAPPING, READ, EXECUTE_BATCH, EXECUTE_UPDATE;
+    MAPPING, EXECUTE_QUERY, BATCH, EXECUTE_UPDATE;
   }
 
   /**

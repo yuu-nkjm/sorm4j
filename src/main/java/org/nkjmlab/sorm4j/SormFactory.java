@@ -1,17 +1,16 @@
 package org.nkjmlab.sorm4j;
 
-import static org.nkjmlab.sorm4j.core.ConfigStore.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.core.ConfigStore;
-import org.nkjmlab.sorm4j.core.ConfiguratorImpl;
-import org.nkjmlab.sorm4j.core.DataSourceConnectionSource;
-import org.nkjmlab.sorm4j.core.DriverManagerConnectionSource;
-import org.nkjmlab.sorm4j.core.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.core.SormImpl;
-import org.nkjmlab.sorm4j.core.TypedOrmConnectionImpl;
+import org.nkjmlab.sorm4j.core.connectionsource.DataSourceConnectionSource;
+import org.nkjmlab.sorm4j.core.connectionsource.DriverManagerConnectionSource;
+import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
+import org.nkjmlab.sorm4j.core.mapping.ConfiguratorImpl;
+import org.nkjmlab.sorm4j.core.mapping.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.core.mapping.SormImpl;
+import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 
 /**
  * Main entry point of Som4j, which is factory for {@link Sorm} object.
@@ -20,6 +19,7 @@ import org.nkjmlab.sorm4j.core.TypedOrmConnectionImpl;
  *
  */
 public final class SormFactory {
+  public static final String DEFAULT_CONFIG_NAME = "DEFAULT_CONFIG";
 
   private static void configure(ConfiguratorImpl configurator,
       Consumer<Configurator> configuratorConsumer) {
@@ -34,7 +34,7 @@ public final class SormFactory {
    * @return
    */
   public static Sorm create(ConnectionSource connectionSource) {
-    return create(connectionSource, DEFAULT_CONFIG_NAME);
+    return create(connectionSource, SormFactory.DEFAULT_CONFIG_NAME);
   }
 
   /**
@@ -55,7 +55,7 @@ public final class SormFactory {
    * @return
    */
   public static Sorm create(DataSource dataSource) {
-    return create(dataSource, DEFAULT_CONFIG_NAME);
+    return create(dataSource, SormFactory.DEFAULT_CONFIG_NAME);
   }
 
   /**
@@ -79,7 +79,7 @@ public final class SormFactory {
    * @return
    */
   public static Sorm create(String jdbcUrl, String user, String password) {
-    return create(jdbcUrl, user, password, DEFAULT_CONFIG_NAME);
+    return create(jdbcUrl, user, password, SormFactory.DEFAULT_CONFIG_NAME);
   }
 
 
@@ -135,7 +135,7 @@ public final class SormFactory {
    * @param configuratorConsumer
    */
   public static void updateDefaultConfig(Consumer<Configurator> configuratorConsumer) {
-    configure(new ConfiguratorImpl(DEFAULT_CONFIG_NAME), configuratorConsumer);
+    configure(new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME), configuratorConsumer);
   }
 
   /**
@@ -195,6 +195,7 @@ public final class SormFactory {
   public static OrmConnection toOrmConnection(Connection connection, String configName) {
     return toOrmConnection(connection, ConfigStore.get(configName));
   }
+
 
   private SormFactory() {}
 

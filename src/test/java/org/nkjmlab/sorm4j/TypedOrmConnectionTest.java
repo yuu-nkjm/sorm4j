@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.core.InsertResultImpl;
+import org.nkjmlab.sorm4j.core.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
