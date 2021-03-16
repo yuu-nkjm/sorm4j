@@ -304,9 +304,9 @@ public class TestSimple {
 
       Map<String, Object> simpleMap1 =
           simpleOrMapper.readMapFirst("select * from simple where id=?", id);
-      assertEquals(id, simpleMap1.get("ID"));
-      assertEquals(simple.getLongCol(), simpleMap1.get("LONG_COL"));
-      assertEquals(simple.getStringCol(), simpleMap1.get("STRING_COL"));
+      assertEquals(id, simpleMap1.get("id"));
+      assertEquals(simple.getLongCol(), simpleMap1.get("long_col"));
+      assertEquals(simple.getStringCol(), simpleMap1.get("string_col"));
 
       simpleOrMapper.delete(simple);
     }
@@ -333,17 +333,17 @@ public class TestSimple {
       List<Map<String, Object>> simpleList =
           simpleOrMapper.readMapList("select * from simple where id in (?,?,?)", simple1.getId(),
               simple2.getId(), simple3.getId());
-      assertEquals(simple1.getId(), simpleList.get(0).get("ID"));
-      assertEquals(simple1.getLongCol(), simpleList.get(0).get("LONG_COL"));
-      assertEquals(simple1.getStringCol(), simpleList.get(0).get("STRING_COL"));
+      assertEquals(simple1.getId(), simpleList.get(0).get("id"));
+      assertEquals(simple1.getLongCol(), simpleList.get(0).get("long_col"));
+      assertEquals(simple1.getStringCol(), simpleList.get(0).get("string_col"));
 
-      assertEquals(simple2.getId(), simpleList.get(1).get("ID"));
-      assertEquals(simple2.getLongCol(), simpleList.get(1).get("LONG_COL"));
-      assertEquals(simple2.getStringCol(), simpleList.get(1).get("STRING_COL"));
+      assertEquals(simple2.getId(), simpleList.get(1).get("id"));
+      assertEquals(simple2.getLongCol(), simpleList.get(1).get("long_col"));
+      assertEquals(simple2.getStringCol(), simpleList.get(1).get("string_col"));
 
-      assertEquals(simple3.getId(), simpleList.get(2).get("ID"));
-      assertEquals(simple3.getLongCol(), simpleList.get(2).get("LONG_COL"));
-      assertEquals(simple3.getStringCol(), simpleList.get(2).get("STRING_COL"));
+      assertEquals(simple3.getId(), simpleList.get(2).get("id"));
+      assertEquals(simple3.getLongCol(), simpleList.get(2).get("long_col"));
+      assertEquals(simple3.getStringCol(), simpleList.get(2).get("string_col"));
 
       simpleOrMapper.delete(simple1);
       simpleOrMapper.delete(simple2);

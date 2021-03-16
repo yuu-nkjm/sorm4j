@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.core.util.SqlTypeUtils;
-import org.nkjmlab.sorm4j.core.util.StringUtils;
 
 /**
  * Default implementation of {@link ColumnFieldMapper}
@@ -86,11 +85,17 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
         new Column(toUpperCase(fieldName.getName())));
   }
 
+  /**
+   * Gets field name corresponding to the column name. If the set of column name candidates guessed
+   * from a field contains the given column name, the field is mapped to the column. Capital case is
+   * ignored for the mapping.
+   *
+   */
   @Override
   public Optional<FieldName> getFieldNameByColumnName(Column column, List<FieldName> fieldNames) {
     for (FieldName fieldName : fieldNames) {
-      if (StringUtils.containsIgnoreCase(guessColumnNameCandidates(fieldName).stream()
-          .map(s -> s.toString()).collect(Collectors.toList()), column.getName())) {
+      if (containsIgnoreCase(guessColumnNameCandidates(fieldName).stream().map(s -> s.toString())
+          .collect(Collectors.toList()), column.getName())) {
         return Optional.of(fieldName);
       }
     }
