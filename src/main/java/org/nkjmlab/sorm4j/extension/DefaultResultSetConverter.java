@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.nkjmlab.sorm4j.core.util.StringUtils;
 
 /**
  * Default implementation of {@link ResultSetConverter}
@@ -29,7 +30,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
     for (int i = 1; i <= columns.size(); i++) {
       int type = columnTypes.get(i - 1);
       Object value = getValueBySqlType(resultSet, i, type);
-      ret.put(columns.get(i - 1), value);
+      ret.put(StringUtils.toLowerCase(columns.get(i - 1)), value);
     }
     return ret;
   }
