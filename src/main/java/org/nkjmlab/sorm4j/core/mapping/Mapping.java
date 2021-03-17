@@ -4,6 +4,7 @@ import static org.nkjmlab.sorm4j.core.util.StringUtils.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -147,8 +148,8 @@ abstract class Mapping<T> {
       String prefix) {
     Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
     return Arrays.stream(objectClass.getDeclaredMethods())
-        .filter(f -> Objects.isNull(f.getAnnotation(ignoreAnn)))
-        .filter(m -> m.getName().length() > prefix.length()
+        .filter(m -> Objects.isNull(m.getAnnotation(ignoreAnn))
+            && !Modifier.isStatic(m.getModifiers()) && m.getName().length() > prefix.length()
             && m.getName().substring(0, prefix.length()).equals(prefix))
         .collect(Collectors.toMap(m -> new FieldName(
             m.getName().substring(prefix.length(), prefix.length() + 1).toLowerCase()
@@ -160,7 +161,8 @@ abstract class Mapping<T> {
   private static Map<FieldName, Field> getAllFields(final Class<?> objectClass) {
     Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
     return Arrays.stream(objectClass.getDeclaredFields())
-        .filter(f -> Objects.isNull(f.getAnnotation(ignoreAnn)))
+        .filter(
+            f -> Objects.isNull(f.getAnnotation(ignoreAnn)) && !Modifier.isStatic(f.getModifiers()))
         .collect(Collectors.toMap(f -> new FieldName(f), f -> {
           f.setAccessible(true);
           return f;
@@ -254,7 +256,7 @@ abstract class Mapping<T> {
   }
 
   /**
-   * Guess cloumn names from the object class
+   * Guess column names from the object class
    *
    * @param objectClass
    * @return

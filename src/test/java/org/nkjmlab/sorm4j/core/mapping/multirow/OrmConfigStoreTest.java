@@ -59,11 +59,11 @@ class OrmConfigStoreTest {
             .setMultiRowSize(20).setBatchSizeWithMultiRow(30));
 
 
-    ConfigStore confs = SormTestUtils.createSorm(NEW_CONFIG).getConfigStore();
+    ConfigStore confs = ConfigStore.get(NEW_CONFIG);
     assertThat(confs.getConfigName()).isEqualTo(NEW_CONFIG);
     assertThat(confs.getColumnFieldMapper()).isEqualTo(DEFAULT_COLUMN_FIELD_MAPPER);
     assertThat(confs.getTableNameMapper()).isEqualTo(DEFAULT_TABLE_NAME_MAPPER);
-    assertThat(confs.getSqlToJavaDataConverter()).isEqualTo(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER);
+    assertThat(confs.getResultSetConverter()).isEqualTo(DEFAULT_SQL_TO_JAVA_DATA_CONVERTER);
     assertThat(confs.getSqlParameterSetter()).isEqualTo(DEFAULT_JAVA_TO_SQL_DATA_CONVERTER);
   }
 
@@ -74,10 +74,10 @@ class OrmConfigStoreTest {
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
     String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
         .getTableMapping(Player.class).getFormattedString());
-
+    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
     assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
 
-    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
+    SormFactory.resetDefaultConfig();
   }
 
   @Test
@@ -89,8 +89,8 @@ class OrmConfigStoreTest {
 
 
     sormImpl = SormFactory.create(jdbcUrl, user, password);
-    assertThat(sormImpl.getConfigStore().getConfigName())
-        .isEqualTo(SormFactory.DEFAULT_CONFIG_NAME);
+    assertThat(sormImpl.getConfigName()).isEqualTo(SormFactory.DEFAULT_CONFIG_NAME);
+    System.out.println(sormImpl.getConfigString());
   }
 
 }

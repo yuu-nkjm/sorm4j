@@ -16,9 +16,11 @@ Sorm4j instance wraps a `java.sql.Connection` object. Sorm4j has only one depend
 - [Quickstart](https://scrapbox.io/sorm4j/Quickstart)
     - To get started, see here.
 - [Examples](https://scrapbox.io/sorm4j/Examples)
-    - If you need more sample codes, please take a look at the [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample)
+    - If you need more sample codes, please take a look at the [Examples](https://scrapbox.io/sorm4j/Examples) page and the [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample) repository.
+- [Key Features](https://scrapbox.io/sorm4j/Key_Features)
+    - The key features of Sorm4j, see here.
 - [Performance](https://scrapbox.io/sorm4j/Performance)
-    - If you need more benchmark result, please take a look at the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh)
+    - If you need more benchmark result, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
 - [Developer Guide](https://scrapbox.io/sorm4j/Developer_Guide)
     - The detailed manual is here.
 

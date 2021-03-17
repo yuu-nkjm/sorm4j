@@ -253,9 +253,20 @@ public class DefaultResultSetConverter implements ResultSetConverter {
       java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
       Object.class);
 
+  /**
+   * Returns the given type is enable to convert native object.
+   *
+   * Following classes are regarded as native class: boolean.class, Boolean.class, byte.class,
+   * Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class,
+   * float.class, Float.class, double.class, Double.class, char.class, Character.class,
+   * byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
+   * java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
+   * java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
+   * Object.class
+   */
   @Override
-  public boolean isEnableToConvertNativeObject(final Class<?> type) {
-    return nativeSqlTypes.contains(type);
+  public boolean isEnableToConvertNativeObject(Class<?> objectClass) {
+    return nativeSqlTypes.contains(objectClass);
   }
 
 }

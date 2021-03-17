@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
+import javax.sql.DataSource;
 
 /**
  * An interface of executing object-relation mapping.
@@ -153,7 +153,7 @@ public interface Sorm {
   /**
    * Creates a Sorm object with the given config name. The config name should be registered by
    * {@link SormFactory#registerConfig(String, java.util.function.Consumer)} or
-   * {@link SormFactory#registerModifiedConfig(String, Sorm, java.util.function.Consumer)}
+   * {@link SormFactory#registerModifiedConfig(String, String, java.util.function.Consumer)}
    *
    * @param configName
    * @return
@@ -161,19 +161,27 @@ public interface Sorm {
   Sorm createWith(String configName);
 
   /**
-   * (non-public API) Get the config store of this object. It is only used for Sorm4j framework.
+   * Get the config name of this object.
    *
    * @return
    */
-  ConfigStore getConfigStore();
+  String getConfigName();
+
+  /**
+   * Get the string of the config of this object.
+   *
+   * @return
+   */
+  String getConfigString();
+
 
 
   /**
-   * Gets {@link ConnectionSource}.
+   * Gets {@link DataSource}.
    *
    * @return
    */
-  ConnectionSource getConnectionSource();
+  DataSource getDataSource();
 
   /**
    * Gets JDBC {@link Connection}.

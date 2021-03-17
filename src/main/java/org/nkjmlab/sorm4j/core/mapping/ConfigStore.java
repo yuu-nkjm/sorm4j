@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.core.mapping;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.core.mapping.multirow.MultiRowProcessorGeneratorFactory;
@@ -24,25 +25,36 @@ public final class ConfigStore {
 
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
   private final ResultSetConverter resultSetConverter;
   private final SqlParameterSetter sqlParameterSetter;
-  private final MultiRowProcessorGeneratorFactory multiProcessorFactory;
+  private final MultiRowProcessorGeneratorFactory multiRowProcessorGeneratorFactory;
+  private final MultiRowProcessorType multiRowProcessorType;
+  private final int batchSize;
+  private final int multiRowSize;
+  private final int batchSizeWithMultiRow;
   private final int transactionIsolationLevel;
+
 
   public ConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
       TableNameMapper tableNameMapper, ResultSetConverter resultSetConverter,
-      SqlParameterSetter javaToSqlConverter, MultiRowProcessorGeneratorFactory batchConfig,
-      int transactionIsolationLevel) {
+      SqlParameterSetter sqlParameterSetter, MultiRowProcessorType multiRowProcessorType,
+      int batchSize, int multiRowSize, int batchSizeWithMultiRow, int transactionIsolationLevel) {
     this.configName = cacheName;
     this.columnFieldMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
     this.resultSetConverter = resultSetConverter;
-    this.sqlParameterSetter = javaToSqlConverter;
-    this.multiProcessorFactory = batchConfig;
+    this.sqlParameterSetter = sqlParameterSetter;
+    this.multiRowProcessorType = multiRowProcessorType;
+    this.batchSize = batchSize;
+    this.multiRowSize = multiRowSize;
+    this.batchSizeWithMultiRow = batchSizeWithMultiRow;
+    this.multiRowProcessorGeneratorFactory =
+        MultiRowProcessorGeneratorFactory.createMultiRowProcessorFactory(sqlParameterSetter,
+            multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
+
     this.transactionIsolationLevel = transactionIsolationLevel;
   }
 
@@ -54,7 +66,7 @@ public final class ConfigStore {
     return columnFieldMapper;
   }
 
-  public ResultSetConverter getSqlToJavaDataConverter() {
+  public ResultSetConverter getResultSetConverter() {
     return resultSetConverter;
   }
 
@@ -62,8 +74,8 @@ public final class ConfigStore {
     return tableNameMapper;
   }
 
-  public MultiRowProcessorGeneratorFactory getMultiProcessorFactory() {
-    return multiProcessorFactory;
+  public MultiRowProcessorGeneratorFactory getMultiRowProcessorGeneratorFactory() {
+    return multiRowProcessorGeneratorFactory;
   }
 
   public SqlParameterSetter getSqlParameterSetter() {
@@ -117,6 +129,32 @@ public final class ConfigStore {
 
   public static void refresh(String configName) {
     OrmCache.refresh(configName);
+  }
+
+  public MultiRowProcessorType getMultiRowProcessorType() {
+    return multiRowProcessorType;
+  }
+
+  public int getBatchSize() {
+    return batchSize;
+  }
+
+  public int getMultiRowSize() {
+    return multiRowSize;
+  }
+
+  public int getBatchSizeWithMultiRow() {
+    return batchSizeWithMultiRow;
+  }
+
+  @Override
+  public String toString() {
+    return "ConfigStore [configName=" + configName + ", columnFieldMapper=" + columnFieldMapper
+        + ", tableNameMapper=" + tableNameMapper + ", resultSetConverter=" + resultSetConverter
+        + ", sqlParameterSetter=" + sqlParameterSetter + ", multiRowProcessorType="
+        + multiRowProcessorType + ", batchSize=" + batchSize + ", multiRowSize=" + multiRowSize
+        + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow + ", transactionIsolationLevel="
+        + transactionIsolationLevel + "]";
   }
 
 }

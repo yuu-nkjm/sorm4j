@@ -14,7 +14,7 @@ class SormFactoryTest {
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
     TypedOrmConnection<Guest> orm = SormFactory.toOrmConnection(sorm.getJdbcConnection(),
         Guest.class, SormFactory.DEFAULT_CONFIG_NAME);
-    orm.insert(GUEST_ALICE);
+    orm.type(Guest.class).insert(GUEST_ALICE);
     assertThat(orm.untype().readOne(Integer.class, "select count(*) from guests")).isEqualTo(1);
   }
 
