@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.core.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
@@ -90,8 +91,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public ConfigStore getConfigStore() {
-    return this.configStore;
+  public String getConfigName() {
+    return this.configStore.getConfigName();
   }
 
 
@@ -108,8 +109,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public ConnectionSource getConnectionSource() {
-    return this.connectionSource;
+  public DataSource getDataSource() {
+    return this.connectionSource.getDataSource();
   }
 
   @Override

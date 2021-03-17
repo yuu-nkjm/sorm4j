@@ -358,14 +358,14 @@ class OrmConnectionTest {
 
 
       try {
-        OrmLogger.onAll();
+        OrmLogger.on();
         m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getCause().getMessage())
             .contains("but 1 column was expected to load data into");
       }
-      OrmLogger.offAll();
+      OrmLogger.off();
 
 
       assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);
@@ -468,7 +468,7 @@ class OrmConnectionTest {
   void testSormExeption() {
     try {
       SormFactory.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
-          .getConnectionSource().getDataSource();
+          .getDataSource();
       fail("Should be fail");
     } catch (Exception e) {
 
@@ -491,7 +491,7 @@ class OrmConnectionTest {
   @Test
   void testTransactionLevel() {
 
-    SormFactory.registerModifiedConfig("isolev", sorm,
+    SormFactory.registerModifiedConfig("isolev", sorm.getConfigName(),
         b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
     try {

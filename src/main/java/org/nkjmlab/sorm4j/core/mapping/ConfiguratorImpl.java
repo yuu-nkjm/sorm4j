@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.core.mapping;
 import static org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType.*;
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.Configurator;
-import org.nkjmlab.sorm4j.core.mapping.multirow.MultiRowProcessorGeneratorFactory;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
@@ -26,10 +25,10 @@ public class ConfiguratorImpl implements Configurator {
 
   public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
 
-  public static final SqlParameterSetter DEFAULT_JAVA_TO_SQL_DATA_CONVERTER =
+  public static final SqlParameterSetter DEFAULT_SQL_PARAMETER_SETTER =
       new DefaultSqlParameterSetter();
 
-  public static final ResultSetConverter DEFAULT_SQL_TO_JAVA_DATA_CONVERTER =
+  public static final ResultSetConverter DEFAULT_RESULT_SET_CONVERTER =
       new DefaultResultSetConverter();
 
   public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
@@ -40,8 +39,8 @@ public class ConfiguratorImpl implements Configurator {
   private final String configName;
   private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
   private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
-  private ResultSetConverter resultSetConverter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
-  private SqlParameterSetter sqlParameterSetter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
+  private ResultSetConverter resultSetConverter = DEFAULT_RESULT_SET_CONVERTER;
+  private SqlParameterSetter sqlParameterSetter = DEFAULT_SQL_PARAMETER_SETTER;
   private MultiRowProcessorType multiRowProcessorType = DEFAULT_MULTI_ROW_PROCESSOR;
   private int batchSize = 32;
   private int multiRowSize = 32;
@@ -54,23 +53,21 @@ public class ConfiguratorImpl implements Configurator {
 
   public ConfiguratorImpl(String configName, ConfigStore configStore) {
     this(configName);
-    this.columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
-    this.tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
-    this.resultSetConverter = DEFAULT_SQL_TO_JAVA_DATA_CONVERTER;
-    this.sqlParameterSetter = DEFAULT_JAVA_TO_SQL_DATA_CONVERTER;
-    this.multiRowProcessorType = DEFAULT_MULTI_ROW_PROCESSOR;
-    this.batchSize = 32;
-    this.multiRowSize = 32;
-    this.batchSizeWithMultiRow = 5;
-    this.transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
+    this.columnFieldMapper = configStore.getColumnFieldMapper();
+    this.tableNameMapper = configStore.getTableNameMapper();
+    this.resultSetConverter = configStore.getResultSetConverter();
+    this.sqlParameterSetter = configStore.getSqlParameterSetter();
+    this.multiRowProcessorType = configStore.getMultiRowProcessorType();
+    this.batchSize = configStore.getBatchSize();
+    this.multiRowSize = configStore.getMultiRowSize();
+    this.batchSizeWithMultiRow = configStore.getBatchSizeWithMultiRow();
+    this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
 
   }
 
   public ConfigStore build() {
     return new ConfigStore(configName, columnFieldMapper, tableNameMapper, resultSetConverter,
-        sqlParameterSetter,
-        MultiRowProcessorGeneratorFactory.createMultiRowProcessorFactory(sqlParameterSetter,
-            multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow),
+        sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow,
         transactionIsolationLevel);
   }
 

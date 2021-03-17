@@ -123,7 +123,7 @@ class SormTest {
   void testToString() {
     assertThat(srv.toString()).contains("Sorm");
 
-    SormFactory.create(SormTestUtils.createDataSourceH2()).getConnectionSource();
+    SormFactory.create(SormTestUtils.createDataSourceH2()).getDataSource();
 
   }
 

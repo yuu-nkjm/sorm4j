@@ -27,8 +27,8 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    OrmLogger.onAll();
-    OrmLogger.offAll();
+    OrmLogger.on();
+    OrmLogger.off();
     SormFactory.registerConfig("BATCH_CONF", builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
 

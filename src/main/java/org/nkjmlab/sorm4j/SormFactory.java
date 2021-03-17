@@ -19,6 +19,9 @@ import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
  *
  */
 public final class SormFactory {
+  /**
+   * Default config name of Sorm.
+   */
   public static final String DEFAULT_CONFIG_NAME = "DEFAULT_CONFIG";
 
   private static void configure(ConfiguratorImpl configurator,
@@ -120,13 +123,14 @@ public final class SormFactory {
   /**
    * Registers modified configuration of the given Sorm object under the given name.
    *
-   * @param configName
-   * @param sorm
+   * @param newConfigName
+   * @param srcConfigName
    * @param configuratorConsumer
    */
-  public static void registerModifiedConfig(String configName, Sorm sorm,
+  public static void registerModifiedConfig(String newConfigName, String srcConfigName,
       Consumer<Configurator> configuratorConsumer) {
-    configure(new ConfiguratorImpl(configName, sorm.getConfigStore()), configuratorConsumer);
+    configure(new ConfiguratorImpl(newConfigName, ConfigStore.get(srcConfigName)),
+        configuratorConsumer);
   }
 
   /**

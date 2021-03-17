@@ -68,10 +68,10 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   public AbstractOrmMapper(Connection connection, ConfigStore configStore) {
     this.connection = connection;
     this.configStore = configStore;
-    this.batchConfig = configStore.getMultiProcessorFactory();
+    this.batchConfig = configStore.getMultiRowProcessorGeneratorFactory();
     this.fieldMapper = configStore.getColumnFieldMapper();
     this.tableNameMapper = configStore.getTableNameMapper();
-    this.resultSetConverter = configStore.getSqlToJavaDataConverter();
+    this.resultSetConverter = configStore.getResultSetConverter();
     this.sqlParameterSetter = configStore.getSqlParameterSetter();
     this.tableMappings = configStore.getTableMappings();
     this.columnsMappings = configStore.getColumnsMappings();
