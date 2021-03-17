@@ -41,10 +41,10 @@ public interface ResultSetConverter {
   /**
    * Returns the given type could be converted to the native object or not.
    *
-   * @param type
+   * @param objectClass
    * @return
    */
-  boolean isEnableToConvertNativeObject(Class<?> type);
+  boolean isEnableToConvertNativeObject(Class<?> objectClass);
 
   /**
    * Converts the result from database to a map objects. The data of the column is extracted by
