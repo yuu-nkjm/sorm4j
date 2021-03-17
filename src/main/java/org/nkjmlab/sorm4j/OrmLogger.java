@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.util.Arrays;
-import java.util.Map;
 import org.nkjmlab.sorm4j.core.util.LogPointFactory;
 
 public final class OrmLogger {
@@ -9,8 +8,7 @@ public final class OrmLogger {
   private OrmLogger() {}
 
   static {
-    //on(MAPPING);
-    onAll();
+    on(Category.MAPPING);
   }
 
   /**
@@ -18,16 +16,7 @@ public final class OrmLogger {
    *
    */
   public enum Category {
-    MAPPING, EXECUTE_QUERY, BATCH, EXECUTE_UPDATE;
-  }
-
-  /**
-   * Sets log mode.
-   *
-   * @param mode
-   */
-  public static void setLogMode(Map<OrmLogger.Category, Boolean> mode) {
-    LogPointFactory.modes.putAll(mode);
+    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE;
   }
 
   /**
@@ -51,14 +40,14 @@ public final class OrmLogger {
   /**
    * Enables logging all.
    */
-  public static void onAll() {
+  public static void on() {
     on(OrmLogger.Category.values());
   }
 
   /**
    * Disables logging all.
    */
-  public static void offAll() {
+  public static void off() {
     off(OrmLogger.Category.values());
   }
 

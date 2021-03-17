@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
@@ -34,10 +33,7 @@ public class TestSimple {
       JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
 
   @BeforeAll
-  static void beforAll() {
-    OrmLogger.setLogMode(Map.of(OrmLogger.Category.EXECUTE_QUERY, true, OrmLogger.Category.BATCH,
-        true, OrmLogger.Category.EXECUTE_UPDATE, true));
-  }
+  static void beforAll() {}
 
   private static void dropAndCreateSimpleTable() {
 

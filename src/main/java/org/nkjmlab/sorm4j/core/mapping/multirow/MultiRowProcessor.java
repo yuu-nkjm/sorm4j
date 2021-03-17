@@ -94,7 +94,7 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.BATCH);
+    Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.MULTI_ROW);
 
     int[] result = exec.apply(objects);
 
