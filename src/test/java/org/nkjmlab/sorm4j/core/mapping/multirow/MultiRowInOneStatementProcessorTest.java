@@ -7,60 +7,61 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
-class SimpleBatchProcessorTest {
+class MultiRowInOneStatementProcessorTest {
 
   private static Sorm sorm;
-  private static final Player a = PLAYER_ALICE;
-  private static final Player b = PLAYER_BOB;
-  private static final Player c = PLAYER_CAROL;
+  private static final Player a = SormTestUtils.PLAYER_ALICE;
+  private static final Player b = SormTestUtils.PLAYER_BOB;
+  private static final Player c = SormTestUtils.PLAYER_CAROL;
+
+
 
   @BeforeAll
   static void setUp() {
-    SormFactory.registerConfig("SIMPLE_BATCH", builder -> builder
-        .setMultiRowProcessorType(Configurator.MultiRowProcessorType.SIMPLE_BATCH));
-    sorm = SormFactory.create(jdbcUrl, user, password, "SIMPLE_BATCH");
+    sorm = SormTestUtils.createSorm();
+    SormTestUtils.dropAndCreateTableAll(sorm);
+    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
+        .getTableMapping(Player.class).getFormattedString());
   }
-
 
   @BeforeEach
   void setUpEach() {
     SormTestUtils.dropAndCreateTableAll(sorm);
   }
 
-  @Test
-  void testSetUp() {
-    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
-    assertThat(s).contains(SimpleBatchProcessor.class.getSimpleName());
-  }
+
 
   @Test
   void testMultiRowInsert() {
     sorm.accept(Player.class, conn -> conn.insert(a, b));
-    sorm.acceptTransactionHandler(tr -> {
-      try {
-        tr.insert(a, null);
-        failBecauseExceptionWasNotThrown(Exception.class);
-      } catch (Exception e) {
-        assertThat(e.getMessage()).contains("it is null");
-      }
+  }
 
-    });
-
+  @Test
+  void testMultiRowInsertNull() {
+    try {
+      sorm.accept(Player.class, conn -> conn.insert(a, b, c, a));
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Unique index or primary key violation");
+    }
+    try {
+      sorm.accept(Player.class, conn -> conn.insert(a, b, null));
+      failBecauseExceptionWasNotThrown(Exception.class);
+    } catch (Exception e) {
+      assertThat(e.getMessage()).contains("Fail to get value from");
+    }
   }
 
   @Test
   void testMultiRowInsertMany() {
     sorm.accept(Guest.class, conn -> conn
-        .insert(Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList())));
+        .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
   @Test

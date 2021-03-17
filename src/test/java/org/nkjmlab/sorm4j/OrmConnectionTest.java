@@ -464,17 +464,6 @@ class OrmConnectionTest {
 
   }
 
-  @Test
-  void testSormExeption() {
-    try {
-      SormFactory.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
-          .getDataSource();
-      fail("Should be fail");
-    } catch (Exception e) {
-
-    }
-  }
-
 
   @Test
   void testTransaction() {
@@ -491,7 +480,7 @@ class OrmConnectionTest {
   @Test
   void testTransactionLevel() {
 
-    SormFactory.registerModifiedConfig("isolev", sorm.getConfigName(),
+    SormFactory.registerModifiedConfig(sorm.getConfigName(), "isolev",
         b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
     try {

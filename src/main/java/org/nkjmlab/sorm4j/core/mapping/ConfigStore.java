@@ -25,7 +25,6 @@ public final class ConfigStore {
 
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
@@ -148,9 +147,14 @@ public final class ConfigStore {
     return batchSizeWithMultiRow;
   }
 
-  public static ConcurrentMap<String, ConfigStore> getConfigstores() {
-    return configStores;
+  @Override
+  public String toString() {
+    return "ConfigStore [configName=" + configName + ", columnFieldMapper=" + columnFieldMapper
+        + ", tableNameMapper=" + tableNameMapper + ", resultSetConverter=" + resultSetConverter
+        + ", sqlParameterSetter=" + sqlParameterSetter + ", multiRowProcessorType="
+        + multiRowProcessorType + ", batchSize=" + batchSize + ", multiRowSize=" + multiRowSize
+        + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow + ", transactionIsolationLevel="
+        + transactionIsolationLevel + "]";
   }
-
 
 }

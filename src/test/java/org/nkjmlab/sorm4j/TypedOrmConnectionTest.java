@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.core.mapping.InsertResultImpl;
@@ -466,13 +467,33 @@ class TypedOrmConnectionTest {
 
   @Test
   void testSormExeption() {
+    DataSource ds = SormFactory
+        .create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password).getDataSource();
     try {
-      SormFactory.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
-          .getDataSource();
-      fail("Should be fail");
+      ds.unwrap(null);
+      failBecauseExceptionWasNotThrown(UnsupportedOperationException.class);
     } catch (Exception e) {
-
     }
+    try {
+      ds.isWrapperFor(null);
+      failBecauseExceptionWasNotThrown(UnsupportedOperationException.class);
+    } catch (Exception e) {
+    }
+    try {
+      ds.getParentLogger();
+      failBecauseExceptionWasNotThrown(UnsupportedOperationException.class);
+    } catch (Exception e) {
+    }
+    try {
+      ds.getConnection("sa", "");
+      ds.getLogWriter();
+      ds.setLogWriter(null);
+      ds.getLoginTimeout();
+      ds.setLoginTimeout(10);
+    } catch (Exception e) {
+      fail();
+    }
+
   }
 
 
@@ -485,6 +506,7 @@ class TypedOrmConnectionTest {
 
     sorm.acceptTransactionHandler(Guest.class, m -> {
       m.insert(a);
+      m = m.untype().type(Guest.class);
       Guest g = m.readFirst("SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
       g = m.readFirst(SqlStatement.of("SELECT * FROM GUESTS"));
@@ -548,6 +570,7 @@ class TypedOrmConnectionTest {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_ALICE;
     sorm.accept(Player.class, m -> {
+      m = m.untype().type(Player.class);
       m.insert(a);
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"));
       m.update(new Player(a.getId(), "UPDATED", "UPDATED"),

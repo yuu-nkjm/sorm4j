@@ -29,6 +29,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   static void setUp() {
     OrmLogger.on();
     OrmLogger.off();
+    OrmLogger.on();
     SormFactory.registerConfig("BATCH_CONF", builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
 
@@ -77,7 +78,8 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowMerge() {
-    sorm.accept(Player.class, conn -> conn.merge(a, b, c));
+    sorm.accept(Player.class, conn -> conn
+        .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
 

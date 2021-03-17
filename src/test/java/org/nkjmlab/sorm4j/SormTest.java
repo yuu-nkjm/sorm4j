@@ -3,10 +3,10 @@ package org.nkjmlab.sorm4j;
 import static org.assertj.core.api.Assertions.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nkjmlab.sorm4j.core.connectionsource.DataSourceConnectionSource;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -25,7 +25,7 @@ class SormTest {
 
   @Test
   void testException() throws SQLException {
-    ConnectionSource mock = Mockito.spy(ConnectionSource.class);
+    DataSource mock = Mockito.spy(DataSource.class);
     Mockito.doThrow(new SQLException("Mock exception")).when(mock).getConnection();
     Sorm sormImpl = SormFactory.create(mock);
     try {
@@ -40,11 +40,10 @@ class SormTest {
     Connection conMock = Mockito.spy(Connection.class);
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock).close();
 
-    ConnectionSource csMock =
-        Mockito.spy(new DataSourceConnectionSource(SormTestUtils.createDataSourceHikari()));
+    DataSource mock = Mockito.spy(DataSource.class);
 
-    Mockito.when(csMock.getConnection()).thenReturn(conMock);
-    Sorm sormImpl = SormFactory.create(csMock);
+    Mockito.when(mock.getConnection()).thenReturn(conMock);
+    Sorm sormImpl = SormFactory.create(mock);
 
     try {
       sormImpl.acceptJdbcConnectionHandler(con -> {

@@ -4,16 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.core.connectionsource.DataSourceConnectionSource;
-import org.nkjmlab.sorm4j.core.connectionsource.DriverManagerConnectionSource;
 import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
 import org.nkjmlab.sorm4j.core.mapping.ConfiguratorImpl;
+import org.nkjmlab.sorm4j.core.mapping.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.core.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.core.mapping.SormImpl;
 import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 
 /**
- * Main entry point of Som4j, which is factory for {@link Sorm} object.
+ * Mink Sorm} object.
  *
  * @author nkjm
  *
@@ -28,27 +27,6 @@ public final class SormFactory {
       Consumer<Configurator> configuratorConsumer) {
     configuratorConsumer.accept(configurator);
     ConfigStore.refreshAndRegister(configurator.build());
-  };
-
-  /**
-   * Create a {@link Sorm} object which uses {@link ConnectionSource}.
-   *
-   * @param connectionSource
-   * @return
-   */
-  public static Sorm create(ConnectionSource connectionSource) {
-    return create(connectionSource, SormFactory.DEFAULT_CONFIG_NAME);
-  }
-
-  /**
-   * Create a {@link Sorm} object which uses {@link ConnectionSource} and the configurations
-   * corresponding to the given configName.
-   *
-   * @param connectionSource
-   * @return
-   */
-  public static Sorm create(ConnectionSource connectionSource, String configName) {
-    return new SormImpl(connectionSource, ConfigStore.get(configName));
   }
 
   /**
@@ -70,7 +48,7 @@ public final class SormFactory {
    * @return
    */
   public static Sorm create(DataSource dataSource, String configName) {
-    return create(createConnectionSource(dataSource), configName);
+    return new SormImpl(dataSource, ConfigStore.get(configName));
   }
 
   /**
@@ -91,22 +69,19 @@ public final class SormFactory {
    * corresponding to the given configName.
    *
    * @param jdbcUrl
-   * @param user
+   * @param username
    * @param password
    * @param configName
    * @return
    */
-  public static Sorm create(String jdbcUrl, String user, String password, String configName) {
-    return create(createConnectionSource(jdbcUrl, user, password), configName);
+  public static Sorm create(String jdbcUrl, String username, String password, String configName) {
+    return create(createDriverManagerConnectionSource(jdbcUrl, username, password), configName);
   }
 
-  private static ConnectionSource createConnectionSource(DataSource dataSource) {
-    return new DataSourceConnectionSource(dataSource);
-  }
 
-  private static ConnectionSource createConnectionSource(String jdbcUrl, String user,
+  private static DataSource createDriverManagerConnectionSource(String jdbcUrl, String username,
       String password) {
-    return new DriverManagerConnectionSource(jdbcUrl, user, password);
+    return new DriverManagerDataSource(jdbcUrl, username, password);
   }
 
   /**
@@ -123,11 +98,11 @@ public final class SormFactory {
   /**
    * Registers modified configuration of the given Sorm object under the given name.
    *
-   * @param newConfigName
    * @param srcConfigName
+   * @param newConfigName
    * @param configuratorConsumer
    */
-  public static void registerModifiedConfig(String newConfigName, String srcConfigName,
+  public static void registerModifiedConfig(String srcConfigName, String newConfigName,
       Consumer<Configurator> configuratorConsumer) {
     configure(new ConfiguratorImpl(newConfigName, ConfigStore.get(srcConfigName)),
         configuratorConsumer);
@@ -140,6 +115,10 @@ public final class SormFactory {
    */
   public static void updateDefaultConfig(Consumer<Configurator> configuratorConsumer) {
     configure(new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME), configuratorConsumer);
+  }
+
+  public static void resetDefaultConfig() {
+    ConfigStore.refreshAndRegister(ConfigStore.INITIAL_DEFAULT_CONFIG_STORE);
   }
 
   /**
@@ -202,5 +181,6 @@ public final class SormFactory {
 
 
   private SormFactory() {}
+
 
 }

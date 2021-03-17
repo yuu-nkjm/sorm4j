@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.core.mapping;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.ConnectionSource;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
@@ -21,14 +20,14 @@ import org.nkjmlab.sorm4j.core.util.Try;
 public final class SormImpl implements Sorm {
   // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
 
-  private final ConnectionSource connectionSource;
+  private final DataSource dataSource;
 
   private final ConfigStore configStore;
 
 
-  public SormImpl(ConnectionSource connectionSource, ConfigStore configs) {
+  public SormImpl(DataSource connectionSource, ConfigStore configs) {
     this.configStore = configs;
-    this.connectionSource = connectionSource;
+    this.dataSource = connectionSource;
   }
 
   @Override
@@ -92,7 +91,12 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String getConfigName() {
-    return this.configStore.getConfigName();
+    return configStore.getConfigName();
+  }
+
+  @Override
+  public String getConfigString() {
+    return configStore.toString();
   }
 
 
@@ -110,13 +114,13 @@ public final class SormImpl implements Sorm {
 
   @Override
   public DataSource getDataSource() {
-    return this.connectionSource.getDataSource();
+    return this.dataSource;
   }
 
   @Override
   public Connection getJdbcConnection() {
     try {
-      return connectionSource.getConnection();
+      return dataSource.getConnection();
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
@@ -176,7 +180,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String toString() {
-    return "Sorm [connectionSource=" + connectionSource + ", configStore=" + configStore + "]";
+    return "Sorm [dataSource=" + dataSource + ", configStore=" + configStore + "]";
   }
 
 
@@ -229,7 +233,8 @@ public final class SormImpl implements Sorm {
 
   @Override
   public Sorm createWith(String configName) {
-    return SormFactory.create(connectionSource, configName);
+    return SormFactory.create(dataSource, configName);
   }
+
 
 }
