@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.core.util.Try;
  */
 
 public class DefaultSqlParameterSetter implements SqlParameterSetter {
-  // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
   @Override
   public void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException {

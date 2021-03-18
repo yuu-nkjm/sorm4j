@@ -18,7 +18,7 @@ public interface OrderedParameterSql extends SqlStatementSupplier {
    * @param parameter
    * @return
    */
-  OrderedParameterSql add(Object parameter);
+  OrderedParameterSql addParameter(Object parameter);
 
   /**
    * Add parameters to the SQL statement sequentially.
@@ -26,11 +26,11 @@ public interface OrderedParameterSql extends SqlStatementSupplier {
    * @param parameters
    * @return
    */
-  OrderedParameterSql add(Object... parameters);
+  OrderedParameterSql addParameter(Object... parameters);
 
 
   static SqlStatement toSqlStatement(String sql, Object... parameters) {
-    return from(sql).add(parameters).toSqlStatement();
+    return from(sql).addParameter(parameters).toSqlStatement();
   }
 
   static OrderedParameterSql from(String sql) {

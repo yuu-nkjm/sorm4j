@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util;
+package org.nkjmlab.sorm4j.core.util;
 
 import static org.assertj.core.api.Assertions.*;
 import java.util.List;

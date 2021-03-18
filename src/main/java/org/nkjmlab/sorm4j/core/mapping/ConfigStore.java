@@ -23,7 +23,7 @@ public final class ConfigStore {
   public static ConfigStore INITIAL_DEFAULT_CONFIG_STORE =
       new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME).build();
 
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;

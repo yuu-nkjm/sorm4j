@@ -33,16 +33,16 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
   }
 
   @Override
-  public OrderedParameterQuery<T> add(Object... parameters) {
+  public OrderedParameterQuery<T> addParameter(Object... parameters) {
     OrderedParameterQuery<T> ret = withOrderedParameter();
-    ret.add(parameters);
+    ret.addParameter(parameters);
     return ret;
   }
 
   @Override
-  public OrderedParameterQuery<T> add(Object parameter) {
+  public OrderedParameterQuery<T> addParameter(Object parameter) {
     OrderedParameterQuery<T> ret = withOrderedParameter();
-    ret.add(parameter);
+    ret.addParameter(parameter);
     return ret;
   }
 

@@ -30,6 +30,15 @@ class SelectQueryTest {
     sorm.accept(con -> assertThat(
         con.createSelectQuery(Player.class).where("id=:id").bind("id", 1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
+
+    sorm.accept(con -> assertThat(
+        con.createNamedParameterQuery(Player.class, "select * from players where id=:id")
+            .bind("id", 1).readLazy().one()).isEqualTo(PLAYER_ALICE));
+
+    sorm.accept(con -> assertThat(
+        con.createOrderedParameterQuery(Player.class, "select * from players where id=?").addParameter(1)
+            .readLazy().one()).isEqualTo(PLAYER_ALICE));
+
   }
 
   @Test
@@ -43,7 +52,7 @@ class SelectQueryTest {
   @Test
   void testExecAddQuery() {
     sorm.accept(Player.class,
-        con -> assertThat(con.createSelectQuery().where("id=?").add(1).readLazy().one())
+        con -> assertThat(con.createSelectQuery().where("id=?").addParameter(1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
   }
 
@@ -51,7 +60,7 @@ class SelectQueryTest {
   void testExecAddAllQuery() {
     sorm.accept(Player.class,
         con -> assertThat(con.createSelectQuery().where(and("id=?", "name=?"))
-            .add(PLAYER_ALICE.getId(), PLAYER_ALICE.getName()).readLazy().one())
+            .addParameter(PLAYER_ALICE.getId(), PLAYER_ALICE.getName()).readLazy().one())
                 .isEqualTo(PLAYER_ALICE));
   }
 

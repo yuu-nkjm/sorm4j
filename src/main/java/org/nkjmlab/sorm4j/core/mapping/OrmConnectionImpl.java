@@ -5,14 +5,13 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterQueryImpl;
-import org.nkjmlab.sorm4j.core.sqlstatement.SelectQueryImpl;
 import org.nkjmlab.sorm4j.core.sqlstatement.QueryOrmExecutor;
+import org.nkjmlab.sorm4j.core.sqlstatement.SelectQueryImpl;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SelectBuilder;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -83,34 +82,26 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   }
 
   @Override
-  public SelectBuilder createSelectBuilder() {
-    return SelectBuilder.create();
-  }
-
-  @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
     return new TypedOrmConnectionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
   }
 
   @Override
   public <T> SelectQuery<T> createSelectQuery(Class<T> objectClass) {
-    SelectQueryImpl<T> ret =
-        new SelectQueryImpl<T>(new QueryOrmExecutor<>(this, objectClass));
+    SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryOrmExecutor<>(this, objectClass));
     ret.from(getTableMapping(objectClass).getTableName());
     return ret;
   }
 
   @Override
   public <T> NamedParameterQuery<T> createNamedParameterQuery(Class<T> objectClass, String sql) {
-    return NamedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass),
-        sql);
+    return NamedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
   }
 
   @Override
   public <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass,
       String sql) {
-    return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass),
-        sql);
+    return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
   }
 
 }

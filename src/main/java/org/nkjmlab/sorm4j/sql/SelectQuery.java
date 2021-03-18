@@ -13,10 +13,10 @@ import java.util.Map;
 public interface SelectQuery<T>
     extends SelectBuilder, NamedParameterSql, OrderedParameterSql, SqlStatementSupplier, Query<T> {
   @Override
-  OrderedParameterQuery<T> add(Object... parameters);
+  OrderedParameterQuery<T> addParameter(Object... parameters);
 
   @Override
-  OrderedParameterQuery<T> add(Object parameter);
+  OrderedParameterQuery<T> addParameter(Object parameter);
 
   @Override
   NamedParameterQuery<T> bindAll(Map<String, Object> namedParams);

@@ -22,14 +22,14 @@ public class OrderedParameterQueryImpl<T> extends AbstractQuery<T>
   }
 
   @Override
-  public OrderedParameterQuery<T> add(Object parameter) {
-    orderedParameterSql.add(parameter);
+  public OrderedParameterQuery<T> addParameter(Object parameter) {
+    orderedParameterSql.addParameter(parameter);
     return this;
   }
 
   @Override
-  public OrderedParameterQuery<T> add(Object... parameters) {
-    orderedParameterSql.add(parameters);
+  public OrderedParameterQuery<T> addParameter(Object... parameters) {
+    orderedParameterSql.addParameter(parameters);
     return this;
   }
 

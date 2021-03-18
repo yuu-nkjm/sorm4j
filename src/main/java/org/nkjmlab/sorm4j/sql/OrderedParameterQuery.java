@@ -10,9 +10,9 @@ package org.nkjmlab.sorm4j.sql;
 public interface OrderedParameterQuery<T> extends Query<T>, OrderedParameterSql {
 
   @Override
-  OrderedParameterQuery<T> add(Object... parameters);
+  OrderedParameterQuery<T> addParameter(Object... parameters);
 
   @Override
-  OrderedParameterQuery<T> add(Object parameter);
+  OrderedParameterQuery<T> addParameter(Object parameter);
 
 }

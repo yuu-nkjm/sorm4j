@@ -469,6 +469,14 @@ class OrmConnectionTest {
   void testTransaction() {
     Guest a = SormTestUtils.GUEST_ALICE;
     sorm.acceptTransactionHandler(m -> {
+      TypedOrmTransaction<Guest> tmp = m.type(Guest.class);
+      tmp.insert(a);
+      tmp.rollback();
+
+    });
+
+
+    sorm.acceptTransactionHandler(m -> {
       m.insert(a);
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());

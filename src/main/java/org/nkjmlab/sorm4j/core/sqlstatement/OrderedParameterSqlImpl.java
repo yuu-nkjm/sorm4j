@@ -23,13 +23,13 @@ public final class OrderedParameterSqlImpl implements OrderedParameterSql {
   }
 
   @Override
-  public OrderedParameterSql add(Object... parameters) {
-    Arrays.asList(parameters).forEach(v -> add(v));
+  public OrderedParameterSql addParameter(Object... parameters) {
+    Arrays.asList(parameters).forEach(v -> addParameter(v));
     return this;
   }
 
   @Override
-  public OrderedParameterSql add(Object parameter) {
+  public OrderedParameterSql addParameter(Object parameter) {
     if (parameter instanceof List) {
       this.parameters.add(SqlUtils.literal(parameter));
     } else {

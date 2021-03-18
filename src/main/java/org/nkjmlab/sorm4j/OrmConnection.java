@@ -5,7 +5,6 @@ import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SelectBuilder;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -53,14 +52,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @return
    */
   OrderedParameterSql createOrderedParameterSql(String sql);
-
-  /**
-   * Creates a {@link SelectBuilder}.
-   *
-   * @return
-   */
-  SelectBuilder createSelectBuilder();
-
 
   /**
    * Creates a {@link SelectQuery}.

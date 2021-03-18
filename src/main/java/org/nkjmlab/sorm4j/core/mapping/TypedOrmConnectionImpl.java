@@ -25,7 +25,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     implements TypedOrmConnection<T> {
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
 
   public TypedOrmConnectionImpl(Class<T> objectClass, Connection connection, ConfigStore options) {

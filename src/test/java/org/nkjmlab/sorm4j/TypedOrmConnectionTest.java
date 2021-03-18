@@ -304,6 +304,13 @@ class TypedOrmConnectionTest {
     Player b = SormTestUtils.PLAYER_BOB;
     sorm.accept(Player.class, m -> {
       m.insert(List.of(a, b));
+
+
+      Player p1 = m.readLazy(SqlStatement.of("select * from players"))
+          .toList((rs, rowNum) -> m.mapRow(Player.class, rs)).get(0);
+      assertThat(p1.getName()).isEqualTo(a.getName());
+
+
       Map<String, Object> map =
           m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
