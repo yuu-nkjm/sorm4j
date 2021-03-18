@@ -1,10 +1,11 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.sql;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.RowMapper;
 
 
 /**
@@ -68,6 +69,13 @@ public interface LazyResultSet<T> {
    * @return
    */
   List<T> toList();
+
+  /**
+   * Returns the results converted by the given row mapper in a List.
+   *
+   * @return
+   */
+  List<T> toList(RowMapper<T> rowMapper);
 
   /**
    * Returns results in a List of {@code Map<String, Object>}.

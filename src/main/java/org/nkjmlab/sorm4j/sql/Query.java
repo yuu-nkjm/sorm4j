@@ -1,8 +1,7 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.TypedOrmReader;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
 
 /**
  * A query for reading and mapping a relation to object.
@@ -12,7 +11,7 @@ import org.nkjmlab.sorm4j.result.LazyResultSet;
  * @param <T>
  */
 
-public interface TypedQuery<T> {
+public interface Query<T> {
 
   /**
    * see {@link TypedOrmReader#readOne(SqlStatement)}

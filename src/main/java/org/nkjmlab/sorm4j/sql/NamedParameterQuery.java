@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @param <T>
  */
-public interface NamedParameterQuery<T> extends TypedQuery<T>, NamedParameterSql {
+public interface NamedParameterQuery<T> extends Query<T>, NamedParameterSql {
 
   @Override
   NamedParameterQuery<T> bindAll(Map<String, Object> namedParams);

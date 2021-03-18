@@ -3,6 +3,8 @@ package org.nkjmlab.sorm4j.core.mapping;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.ConsumerHandler;
+import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;

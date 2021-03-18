@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -6,12 +6,12 @@ import org.nkjmlab.sorm4j.core.sqlstatement.SelectBuilderImpl;
 
 
 /**
- * API of cleate a select SQL statement.
+ * API of creates a select SQL statement.
  *
  * @author nkjm
  *
  */
-public interface SelectBuilder {
+public interface SelectBuilder extends SqlStatementSupplier {
 
   /**
    * Value object represents conditions of where clause or having clause. This object could include

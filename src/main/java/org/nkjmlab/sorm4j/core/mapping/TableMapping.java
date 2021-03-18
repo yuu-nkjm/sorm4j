@@ -28,7 +28,7 @@ import org.nkjmlab.sorm4j.extension.Column;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.InsertResult;
 
 /**
  * Holds mapping data from a given class and a table

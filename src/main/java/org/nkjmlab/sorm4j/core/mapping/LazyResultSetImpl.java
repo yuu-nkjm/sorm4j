@@ -14,8 +14,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.nkjmlab.sorm4j.ResultSetMapper;
+import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.core.util.Try;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
 
 /**
  * Represents a result set from database.
@@ -69,7 +71,16 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public List<T> toList() {
-    List<T> ret = Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+    List<T> ret =
+        Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+    close();
+    return ret;
+  }
+
+  @Override
+  public List<T> toList(RowMapper<T> rowMapper) {
+    List<T> ret = Try.getOrThrow(() -> ResultSetMapper.convertToRowsMapper(rowMapper).apply(resultSet),
+        Try::rethrow);
     close();
     return ret;
   }
@@ -102,7 +113,7 @@ final class LazyResultSetImpl<T>
   @Override
   public List<Map<String, Object>> toMapList() {
     List<Map<String, Object>> ret =
-        Try.getOrThrow(() -> ormMapper.loadMapList(resultSet), Try::rethrow);
+        Try.getOrThrow(() -> ormMapper.mapRowsAux(resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -149,8 +160,8 @@ final class LazyResultSetImpl<T>
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.getFunction = objectClass.equals(LinkedHashMap.class)
-          ? Try.createSupplierWithThrow(() -> (S) orMapper.loadSingleMap(resultSet), Try::rethrow)
-          : Try.createSupplierWithThrow(() -> orMapper.loadSingleObject(objectClass, resultSet),
+          ? Try.createSupplierWithThrow(() -> (S) orMapper.mapRowAux(resultSet), Try::rethrow)
+          : Try.createSupplierWithThrow(() -> orMapper.mapRowAux(objectClass, resultSet),
               Try::rethrow);
     }
 

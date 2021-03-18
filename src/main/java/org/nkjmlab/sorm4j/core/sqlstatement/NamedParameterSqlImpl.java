@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.core.util.SqlUtils;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * SQL with named parameters. The instance could be convert to {@link SqlStatement}.The class could

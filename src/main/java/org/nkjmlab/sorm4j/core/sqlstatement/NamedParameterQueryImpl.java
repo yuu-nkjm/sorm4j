@@ -1,10 +1,9 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.TypedOrmReader;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * An implementation of {@link NamedParameterQuery}
@@ -13,12 +12,13 @@ import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
  *
  * @param <T>
  */
-public class NamedParameterQueryImpl<T> extends AbstTypedQuery<T> implements NamedParameterQuery<T> {
+public class NamedParameterQueryImpl<T> extends AbstractQuery<T>
+    implements NamedParameterQuery<T> {
 
   private final NamedParameterSql namedParameterSql;
 
-  NamedParameterQueryImpl(TypedOrmReader<T> conn, String sql) {
-    super(conn);
+  NamedParameterQueryImpl(QueryExecutor<T> executor, String sql) {
+    super(executor);
     this.namedParameterSql = NamedParameterSql.from(sql);
   }
 
@@ -41,8 +41,8 @@ public class NamedParameterQueryImpl<T> extends AbstTypedQuery<T> implements Nam
   }
 
 
-  public static <T> NamedParameterQuery<T> createFrom(TypedOrmReader<T> conn, String sql) {
-    return new NamedParameterQueryImpl<>(conn, sql);
+  public static <T> NamedParameterQuery<T> createFrom(QueryExecutor<T> executor, String sql) {
+    return new NamedParameterQueryImpl<>(executor, sql);
   }
 
 

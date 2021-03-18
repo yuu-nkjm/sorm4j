@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterSqlImpl;
@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterSqlImpl;
  * @author nkjm
  *
  */
-public interface OrderedParameterSql {
+public interface OrderedParameterSql extends SqlStatementSupplier {
 
   /**
    * Add one parameter to the SQL statement sequentially.
@@ -28,12 +28,6 @@ public interface OrderedParameterSql {
    */
   OrderedParameterSql add(Object... parameters);
 
-  /**
-   * Convert to a {@link SqlStatement} objects.
-   *
-   * @return
-   */
-  SqlStatement toSqlStatement();
 
   static SqlStatement toSqlStatement(String sql, Object... parameters) {
     return from(sql).add(parameters).toSqlStatement();

@@ -3,8 +3,8 @@ package org.nkjmlab.sorm4j;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * The typed interface of reading functions of object-relation mapping.

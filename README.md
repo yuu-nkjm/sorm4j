@@ -3,11 +3,44 @@
 ![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j) [![javadoc](https://javadoc.io/badge2/org.nkjmlab/sorm4j/javadoc.svg)](https://javadoc.io/doc/org.nkjmlab/sorm4j) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
-Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. It provides only simple functionalities.
- - Sets Java objects into `java.sql.PreparedStatement` parameters.
- - Maps `java.sql.ResultSet` to Java objects.
+Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. It provides only simple functionalities to do select, insert, update, delete and merge. 
 
-Sorm4j instance wraps a `java.sql.Connection` object. Sorm4j has only one dependency on a logging facade (SLF4J). Sorm4j is tested and evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. It means this tool is flexible and can be integrated with any code that depends on JDBC (including code that already uses another ORM tool). Sorm4j requires at Java 11 or later to run.
+Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and it maps the result to Java objects. It also open an connection to database and close it after the execution.
+
+Here is an example with lambda expression:
+
+```java
+// Creates an entry point as javax.sql.DataSource.
+Sorm sorm = SormFactory.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","username","password"); 
+
+// insert
+sorm.apply(conn -> conn.insert(new Customer(1, "Alice", "Tokyo"))); 
+
+// select
+List<Customer> customers = 
+  sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where address=?","Tokyo"));
+
+```
+
+Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has only one dependency on a logging facade (SLF4J). It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool). 
+
+Here is an example with raw `java.sql.Connection`:
+
+```java
+try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, username, password)) {
+  // Creates object-relation mapping tool to wrap JDBC connection.
+  OrmConnection conn = SormFactory.toOrmConnection(jdbcConn);  
+  conn.insert(new Customer(1, "Alice", "Tokyo"));
+  conn.readList(Customer.class, "select * from customer where address=?","Tokyo");
+} catch (SQLException e) {
+  e.printStackTrace();
+} 
+```
+
+
+Sorm4j is tested and evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. 
+
+Sorm4j requires Java 11 or later to run.
 
 
 ## Website
@@ -33,7 +66,7 @@ The interfaces and classes in the following packages are public API.
  - org.nkjmlab.sorm4j.annotation
  - org.nkjmlab.sorm4j.extension
  - org.nkjmlab.sorm4j.result
- - org.nkjmlab.sorm4j.sqlstatement
+ - org.nkjmlab.sorm4j.sql
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).

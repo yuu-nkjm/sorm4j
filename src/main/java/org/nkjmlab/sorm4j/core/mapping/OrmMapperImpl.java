@@ -5,9 +5,9 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.InsertResult;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * The main class for the ORMapper engine.
@@ -260,10 +260,6 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
     return readLazyAux(objectClass, sql, parameters);
   }
 
-  @Override
-  public int executeUpdate(SqlStatement sql) {
-    return executeUpdate(sql.getSql(), sql.getParameters());
-  }
 
   @Override
   public <T> T readFirst(Class<T> objectClass, SqlStatement sql) {
@@ -309,7 +305,6 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
   public <T> T readOne(Class<T> objectClass, SqlStatement sql) {
     return readOneAux(objectClass, sql.getSql(), sql.getParameters());
   }
-
 
 }
 

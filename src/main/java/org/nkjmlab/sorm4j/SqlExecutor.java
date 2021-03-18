@@ -2,8 +2,10 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * A interface for executing SQL with parameters.
@@ -12,6 +14,24 @@ import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
  *
  */
 public interface SqlExecutor {
+
+  /**
+   * Executes a query and apply the given handler to the returned result set.
+   * <p>
+   * This method wraps {@link PreparedStatement#executeQuery(String)}
+   * <p>
+   * Parameters will be set according with the correspondence defined in
+   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object...)}
+   *
+   * @param <T>
+   * @param sql SQL code to be executed.
+   * @param resultSetHandler
+   * @return
+   */
+  <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler);
+
+
+  <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper);
 
   /**
    * Executes an update and returns the number of rows modified.
@@ -41,5 +61,6 @@ public interface SqlExecutor {
    * @return
    */
   Connection getJdbcConnection();
+
 
 }

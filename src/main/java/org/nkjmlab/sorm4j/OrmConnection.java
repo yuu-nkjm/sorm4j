@@ -1,9 +1,12 @@
 package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
  * Main API for object relation mapping. The api consists of {@link OrmReader}, {@link OrmUpdater},
@@ -13,10 +16,20 @@ import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
  *
  */
 public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlExecutor,
-    TransactionFunction, Closeable, AutoCloseable {
+    ResultSetMapper, TransactionFunction, Closeable, AutoCloseable {
 
   /**
-   * Create {@link NamedParameterSql} from SQL string.
+   * Creates a {@link NamedParameterQuery} from SQL string.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
+  <T> NamedParameterQuery<T> createNamedParameterQuery(Class<T> objectClass, String sql);
+
+  /**
+   * Creates a {@link NamedParameterSql} from SQL string.
    *
    * @param sql
    * @return
@@ -24,7 +37,17 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
   NamedParameterSql createNamedParameterSql(String sql);
 
   /**
-   * Create {@link OrderedParameterSql} from SQL string.
+   * Creates a {@link OrderedParameterQuery} from SQL string.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param sql
+   * @return
+   */
+  <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass, String sql);
+
+  /**
+   * Creates a {@link OrderedParameterSql} from SQL string.
    *
    * @param sql
    * @return
@@ -32,12 +55,27 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
   OrderedParameterSql createOrderedParameterSql(String sql);
 
   /**
-   * Create {@link SelectBuilder}.
+   * Creates a {@link SelectBuilder}.
    *
    * @return
    */
   SelectBuilder createSelectBuilder();
 
-  <S> TypedOrmConnection<S> type(Class<S> objectClass);
+
+  /**
+   * Creates a {@link SelectQuery}.
+   *
+   * @return
+   */
+  <T> SelectQuery<T> createSelectQuery(Class<T> objectClass);
+
+  /**
+   * Creates a {@link TypedOrmConnection}
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
+  <T> TypedOrmConnection<T> type(Class<T> objectClass);
 
 }

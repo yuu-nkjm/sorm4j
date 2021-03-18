@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * @param <T>
  */
 public interface SelectQuery<T>
-    extends SelectBuilder, NamedParameterSql, OrderedParameterSql, TypedQuery<T> {
+    extends SelectBuilder, NamedParameterSql, OrderedParameterSql, SqlStatementSupplier, Query<T> {
   @Override
   OrderedParameterQuery<T> add(Object... parameters);
 

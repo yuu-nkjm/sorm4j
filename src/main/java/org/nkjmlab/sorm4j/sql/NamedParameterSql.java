@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterSqlImpl;
@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterSqlImpl;
  * @author nkjm
  *
  */
-public interface NamedParameterSql {
+public interface NamedParameterSql extends SqlStatementSupplier {
 
   /**
    * Binds key-value pairs to named parameters in a SQL statement.
@@ -28,12 +28,6 @@ public interface NamedParameterSql {
    */
   NamedParameterSql bind(String key, Object value);
 
-  /**
-   * Convert {@link SqlStatement} objects.
-   *
-   * @return
-   */
-  SqlStatement toSqlStatement();
 
   static NamedParameterSql from(String sql, String prefix, String suffix) {
     return new NamedParameterSqlImpl(sql, prefix, suffix);

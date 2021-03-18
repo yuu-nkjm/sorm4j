@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
@@ -23,6 +23,12 @@ class OrderedParametersQueryTest {
       conn.insert(PLAYER_ALICE);
       Player ret = conn.createOrderedParameterQuery("select * from PLAYERS where ID=?").add(1)
           .readList().get(0);
+      assertThat(ret).isEqualTo(PLAYER_ALICE);
+    });
+    sorm.accept(conn -> {
+      Player ret =
+          conn.createOrderedParameterQuery(Player.class, "select * from PLAYERS where ID=?").add(1)
+              .readList().get(0);
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
   }
