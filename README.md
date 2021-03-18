@@ -65,7 +65,6 @@ The interfaces and classes in the following packages are public APIs.
  - org.nkjmlab.sorm4j
  - org.nkjmlab.sorm4j.annotation
  - org.nkjmlab.sorm4j.extension
- - org.nkjmlab.sorm4j.result
  - org.nkjmlab.sorm4j.sql
 
 ## License

@@ -6,12 +6,12 @@ package org.nkjmlab.sorm4j;
  * @param <T>
  */
 @FunctionalInterface
-public
-interface FunctionHandler<T, R> {
+public interface FunctionHandler<T, R> {
 
   /**
+   * Performs this operation on the given argument and return a value.
    *
-   * @param t
+   * @param t the input argument
    * @return
    * @throws Exception
    */

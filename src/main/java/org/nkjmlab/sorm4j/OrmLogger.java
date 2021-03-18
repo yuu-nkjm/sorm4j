@@ -3,6 +3,12 @@ package org.nkjmlab.sorm4j;
 import java.util.Arrays;
 import org.nkjmlab.sorm4j.core.util.LogPointFactory;
 
+/**
+ * Logger for object-relation mapping.
+ *
+ * @author nkjm
+ *
+ */
 public final class OrmLogger {
 
   private OrmLogger() {}

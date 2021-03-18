@@ -62,6 +62,15 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
     }
   }
 
+  /**
+   * Treats object.
+   *
+   * @param type
+   * @param stmt
+   * @param column
+   * @param parameter
+   * @throws SQLException
+   */
   protected void procObject(Class<?> type, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
     if (parameter instanceof Clob) {
@@ -178,6 +187,15 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
     }
   }
 
+  /**
+   * Treats array.
+   *
+   * @param type
+   * @param stmt
+   * @param column
+   * @param parameter
+   * @throws SQLException
+   */
   protected void procArray(Class<?> type, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
     final String name = type.getComponentType().getName();

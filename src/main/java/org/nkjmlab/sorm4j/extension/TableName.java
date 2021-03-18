@@ -41,6 +41,9 @@ public final class TableName {
     return Objects.hash(name);
   }
 
+  /**
+   * Uses {@link #getName()} when you want to get name.
+   */
   @Override
   public String toString() {
     return name;
