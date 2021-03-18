@@ -14,22 +14,22 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  *
  * @param <T>
  */
-public class SelectTypedQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<T> {
+public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<T> {
 
   private final SelectBuilder selectBuilder;
 
 
-  public SelectTypedQueryImpl(QueryExecutor<T> executor) {
+  public SelectQueryImpl(QueryExecutor<T> executor) {
     super(executor);
     this.selectBuilder = SelectBuilder.create();
   }
 
   private NamedParameterQuery<T> withNamedParameter() {
-    return NamedParameterTypedQueryImpl.createFrom(executor, buildSql());
+    return NamedParameterQueryImpl.createFrom(executor, buildSql());
   }
 
   private OrderedParameterQuery<T> withOrderedParameter() {
-    return OrderedParameterTypedQueryImpl.createFrom(executor, buildSql());
+    return OrderedParameterQueryImpl.createFrom(executor, buildSql());
   }
 
   @Override

@@ -33,7 +33,7 @@ The interfaces and classes in the following packages are public API.
  - org.nkjmlab.sorm4j.annotation
  - org.nkjmlab.sorm4j.extension
  - org.nkjmlab.sorm4j.result
- - org.nkjmlab.sorm4j.sqlstatement
+ - org.nkjmlab.sorm4j.sql
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).

@@ -3,10 +3,10 @@ package org.nkjmlab.sorm4j.core.mapping;
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterTypedQueryImpl;
-import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterTypedQueryImpl;
-import org.nkjmlab.sorm4j.core.sqlstatement.SelectTypedQueryImpl;
-import org.nkjmlab.sorm4j.core.sqlstatement.TypedQueryExecutor;
+import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterQueryImpl;
+import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterQueryImpl;
+import org.nkjmlab.sorm4j.core.sqlstatement.SelectQueryImpl;
+import org.nkjmlab.sorm4j.core.sqlstatement.QueryTypedOrmExecutor;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -79,19 +79,19 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public SelectQuery<T> createSelectQuery() {
-    SelectTypedQueryImpl<T> ret = new SelectTypedQueryImpl<T>(new TypedQueryExecutor<>(this));
+    SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryTypedOrmExecutor<>(this));
     ret.from(getTableName());
     return ret;
   }
 
   @Override
   public NamedParameterQuery<T> createNamedParameterQuery(String sql) {
-    return NamedParameterTypedQueryImpl.createFrom(new TypedQueryExecutor<>(this), sql);
+    return NamedParameterQueryImpl.createFrom(new QueryTypedOrmExecutor<>(this), sql);
   }
 
   @Override
   public OrderedParameterQuery<T> createOrderedParameterQuery(String sql) {
-    return OrderedParameterTypedQueryImpl.createFrom(new TypedQueryExecutor<>(this), sql);
+    return OrderedParameterQueryImpl.createFrom(new QueryTypedOrmExecutor<>(this), sql);
   }
 
   @Override

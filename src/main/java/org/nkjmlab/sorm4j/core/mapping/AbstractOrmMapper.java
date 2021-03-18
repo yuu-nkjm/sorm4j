@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.ResultSetMapper;
+import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.core.mapping.multirow.MultiRowProcessorGeneratorFactory;
@@ -31,7 +32,6 @@ import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.RowMapper;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {

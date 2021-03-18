@@ -15,9 +15,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.ResultSetMapper;
+import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.RowMapper;
 
 /**
  * Represents a result set from database.

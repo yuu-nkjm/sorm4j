@@ -1,36 +1,39 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.TypedOrmReader;
+import org.nkjmlab.sorm4j.OrmReader;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
-public class TypedQueryExecutor<T> implements QueryExecutor<T> {
+public class QueryOrmExecutor<T> implements QueryExecutor<T> {
 
-  protected final TypedOrmReader<T> conn;
+  protected final OrmReader conn;
+  private final Class<T> objectClass;
 
-  public TypedQueryExecutor(TypedOrmReader<T> conn) {
+
+  public QueryOrmExecutor(OrmReader conn, Class<T> objectClass) {
     this.conn = conn;
+    this.objectClass = objectClass;
   }
 
   @Override
   public T readOne(SqlStatement sqlStatement) {
-    return conn.readOne(sqlStatement);
+    return conn.readOne(objectClass, sqlStatement);
   }
 
   @Override
   public T readFirst(SqlStatement sqlStatement) {
-    return conn.readFirst(sqlStatement);
+    return conn.readFirst(objectClass, sqlStatement);
   }
 
   @Override
   public LazyResultSet<T> readLazy(SqlStatement sqlStatement) {
-    return conn.readLazy(sqlStatement);
+    return conn.readLazy(objectClass, sqlStatement);
   }
 
   @Override
   public List<T> readList(SqlStatement sqlStatement) {
-    return conn.readList(sqlStatement);
+    return conn.readList(objectClass, sqlStatement);
   }
 
 

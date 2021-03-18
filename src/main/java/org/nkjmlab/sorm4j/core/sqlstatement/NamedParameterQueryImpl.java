@@ -12,12 +12,12 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  *
  * @param <T>
  */
-public class NamedParameterTypedQueryImpl<T> extends AbstractQuery<T>
+public class NamedParameterQueryImpl<T> extends AbstractQuery<T>
     implements NamedParameterQuery<T> {
 
   private final NamedParameterSql namedParameterSql;
 
-  NamedParameterTypedQueryImpl(QueryExecutor<T> executor, String sql) {
+  NamedParameterQueryImpl(QueryExecutor<T> executor, String sql) {
     super(executor);
     this.namedParameterSql = NamedParameterSql.from(sql);
   }
@@ -42,7 +42,7 @@ public class NamedParameterTypedQueryImpl<T> extends AbstractQuery<T>
 
 
   public static <T> NamedParameterQuery<T> createFrom(QueryExecutor<T> executor, String sql) {
-    return new NamedParameterTypedQueryImpl<>(executor, sql);
+    return new NamedParameterQueryImpl<>(executor, sql);
   }
 
 

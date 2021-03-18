@@ -11,12 +11,12 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  *
  * @param <T>
  */
-public class OrderedParameterTypedQueryImpl<T> extends AbstractQuery<T>
+public class OrderedParameterQueryImpl<T> extends AbstractQuery<T>
     implements OrderedParameterQuery<T> {
 
   private final OrderedParameterSql orderedParameterSql;
 
-  public OrderedParameterTypedQueryImpl(QueryExecutor<T> executor, String sql) {
+  public OrderedParameterQueryImpl(QueryExecutor<T> executor, String sql) {
     super(executor);
     this.orderedParameterSql = OrderedParameterSql.from(sql);
   }
@@ -40,7 +40,7 @@ public class OrderedParameterTypedQueryImpl<T> extends AbstractQuery<T>
 
 
   public static <T> OrderedParameterQuery<T> createFrom(QueryExecutor<T> executor, String sql) {
-    return new OrderedParameterTypedQueryImpl<>(executor, sql);
+    return new OrderedParameterQueryImpl<>(executor, sql);
   }
 
 
