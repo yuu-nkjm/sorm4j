@@ -2,13 +2,12 @@ package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sql.SelectBuilder.*;
+import static org.nkjmlab.sorm4j.sql.SelectBuilder.as;
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sql.SelectBuilder;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -27,6 +26,9 @@ class SelectQueryTest {
   void testExecBindQuery() {
     sorm.accept(Player.class,
         con -> assertThat(con.createSelectQuery().where("id=:id").bind("id", 1).readLazy().one())
+            .isEqualTo(PLAYER_ALICE));
+    sorm.accept(con -> assertThat(
+        con.createSelectQuery(Player.class).where("id=:id").bind("id", 1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
   }
 

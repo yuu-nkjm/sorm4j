@@ -7,7 +7,6 @@ import java.io.Closeable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.nkjmlab.sorm4j.ResultSetMapper;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.RowMapper;
@@ -79,14 +79,8 @@ final class LazyResultSetImpl<T>
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    final List<T> ret = new ArrayList<>();
-    Try.runOrThrow(() -> {
-      int rowNum = 0;
-      while (resultSet.next()) {
-        rowNum++;
-        ret.add(rowMapper.mapRow(resultSet, rowNum));
-      }
-    }, Try::rethrow);
+    List<T> ret = Try.getOrThrow(() -> ResultSetMapper.convertToRowsMapper(rowMapper).apply(resultSet),
+        Try::rethrow);
     close();
     return ret;
   }

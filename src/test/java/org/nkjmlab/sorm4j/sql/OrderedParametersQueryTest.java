@@ -25,6 +25,12 @@ class OrderedParametersQueryTest {
           .readList().get(0);
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
+    sorm.accept(conn -> {
+      Player ret =
+          conn.createOrderedParameterQuery(Player.class, "select * from PLAYERS where ID=?").add(1)
+              .readList().get(0);
+      assertThat(ret).isEqualTo(PLAYER_ALICE);
+    });
   }
 
 }

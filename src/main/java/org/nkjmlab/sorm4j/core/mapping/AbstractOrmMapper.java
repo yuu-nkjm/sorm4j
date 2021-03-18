@@ -31,6 +31,7 @@ import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.RowMapper;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
@@ -164,7 +165,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
 
   private <R> R execStatementAndReadResultSet(String sql, Object[] parameters,
-      ThrowableFunction<ResultSet, R> sqlResultReader) {
+      FunctionHandler<ResultSet, R> resultSetHandler) {
     final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
       log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
@@ -175,7 +176,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
-        R ret = sqlResultReader.apply(resultSet);
+        R ret = resultSetHandler.apply(resultSet);
         dp.ifPresent(sw -> log.debug("{} Read [{}] objects from [{}]", sw.getTagAndElapsedTime(),
             ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
             Try.getOrNull(() -> connection.getMetaData().getURL())));
@@ -191,13 +192,13 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
   @Override
   public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      sqlParameterSetter.setParameters(stmt, sql.getParameters());
-      ResultSet rs = stmt.executeQuery();
-      return resultSetHandler.apply(rs);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
+    return execStatementAndReadResultSet(sql.getSql(), sql.getParameters(), resultSetHandler);
+  }
+
+  @Override
+  public <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper) {
+    return execStatementAndReadResultSet(sql.getSql(), sql.getParameters(),
+        ResultSetMapper.convertToRowsMapper(rowMapper));
   }
 
 
@@ -383,22 +384,22 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
   @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRow(objectClass, resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> mapRowAux(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public Map<String, Object> mapRow(ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRow(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> mapRowAux(resultSet), Try::rethrow);
   }
 
   @Override
   public final <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRows(objectClass, resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> mapRowsAux(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public final List<Map<String, Object>> mapRows(ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRows(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> mapRowsAux(resultSet), Try::rethrow);
   }
 
 

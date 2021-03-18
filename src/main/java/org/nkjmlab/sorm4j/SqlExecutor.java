@@ -3,7 +3,9 @@ package org.nkjmlab.sorm4j;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.sql.RowMapper;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
@@ -30,6 +32,7 @@ public interface SqlExecutor {
   <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler);
 
 
+  <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper);
 
   /**
    * Executes an update and returns the number of rows modified.

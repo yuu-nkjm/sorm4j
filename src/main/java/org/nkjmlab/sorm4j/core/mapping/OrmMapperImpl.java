@@ -306,6 +306,5 @@ class OrmMapperImpl extends AbstractOrmMapper implements OrmMapper {
     return readOneAux(objectClass, sql.getSql(), sql.getParameters());
   }
 
-
 }
 
