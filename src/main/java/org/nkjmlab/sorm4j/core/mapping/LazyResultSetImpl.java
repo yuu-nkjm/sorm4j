@@ -119,7 +119,7 @@ final class LazyResultSetImpl<T>
   @Override
   public List<Map<String, Object>> toMapList() {
     List<Map<String, Object>> ret =
-        Try.getOrThrow(() -> ormMapper.loadMapList(resultSet), Try::rethrow);
+        Try.getOrThrow(() -> ormMapper.mapRowsAux(resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -166,8 +166,8 @@ final class LazyResultSetImpl<T>
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.getFunction = objectClass.equals(LinkedHashMap.class)
-          ? Try.createSupplierWithThrow(() -> (S) orMapper.loadSingleMap(resultSet), Try::rethrow)
-          : Try.createSupplierWithThrow(() -> orMapper.loadSingleObject(objectClass, resultSet),
+          ? Try.createSupplierWithThrow(() -> (S) orMapper.mapRowAux(resultSet), Try::rethrow)
+          : Try.createSupplierWithThrow(() -> orMapper.mapRowAux(objectClass, resultSet),
               Try::rethrow);
     }
 

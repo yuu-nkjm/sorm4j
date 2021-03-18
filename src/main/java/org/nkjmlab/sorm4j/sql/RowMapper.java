@@ -4,5 +4,13 @@ import java.sql.ResultSet;
 
 @FunctionalInterface
 public interface RowMapper<T> {
-  T mapRow(ResultSet rs, int rowNum);
+
+  /**
+   * Maps a row in resultSet to a object.
+   *
+   * @param resultSet
+   * @param rowNum Starts 1. e.g. 1, 2, ...
+   * @return
+   */
+  T mapRow(ResultSet resultSet, int rowNum);
 }

@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmLogger;
+import org.nkjmlab.sorm4j.ResultSetMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.core.mapping.multirow.MultiRowProcessorGeneratorFactory;
@@ -32,10 +33,53 @@ import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
-abstract class AbstractOrmMapper implements SqlExecutor {
+abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
+  private static class ColumnsAndTypes {
+
+    private final List<String> columns;
+    private final List<Integer> columnTypes;
+
+    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+      this.columns = columns;
+      this.columnTypes = columnTypes;
+    }
+
+    public List<String> getColumns() {
+      return columns;
+    }
+
+    public List<Integer> getColumnTypes() {
+      return columnTypes;
+    }
+
+  }
+
+
   private static final org.slf4j.Logger log =
       org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
+  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
+    ResultSetMetaData metaData = resultSet.getMetaData();
+    int colNum = metaData.getColumnCount();
+    List<String> columns = new ArrayList<>(colNum);
+    List<Integer> columnTypes = new ArrayList<>(colNum);
+    for (int i = 1; i <= colNum; i++) {
+      columns.add(metaData.getColumnName(i));
+      columnTypes.add(metaData.getColumnType(i));
+    }
+    return new ColumnsAndTypes(columns, columnTypes);
+  }
+
+  static final <R> R execPreparedStatementAndClose(SqlParameterSetter sqlParameterSetter,
+      Connection connection, String sql, Object[] parameters,
+      ThrowableFunction<PreparedStatement, R> func) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+      sqlParameterSetter.setParameters(stmt, parameters);
+      return func.apply(stmt);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
+    }
+  }
 
   private final ColumnFieldMapper fieldMapper;
 
@@ -55,12 +99,13 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
 
+
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
 
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
 
-  private final int transactionIsolationLevel;
 
+  private final int transactionIsolationLevel;
 
   /**
    * Creates a instance
@@ -82,27 +127,14 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
   }
 
+
   public <T> int deleteAll(Class<T> objectClass) {
     return getTableMapping(objectClass).deleteAll(connection);
   }
 
-
   public int deleteAllOn(String tableName) {
     return executeUpdate("DELETE FROM " + tableName);
   }
-
-  /**
-   * Execute sql function. objects when objects[0] is null, {@code NullPointerException} are throw.
-   */
-  protected final <T, R> R execSqlIfParameterExists(T[] objects,
-      Function<TableMapping<T>, R> sqlFunction, Supplier<R> notExists) {
-    if (objects == null || objects.length == 0) {
-      return notExists.get();
-    }
-    TableMapping<T> mapping = getCastedTableMapping(objects[0].getClass());
-    return sqlFunction.apply(mapping);
-  }
-
 
   /**
    * Execute sql function with table name. objects when objects[0] is null,
@@ -117,35 +149,17 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return sqlFunction.apply(mapping);
   }
 
-  @Override
-  public int executeUpdate(String sql, Object... parameters) {
-    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
 
-    final int ret = execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
-        stmt -> stmt.executeUpdate());
-    dp.ifPresent(sw -> {
-      log.debug("{} Call [{}] [{}]", sw.getTagAndElapsedTime(), sql,
-          Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
-      log.trace("[{}] Parameters = {} ", sw.getTag(), parameters);
-    });
-    return ret;
-  }
-
-  @Override
-  public int executeUpdate(SqlStatement sql) {
-    return executeUpdate(sql.getSql(), sql.getParameters());
-  }
-
-
-  @Override
-  public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      sqlParameterSetter.setParameters(stmt, sql.getParameters());
-      ResultSet rs = stmt.executeQuery();
-      return resultSetHandler.apply(rs);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
+  /**
+   * Execute sql function. objects when objects[0] is null, {@code NullPointerException} are throw.
+   */
+  protected final <T, R> R execSqlIfParameterExists(T[] objects,
+      Function<TableMapping<T>, R> sqlFunction, Supplier<R> notExists) {
+    if (objects == null || objects.length == 0) {
+      return notExists.get();
     }
+    TableMapping<T> mapping = getCastedTableMapping(objects[0].getClass());
+    return sqlFunction.apply(mapping);
   }
 
 
@@ -175,12 +189,12 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  static final <R> R execPreparedStatementAndClose(SqlParameterSetter sqlParameterSetter,
-      Connection connection, String sql, Object[] parameters,
-      ThrowableFunction<PreparedStatement, R> func) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-      sqlParameterSetter.setParameters(stmt, parameters);
-      return func.apply(stmt);
+  @Override
+  public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
+      sqlParameterSetter.setParameters(stmt, sql.getParameters());
+      ResultSet rs = stmt.executeQuery();
+      return resultSetHandler.apply(rs);
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -188,10 +202,30 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
 
 
+  @Override
+  public int executeUpdate(SqlStatement sql) {
+    return executeUpdate(sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public int executeUpdate(String sql, Object... parameters) {
+    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
+
+    final int ret = execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
+        stmt -> stmt.executeUpdate());
+    dp.ifPresent(sw -> {
+      log.debug("{} Call [{}] [{}]", sw.getTagAndElapsedTime(), sql,
+          Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
+      log.trace("[{}] Parameters = {} ", sw.getTag(), parameters);
+    });
+    return ret;
+  }
+
   @SuppressWarnings("unchecked")
   protected <T> TableMapping<T> getCastedTableMapping(Class<?> objectClass) {
     return (TableMapping<T>) getTableMapping(objectClass);
   }
+
 
   @SuppressWarnings("unchecked")
   protected <T> TableMapping<T> getCastedTableMapping(String tableName, Class<?> objectClass) {
@@ -212,7 +246,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return ret;
   }
 
-
   public ConfigStore getConfigStore() {
     return configStore;
   }
@@ -226,6 +259,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     TableName tableName = toTableName(objectClass);
     return getTableMapping(tableName, objectClass);
   }
+
 
   /**
    * Get table mapping by the table name and the object class. When there is no mapping, the method
@@ -250,10 +284,14 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return ret;
   }
 
+  protected int getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
+  }
+
 
   <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     if (resultSet.next()) {
-      return loadSingleObject(objectClass, resultSet);
+      return mapRowAux(objectClass, resultSet);
     }
     return null;
   }
@@ -261,16 +299,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
-      ret = loadSingleMap(resultSet);
-    }
-    return ret;
-  }
-
-  List<Map<String, Object>> loadMapList(ResultSet resultSet) throws SQLException {
-    final List<Map<String, Object>> ret = new ArrayList<>();
-    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
-    while (resultSet.next()) {
-      ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
+      ret = mapRowAux(resultSet);
     }
     return ret;
   }
@@ -294,10 +323,11 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   }
 
+
   <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     T ret = null;
     if (resultSet.next()) {
-      ret = loadSingleObject(objectClass, resultSet);
+      ret = mapRowAux(objectClass, resultSet);
     }
     if (resultSet.next()) {
       throw new RuntimeException("Non-unique result returned");
@@ -305,16 +335,70 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return ret;
   }
 
-
   Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
-      ret = loadSingleMap(resultSet);
+      ret = mapRowAux(resultSet);
     }
     if (resultSet.next()) {
       throw new SormException("Non-unique result returned");
     }
     return ret;
+  }
+
+
+  public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
+      throws SQLException {
+    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
+    return mapping.loadPojoList(resultSet);
+  }
+
+
+  public <T> T mapRowAux(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
+        ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
+        : toSinglePojo(objectClass, resultSet);
+  }
+
+  public Map<String, Object> mapRowAux(ResultSet resultSet) throws SQLException {
+    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+    return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+  }
+
+  public final <T> List<T> mapRowsAux(Class<T> objectClass, ResultSet resultSet)
+      throws SQLException {
+    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
+        ? loadNativeObjectList(objectClass, resultSet)
+        : loadPojoList(objectClass, resultSet);
+  }
+
+  public final List<Map<String, Object>> mapRowsAux(ResultSet resultSet) throws SQLException {
+    final List<Map<String, Object>> ret = new ArrayList<>();
+    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+    while (resultSet.next()) {
+      ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
+    }
+    return ret;
+  }
+
+  @Override
+  public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
+    return Try.getOrThrow(() -> mapRow(objectClass, resultSet), Try::rethrow);
+  }
+
+  @Override
+  public Map<String, Object> mapRow(ResultSet resultSet) {
+    return Try.getOrThrow(() -> mapRow(resultSet), Try::rethrow);
+  }
+
+  @Override
+  public final <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet) {
+    return Try.getOrThrow(() -> mapRows(objectClass, resultSet), Try::rethrow);
+  }
+
+  @Override
+  public final List<Map<String, Object>> mapRows(ResultSet resultSet) {
+    return Try.getOrThrow(() -> mapRows(resultSet), Try::rethrow);
   }
 
 
@@ -325,10 +409,11 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return readListAux(objectClass, getCastedTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
+
+
   final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
     return readLazyAux(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
   }
-
 
   /**
    * Reads an object from the database by its primary keys.
@@ -339,7 +424,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
     return readFirstAux(objectClass, sql, primaryKeyValues);
   }
-
 
   final <T> T readFirstAux(Class<T> objectClass, String sql, Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters,
@@ -357,14 +441,10 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     }
   }
 
-
   final <T> List<T> readListAux(Class<T> objectClass, String sql, Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters,
-        resultSet -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
-            ? loadNativeObjectList(objectClass, resultSet)
-            : loadPojoList(objectClass, resultSet));
+        resultSet -> mapRowsAux(objectClass, resultSet));
   }
-
 
   public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters, resultSet -> {
@@ -375,8 +455,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       return null;
     });
   }
-
-
 
   public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
     try {
@@ -394,7 +472,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
-    return execStatementAndReadResultSet(sql, parameters, resultSet -> loadMapList(resultSet));
+    return execStatementAndReadResultSet(sql, parameters, resultSet -> mapRowsAux(resultSet));
   }
 
   public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
@@ -415,31 +493,13 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     return execStatementAndReadResultSet(sql, parameters, resultSet -> {
       T ret = null;
       if (resultSet.next()) {
-        ret = loadSingleObject(objectClass, resultSet);
+        ret = mapRowAux(objectClass, resultSet);
       }
       if (resultSet.next()) {
         throw new SormException("Non-unique result returned");
       }
       return ret;
     });
-  }
-
-  public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
-      throws SQLException {
-    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
-    return mapping.loadPojoList(resultSet);
-  }
-
-  public Map<String, Object> loadSingleMap(ResultSet resultSet) throws SQLException {
-    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
-    return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
-
-  }
-
-  public <T> T loadSingleObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
-        ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
-        : toSinglePojo(objectClass, resultSet);
   }
 
   private final <T> T toSinglePojo(final Class<T> objectClass, final ResultSet resultSet)
@@ -456,42 +516,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private TableName toTableName(String tableName) {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
         k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
-  }
-
-  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
-    ResultSetMetaData metaData = resultSet.getMetaData();
-    int colNum = metaData.getColumnCount();
-    List<String> columns = new ArrayList<>(colNum);
-    List<Integer> columnTypes = new ArrayList<>(colNum);
-    for (int i = 1; i <= colNum; i++) {
-      columns.add(metaData.getColumnName(i));
-      columnTypes.add(metaData.getColumnType(i));
-    }
-    return new ColumnsAndTypes(columns, columnTypes);
-  }
-
-  private static class ColumnsAndTypes {
-
-    private final List<String> columns;
-    private final List<Integer> columnTypes;
-
-    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
-      this.columns = columns;
-      this.columnTypes = columnTypes;
-    }
-
-    public List<String> getColumns() {
-      return columns;
-    }
-
-    public List<Integer> getColumnTypes() {
-      return columnTypes;
-    }
-
-  }
-
-  protected int getTransactionIsolationLevel() {
-    return transactionIsolationLevel;
   }
 
 }

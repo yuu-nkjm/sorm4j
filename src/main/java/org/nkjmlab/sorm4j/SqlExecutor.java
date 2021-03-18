@@ -22,9 +22,8 @@ public interface SqlExecutor {
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParameterSetter#setParameters(PreparedStatement, Object...)}
    *
-   * @param sql SQL code to be executed.
    * @param <T>
-   * @param sql
+   * @param sql SQL code to be executed.
    * @param resultSetHandler
    * @return
    */
@@ -60,5 +59,6 @@ public interface SqlExecutor {
    * @return
    */
   Connection getJdbcConnection();
+
 
 }

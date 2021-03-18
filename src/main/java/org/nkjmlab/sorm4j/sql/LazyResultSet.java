@@ -70,12 +70,17 @@ public interface LazyResultSet<T> {
   List<T> toList();
 
   /**
+   * Returns the results converted by the given row mapper in a List.
+   *
+   * @return
+   */
+  List<T> toList(RowMapper<T> rowMapper);
+
+  /**
    * Returns results in a List of {@code Map<String, Object>}.
    *
    * @return
    */
   List<Map<String, Object>> toMapList();
-
-  List<T> toList(RowMapper<T> rowMapper);
 
 }
