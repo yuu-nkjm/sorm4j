@@ -109,7 +109,7 @@ public final class SormFactory {
   }
 
   /**
-   * Updates default configuration.
+   * Updates default configuration. This updates does not effect existing {@link Sorm} objects.
    *
    * @param configuratorConsumer
    */
