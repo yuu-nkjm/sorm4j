@@ -513,6 +513,7 @@ class TypedOrmConnectionTest {
 
     sorm.acceptTransactionHandler(Guest.class, m -> {
       m.insert(a);
+      m = m.type(Player.class).type(Guest.class);
       m = m.untype().type(Guest.class);
       Guest g = m.readFirst("SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
