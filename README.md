@@ -5,9 +5,9 @@
 
 Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. It provides only simple functionalities to do select, insert, update, delete and merge. 
 
-Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and it maps the result to Java objects. It also open an connection to database and close it after the execution.
+Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and it maps the result to Java objects. It opens a connection to a database and closes it after the execution automatically.
 
-Here is an example with lambda expression:
+Here is an example with lambda expressions:
 
 ```java
 // Creates an entry point as javax.sql.DataSource.
@@ -53,14 +53,14 @@ Sorm4j requires Java 11 or later to run.
 - [Key Features](https://scrapbox.io/sorm4j/Key_Features)
     - The key features of Sorm4j, see here.
 - [Performance](https://scrapbox.io/sorm4j/Performance)
-    - If you need more benchmark result, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
+    - If you need more benchmark results, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
 - [Developer Guide](https://scrapbox.io/sorm4j/Developer_Guide)
     - The detailed manual is here.
 
 ## Versioning
 This project uses [Semantic Versioning](https://semver.org/) from 1.0.0.
 
-The interfaces and classes in the following packages are public API.
+The interfaces and classes in the following packages are public APIs.
 
  - org.nkjmlab.sorm4j
  - org.nkjmlab.sorm4j.annotation
