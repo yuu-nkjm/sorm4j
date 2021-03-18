@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.core.mapping.SormImpl;
 import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 
 /**
- * Mink Sorm} object.
+ * Main entry point of this library. It creates {@link Sorm} object.
  *
  * @author nkjm
  *

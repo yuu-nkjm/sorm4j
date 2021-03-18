@@ -2,6 +2,14 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.ResultSet;
 
+/**
+ *
+ * Maps a row in resultSet to a object.
+ *
+ * @author nkjm
+ *
+ * @param <T>
+ */
 @FunctionalInterface
 public interface RowMapper<T> {
 

@@ -68,6 +68,13 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
 
+  /**
+   * Gets schema pattern.
+   *
+   * @param metaData
+   * @return
+   * @throws SQLException
+   */
   protected String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
     // oracle expects a pattern such as "%" to work
     return "Oracle".equalsIgnoreCase(metaData.getDatabaseProductName()) ? "%" : null;
@@ -80,6 +87,12 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Guesses candidates of column name from the given field name.
+   *
+   * @param fieldName
+   * @return
+   */
   protected List<Column> guessColumnNameCandidates(FieldName fieldName) {
     return List.of(new Column(toUpperSnakeCase(fieldName.getName())),
         new Column(toUpperCase(fieldName.getName())));

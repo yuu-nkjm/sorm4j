@@ -31,6 +31,14 @@ public interface SqlExecutor {
   <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler);
 
 
+  /**
+   * Executes a query and apply the given mapper to the each row in returned result set.
+   *
+   * @param <T>
+   * @param sql
+   * @param rowMapper
+   * @return
+   */
   <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper);
 
   /**
