@@ -94,7 +94,10 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
   @Override
   public <T> SelectQuery<T> createSelectQuery(Class<T> objectClass) {
-    return new SelectTypedQueryImpl<T>(new UntypedQueryExecutor<>(this, objectClass));
+    SelectTypedQueryImpl<T> ret =
+        new SelectTypedQueryImpl<T>(new UntypedQueryExecutor<>(this, objectClass));
+    ret.from(getTableMapping(objectClass).getTableName());
+    return ret;
   }
 
   @Override

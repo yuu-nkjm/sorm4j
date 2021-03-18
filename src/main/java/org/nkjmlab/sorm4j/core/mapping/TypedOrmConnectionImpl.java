@@ -79,7 +79,9 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public SelectQuery<T> createSelectQuery() {
-    return new SelectTypedQueryImpl<T>(new TypedQueryExecutor<>(this));
+    SelectTypedQueryImpl<T> ret = new SelectTypedQueryImpl<T>(new TypedQueryExecutor<>(this));
+    ret.from(getTableName());
+    return ret;
   }
 
   @Override
