@@ -12,47 +12,9 @@ import javax.sql.DataSource;
 public interface Sorm {
 
   /**
-   * Interface for object-relation handling without a return value.
-   *
-   * This interface is only designed for {@link Sorm} interface.
-   *
-   * @param <T>
-   */
-  @FunctionalInterface
-  interface ConsumerHandler<T> {
-    /**
-     * Will be invoked with an open connection. The handle may be closed when this callback returns.
-     *
-     * @param t
-     * @throws Exception
-     */
-    void accept(T t) throws Exception;
-  }
-
-  /**
-   * Interface for object-relation handling with a return value.
-   *
-   * This interface is only designed for {@link Sorm} interface.
-   *
-   * @param <T>
-   */
-  @FunctionalInterface
-  interface FunctionHandler<T, R> {
-
-    /**
-     * Will be invoked with an open connection. The handle may be closed when this callback returns.
-     *
-     * @param t
-     * @return
-     * @throws Exception
-     */
-    R apply(T t) throws Exception;
-  }
-
-  /**
    * Accepts a {@link TypedOrmConnection} handler for a task with object-relation mapping. The
-   * connection will be closed after the process of handler.
    *
+   * connection will be closed after the process of handler.
    * @param <T>
    * @param objectClass
    * @param handler

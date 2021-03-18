@@ -1,12 +1,11 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
-import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * This class represents a select query. This class has functions as SQL select builder.
@@ -15,22 +14,22 @@ import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
  *
  * @param <T>
  */
-public class SelectQueryImpl<T> extends AbstTypedQuery<T> implements SelectQuery<T> {
+public class SelectTypedQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<T> {
 
-  private SelectBuilder selectBuilder;
+  private final SelectBuilder selectBuilder;
 
-  public SelectQueryImpl(TypedOrmConnection<T> conn) {
-    super(conn);
+
+  public SelectTypedQueryImpl(QueryExecutor<T> executor) {
+    super(executor);
     this.selectBuilder = SelectBuilder.create();
-    this.selectBuilder.from(conn.getTableName());
   }
 
   private NamedParameterQuery<T> withNamedParameter() {
-    return NamedParameterQueryImpl.createFrom(conn, buildSql());
+    return NamedParameterTypedQueryImpl.createFrom(executor, buildSql());
   }
 
   private OrderedParameterQuery<T> withOrderedParameter() {
-    return OrderedParameterQueryImpl.createFrom(conn, buildSql());
+    return OrderedParameterTypedQueryImpl.createFrom(executor, buildSql());
   }
 
   @Override
@@ -157,5 +156,6 @@ public class SelectQueryImpl<T> extends AbstTypedQuery<T> implements SelectQuery
     selectBuilder.where(expr);
     return this;
   }
+
 }
 

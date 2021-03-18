@@ -1,13 +1,14 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.*;
-import static org.nkjmlab.sorm4j.sqlstatement.SelectBuilder.as;
+import static org.nkjmlab.sorm4j.sql.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.sql.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;

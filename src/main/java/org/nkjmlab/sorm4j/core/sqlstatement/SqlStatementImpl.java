@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
 import java.util.Arrays;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * This class represents a sql statement with ordered parameters.

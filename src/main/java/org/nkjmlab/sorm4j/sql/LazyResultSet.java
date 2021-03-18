@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.sql;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
@@ -75,5 +75,7 @@ public interface LazyResultSet<T> {
    * @return
    */
   List<Map<String, Object>> toMapList();
+
+  List<T> toList(RowMapper<T> rowMapper);
 
 }

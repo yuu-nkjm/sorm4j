@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sqlstatement;
+package org.nkjmlab.sorm4j.sql;
 
 /**
  * Query with ordered parameters.
@@ -7,7 +7,7 @@ package org.nkjmlab.sorm4j.sqlstatement;
  *
  * @param <T>
  */
-public interface OrderedParameterQuery<T> extends TypedQuery<T>, OrderedParameterSql {
+public interface OrderedParameterQuery<T> extends Query<T>, OrderedParameterSql {
 
   @Override
   OrderedParameterQuery<T> add(Object... parameters);

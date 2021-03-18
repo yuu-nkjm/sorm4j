@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
@@ -28,7 +29,8 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 abstract class AbstractOrmMapper implements SqlExecutor {
   private static final org.slf4j.Logger log =
@@ -127,6 +129,23 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       log.trace("[{}] Parameters = {} ", sw.getTag(), parameters);
     });
     return ret;
+  }
+
+  @Override
+  public int executeUpdate(SqlStatement sql) {
+    return executeUpdate(sql.getSql(), sql.getParameters());
+  }
+
+
+  @Override
+  public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
+      sqlParameterSetter.setParameters(stmt, sql.getParameters());
+      ResultSet rs = stmt.executeQuery();
+      return resultSetHandler.apply(rs);
+    } catch (Exception e) {
+      throw Try.rethrow(e);
+    }
   }
 
 

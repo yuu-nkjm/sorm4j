@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.core.util.SqlUtils;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * An implementation of {@link OrderedParameterSql}

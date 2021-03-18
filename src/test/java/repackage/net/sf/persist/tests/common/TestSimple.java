@@ -25,7 +25,7 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.util.StringUtils;
-import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.InsertResult;
 
 public class TestSimple {
 

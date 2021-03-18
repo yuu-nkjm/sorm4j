@@ -2,7 +2,8 @@ package org.nkjmlab.sorm4j.core.sqlstatement;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.sqlstatement.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.SelectBuilder;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * An builder of select SQL.
@@ -149,6 +150,11 @@ public class SelectBuilderImpl implements SelectBuilder {
   public SelectBuilder where(String expr) {
     where = expr;
     return this;
+  }
+
+  @Override
+  public SqlStatement toSqlStatement() {
+    return SqlStatement.of(buildSql());
   }
 
 }

@@ -1,9 +1,8 @@
 package org.nkjmlab.sorm4j.core.sqlstatement;
 
-import org.nkjmlab.sorm4j.TypedOrmReader;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
  * An implementation of {@link OrderedParameterQuery}
@@ -12,16 +11,15 @@ import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
  *
  * @param <T>
  */
-public class OrderedParameterQueryImpl<T> extends AbstTypedQuery<T>
+public class OrderedParameterTypedQueryImpl<T> extends AbstractQuery<T>
     implements OrderedParameterQuery<T> {
 
-  private OrderedParameterSql orderedParameterSql;
+  private final OrderedParameterSql orderedParameterSql;
 
-  public OrderedParameterQueryImpl(TypedOrmReader<T> conn, String sql) {
-    super(conn);
+  public OrderedParameterTypedQueryImpl(QueryExecutor<T> executor, String sql) {
+    super(executor);
     this.orderedParameterSql = OrderedParameterSql.from(sql);
   }
-
 
   @Override
   public OrderedParameterQuery<T> add(Object parameter) {
@@ -41,9 +39,10 @@ public class OrderedParameterQueryImpl<T> extends AbstTypedQuery<T>
   }
 
 
-  public static <T> OrderedParameterQuery<T> createFrom(TypedOrmReader<T> conn, String sql) {
-    return new OrderedParameterQueryImpl<>(conn, sql);
+  public static <T> OrderedParameterQuery<T> createFrom(QueryExecutor<T> executor, String sql) {
+    return new OrderedParameterTypedQueryImpl<>(executor, sql);
   }
+
 
 
 }

@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sqlstatement.SqlStatement;
+import org.nkjmlab.sorm4j.sql.InsertResult;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<T> {
 
@@ -256,11 +256,6 @@ class TypedOrmMapperImpl<T> extends AbstractOrmMapper implements TypedOrmMapper<
   @Override
   public int[] update(List<T> objects) {
     return applytoArray(objects, array -> update(array));
-  }
-
-  @Override
-  public int executeUpdate(SqlStatement sql) {
-    return executeUpdate(sql.getSql(), sql.getParameters());
   }
 
   @Override

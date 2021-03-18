@@ -7,6 +7,7 @@ import java.io.Closeable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.core.util.Try;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.RowMapper;
 
 /**
  * Represents a result set from database.
@@ -69,7 +71,22 @@ final class LazyResultSetImpl<T>
    */
   @Override
   public List<T> toList() {
-    List<T> ret = Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+    List<T> ret =
+        Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+    close();
+    return ret;
+  }
+
+  @Override
+  public List<T> toList(RowMapper<T> rowMapper) {
+    final List<T> ret = new ArrayList<>();
+    Try.runOrThrow(() -> {
+      int rowNum = 0;
+      while (resultSet.next()) {
+        rowNum++;
+        ret.add(rowMapper.mapRow(resultSet, rowNum));
+      }
+    }, Try::rethrow);
     close();
     return ret;
   }

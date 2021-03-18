@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
-import org.nkjmlab.sorm4j.sqlstatement.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sqlstatement.SelectQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
  * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},
@@ -17,7 +17,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
     SqlExecutor, TransactionFunction, Closeable, AutoCloseable {
 
   /**
-   * Create {@link NamedParameterQuery} from SQL string.
+   * Creates a {@link NamedParameterQuery} from SQL string.
    *
    * @param sql
    * @return
@@ -25,7 +25,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
   NamedParameterQuery<T> createNamedParameterQuery(String sql);
 
   /**
-   * Create {@link OrderedParameterQuery} from SQL string.
+   * Creates a {@link OrderedParameterQuery} from SQL string.
    *
    * @param sql
    * @return
@@ -33,7 +33,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
   OrderedParameterQuery<T> createOrderedParameterQuery(String sql);
 
   /**
-   * Create {@link SelectQuery}.
+   * Creates a {@link SelectQuery}.
    *
    * @return
    */
@@ -46,8 +46,20 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    */
   String getTableName();
 
+  /**
+   * Creates {@link TypedOrmConnection}
+   *
+   * @param <S>
+   * @param objectClass
+   * @return
+   */
   <S> TypedOrmConnection<S> type(Class<S> objectClass);
 
+  /**
+   * Creates an {@link OrmConnection}
+   *
+   * @return
+   */
   OrmConnection untype();
 
 
