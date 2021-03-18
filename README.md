@@ -58,9 +58,9 @@ Sorm4j requires Java 11 or later to run.
     - The detailed manual is here.
 
 ## Versioning
-This project uses [Semantic Versioning](https://semver.org/) from 1.0.0.
+This project uses [Semantic Versioning](https://semver.org/) from 1.0.0 release.
 
-The interfaces and classes in the following packages are public APIs.
+The interfaces and classes in the following packages are regarded as public API.
 
  - org.nkjmlab.sorm4j
  - org.nkjmlab.sorm4j.annotation
@@ -71,4 +71,4 @@ The interfaces and classes in the following packages are public APIs.
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).
 
 ## Special thanks
-* r5v9 for creating [r5v9/Persist (BSD license)](https://github.com/r5v9/persist), which inspires this project.
+- r5v9 for creating [r5v9/Persist (BSD license)](https://github.com/r5v9/persist), which inspires this project.
