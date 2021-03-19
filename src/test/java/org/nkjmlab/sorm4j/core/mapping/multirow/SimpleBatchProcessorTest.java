@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -18,9 +17,6 @@ import org.nkjmlab.sorm4j.tool.SormTestUtils;
 class SimpleBatchProcessorTest {
 
   private static Sorm sorm;
-  private static final Player a = PLAYER_ALICE;
-  private static final Player b = PLAYER_BOB;
-  private static final Player c = PLAYER_CAROL;
 
   @BeforeAll
   static void setUp() {
@@ -37,17 +33,16 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testSetUp() {
-    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
-    assertThat(s).contains(SimpleBatchProcessor.class.getSimpleName());
+    assertThat(sorm.getConfigString())
+        .contains(Configurator.MultiRowProcessorType.SIMPLE_BATCH.name());
   }
 
   @Test
   void testMultiRowInsert() {
-    sorm.accept(Player.class, conn -> conn.insert(a, b));
+    sorm.accept(Player.class, conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
     sorm.acceptTransactionHandler(tr -> {
       try {
-        tr.insert(a, null);
+        tr.insert(PLAYER_ALICE, null);
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getMessage()).contains("it is null");

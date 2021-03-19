@@ -11,7 +11,6 @@ import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -35,10 +34,10 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
     sorm = SormTestUtils.createSorm("BATCH_CONF");
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
+    String s = sorm.getConfigString();
 
-    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
+    assertThat(s.toString())
+        .contains(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
     sorm = SormFactory.create(jdbcUrl, user, password, "BATCH_CONF");
   }
 

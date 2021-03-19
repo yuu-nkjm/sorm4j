@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -26,8 +25,6 @@ class MultiRowInOneStatementProcessorTest {
   static void setUp() {
     sorm = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
   }
 
   @BeforeEach

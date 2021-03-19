@@ -22,6 +22,17 @@ class SormTest {
     SormTestUtils.dropAndCreateTable(srv, Player.class);
   }
 
+  @Test
+  void testGetFormattedStringn() throws SQLException {
+    Guest a = SormTestUtils.GUEST_ALICE;
+    try (OrmConnection tr = srv.openTransaction()) {
+      tr.begin();
+      tr.insert(a);
+      // auto-rollback
+    }
+
+    System.out.println(srv.getTableMappingStatusMap());
+  }
 
   @Test
   void testException() throws SQLException {

@@ -514,6 +514,18 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
         k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()), Try::rethrow));
   }
 
+  public String getTableName(Class<?> objectClass) {
+    return toTableName(objectClass).getName();
+  }
+
+  public String getTableMappingAsFormattedString(Class<?> objectClass) {
+    return getTableMapping(objectClass).getFormattedString();
+  }
+
+  public String getTableMappingAsFormattedString(String tableName, Class<?> objectClass) {
+    return getTableMapping(tableName, objectClass).getFormattedString();
+  }
+
   private TableName toTableName(String tableName) {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
         k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
