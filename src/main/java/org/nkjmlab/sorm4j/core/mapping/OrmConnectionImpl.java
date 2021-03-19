@@ -83,7 +83,7 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
   @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
-    return new TypedOrmConnectionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+    return new TypedOrmConnectionImpl<>(objectClass, this);
   }
 
   @Override
@@ -103,5 +103,7 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
       String sql) {
     return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
   }
+
+
 
 }

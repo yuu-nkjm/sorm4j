@@ -2,6 +2,8 @@ package org.nkjmlab.sorm4j.core.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
@@ -20,7 +22,8 @@ import org.nkjmlab.sorm4j.core.util.Try;
  *
  */
 public final class SormImpl implements Sorm {
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log =
+  // org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
   private final DataSource dataSource;
 
@@ -39,7 +42,8 @@ public final class SormImpl implements Sorm {
 
   @Override
   public <T> TypedOrmTransaction<T> openTransaction(Class<T> objectClass) {
-    return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), configStore);
+    return new TypedOrmTransactionImpl<>(objectClass,
+        new OrmTransactionImpl(getJdbcConnection(), configStore));
   }
 
 
@@ -111,7 +115,8 @@ public final class SormImpl implements Sorm {
 
   @Override
   public <T> TypedOrmConnection<T> openConnection(Class<T> objectClass) {
-    return new TypedOrmConnectionImpl<T>(objectClass, getJdbcConnection(), configStore);
+    return new TypedOrmConnectionImpl<T>(objectClass,
+        new OrmConnectionImpl(getJdbcConnection(), configStore));
   }
 
   @Override
@@ -201,7 +206,7 @@ public final class SormImpl implements Sorm {
 
     @Override
     public <T> TypedOrmTransaction<T> type(Class<T> objectClass) {
-      return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+      return new TypedOrmTransactionImpl<>(objectClass, this);
     }
 
   }
@@ -209,10 +214,9 @@ public final class SormImpl implements Sorm {
   public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
       implements TypedOrmTransaction<T> {
 
-    public TypedOrmTransactionImpl(Class<T> objectClass, Connection connection,
-        ConfigStore options) {
-      super(objectClass, connection, options);
-      begin(options.getTransactionIsolationLevel());
+    public TypedOrmTransactionImpl(Class<T> objectClass, OrmTransactionImpl ormTransaction) {
+      super(objectClass, (OrmConnectionImpl) ormTransaction);
+      begin(ormTransaction.getTransactionIsolationLevel());
     }
 
     @Override
@@ -223,12 +227,12 @@ public final class SormImpl implements Sorm {
 
     @Override
     public <S> TypedOrmTransaction<S> type(Class<S> objectClass) {
-      return new TypedOrmTransactionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+      return new TypedOrmTransactionImpl<>(objectClass, (OrmTransactionImpl) ormConnection);
     }
 
     @Override
     public OrmTransaction untype() {
-      return new OrmTransactionImpl(getJdbcConnection(), getConfigStore());
+      return (OrmTransactionImpl) ormConnection;
     }
 
   }
@@ -236,6 +240,12 @@ public final class SormImpl implements Sorm {
   @Override
   public Sorm createWith(String configName) {
     return SormFactory.create(dataSource, configName);
+  }
+
+  @Override
+  public Map<String, String> getTableMappingStatusMap() {
+    return configStore.getTableMappings().entrySet().stream()
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
   }
 
 

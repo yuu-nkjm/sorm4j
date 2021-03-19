@@ -17,6 +17,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
 public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlExecutor,
     ResultSetMapper, TransactionFunction, Closeable, AutoCloseable {
 
+
   /**
    * Creates a {@link NamedParameterQuery} from SQL string.
    *
@@ -59,6 +60,15 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @return
    */
   <T> SelectQuery<T> createSelectQuery(Class<T> objectClass);
+
+
+  /**
+   * Gets table name corresponding to the given object class.
+   *
+   * @param objectClass
+   * @return
+   */
+  String getTableName(Class<?> objectClass);
 
   /**
    * Creates a {@link TypedOrmConnection}
