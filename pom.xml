@@ -236,6 +236,9 @@
           <excludePackageNames>org.nkjmlab.sorm4j.core:org.nkjmlab.sorm4j.core.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
+          <additionalOptions>
+            <additionalOption>--frames</additionalOption>
+          </additionalOptions>
         </configuration>
         <executions>
           <execution>
