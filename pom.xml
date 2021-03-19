@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   <name>sorm4j</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
   <url>https://github.com/yuu-nkjm/sorm4j</url>
@@ -236,9 +236,6 @@
           <excludePackageNames>org.nkjmlab.sorm4j.core:org.nkjmlab.sorm4j.core.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
-          <additionalOptions>
-            <additionalOption>--frames</additionalOption>
-          </additionalOptions>
         </configuration>
         <executions>
           <execution>
