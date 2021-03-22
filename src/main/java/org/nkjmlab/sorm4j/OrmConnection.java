@@ -2,8 +2,10 @@ package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
@@ -29,10 +31,19 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
   <T> NamedParameterQuery<T> createNamedParameterQuery(Class<T> objectClass, String sql);
 
   /**
+   * Creates a {@link NamedParameterRequest} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  NamedParameterRequest createNamedParameterRequest(String sql);
+
+  /**
    * Creates a {@link NamedParameterSql} from SQL string.
    *
    * @param sql
    * @return
+   * @deprecated Use {@link NamedParameterSql#from(String)}
    */
   NamedParameterSql createNamedParameterSql(String sql);
 
@@ -42,15 +53,24 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @param <T>
    * @param objectClass
    * @param sql
-   * @return
    */
   <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass, String sql);
+
+  /**
+   * Creates a {@link OrderedParameterRequest} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  OrderedParameterRequest createOrderedParameterRequest(String sql);
+
 
   /**
    * Creates a {@link OrderedParameterSql} from SQL string.
    *
    * @param sql
    * @return
+   * @deprecated Use {@link OrderedParameterSql#from(String)}
    */
   OrderedParameterSql createOrderedParameterSql(String sql);
 
@@ -60,7 +80,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @return
    */
   <T> SelectQuery<T> createSelectQuery(Class<T> objectClass);
-
 
   /**
    * Gets table name corresponding to the given object class.

@@ -29,10 +29,23 @@ public interface OrderedParameterSql extends SqlStatementSupplier {
   OrderedParameterSql addParameter(Object... parameters);
 
 
+  /**
+   * Creates a {@link OrderedParameterSql} object with parameters.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
   static SqlStatement toSqlStatement(String sql, Object... parameters) {
     return from(sql).addParameter(parameters).toSqlStatement();
   }
 
+  /**
+   * Creates a {@link OrderedParameterSql} object.
+   *
+   * @param sql
+   * @return
+   */
   static OrderedParameterSql from(String sql) {
     return new OrderedParameterSqlImpl(sql);
   }

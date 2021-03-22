@@ -3,7 +3,7 @@
 ![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j) [![javadoc](https://javadoc.io/badge2/org.nkjmlab/sorm4j/javadoc.svg)](https://javadoc.io/doc/org.nkjmlab/sorm4j) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
-Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. It provides only simple functionalities to do select, insert, update, delete and merge. 
+Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. Sorm4j is a sort of JDBC wrapper. It provides only simple functionalities to do select, insert, update, delete and merge. 
 
 Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and it maps the result to Java objects. It opens a connection to a database and closes it after the execution automatically.
 
@@ -40,7 +40,7 @@ try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, username, passwo
 
 Sorm4j is tested and evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. 
 
-Sorm4j requires Java 11 or later to run.
+Sorm4j requires Java 11 (or above) to run and build.
 
 
 ## Website
@@ -58,9 +58,7 @@ Sorm4j requires Java 11 or later to run.
     - The detailed manual is here.
 
 ## Versioning
-This project uses [Semantic Versioning](https://semver.org/) from 1.0.0 release.
-
-The interfaces and classes in the following packages are regarded as public API.
+The interfaces and classes in the following packages are regarded as public API. If any methods are going to remove, they will be annotated by `@deprecated` and announced release note.
 
  - org.nkjmlab.sorm4j
  - org.nkjmlab.sorm4j.annotation
