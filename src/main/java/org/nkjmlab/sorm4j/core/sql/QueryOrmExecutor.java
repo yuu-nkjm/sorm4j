@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.core.sqlstatement;
+package org.nkjmlab.sorm4j.core.sql;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.OrmReader;

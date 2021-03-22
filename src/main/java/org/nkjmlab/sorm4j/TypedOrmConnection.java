@@ -2,7 +2,9 @@ package org.nkjmlab.sorm4j;
 
 import java.io.Closeable;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -25,12 +27,29 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
   NamedParameterQuery<T> createNamedParameterQuery(String sql);
 
   /**
+   * Creates a {@link NamedParameterRequest} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  NamedParameterRequest createNamedParameterRequest(String sql);
+
+  /**
    * Creates a {@link OrderedParameterQuery} from SQL string.
    *
    * @param sql
    * @return
    */
   OrderedParameterQuery<T> createOrderedParameterQuery(String sql);
+
+  /**
+   * Creates a {@link OrderedParameterRequest} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  OrderedParameterRequest createOrderedParameterRequest(String sql);
+
 
   /**
    * Creates a {@link SelectQuery}.
@@ -45,7 +64,6 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    * @return
    */
   String getTableName();
-
 
   /**
    * Creates {@link TypedOrmConnection}
@@ -62,7 +80,6 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    * @return
    */
   OrmConnection untype();
-
 
 
 }

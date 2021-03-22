@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.core.sqlstatement.SelectBuilderImpl;
+import org.nkjmlab.sorm4j.core.sql.SelectBuilderImpl;
 
 
 /**
@@ -230,7 +230,7 @@ public interface SelectBuilder extends SqlStatementSupplier {
   SelectBuilder orderBy(String column, String ascOrDesc);
 
   /**
-   * Create select clause.
+   * Create select clause. The default value is "*".
    * <p>
    * For example,
    *

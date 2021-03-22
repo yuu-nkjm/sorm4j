@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterSqlImpl;
+import org.nkjmlab.sorm4j.core.sql.OrderedParameterSqlImpl;
 
 /**
  * SQL with ordered parameters. The instance could be convert to {@link SqlStatement}. The class

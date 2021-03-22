@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,48 @@ class TypedOrmConnectionTest {
     SormTestUtils.dropAndCreateTable(sorm, Player.class);
     SormTestUtils.dropAndCreateTable(sorm, Location.class);
   }
+
+  @Test
+  void testOrderedRequest() {
+    AtomicInteger id = new AtomicInteger(10);
+
+    int row = sorm.apply(Player.class,
+        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+            .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
+            .executeUpdate());
+    assertThat(row).isEqualTo(1);
+
+
+    row = sorm.apply(Player.class,
+        conn -> conn.createOrderedParameterRequest("insert into players values(?,?,?)")
+            .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
+            .executeUpdate());
+    assertThat(row).isEqualTo(1);
+
+
+    List<Player> ret1 =
+        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.of("select * from players"),
+            (rs, rn) -> conn.mapRow(Player.class, rs)));
+
+    assertThat(ret1.size()).isEqualTo(2);
+    ret1 =
+        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.of("select * from players"),
+            rs -> conn.mapRows(Player.class, rs)));
+    assertThat(ret1.size()).isEqualTo(2);
+
+    List<Map<String, Object>> ret2 = sorm.apply(Player.class, conn -> conn
+        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRows(rs)));
+
+    assertThat(ret2.size()).isEqualTo(2);
+
+    ret2 = sorm.apply(Player.class, conn -> conn
+        .executeQuery(SqlStatement.of("select * from players"), (rs, rowNum) -> conn.mapRow(rs)));
+
+    assertThat(ret2.size()).isEqualTo(2);
+
+
+  }
+
 
   @Test
   void testException() {
@@ -325,6 +368,11 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
+      map = m.readMapFirst("select * from players");
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+
+
       map = m.readMapFirst(SqlStatement.of("select * from players WHERE id=?", 100));
       assertThat(map).isNull();
 
@@ -408,9 +456,21 @@ class TypedOrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
+
+    sorm.accept(Player.class, m -> {
+      Map<String, Object> map = m.readMapList("select * from players").get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+
     sorm.accept(Player.class, m -> {
       Map<String, Object> map =
           m.readMapOne(SqlStatement.of("select * from players where id=?", 1));
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+    sorm.accept(Player.class, m -> {
+      Map<String, Object> map = m.readMapOne("select * from players where id=?", 1);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });

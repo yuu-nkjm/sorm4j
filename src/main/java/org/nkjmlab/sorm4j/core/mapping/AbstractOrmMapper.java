@@ -247,10 +247,6 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     return ret;
   }
 
-  public ConfigStore getConfigStore() {
-    return configStore;
-  }
-
   @Override
   public Connection getJdbcConnection() {
     return connection;
@@ -516,14 +512,6 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
   public String getTableName(Class<?> objectClass) {
     return toTableName(objectClass).getName();
-  }
-
-  public String getTableMappingAsFormattedString(Class<?> objectClass) {
-    return getTableMapping(objectClass).getFormattedString();
-  }
-
-  public String getTableMappingAsFormattedString(String tableName, Class<?> objectClass) {
-    return getTableMapping(tableName, objectClass).getFormattedString();
   }
 
   private TableName toTableName(String tableName) {

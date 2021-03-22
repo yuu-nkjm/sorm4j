@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.core.sqlstatement;
+package org.nkjmlab.sorm4j.core.sql;
 
 import java.util.Arrays;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
