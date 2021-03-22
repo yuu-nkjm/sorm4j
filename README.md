@@ -44,7 +44,7 @@ Sorm4j requires Java 11 (or above) to run and build.
 
 
 ## Quickstart
-Add dependency to your pom.xml. The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j).
+The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j). Add dependency to your pom.xml:
 
 ```xml
  <dependency>
