@@ -20,12 +20,6 @@ public class NamedParameterRequestImpl implements NamedParameterRequest {
     this.sqlExecutor = sqlExecutor;
   }
 
-  public NamedParameterRequestImpl(SqlExecutor sqlExecutor, String sql, String prefix,
-      String suffix) {
-    this.sql = NamedParameterSql.from(sql, prefix, suffix);
-    this.sqlExecutor = sqlExecutor;
-  }
-
   @Override
   public <T> T executeQuery(FunctionHandler<ResultSet, T> resultSetHandler) {
     return sqlExecutor.executeQuery(toSqlStatement(), resultSetHandler);
