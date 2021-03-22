@@ -230,7 +230,7 @@ public interface SelectBuilder extends SqlStatementSupplier {
   SelectBuilder orderBy(String column, String ascOrDesc);
 
   /**
-   * Create select clause.
+   * Create select clause. The default value is "*".
    * <p>
    * For example,
    *

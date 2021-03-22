@@ -17,7 +17,9 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  * @author nkjm
  *
  */
-public final class NamedParameterSqlImpl implements NamedParameterSql {
+public class NamedParameterSqlImpl implements NamedParameterSql {
+  private static final String DEFAULT_PREFIX = ":";
+  private static final String DEFAULT_SUFFIX = "";
 
   private final String sql;
   private final Map<String, Object> parameters = new HashMap<>();
@@ -28,6 +30,10 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
+  }
+
+  public NamedParameterSqlImpl(String sql) {
+    this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX);
   }
 
   @Override

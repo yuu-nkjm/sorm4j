@@ -50,7 +50,7 @@ Add dependency to your pom.xml:
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.1.1</version>
+   <version>1.2.0</version>
  </dependency>
 ```
 

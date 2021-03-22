@@ -13,7 +13,7 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  * @author nkjm
  *
  */
-public final class OrderedParameterSqlImpl implements OrderedParameterSql {
+public class OrderedParameterSqlImpl implements OrderedParameterSql {
 
   private final String sql;
   private final List<Object> parameters = new ArrayList<>();

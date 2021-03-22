@@ -31,6 +31,10 @@ public interface SelectQuery<T>
   @Override
   SelectQuery<T> distinct();
 
+  /**
+   * Sets the table name. The value automatically sets based on the given class.
+   *
+   */
   @Override
   SelectQuery<T> from(String table);
 
