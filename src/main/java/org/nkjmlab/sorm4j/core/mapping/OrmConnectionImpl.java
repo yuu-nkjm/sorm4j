@@ -70,6 +70,7 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   }
 
   @Override
+  @Deprecated
   public NamedParameterSql createNamedParameterSql(String sql) {
     return NamedParameterSql.from(sql);
   }
@@ -86,6 +87,7 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   }
 
   @Override
+  @Deprecated
   public OrderedParameterSql createOrderedParameterSql(String sql) {
     return OrderedParameterSql.from(sql);
   }
