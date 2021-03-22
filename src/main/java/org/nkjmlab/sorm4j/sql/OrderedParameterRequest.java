@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterRequestImpl;
+import org.nkjmlab.sorm4j.core.sql.OrderedParameterRequestImpl;
 
 public interface OrderedParameterRequest extends OrderedParameterSql, Request {
 

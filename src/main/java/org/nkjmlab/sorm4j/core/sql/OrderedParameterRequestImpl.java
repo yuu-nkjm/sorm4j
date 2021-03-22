@@ -1,28 +1,21 @@
-package org.nkjmlab.sorm4j.core.sqlstatement;
+package org.nkjmlab.sorm4j.core.sql;
 
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.Map;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
-public class NamedParameterRequestImpl implements NamedParameterRequest {
+public class OrderedParameterRequestImpl implements OrderedParameterRequest {
 
-  private final NamedParameterSql sql;
+  private final OrderedParameterSql sql;
   private final SqlExecutor sqlExecutor;
 
-  public NamedParameterRequestImpl(SqlExecutor sqlExecutor, String sql) {
-    this.sql = NamedParameterSql.from(sql);
-    this.sqlExecutor = sqlExecutor;
-  }
-
-  public NamedParameterRequestImpl(SqlExecutor sqlExecutor, String sql, String prefix,
-      String suffix) {
-    this.sql = NamedParameterSql.from(sql, prefix, suffix);
+  public OrderedParameterRequestImpl(SqlExecutor sqlExecutor, String sql) {
+    this.sql = OrderedParameterSql.from(sql);
     this.sqlExecutor = sqlExecutor;
   }
 
@@ -47,16 +40,15 @@ public class NamedParameterRequestImpl implements NamedParameterRequest {
   }
 
   @Override
-  public NamedParameterRequest bindAll(Map<String, Object> keyValuePairOfNamedParameters) {
-    sql.bindAll(keyValuePairOfNamedParameters);
+  public OrderedParameterRequest addParameter(Object parameter) {
+    sql.addParameter(parameter);
     return this;
   }
 
   @Override
-  public NamedParameterRequest bind(String key, Object value) {
-    sql.bind(key, value);
+  public OrderedParameterRequest addParameter(Object... parameters) {
+    sql.addParameter(parameters);
     return this;
   }
-
 
 }

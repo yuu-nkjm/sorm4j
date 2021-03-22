@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterSqlImpl;
+import org.nkjmlab.sorm4j.core.sql.NamedParameterSqlImpl;
 
 /**
  * A SQL statement with named parameters.
