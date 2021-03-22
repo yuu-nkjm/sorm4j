@@ -85,6 +85,18 @@ public final class SormFactory {
   }
 
   /**
+   * Gets the string of the config of the given config name. {@link #DEFAULT_CONFIG_NAME} is default
+   * config name.
+   *
+   * @param configName
+   * @return
+   * @exception {@link SormException} will be throw if the config name is not registerd yet.
+   */
+  public static String getConfigString(String configName) {
+    return ConfigStore.get(configName).toString();
+  }
+
+  /**
    * Registers configuration under the given name.
    *
    * @param configName
@@ -106,15 +118,6 @@ public final class SormFactory {
       Consumer<Configurator> configuratorConsumer) {
     configure(new ConfiguratorImpl(newConfigName, ConfigStore.get(srcConfigName)),
         configuratorConsumer);
-  }
-
-  /**
-   * Updates default configuration.
-   *
-   * @param configuratorConsumer
-   */
-  public static void updateDefaultConfig(Consumer<Configurator> configuratorConsumer) {
-    configure(new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME), configuratorConsumer);
   }
 
   public static void resetDefaultConfig() {
@@ -145,7 +148,8 @@ public final class SormFactory {
 
   private static <T> TypedOrmConnection<T> toOrmConnection(Connection connection,
       Class<T> objectClass, ConfigStore configStore) {
-    return new TypedOrmConnectionImpl<T>(objectClass, connection, configStore);
+    return new TypedOrmConnectionImpl<T>(objectClass,
+        new OrmConnectionImpl(connection, configStore));
   }
 
   /**
@@ -179,6 +183,15 @@ public final class SormFactory {
     return toOrmConnection(connection, ConfigStore.get(configName));
   }
 
+
+  /**
+   * Updates default configuration. This updates does not effect existing {@link Sorm} objects.
+   *
+   * @param configuratorConsumer
+   */
+  public static void updateDefaultConfig(Consumer<Configurator> configuratorConsumer) {
+    configure(new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME), configuratorConsumer);
+  }
 
   private SormFactory() {}
 

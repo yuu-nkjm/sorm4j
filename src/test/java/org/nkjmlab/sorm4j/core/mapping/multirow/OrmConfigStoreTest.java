@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
-import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
@@ -19,7 +18,6 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class OrmConfigStoreTest {
@@ -72,10 +70,7 @@ class OrmConfigStoreTest {
     SormFactory.updateDefaultConfig(builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    String s = sorm.apply(Player.class, conn -> ((TypedOrmConnectionImpl<Player>) conn)
-        .getTableMapping(Player.class).getFormattedString());
-    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
-    assertThat(s.toString()).contains(BatchOfMultiRowInOneStatementProcessor.class.getSimpleName());
+    assertThat(sorm.getConfigString()).contains(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH.toString());
 
     SormFactory.resetDefaultConfig();
   }
@@ -90,7 +85,6 @@ class OrmConfigStoreTest {
 
     sormImpl = SormFactory.create(jdbcUrl, user, password);
     assertThat(sormImpl.getConfigName()).isEqualTo(SormFactory.DEFAULT_CONFIG_NAME);
-    System.out.println(sormImpl.getConfigString());
   }
 
 }

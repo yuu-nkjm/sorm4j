@@ -4,7 +4,16 @@ import java.util.List;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 
 /**
+ * <p>
  * A interface for updating database.
+ * <p>
+ *
+ * <p>
+ * Merge methods execute a SQL sentence as MERGE INTO of the H2 grammar. This operation may be not
+ * working the other database system.
+ *
+ * See, <a href="http://www.h2database.com/html/commands.html#merge_into">MERGE INTO - Commands</a>
+ * </p>
  *
  * @author nkjm
  *

@@ -1,12 +1,14 @@
 package org.nkjmlab.sorm4j.core.mapping;
 
-import java.sql.Connection;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.core.sqlstatement.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.core.sqlstatement.OrderedParameterQueryImpl;
-import org.nkjmlab.sorm4j.core.sqlstatement.SelectQueryImpl;
 import org.nkjmlab.sorm4j.core.sqlstatement.QueryTypedOrmExecutor;
+import org.nkjmlab.sorm4j.core.sqlstatement.SelectQueryImpl;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -25,16 +27,16 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
     implements TypedOrmConnection<T> {
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log =
+  // org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
 
-
-  public TypedOrmConnectionImpl(Class<T> objectClass, Connection connection, ConfigStore options) {
-    super(objectClass, connection, options);
+  public TypedOrmConnectionImpl(Class<T> objectClass, OrmConnectionImpl ormMapper) {
+    super(objectClass, ormMapper);
   }
 
   @Override
   public String getTableName() {
-    return getTableMapping(objectClass).getTableName();
+    return ormConnection.getTableName(objectClass);
   }
 
   @Override
@@ -70,7 +72,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public void begin() {
-    begin(getTransactionIsolationLevel());
+    begin(ormConnection.getTransactionIsolationLevel());
   }
 
   private void setTransactionIsolation(int level) {
@@ -96,14 +98,32 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
-    return new TypedOrmConnectionImpl<>(objectClass, getJdbcConnection(), getConfigStore());
+    return new TypedOrmConnectionImpl<>(objectClass, ormConnection);
   }
 
   @Override
   public OrmConnection untype() {
-    return new OrmConnectionImpl(getJdbcConnection(), getConfigStore());
+    return ormConnection;
   }
 
+  @Override
+  public <S> S mapRow(Class<S> objectClass, ResultSet resultSet) {
+    return ormConnection.mapRow(objectClass, resultSet);
+  }
 
+  @Override
+  public Map<String, Object> mapRow(ResultSet resultSet) {
+    return ormConnection.mapRow(resultSet);
+  }
+
+  @Override
+  public <S> List<S> mapRows(Class<S> objectClass, ResultSet resultSet) {
+    return ormConnection.mapRows(objectClass, resultSet);
+  }
+
+  @Override
+  public List<Map<String, Object>> mapRows(ResultSet resultSet) {
+    return ormConnection.mapRows(resultSet);
+  }
 
 }

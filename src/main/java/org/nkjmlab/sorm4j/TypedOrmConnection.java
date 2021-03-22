@@ -46,6 +46,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    */
   String getTableName();
 
+
   /**
    * Creates {@link TypedOrmConnection}
    *
@@ -61,6 +62,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    * @return
    */
   OrmConnection untype();
+
 
 
 }

@@ -28,15 +28,37 @@ public interface NamedParameterSql extends SqlStatementSupplier {
    */
   NamedParameterSql bind(String key, Object value);
 
-
+  /**
+   * Creates {@link NamedParameterSql} object. the named parameters should have the given prefix and
+   * suffix.
+   *
+   * @param sql
+   * @param prefix
+   * @param suffix
+   * @return
+   */
   static NamedParameterSql from(String sql, String prefix, String suffix) {
     return new NamedParameterSqlImpl(sql, prefix, suffix);
   }
 
+  /**
+   * Creates {@link NamedParameterSql} object.
+   *
+   * @param sql
+   * @return
+   */
+
   static NamedParameterSql from(String sql) {
-    return NamedParameterSql.from(sql, ":", "");
+    return new NamedParameterSqlImpl(sql);
   }
 
+  /**
+   * Creates {@link NamedParameterSql} object with parameters.
+   *
+   * @param sql
+   * @param namedParameters
+   * @return
+   */
   static SqlStatement toSqlStatement(String sql, Map<String, Object> namedParameters) {
     return NamedParameterSql.from(sql).bindAll(namedParameters).toSqlStatement();
   }

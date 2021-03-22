@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+import java.util.Map;
 import javax.sql.DataSource;
 
 /**
@@ -15,6 +16,7 @@ public interface Sorm {
    * Accepts a {@link TypedOrmConnection} handler for a task with object-relation mapping. The
    *
    * connection will be closed after the process of handler.
+   *
    * @param <T>
    * @param objectClass
    * @param handler
@@ -151,6 +153,13 @@ public interface Sorm {
    * @return
    */
   Connection getJdbcConnection();
+
+  /**
+   * Gets map of the table mapping status. The keys are table names in lower case.
+   *
+   * @return
+   */
+  Map<String, String> getTableMappingStatusMap();
 
   /**
    * Open {@link OrmConnection}. You should always use try-with-resources to ensure the database
