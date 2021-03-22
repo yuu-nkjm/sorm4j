@@ -11,7 +11,9 @@ import org.nkjmlab.sorm4j.core.sql.QueryTypedOrmExecutor;
 import org.nkjmlab.sorm4j.core.sql.SelectQueryImpl;
 import org.nkjmlab.sorm4j.core.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -124,6 +126,16 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   @Override
   public List<Map<String, Object>> mapRows(ResultSet resultSet) {
     return ormConnection.mapRows(resultSet);
+  }
+
+  @Override
+  public NamedParameterRequest createNamedParameterRequest(String sql) {
+    return NamedParameterRequest.from(this, sql);
+  }
+
+  @Override
+  public OrderedParameterRequest createOrderedParameterRequest(String sql) {
+    return OrderedParameterRequest.from(this, sql);
   }
 
 }

@@ -89,9 +89,6 @@ class OrmConnectionTest {
         .addParameter(id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
-
-
-
   }
 
   @Test
@@ -451,6 +448,11 @@ class OrmConnectionTest {
     });
     sorm.accept(m -> {
       Map<String, Object> map = m.readMapLazy("select * from players").toMapList().get(0);
+      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
+          .isEqualTo(a.getName());
+    });
+    sorm.accept(m -> {
+      Map<String, Object> map = m.readMapList("select * from players").get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
