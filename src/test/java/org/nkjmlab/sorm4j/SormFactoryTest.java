@@ -10,6 +10,14 @@ import org.nkjmlab.sorm4j.tool.SormTestUtils;
 class SormFactoryTest {
 
   @Test
+  void testGetConfigString() {
+    String str = SormFactory.getConfigString(SormFactory.DEFAULT_CONFIG_NAME);
+    assertThat(str).contains("configName=DEFAULT_CONFIG");
+
+  }
+
+
+  @Test
   void testToOrmConnectionConnectionClassOfTString() {
     Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
     TypedOrmConnection<Guest> orm = SormFactory.toOrmConnection(sorm.getJdbcConnection(),
