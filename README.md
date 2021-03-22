@@ -50,7 +50,7 @@ Add dependency to your pom.xml:
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.1.0</version>
+   <version>1.1.1</version>
  </dependency>
 ```
 
@@ -80,7 +80,8 @@ Sorm sorm = SormFactory.create("jdbc:h2:mem:sormtest", "sa","");
 Reads matching rows from table:
 
 ```java
-List<Customer> list = sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where id>?", 5));
+List<Customer> list =
+  sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where id>?", 5));
 ```
 
 Inserts a new row:
