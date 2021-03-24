@@ -23,22 +23,6 @@ List<Customer> customers =
 
 Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has only one dependency on a logging facade (SLF4J). It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
 
-Here is an example with raw `java.sql.Connection`:
-
-```java
-try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, username, password)) {
-  // Creates object-relation mapping tool to wrap JDBC connection.
-  OrmConnection conn = SormFactory.toOrmConnection(jdbcConn);
-  conn.insert(new Customer(1, "Alice", "Tokyo"));
-  conn.readList(Customer.class, "select * from customer where address=?","Tokyo");
-} catch (SQLException e) {
-  e.printStackTrace();
-}
-```
-
-
-Sorm4j is tested and evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations.
-
 Sorm4j requires Java 11 (or above) to run and build.
 
 
@@ -99,7 +83,7 @@ sorm.apply(conn-> conn.insert(new Customer(1, "Alice", "Tokyo")));
 - read: reads one row from table including 10,240 row using primary key
 - insert: inserts one row to table
 
-If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
+Sorm4j is evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
 
 ## Website
 [Sorm4j website](https://scrapbox.io/sorm4j/) shows more information.
