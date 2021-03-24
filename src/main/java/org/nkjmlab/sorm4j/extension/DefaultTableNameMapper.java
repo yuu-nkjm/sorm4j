@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.core.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
-import org.nkjmlab.sorm4j.core.util.StringUtils;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
  * Default implementation of {@link TableNameMapper}

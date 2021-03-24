@@ -233,7 +233,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.2.0</version>
         <configuration>
-          <excludePackageNames>org.nkjmlab.sorm4j.core:org.nkjmlab.sorm4j.core.*</excludePackageNames>
+          <excludePackageNames>org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
           <additionalOptions>--frames</additionalOptions>

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.core.sql.NamedParameterRequestImpl;
+import org.nkjmlab.sorm4j.internal.sql.NamedParameterRequestImpl;
 
 public interface NamedParameterRequest extends NamedParameterSql, Request {
 

@@ -1,7 +1,7 @@
 
 package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.core.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.core.util.SqlTypeUtils;
+import org.nkjmlab.sorm4j.internal.util.SqlTypeUtils;
 
 /**
  * Default implementation of {@link ColumnFieldMapper}

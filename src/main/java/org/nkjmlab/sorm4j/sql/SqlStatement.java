@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
-import org.nkjmlab.sorm4j.core.sql.SqlStatementImpl;
-import org.nkjmlab.sorm4j.core.util.SqlUtils;
+import org.nkjmlab.sorm4j.internal.sql.SqlStatementImpl;
+import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
 
 /**
