@@ -102,12 +102,9 @@ Sorm4j is evaluated performance with the H2 database. The results show a small o
     - The detailed manual is here.
 
 ## Versioning
-The interfaces and classes in the following packages are regarded as public API. If any methods are going to remove, they will be annotated by `@deprecated` and announced release note.
+The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.extension`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@deprecated` and announced release note.
 
- - org.nkjmlab.sorm4j
- - org.nkjmlab.sorm4j.annotation
- - org.nkjmlab.sorm4j.extension
- - org.nkjmlab.sorm4j.sql
+
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).
