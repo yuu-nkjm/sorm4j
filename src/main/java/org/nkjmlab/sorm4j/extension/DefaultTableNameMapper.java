@@ -46,8 +46,8 @@ public class DefaultTableNameMapper implements TableNameMapper {
 
   protected List<String> guessTableNameCandidates(Class<?> objectClass) {
     String className = objectClass.getSimpleName();
-    return StringUtils.addPluralSuffix(
-        List.of(toUpperCase(className), toLowerCase(className), toUpperSnakeCase(className)));
+    return StringUtils
+        .addPluralSuffix(List.of(toUpperCase(className), toUpperSnakeCase(className)));
   }
 
   /**
