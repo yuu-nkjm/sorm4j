@@ -61,14 +61,7 @@ public class Customer {
   public int id;
   public String name;
   public String address;
-  // Require public no arg constructor (default constructor)
-  public Customer() {}
-
-  public Customer(int id, String name, String address) {
-    this.id = id;
-    this.name = name;
-    this.address = address;
-  }
+}
 ```
 
 Create an entry point:
