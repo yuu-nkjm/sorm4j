@@ -50,7 +50,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.2.0</version>
+   <version>1.2.1</version>
  </dependency>
 ```
 
@@ -89,6 +89,25 @@ Inserts a new row:
 ```java
 sorm.apply(conn-> conn.insert(new Customer(1, "Alice", "Tokyo")));
 ```
+
+## Performance (Oracle JMH)
+![](https://i.gyazo.com/1030837229df0d24b301b84cd1df140f.png)![](https://i.gyazo.com/ec20038daf68db8e290c86c62be52234.png)
+(The lower the better)
+
+|lib|read|insert|
+|:----|:----|:----|
+| Hand coded (baseline)|5.8|6.2|
+| Sorm4j|6.0 (3% slower)|7.1 (15% slower)|
+| Sql2o|8.4 (45% slower)|11.1 (79% slower)|
+| JDBI|18.4 (217% slower)|12.5 (102% slower)|
+|JOOQ|35.8 (517% slower)|-|
+|MyBatis|12.5 (116% slower)|-|
+
+
+- read: reads one row from table including 10,240 row using primary key
+- insert: inserts one row to table
+
+If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
 
 ## Website
 [Sorm4j website](https://scrapbox.io/sorm4j/) shows more information.
