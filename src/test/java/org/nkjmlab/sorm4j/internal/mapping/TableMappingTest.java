@@ -9,28 +9,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.internal.mapping.AbstractOrmMapper;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Location;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class TableMappingTest {
-  private Sorm sormImpl;
+  private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    sormImpl = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(sormImpl, Guest.class);
-    SormTestUtils.dropAndCreateTable(sormImpl, Player.class);
-    SormTestUtils.dropAndCreateTable(sormImpl, Location.class);
+    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
   }
 
   @Test
   void testGetValue() {
     try {
-      sormImpl.accept(Guest.class, m -> {
+      sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new Guest(), "hoge");
       });
@@ -39,7 +33,7 @@ class TableMappingTest {
     }
 
     try {
-      sormImpl.accept(Guest.class, m -> {
+      sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.getValue(new String(), "id");
       });
@@ -55,7 +49,7 @@ class TableMappingTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
         .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
     try {
-      sormImpl.accept(Guest.class, m -> {
+      sorm.accept(Guest.class, m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
@@ -68,7 +62,7 @@ class TableMappingTest {
   @Test
   void testSetValue() {
     try {
-      sormImpl.accept(Guest.class, m -> {
+      sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "hoge", 0);
       });
@@ -76,7 +70,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("does not have a corresponding");
     }
     try {
-      sormImpl.accept(Guest.class, m -> {
+      sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.setValue(new Guest(), "id", "String");
       });
@@ -84,7 +78,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
-      sormImpl.accept(Player.class, m -> {
+      sorm.accept(Player.class, m -> {
         TableMapping<Player> tm = getTableMapping(m, Player.class);
         tm.setValue(new Player(), "name", 1);
       });
@@ -95,14 +89,14 @@ class TableMappingTest {
 
   @Test
   void testCol() {
-    sormImpl.accept(Guest.class, m -> {
+    sorm.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getAllColumns())
           .containsAll(List.of("ID", "NAME", "ADDRESS"));
     });
-    sormImpl.accept(Guest.class, m -> {
+    sorm.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).getPrimaryKeys()).containsAll(List.of("ID"));
     });
-    sormImpl.accept(Guest.class, m -> {
+    sorm.accept(Guest.class, m -> {
       assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
     });
   }

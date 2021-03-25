@@ -25,9 +25,7 @@ class OrmConnectionTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
-    SormTestUtils.dropAndCreateTable(sorm, Player.class);
+    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
   }
 
   @Test

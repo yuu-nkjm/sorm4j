@@ -8,30 +8,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SormTest {
 
-  private Sorm srv;
+  private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    srv = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(srv, Guest.class);
-    SormTestUtils.dropAndCreateTable(srv, Player.class);
+    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
   }
 
   @Test
   void testGetFormattedStringn() throws SQLException {
     Guest a = SormTestUtils.GUEST_ALICE;
-    try (OrmConnection tr = srv.openTransaction()) {
+    try (OrmConnection tr = sorm.openTransaction()) {
       tr.begin();
       tr.insert(a);
       // auto-rollback
     }
 
-    System.out.println(srv.getTableMappingStatusMap());
+    System.out.println(sorm.getTableMappingStatusMap());
   }
 
   @Test
@@ -131,7 +128,7 @@ class SormTest {
 
   @Test
   void testToString() {
-    assertThat(srv.toString()).contains("Sorm");
+    assertThat(sorm.toString()).contains("Sorm");
 
     SormFactory.create(SormTestUtils.createDataSourceH2()).getDataSource();
 
@@ -141,19 +138,19 @@ class SormTest {
   @Test
   void testRunWithJdbcConnection() {
 
-    srv.acceptJdbcConnectionHandler(con -> {
+    sorm.acceptJdbcConnectionHandler(con -> {
     });
 
   }
 
   @Test
   void testExecuteWithJdbcConnection() {
-    srv.applyJdbcConnectionHandler(con -> "test");
+    sorm.applyJdbcConnectionHandler(con -> "test");
   }
 
   @Test
   void testRunTransactionConsumerOfOrmTransaction() {
-    srv.acceptJdbcConnectionHandler(t -> {
+    sorm.acceptJdbcConnectionHandler(t -> {
     });
   }
 
@@ -161,13 +158,13 @@ class SormTest {
 
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
-    try (TypedOrmTransaction<Guest> tr = srv.openTransaction(Guest.class)) {
+    try (TypedOrmTransaction<Guest> tr = sorm.openTransaction(Guest.class)) {
       tr.begin();
       tr.insert(a);
       tr.rollback();
       tr.commit();
     }
-    srv.acceptJdbcConnectionHandler(con -> {
+    sorm.acceptJdbcConnectionHandler(con -> {
       assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
 
@@ -175,20 +172,20 @@ class SormTest {
 
   @Test
   void testBeginTransaction() {
-    try (OrmConnection tr = srv.openTransaction()) {
+    try (OrmConnection tr = sorm.openTransaction()) {
       tr.begin();
       tr.insert(a);
       // auto-rollback
     }
-    srv.acceptJdbcConnectionHandler(con -> {
+    sorm.acceptJdbcConnectionHandler(con -> {
       assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
-    try (OrmConnection tr = srv.openTransaction()) {
+    try (OrmConnection tr = sorm.openTransaction()) {
       tr.begin();
       tr.insert(a);
       tr.commit();
     }
-    srv.acceptJdbcConnectionHandler(con -> {
+    sorm.acceptJdbcConnectionHandler(con -> {
       assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
     });
   }

@@ -4,8 +4,6 @@ import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 public class SormTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
@@ -56,19 +54,6 @@ public class SormTestUtils {
     dropAndCreateLocationTable(sorm);
   }
 
-  public static void dropAndCreateTable(Sorm srv, Class<?> clazz) {
-    String name = clazz.getSimpleName();
-    if (name.equals(Guest.class.getSimpleName())) {
-      dropAndCreateGuestTable(srv);
-    } else if (name.equals(Player.class.getSimpleName())) {
-      dropAndCreatePlayerTable(srv);
-    } else if (name.equals(Location.class.getSimpleName())) {
-      dropAndCreateLocationTable(srv);
-    } else {
-      throw new IllegalArgumentException(clazz + " is illegal");
-    }
-  }
-
   private static void dropAndCreateLocationTable(Sorm srv) {
     srv.accept(conn -> conn.executeUpdate("DROP TABLE location IF EXISTS"));
     srv.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_LOCATIONS));
@@ -90,23 +75,10 @@ public class SormTestUtils {
     return createDataSourceH2(jdbcUrl, user, password);
   }
 
-  public static DataSource createDataSourceHikari() {
-    return createDataSourceHikari(jdbcUrl, user, password);
-  }
 
   private static DataSource createDataSourceH2(String url, String user, String password) {
     return JdbcConnectionPool.create(url, user, password);
   }
 
-  private static DataSource createDataSourceHikari(String url, String user, String password) {
-    HikariConfig config = new HikariConfig();
-    config.addDataSourceProperty("cachePrepStmts", "true");
-    config.addDataSourceProperty("prepStmtCacheSize", "250");
-    config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-    config.setJdbcUrl(url);
-    config.setUsername(user);
-    config.setPassword(password);
-    return new HikariDataSource(config);
-  }
 
 }
