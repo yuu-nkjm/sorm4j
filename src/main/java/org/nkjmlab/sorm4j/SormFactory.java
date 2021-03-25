@@ -4,12 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.core.mapping.ConfigStore;
-import org.nkjmlab.sorm4j.core.mapping.ConfiguratorImpl;
-import org.nkjmlab.sorm4j.core.mapping.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.core.mapping.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.core.mapping.SormImpl;
-import org.nkjmlab.sorm4j.core.mapping.TypedOrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.mapping.ConfigStore;
+import org.nkjmlab.sorm4j.internal.mapping.ConfiguratorImpl;
+import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.internal.mapping.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
+import org.nkjmlab.sorm4j.internal.mapping.TypedOrmConnectionImpl;
 
 /**
  * Main entry point of this library. It creates {@link Sorm} object.

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.nkjmlab.sorm4j.core.util.StringUtils;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
  * Default implementation of {@link ResultSetConverter}
@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.core.util.StringUtils;
 
 public class DefaultResultSetConverter implements ResultSetConverter {
 
-  private static org.slf4j.Logger log = org.nkjmlab.sorm4j.core.util.LoggerFactory.getLogger();
+  private static org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @Override
   public final Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,

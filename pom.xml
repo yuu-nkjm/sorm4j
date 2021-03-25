@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.2</version>
   <name>sorm4j</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
   <url>https://github.com/yuu-nkjm/sorm4j</url>
@@ -136,13 +136,6 @@
       <version>1.4.200</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>4.0.2</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -233,7 +226,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.2.0</version>
         <configuration>
-          <excludePackageNames>org.nkjmlab.sorm4j.core:org.nkjmlab.sorm4j.core.*</excludePackageNames>
+          <excludePackageNames>org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
           <additionalOptions>--frames</additionalOptions>

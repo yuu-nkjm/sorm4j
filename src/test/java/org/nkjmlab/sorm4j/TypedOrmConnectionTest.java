@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.core.mapping.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
@@ -28,10 +28,7 @@ class TypedOrmConnectionTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTable(sorm, Guest.class);
-    SormTestUtils.dropAndCreateTable(sorm, Player.class);
-    SormTestUtils.dropAndCreateTable(sorm, Location.class);
+    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
   }
 
   @Test
