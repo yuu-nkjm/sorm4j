@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -15,46 +17,29 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.ResultSetMapper;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
+import org.nkjmlab.sorm4j.extension.Column;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorGeneratorFactory;
+import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
-  private static class ColumnsAndTypes {
-
-    private final List<String> columns;
-    private final List<Integer> columnTypes;
-
-    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
-      this.columns = columns;
-      this.columnTypes = columnTypes;
-    }
-
-    public List<String> getColumns() {
-      return columns;
-    }
-
-    public List<Integer> getColumnTypes() {
-      return columnTypes;
-    }
-
-  }
-
 
   private static final org.slf4j.Logger log =
       org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
@@ -82,7 +67,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     }
   }
 
-  private final ColumnFieldMapper fieldMapper;
+  private final ColumnFieldMapper columnFieldMapper;
 
   private final TableNameMapper tableNameMapper;
 
@@ -92,19 +77,15 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
   private final Connection connection;
 
-  private final MultiRowProcessorGeneratorFactory batchConfig;
-
-  private final ConfigStore configStore;
+  private final MultiRowProcessorFactory multiRowProcessorFactory;
 
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
 
   private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
 
-
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
 
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
-
 
   private final int transactionIsolationLevel;
 
@@ -115,9 +96,8 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
    */
   public AbstractOrmMapper(Connection connection, ConfigStore configStore) {
     this.connection = connection;
-    this.configStore = configStore;
-    this.batchConfig = configStore.getMultiRowProcessorGeneratorFactory();
-    this.fieldMapper = configStore.getColumnFieldMapper();
+    this.multiRowProcessorFactory = configStore.getMultiRowProcessorFactory();
+    this.columnFieldMapper = configStore.getColumnFieldMapper();
     this.tableNameMapper = configStore.getTableNameMapper();
     this.resultSetConverter = configStore.getResultSetConverter();
     this.sqlParameterSetter = configStore.getSqlParameterSetter();
@@ -236,8 +216,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
   <T> ColumnsMapping<T> getColumnsMapping(Class<T> objectClass) {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
-      ColumnsMapping<T> m =
-          ColumnsMapping.createMapping(objectClass, resultSetConverter, fieldMapper);
+      ColumnsMapping<T> m = createColumnsMapping(objectClass);
 
       LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING)
           .ifPresent(lp -> log.info(System.lineSeparator() + m.getFormattedString()));
@@ -272,14 +251,69 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     @SuppressWarnings("unchecked")
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
-          TableMapping<T> m = TableMapping.createMapping(resultSetConverter, sqlParameterSetter,
-              objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
+          TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
           LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING).ifPresent(lp -> log
               .info("[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
           return m;
         }, Try::rethrow));
     return ret;
   }
+
+
+  public <T> ColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
+
+    Constructor<T> constructor = Try.createSupplierWithThrow(
+        () -> objectClass.getDeclaredConstructor(),
+        e -> new SormException(
+            "Container class for object relation mapping must have the public default constructor (with no arguments).",
+            e))
+        .get();
+    constructor.setAccessible(true);
+
+    ColumnToAccessorMap columnToAccessorMap =
+        new ColumnToAccessorMap(columnFieldMapper.createAccessors(objectClass));
+
+    return new ColumnsMapping<>(objectClass, resultSetConverter, columnToAccessorMap, constructor);
+  }
+
+
+  public <T> TableMapping<T> createTableMapping(Class<T> objectClass, String tableName,
+      Connection connection) throws SQLException {
+
+    DatabaseMetaData metaData = connection.getMetaData();
+
+    List<Column> allColumns = columnFieldMapper.getColumns(metaData, tableName);
+
+    List<String> primaryKeys = columnFieldMapper.getPrimaryKeys(metaData, tableName).stream()
+        .map(c -> c.getName()).collect(Collectors.toList());
+
+    List<String> autoGeneratedColumns =
+        columnFieldMapper.getAutoGeneratedColumns(metaData, tableName).stream()
+            .map(c -> c.getName()).collect(Collectors.toList());
+
+    List<String> columns = allColumns.stream().map(c -> c.getName()).collect(Collectors.toList());
+
+    TableMappingSql sql =
+        new TableMappingSql(tableName, columns, primaryKeys, autoGeneratedColumns);
+
+    ColumnToAccessorMap columnToAccessorMap =
+        new ColumnToAccessorMap(columnFieldMapper.createAccessors(allColumns, objectClass));
+
+    if (!StringUtils.equalsSetIgnoreCase(columns, columnToAccessorMap.keySet())) {
+      throw new SormException(StringUtils.format(
+          "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
+          columns.stream().filter(e -> !columnToAccessorMap.keySet().contains(e)).sorted()
+              .collect(Collectors.toList()),
+          tableName, allColumns.stream().sorted().collect(Collectors.toList()),
+          objectClass.getName(),
+          columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList())));
+    }
+
+    return new TableMapping<>(resultSetConverter, objectClass, columnToAccessorMap,
+        sqlParameterSetter, multiRowProcessorFactory, sql);
+  }
+
+
 
   protected int getTransactionIsolationLevel() {
     return transactionIsolationLevel;
@@ -519,4 +553,23 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
         k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
   }
 
+  private static class ColumnsAndTypes {
+
+    private final List<String> columns;
+    private final List<Integer> columnTypes;
+
+    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+      this.columns = columns;
+      this.columnTypes = columnTypes;
+    }
+
+    public List<String> getColumns() {
+      return columns;
+    }
+
+    public List<Integer> getColumnTypes() {
+      return columnTypes;
+    }
+
+  }
 }

@@ -33,7 +33,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.2.2</version>
+   <version>1.2.3</version>
  </dependency>
 ```
 
@@ -67,18 +67,16 @@ sorm.apply(conn-> conn.insert(new Customer(1, "Alice", "Tokyo")));
 ```
 
 ## Performance (Oracle JMH)
-![](https://i.gyazo.com/1030837229df0d24b301b84cd1df140f.png)![](https://i.gyazo.com/ec20038daf68db8e290c86c62be52234.png)
-(The lower the better)
-
 |lib|read (microsec/op)|insert (microsec/op)|
 |:----|:----|:----|
-|Hand coded (baseline)|5.8|6.2|
-|Sorm4j|6.0 (3% slower)|7.1 (15% slower)|
-|[Sql2o](https://github.com/aaberg/sql2o)|8.4 (45% slower)|11.1 (79% slower)|
-|[JDBI](https://github.com/jdbi/jdbi)|18.4 (217% slower)|12.5 (102% slower)|
-|[JOOQ](https://github.com/jOOQ/jOOQ)|35.8 (517% slower)|-|
-|[MyBatis](https://github.com/mybatis/mybatis-3)|12.5 (116% slower)|-|
-
+|Hand coded (baseline)|5.7|6.1|
+|Sorm4j|6.0 (5% slower)|6.9 (13% slower)|
+|[Sql2o](https://github.com/aaberg/sql2o)|8.1 (42% slower)|11.0 (80% slower)|
+|[JDBI](https://github.com/jdbi/jdbi)|18.7 (228% slower)|12.5 (105% slower)|
+|[JOOQ](https://github.com/jOOQ/jOOQ)|35.3 (519% slower)|-|
+|[MyBatis](https://github.com/mybatis/mybatis-3)|12.5 (119% slower)|-|
+|[Spring JDBCTemplate](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#jdbc)|10.2 (79% slower)|-|
+|[Apache DbUtils](https://commons.apache.org/proper/commons-dbutils/)|7.3 (28% slower)|-|
 
 - read: reads one row from table including 10,240 row using primary key
 - insert: inserts one row to table

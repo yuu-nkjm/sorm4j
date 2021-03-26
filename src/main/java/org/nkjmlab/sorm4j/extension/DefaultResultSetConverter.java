@@ -46,6 +46,9 @@ public class DefaultResultSetConverter implements ResultSetConverter {
     return valueT;
   }
 
+
+  // 2021-03-26 An approach to create converter at once and apply the converter to get result is
+  // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
   @Override
   public Object getValueBySetterParameterType(ResultSet resultSet, int column,
       Class<?> setterParameterType) throws SQLException {
@@ -60,9 +63,10 @@ public class DefaultResultSetConverter implements ResultSetConverter {
         case "java.lang.Byte":
           return resultSet.getBytes(column);
         case "char":
-        case "java.lang.Character":
+        case "java.lang.Character": {
           final String str = resultSet.getString(column);
           return (str == null) ? null : str.toCharArray();
+        }
         default:
           log.debug(
               "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",

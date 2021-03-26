@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.extension;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -65,6 +66,23 @@ public interface ColumnFieldMapper {
    * @return
    */
   List<Column> getColumnNameCandidates(List<FieldName> fieldNames);
+
+  /**
+   * Creates accessors map.
+   *
+   * @param columns
+   * @param objectClass
+   * @return
+   */
+  Map<String, Accessor> createAccessors(List<Column> columns, Class<?> objectClass);
+
+  /**
+   * Creates accessors map.
+   *
+   * @param objectClass
+   * @return
+   */
+  Map<String, Accessor> createAccessors(Class<?> objectClass);
 
 
 
