@@ -5,6 +5,13 @@ import java.util.List;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.RowMapper;
 
+
+/**
+ * An executable request
+ *
+ * @author nkjm
+ *
+ */
 public interface Request {
 
   /**
