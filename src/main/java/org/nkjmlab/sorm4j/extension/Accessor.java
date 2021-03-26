@@ -1,34 +1,62 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.extension;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.nkjmlab.sorm4j.extension.Column;
 
-final class Accessor {
+/**
+ * Field accessor mapping to the column.
+ *
+ * @author nkjm
+ *
+ */
+public final class Accessor {
 
   private final GetterAccessor getter;
   private final SetterAccessor setter;
   private final Column column;
 
 
-  Accessor(Column column, Field field, Method getter, Method setter) {
+  public Accessor(Column column, Field field, Method getter, Method setter) {
     this.column = column;
     this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
     this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
   }
 
 
+  /**
+   * Gets the value from the corresponding field by getter method/field access.
+   *
+   * @param object
+   * @return
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException
+   */
   public Object get(Object object)
       throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     return getter.get(object);
   }
 
+  /**
+   * Sets the given value to the corresponding field by setter method/field access.
+   *
+   * @param object
+   * @param value
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
+   * @throws InvocationTargetException
+   */
   public void set(Object object, Object value)
       throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     setter.set(object, value);
   }
 
+  /**
+   * Gets parameter type of setter method/field access.
+   *
+   * @return
+   */
   public final Class<?> getSetterParameterType() {
     return setter.getParameterType();
   }

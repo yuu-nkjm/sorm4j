@@ -39,9 +39,7 @@ public final class TableMapping<T> extends Mapping<T> {
   private final TableMappingSql sql;
   private final MultiRowProcessor<T> multiRowProcessor;
 
-
-
-  TableMapping(ResultSetConverter resultSetConverter, Class<T> objectClass,
+  public TableMapping(ResultSetConverter resultSetConverter, Class<T> objectClass,
       ColumnToAccessorMap columnToAccessorMap, SqlParameterSetter sqlParameterSetter,
       MultiRowProcessorFactory multiRowProcessorFactory, TableMappingSql sql) {
     super(resultSetConverter, objectClass, columnToAccessorMap);
@@ -53,14 +51,10 @@ public final class TableMapping<T> extends Mapping<T> {
     this.multiRowProcessor = processor;
   }
 
-
-
   private Class<?> getSetterParamType(String column) {
     return setterParameterTypeMap.computeIfAbsent(column,
         k -> columnToAccessorMap.get(column).getSetterParameterType());
   }
-
-
 
   public TableMappingSql getSql() {
     return sql;

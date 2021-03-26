@@ -26,7 +26,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final Constructor<T> constructor;
 
 
-  ColumnsMapping(Class<T> objectClass, ResultSetConverter defaultResultSetConverter,
+  public ColumnsMapping(Class<T> objectClass, ResultSetConverter defaultResultSetConverter,
       ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
     super(defaultResultSetConverter, objectClass, columnToAccessorMap);
     this.constructor = constructor;

@@ -23,7 +23,8 @@ public final class ConfigStore {
   public static ConfigStore INITIAL_DEFAULT_CONFIG_STORE =
       new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME).build();
 
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+  // private static final org.slf4j.Logger log =
+  // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final String configName;
   private final ColumnFieldMapper columnFieldMapper;
@@ -51,9 +52,8 @@ public final class ConfigStore {
     this.batchSize = batchSize;
     this.multiRowSize = multiRowSize;
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
-    this.multiRowProcessorFactory =
-        MultiRowProcessorFactory.createMultiRowProcessorFactory(sqlParameterSetter,
-            multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
+    this.multiRowProcessorFactory = MultiRowProcessorFactory.createMultiRowProcessorFactory(
+        sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
 
     this.transactionIsolationLevel = transactionIsolationLevel;
   }
@@ -74,7 +74,7 @@ public final class ConfigStore {
     return tableNameMapper;
   }
 
-  public MultiRowProcessorFactory getMultiRowProcessorGeneratorFactory() {
+  public MultiRowProcessorFactory getMultiRowProcessorFactory() {
     return multiRowProcessorFactory;
   }
 

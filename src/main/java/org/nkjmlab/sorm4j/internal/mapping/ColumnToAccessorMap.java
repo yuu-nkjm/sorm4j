@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.extension.Accessor;
 
-final class ColumnToAccessorMap {
+public final class ColumnToAccessorMap {
   // key => UPPER COLUMN_NAME
   private final Map<String, Accessor> columnToAccessorMap;
 
