@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorGeneratorFactory;
+import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
@@ -30,7 +30,7 @@ public final class ConfigStore {
   private final TableNameMapper tableNameMapper;
   private final ResultSetConverter resultSetConverter;
   private final SqlParameterSetter sqlParameterSetter;
-  private final MultiRowProcessorGeneratorFactory multiRowProcessorGeneratorFactory;
+  private final MultiRowProcessorFactory multiRowProcessorFactory;
   private final MultiRowProcessorType multiRowProcessorType;
   private final int batchSize;
   private final int multiRowSize;
@@ -51,8 +51,8 @@ public final class ConfigStore {
     this.batchSize = batchSize;
     this.multiRowSize = multiRowSize;
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
-    this.multiRowProcessorGeneratorFactory =
-        MultiRowProcessorGeneratorFactory.createMultiRowProcessorFactory(sqlParameterSetter,
+    this.multiRowProcessorFactory =
+        MultiRowProcessorFactory.createMultiRowProcessorFactory(sqlParameterSetter,
             multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
 
     this.transactionIsolationLevel = transactionIsolationLevel;
@@ -74,8 +74,8 @@ public final class ConfigStore {
     return tableNameMapper;
   }
 
-  public MultiRowProcessorGeneratorFactory getMultiRowProcessorGeneratorFactory() {
-    return multiRowProcessorGeneratorFactory;
+  public MultiRowProcessorFactory getMultiRowProcessorGeneratorFactory() {
+    return multiRowProcessorFactory;
   }
 
   public SqlParameterSetter getSqlParameterSetter() {

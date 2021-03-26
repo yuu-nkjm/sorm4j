@@ -11,10 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
  * Holds mapping data from a given class and a table. The object reads a query result in
@@ -29,21 +27,10 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   ColumnsMapping(Class<T> objectClass, ResultSetConverter defaultResultSetConverter,
-      ColumnFieldMapper columnFieldMapper) {
-    super(defaultResultSetConverter, objectClass, columnFieldMapper);
-    this.constructor = Try.createSupplierWithThrow(() -> objectClass.getDeclaredConstructor(),
-        e -> new SormException(
-            "Container class for object relation mapping must have the public default constructor (with no arguments).",
-            e))
-        .get();
-    this.constructor.setAccessible(true);
+      ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
+    super(defaultResultSetConverter, objectClass, columnToAccessorMap);
+    this.constructor = constructor;
   }
-
-  static <T> ColumnsMapping<T> createMapping(Class<T> objectClass, ResultSetConverter converter,
-      ColumnFieldMapper nameGuesser) {
-    return new ColumnsMapping<>(objectClass, converter, nameGuesser);
-  }
-
 
   String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"

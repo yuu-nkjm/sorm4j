@@ -26,7 +26,7 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorGeneratorFactory;
+import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -92,7 +92,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
 
   private final Connection connection;
 
-  private final MultiRowProcessorGeneratorFactory batchConfig;
+  private final MultiRowProcessorFactory batchConfig;
 
   private final ConfigStore configStore;
 
@@ -237,7 +237,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m =
-          ColumnsMapping.createMapping(objectClass, resultSetConverter, fieldMapper);
+          MappingFactory.createColumnsMapping(objectClass, resultSetConverter, fieldMapper);
 
       LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING)
           .ifPresent(lp -> log.info(System.lineSeparator() + m.getFormattedString()));
@@ -272,7 +272,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     @SuppressWarnings("unchecked")
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
-          TableMapping<T> m = TableMapping.createMapping(resultSetConverter, sqlParameterSetter,
+          TableMapping<T> m = MappingFactory.createTableMapping(resultSetConverter, sqlParameterSetter,
               objectClass, tableName.getName(), fieldMapper, batchConfig, connection);
           LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING).ifPresent(lp -> log
               .info("[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
