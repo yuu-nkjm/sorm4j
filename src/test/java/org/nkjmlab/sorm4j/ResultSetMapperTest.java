@@ -29,7 +29,7 @@ class ResultSetMapperTest {
   @Test
   void testMapRowResultSet() {
     List<Map<String, Object>> ret = sorm.apply(conn -> conn
-        .executeQuery(SqlStatement.of("select * from players"), (rs, rowNum) -> conn.mapRow(rs)));
+        .executeQuery(SqlStatement.of("select * from players"), (rs, rowNum) -> conn.mapRowToMap(rs)));
   }
 
   @Test
@@ -42,7 +42,7 @@ class ResultSetMapperTest {
   @Test
   void testMapRowsResultSet() {
     List<Map<String, Object>> ret = sorm.apply(conn -> conn
-        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRows(rs)));
+        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRowsToMapList(rs)));
   }
 
 }

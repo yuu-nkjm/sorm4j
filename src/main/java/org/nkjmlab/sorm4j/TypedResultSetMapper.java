@@ -9,17 +9,16 @@ import java.util.List;
  * @author nkjm
  *
  */
-public interface ResultSetMapper {
+public interface TypedResultSetMapper<T> {
 
   /**
    * Maps the current row in the given resultSet to an object.
    *
    * @param <T>
-   * @param objectClass
    * @param resultSet
    * @return
    */
-  <T> T mapRow(Class<T> objectClass, ResultSet resultSet);
+  T mapRow(ResultSet resultSet);
 
 
   /**
@@ -30,6 +29,6 @@ public interface ResultSetMapper {
    * @param resultSet
    * @return
    */
-  <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet);
+  List<T> mapRows(ResultSet resultSet);
 
 }

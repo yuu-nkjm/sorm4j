@@ -17,7 +17,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
  *
  */
 public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlExecutor,
-    ResultSetMapper, TransactionFunction, Closeable, AutoCloseable {
+    ResultSetMapper, ResultSetMapMapper, TransactionFunction, Closeable, AutoCloseable {
 
 
   /**

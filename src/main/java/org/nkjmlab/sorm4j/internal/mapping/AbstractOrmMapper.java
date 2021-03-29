@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmLogger;
-import org.nkjmlab.sorm4j.ResultSetMapper;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
@@ -39,7 +38,7 @@ import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
-abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
+abstract class AbstractOrmMapper implements SqlExecutor {
 
   private static final org.slf4j.Logger log =
       org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
@@ -178,7 +177,7 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
   @Override
   public <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper) {
     return execStatementAndReadResultSet(sql.getSql(), sql.getParameters(),
-        ResultSetMapper.convertToRowsMapper(rowMapper));
+        RowMapper.convertToRowsMapper(rowMapper));
   }
 
 
@@ -413,23 +412,19 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     return ret;
   }
 
-  @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
     return Try.getOrThrow(() -> mapRowAux(objectClass, resultSet), Try::rethrow);
   }
 
-  @Override
-  public Map<String, Object> mapRow(ResultSet resultSet) {
+  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     return Try.getOrThrow(() -> mapRowAux(resultSet), Try::rethrow);
   }
 
-  @Override
   public final <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet) {
     return Try.getOrThrow(() -> mapRowsAux(objectClass, resultSet), Try::rethrow);
   }
 
-  @Override
-  public final List<Map<String, Object>> mapRows(ResultSet resultSet) {
+  public final List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
     return Try.getOrThrow(() -> mapRowsAux(resultSet), Try::rethrow);
   }
 

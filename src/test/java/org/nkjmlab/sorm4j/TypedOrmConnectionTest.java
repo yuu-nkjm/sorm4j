@@ -49,23 +49,22 @@ class TypedOrmConnectionTest {
     assertThat(row).isEqualTo(1);
 
 
-    List<Player> ret1 =
-        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.of("select * from players"),
-            (rs, rn) -> conn.mapRow(Player.class, rs)));
+    List<Player> ret1 = sorm.apply(Player.class, conn -> conn
+        .executeQuery(SqlStatement.of("select * from players"), (rs, rn) -> conn.mapRow(rs)));
 
     assertThat(ret1.size()).isEqualTo(2);
-    ret1 =
-        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.of("select * from players"),
-            rs -> conn.mapRows(Player.class, rs)));
+    ret1 = sorm.apply(Player.class, conn -> conn
+        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRows(rs)));
     assertThat(ret1.size()).isEqualTo(2);
 
     List<Map<String, Object>> ret2 = sorm.apply(Player.class, conn -> conn
-        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRows(rs)));
+        .executeQuery(SqlStatement.of("select * from players"), rs -> conn.mapRowsToMapList(rs)));
 
     assertThat(ret2.size()).isEqualTo(2);
 
-    ret2 = sorm.apply(Player.class, conn -> conn
-        .executeQuery(SqlStatement.of("select * from players"), (rs, rowNum) -> conn.mapRow(rs)));
+    ret2 =
+        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.of("select * from players"),
+            (rs, rowNum) -> conn.mapRowToMap(rs)));
 
     assertThat(ret2.size()).isEqualTo(2);
 
@@ -347,7 +346,7 @@ class TypedOrmConnectionTest {
 
 
       Player p1 = m.readLazy(SqlStatement.of("select * from players"))
-          .toList((rs, rowNum) -> m.mapRow(Player.class, rs)).get(0);
+          .toList((rs, rowNum) -> m.mapRow(rs)).get(0);
       assertThat(p1.getName()).isEqualTo(a.getName());
 
 

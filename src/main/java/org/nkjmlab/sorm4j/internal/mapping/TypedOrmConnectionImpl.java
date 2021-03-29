@@ -109,23 +109,23 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
   }
 
   @Override
-  public <S> S mapRow(Class<S> objectClass, ResultSet resultSet) {
+  public T mapRow(ResultSet resultSet) {
     return ormConnection.mapRow(objectClass, resultSet);
   }
 
   @Override
-  public Map<String, Object> mapRow(ResultSet resultSet) {
-    return ormConnection.mapRow(resultSet);
+  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
+    return ormConnection.mapRowToMap(resultSet);
   }
 
   @Override
-  public <S> List<S> mapRows(Class<S> objectClass, ResultSet resultSet) {
+  public List<T> mapRows(ResultSet resultSet) {
     return ormConnection.mapRows(objectClass, resultSet);
   }
 
   @Override
-  public List<Map<String, Object>> mapRows(ResultSet resultSet) {
-    return ormConnection.mapRows(resultSet);
+  public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
+    return ormConnection.mapRowsToMapList(resultSet);
   }
 
   @Override

@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.nkjmlab.sorm4j.ResultSetMapper;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
@@ -78,7 +77,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
     List<T> ret = Try.getOrThrow(
-        () -> ResultSetMapper.convertToRowsMapper(rowMapper).apply(resultSet), Try::rethrow);
+        () -> RowMapper.convertToRowsMapper(rowMapper).apply(resultSet), Try::rethrow);
     close();
     return ret;
   }
