@@ -41,6 +41,12 @@ public class DefaultTableNameMapper implements TableNameMapper {
             objectClass.getName(), OrmTable.class.getName(), candidates)));
   }
 
+  /**
+   * Guesses table name from the given object class.
+   *
+   * @param objectClass
+   * @return
+   */
   protected List<String> guessTableNameCandidates(Class<?> objectClass) {
     final OrmTable tableAnnotation = objectClass.getAnnotation(OrmTable.class);
     if (tableAnnotation != null && !tableAnnotation.value().equals("")) {
@@ -48,7 +54,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
     }
 
     String className = objectClass.getSimpleName();
-    return StringUtils.addPluralSuffix(List.of(toUpperCase(className)));
+    return StringUtils.addPluralSuffix(List.of(toCanonical(className)));
   }
 
   /**

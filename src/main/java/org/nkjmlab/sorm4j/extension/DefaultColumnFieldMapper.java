@@ -262,6 +262,13 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     }
   }
 
+  /**
+   * Gets schema pattern for accessing {@link DatabaseMetaData}.
+   *
+   * @param metaData
+   * @return
+   * @throws SQLException
+   */
   protected String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
     // oracle expects a pattern such as "%" to work
     return "Oracle".equalsIgnoreCase(metaData.getDatabaseProductName()) ? "%" : null;
@@ -276,7 +283,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   protected List<Column> guessColumnNameCandidates(FieldName fieldName) {
     final String _fieldName = fieldName.getName();
-    return Stream.of(toUpperCase(_fieldName)).map(Column::new).collect(Collectors.toList());
+    return Stream.of(toCanonical(_fieldName)).map(Column::new).collect(Collectors.toList());
   }
 
 
