@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.OrmColum;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
@@ -129,11 +130,23 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   @Override
   public Map<String, Accessor> createAccessors(Class<?> objectClass) {
-    return createAccessors(guessColumnNames(objectClass), objectClass);
+    Set<FieldName> names = new HashSet<>();
+    names.addAll(getAllFields(objectClass).keySet());
+    names.addAll(getAllGetters(objectClass).keySet());
+    names.addAll(getAllSetters(objectClass).keySet());
+
+    List<Column> columns = new ArrayList<>(names).stream()
+        .flatMap(fieldName -> guessColumnNameCandidates(fieldName).stream())
+        .collect(Collectors.toList());
+    columns.addAll(getAnnotatedFieldsMap(objectClass).keySet());
+    columns.addAll(getAnnotatedGettersMap(objectClass).keySet());
+    columns.addAll(getAnnotatatedSettersMap(objectClass).keySet());
+
+    return createAccessors(objectClass, columns);
   }
 
   @Override
-  public Map<String, Accessor> createAccessors(List<Column> columns, Class<?> objectClass) {
+  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<Column> columns) {
     Map<FieldName, Field> fields = getAllFields(objectClass);
     Map<FieldName, Method> getters = getAllGetters(objectClass);
     Map<FieldName, Method> setters = getAllSetters(objectClass);
@@ -148,7 +161,8 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       Method g = isValidGetter(annotatedGetters.get(column));
       Method s = isValidSetter(annotatedSetters.get(column));
 
-      Optional<FieldName> op = getFieldNameByColumnName(column, fieldsList);
+      Optional<FieldName> op =
+          fieldsList.stream().filter(fieldName -> isMatch(column, fieldName)).findFirst();
       if (op.isPresent()) {
         FieldName fieldName = op.get();
         f = f != null ? f : fields.get(fieldName);
@@ -164,6 +178,22 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       }
     }
     return ret;
+  }
+
+
+  /**
+   * Gets field name corresponding to the column name. If the set of column name candidates guessed
+   * from a field contains the given column name, the field is mapped to the column. Capital case is
+   * ignored for the mapping.
+   *
+   * @param column
+   * @param fieldName
+   * @return
+   */
+  protected boolean isMatch(Column column, FieldName fieldName) {
+    final List<String> candidates = guessColumnNameCandidates(fieldName).stream()
+        .map(Column::getName).collect(Collectors.toList());
+    return containsIgnoreCase(candidates, column.getName());
   }
 
 
@@ -183,13 +213,6 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return columnsList;
     }
   }
-
-  @Override
-  public List<Column> getColumnNameCandidates(List<FieldName> fieldNames) {
-    return fieldNames.stream().flatMap(fieldName -> guessColumnNameCandidates(fieldName).stream())
-        .collect(Collectors.toList());
-  }
-
 
   @Override
   public List<Column> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException {
@@ -224,28 +247,6 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
 
 
-  /**
-   * Gets field name corresponding to the column name.
-   *
-   * Gets field name corresponding to the column name. If the set of column name candidates guessed
-   * from a field contains the given column name, the field is mapped to the column. Capital case is
-   * ignored for the mapping.
-   *
-   * @param column column name
-   * @param fieldNames fieldNames exists in mapped object.
-   * @return
-   */
-  @Override
-  public Optional<FieldName> getFieldNameByColumnName(Column column, List<FieldName> fieldNames) {
-    for (FieldName fieldName : fieldNames) {
-      if (containsIgnoreCase(guessColumnNameCandidates(fieldName).stream().map(s -> s.toString())
-          .collect(Collectors.toList()), column.getName())) {
-        return Optional.of(fieldName);
-      }
-    }
-    return Optional.empty();
-  }
-
   @Override
   public List<Column> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
       throws SQLException {
@@ -271,28 +272,11 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
    * @param fieldName
    * @return
    */
+
   protected List<Column> guessColumnNameCandidates(FieldName fieldName) {
-    return List.of(new Column(toUpperSnakeCase(fieldName.getName())),
-        new Column(toUpperCase(fieldName.getName())));
-  }
-
-  /**
-   * Guess column names from the object class
-   *
-   * @param objectClass
-   * @return
-   */
-  List<Column> guessColumnNames(Class<?> objectClass) {
-    Set<FieldName> names = new HashSet<>();
-    names.addAll(getAllFields(objectClass).keySet());
-    names.addAll(getAllGetters(objectClass).keySet());
-    names.addAll(getAllSetters(objectClass).keySet());
-
-    List<Column> columns = getColumnNameCandidates(new ArrayList<>(names));
-    columns.addAll(getAnnotatedFieldsMap(objectClass).keySet());
-    columns.addAll(getAnnotatedGettersMap(objectClass).keySet());
-    columns.addAll(getAnnotatatedSettersMap(objectClass).keySet());
-    return columns;
+    final String _fieldName = fieldName.getName();
+    return Stream.of(toUpperSnakeCase(_fieldName), toUpperCase(_fieldName)).map(Column::new)
+        .collect(Collectors.toList());
   }
 
 

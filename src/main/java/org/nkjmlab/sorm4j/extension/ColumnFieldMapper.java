@@ -4,7 +4,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 
 
 /**
@@ -50,40 +51,24 @@ public interface ColumnFieldMapper {
   List<Column> getPrimaryKeys(DatabaseMetaData metaData, String tableName) throws SQLException;
 
 
-  /**
-   * Gets field name corresponding to the column name.
-   *
-   * @param column column name
-   * @param fieldNames fieldNames exists in mapped object.
-   * @return
-   */
-  Optional<FieldName> getFieldNameByColumnName(Column column, List<FieldName> fieldNames);
 
   /**
-   * Gets column name candidates based the field names.
-   *
-   * @param fieldNames
-   * @return
-   */
-  List<Column> getColumnNameCandidates(List<FieldName> fieldNames);
-
-  /**
-   * Creates accessors map.
-   *
+   * Creates accessors by guessing column names from the object class for {@link TableMapping}
+   * @param objectClass
    * @param columns
-   * @param objectClass
+   *
    * @return
    */
-  Map<String, Accessor> createAccessors(List<Column> columns, Class<?> objectClass);
+  Map<String, Accessor> createAccessors(Class<?> objectClass, List<Column> columns);
 
   /**
-   * Creates accessors map.
+   * Creates accessors by guessing column names from the object class for {@link ColumnsMapping}
    *
    * @param objectClass
    * @return
    */
-  Map<String, Accessor> createAccessors(Class<?> objectClass);
 
+  Map<String, Accessor> createAccessors(Class<?> objectClass);
 
 
 }
