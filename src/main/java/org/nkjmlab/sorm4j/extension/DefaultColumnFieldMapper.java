@@ -24,6 +24,7 @@ import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
 import org.nkjmlab.sorm4j.internal.util.SqlTypeUtils;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
  * Default implementation of {@link ColumnFieldMapper}
@@ -174,7 +175,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
             "Skip matching with Column [{}] to field because could not found corresponding field.",
             column);
       } else {
-        ret.put(column.getName(), new Accessor(column, f, g, s));
+        ret.put(StringUtils.toCanonical(column.getName()), new Accessor(column, f, g, s));
       }
     }
     return ret;
@@ -193,7 +194,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   protected boolean isMatch(Column column, FieldName fieldName) {
     final List<String> candidates = guessColumnNameCandidates(fieldName).stream()
         .map(Column::getName).collect(Collectors.toList());
-    return containsIgnoreCase(candidates, column.getName());
+    return containsAsCanonical(candidates, column.getName());
   }
 
 
@@ -275,8 +276,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   protected List<Column> guessColumnNameCandidates(FieldName fieldName) {
     final String _fieldName = fieldName.getName();
-    return Stream.of(toUpperSnakeCase(_fieldName), toUpperCase(_fieldName)).map(Column::new)
-        .collect(Collectors.toList());
+    return Stream.of(toUpperCase(_fieldName)).map(Column::new).collect(Collectors.toList());
   }
 
 

@@ -48,8 +48,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
     }
 
     String className = objectClass.getSimpleName();
-    return StringUtils
-        .addPluralSuffix(List.of(toUpperCase(className), toUpperSnakeCase(className)));
+    return StringUtils.addPluralSuffix(List.of(toUpperCase(className)));
   }
 
   /**
@@ -82,7 +81,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
    * @return
    */
   protected boolean isMatch(List<String> candidates, String exactTableName) {
-    return containsIgnoreCase(candidates, exactTableName);
+    return containsAsCanonical(candidates, exactTableName);
   }
 
 

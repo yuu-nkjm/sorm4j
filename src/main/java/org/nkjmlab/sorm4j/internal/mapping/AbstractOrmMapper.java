@@ -299,11 +299,12 @@ abstract class AbstractOrmMapper implements SqlExecutor, ResultSetMapper {
     ColumnToAccessorMap columnToAccessorMap =
         new ColumnToAccessorMap(columnFieldMapper.createAccessors(objectClass, allColumns));
 
-    if (!StringUtils.equalsSetIgnoreCase(columns, columnToAccessorMap.keySet())) {
+    if (!StringUtils.equalsAsCanonical(columns, columnToAccessorMap.keySet())) {
       throw new SormException(StringUtils.format(
           "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
-          columns.stream().filter(e -> !columnToAccessorMap.keySet().contains(e)).sorted()
-              .collect(Collectors.toList()),
+          columns.stream()
+              .filter(e -> !columnToAccessorMap.keySet().contains(StringUtils.toCanonical(e)))
+              .sorted().collect(Collectors.toList()),
           tableName, allColumns.stream().sorted().collect(Collectors.toList()),
           objectClass.getName(),
           columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList())));

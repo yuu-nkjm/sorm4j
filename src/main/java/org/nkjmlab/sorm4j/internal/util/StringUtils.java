@@ -12,7 +12,12 @@ public final class StringUtils {
 
   private StringUtils() {};
 
+
   private static final ConcurrentMap<String, String> upperCaseCaches = new ConcurrentHashMap<>();
+
+  private static final ConcurrentMap<String, String> lowerCaseCaches = new ConcurrentHashMap<>();
+
+  private static final ConcurrentMap<String, String> canonicalCaches = new ConcurrentHashMap<>();
 
   public static String toUpperCase(String str) {
     String upper = upperCaseCaches.computeIfAbsent(str, key -> key.toUpperCase(Locale.ENGLISH));
@@ -20,8 +25,15 @@ public final class StringUtils {
   }
 
   public static String toLowerCase(String str) {
-    return str.toLowerCase(Locale.ENGLISH);
+    String upper = lowerCaseCaches.computeIfAbsent(str, key -> key.toLowerCase(Locale.ENGLISH));
+    return upper;
   }
+
+  public static String toCanonical(String str) {
+    return canonicalCaches.computeIfAbsent(str,
+        key -> key.replaceAll("_", "").replaceAll("\\s", "").toUpperCase(Locale.ENGLISH));
+  }
+
 
 
   /**
@@ -43,21 +55,21 @@ public final class StringUtils {
 
 
 
-  public static boolean containsIgnoreCase(Collection<String> list, String str) {
+  public static boolean containsAsCanonical(Collection<String> list, String str) {
     if (str == null || str.length() == 0) {
       return false;
     }
     for (String e : list) {
-      if (toUpperCase(e).equals(toUpperCase(str))) {
+      if (toCanonical(e).equals(toCanonical(str))) {
         return true;
       }
     }
     return false;
   }
 
-  public static boolean equalsSetIgnoreCase(Collection<String> set1, Collection<String> set2) {
-    return set1.stream().map(s -> toUpperCase(s)).collect(Collectors.toSet())
-        .equals(set2.stream().map(s -> toUpperCase(s)).collect(Collectors.toSet()));
+  public static boolean equalsAsCanonical(Collection<String> set1, Collection<String> set2) {
+    return set1.stream().map(s -> toCanonical(s)).collect(Collectors.toSet())
+        .equals(set2.stream().map(s -> toCanonical(s)).collect(Collectors.toSet()));
 
   }
 
