@@ -2,15 +2,14 @@ package org.nkjmlab.sorm4j.extension;
 
 import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
-import org.nkjmlab.sorm4j.internal.util.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
  * Default implementation of {@link TableNameMapper}
@@ -67,14 +66,17 @@ public class DefaultTableNameMapper implements TableNameMapper {
    */
   protected Optional<TableName> convertToExactTableName(DatabaseMetaData metaData,
       List<String> tableNameCandidates) throws SQLException {
-    return new ResultSetStream<>(
-        metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"}),
-        Try.createFunctionWithThrow(rs -> {
-          String exactTableNameOnDb = rs.getString(3);
-          return exactTableNameOnDb;
-        }, Try::rethrow)).stream()
-            .filter(tableNameOnDb -> isMatch(tableNameCandidates, tableNameOnDb))
-            .map(TableName::new).findFirst();
+
+    try (
+        ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
+      while (resultSet.next()) {
+        String tableNameOnDb = resultSet.getString(3);
+        if (isMatch(tableNameCandidates, tableNameOnDb)) {
+          return Optional.of(new TableName(tableNameOnDb));
+        }
+      }
+      return Optional.empty();
+    }
   }
 
 
