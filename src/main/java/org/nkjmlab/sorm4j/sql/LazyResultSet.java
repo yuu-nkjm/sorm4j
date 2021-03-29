@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.sql;
 
+import java.io.Closeable;
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.List;
@@ -15,11 +16,12 @@ import org.nkjmlab.sorm4j.RowMapper;
  *
  * @param <T>
  */
-public interface LazyResultSet<T> {
+public interface LazyResultSet<T> extends Iterable<T>, Closeable, AutoCloseable {
 
   /**
-   * Close this result set. After call this method, operations to this object is invalid.
+   * Closes this result set. After call this method, operations to this object is invalid.
    */
+  @Override
   void close();
 
   /**
@@ -40,6 +42,7 @@ public interface LazyResultSet<T> {
    * Iterates all the rows of the result set. The Iterator must be closed to release database
    * resources. The iterator is closed automatically if hasNext is false.
    */
+  @Override
   Iterator<T> iterator();
 
   /**

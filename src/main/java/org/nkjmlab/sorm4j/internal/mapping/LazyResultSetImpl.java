@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import static java.util.Spliterator.*;
 import static java.util.Spliterators.*;
-import java.io.Closeable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,8 +23,7 @@ import org.nkjmlab.sorm4j.sql.LazyResultSet;
  *
  * @param <T> element type in result
  */
-final class LazyResultSetImpl<T>
-    implements Iterable<T>, Closeable, AutoCloseable, LazyResultSet<T> {
+final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
   private final Class<T> objectClass;
   private final AbstractOrmMapper ormMapper;
@@ -79,8 +77,8 @@ final class LazyResultSetImpl<T>
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrThrow(() -> ResultSetMapper.convertToRowsMapper(rowMapper).apply(resultSet),
-        Try::rethrow);
+    List<T> ret = Try.getOrThrow(
+        () -> ResultSetMapper.convertToRowsMapper(rowMapper).apply(resultSet), Try::rethrow);
     close();
     return ret;
   }
