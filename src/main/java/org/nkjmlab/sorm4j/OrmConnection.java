@@ -3,10 +3,8 @@ package org.nkjmlab.sorm4j;
 import java.io.Closeable;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -39,15 +37,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
   NamedParameterRequest createNamedParameterRequest(String sql);
 
   /**
-   * Creates a {@link NamedParameterSql} from SQL string.
-   *
-   * @param sql
-   * @return
-   * @deprecated Use {@link NamedParameterSql#from(String)}
-   */
-  NamedParameterSql createNamedParameterSql(String sql);
-
-  /**
    * Creates a {@link OrderedParameterQuery} from SQL string.
    *
    * @param <T>
@@ -64,15 +53,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    */
   OrderedParameterRequest createOrderedParameterRequest(String sql);
 
-
-  /**
-   * Creates a {@link OrderedParameterSql} from SQL string.
-   *
-   * @param sql
-   * @return
-   * @deprecated Use {@link OrderedParameterSql#from(String)}
-   */
-  OrderedParameterSql createOrderedParameterSql(String sql);
 
   /**
    * Creates a {@link SelectQuery}.

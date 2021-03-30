@@ -92,8 +92,8 @@ Sorm4j is evaluated performance with the H2 database. The results show a small o
     - Next to get started, see here.
 - [Examples](https://scrapbox.io/sorm4j/Examples)
     - If you need more sample codes, please take a look at the [Examples](https://scrapbox.io/sorm4j/Examples) page and the [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample) repository.
-- [Key Features](https://scrapbox.io/sorm4j/Key_Features)
-    - The key features of Sorm4j, see here.
+- [Features](https://scrapbox.io/sorm4j/Features)
+    - The features of Sorm4j, see here.
 - [Performance](https://scrapbox.io/sorm4j/Performance)
     - If you need more benchmark results, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
 - [Developer's Guide](https://scrapbox.io/sorm4j/Developer's_Guide)
