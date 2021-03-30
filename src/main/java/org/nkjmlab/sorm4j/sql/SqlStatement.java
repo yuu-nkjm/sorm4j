@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
 
 /**
- * This class represents a sql statement with ordered parameters.
+ * This class represents a SQL statement with ordered parameters.
  *
  * @author nkjm
  *
@@ -36,7 +36,7 @@ public interface SqlStatement {
    * @return
    */
   static SqlStatement of(String sql, Object... parameters) {
-    return new SqlStatementImpl(sql, parameters);
+    return SqlStatementImpl.of(sql, parameters);
   }
 
   /**

@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
@@ -30,11 +29,7 @@ public class OrderedParameterSqlImpl implements OrderedParameterSql {
 
   @Override
   public OrderedParameterSql addParameter(Object parameter) {
-    if (parameter instanceof List) {
-      this.parameters.add(SqlUtils.literal(parameter));
-    } else {
-      this.parameters.add(parameter);
-    }
+    this.parameters.add(parameter);
     return this;
   }
 

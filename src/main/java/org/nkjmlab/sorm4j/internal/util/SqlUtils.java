@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class SqlUtils {
 
@@ -14,7 +13,11 @@ public final class SqlUtils {
    * @return
    */
   public static String quote(String str) {
-    return wrapSingleQuote(str.contains("'") ? str.replaceAll("'", "''") : str);
+    return wrapSingleQuote(escapeSingleQuote(str));
+  }
+
+  private static String escapeSingleQuote(String str) {
+    return str.contains("'") ? str.replaceAll("'", "''") : str;
   }
 
   private static String wrapSingleQuote(String str) {
@@ -22,7 +25,7 @@ public final class SqlUtils {
   }
 
   /**
-   * Convert the given arguments to SQL literal.
+   * Converts the given arguments to SQL literal.
    *
    * @param element
    * @return
@@ -34,9 +37,9 @@ public final class SqlUtils {
       return element.toString();
     } else if (element instanceof List) {
       return String.join(", ",
-          ((List<?>) element).stream().map(e -> literal(e)).collect(Collectors.toList()));
+          ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
     }
-    String str = element.toString();
+    final String str = element.toString();
     switch (str) {
       case "?":
         return str;

@@ -52,23 +52,29 @@ public class SormTestUtils {
     dropAndCreateGuestTable(sorm);
     dropAndCreatePlayerTable(sorm);
     dropAndCreateLocationTable(sorm);
+    dropAndCreateCustomerTable(sorm);
   }
 
-  private static void dropAndCreateLocationTable(Sorm srv) {
-    srv.accept(conn -> conn.executeUpdate("DROP TABLE location IF EXISTS"));
-    srv.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_LOCATIONS));
+  private static void dropAndCreateCustomerTable(Sorm sorm) {
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE customer IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate(Customer.CREATE_TABLE_SQL));
   }
 
-  private static void dropAndCreateGuestTable(Sorm srv) {
-    srv.accept(conn -> conn.executeUpdate("DROP TABLE guests IF EXISTS"));
-    srv.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_GUESTS));
+  private static void dropAndCreateLocationTable(Sorm sorm) {
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE location IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_LOCATIONS));
   }
 
-  private static void dropAndCreatePlayerTable(Sorm srv) {
-    srv.accept(conn -> conn.executeUpdate("DROP TABLE players IF EXISTS"));
-    srv.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS));
-    srv.accept(conn -> conn.executeUpdate("DROP TABLE players1 IF EXISTS"));
-    srv.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS1));
+  private static void dropAndCreateGuestTable(Sorm sorm) {
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE guests IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_GUESTS));
+  }
+
+  private static void dropAndCreatePlayerTable(Sorm sorm) {
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE players IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS));
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE players1 IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS1));
   }
 
   public static DataSource createDataSourceH2() {
