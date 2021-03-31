@@ -48,8 +48,9 @@ public interface TypedOrmReader<T> {
   /**
    * Reads an object from the database.
    *
-   * @param sql
-   * @param parameters
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    * @return
    */
   T readFirst(String sql, Object... parameters);
@@ -65,8 +66,9 @@ public interface TypedOrmReader<T> {
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    *
-   * @param sql
-   * @param parameters
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    * @return
    */
   LazyResultSet<T> readLazy(String sql, Object... parameters);
@@ -89,8 +91,9 @@ public interface TypedOrmReader<T> {
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParameterSetter#setParameters(PreparedStatement, Object[])}
    *
-   * @param sql
-   * @param parameters
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    * @return
    */
   List<T> readList(String sql, Object... parameters);

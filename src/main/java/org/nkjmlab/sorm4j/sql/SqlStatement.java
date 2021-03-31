@@ -29,14 +29,13 @@ public interface SqlStatement {
 
 
   /**
-   * Create SqlStatement objects from the given arguments.
+   * Creates {@link SqlStatement} object from the given SQL string.
    *
-   * @param sql
-   * @param parameters
+   * @param sql without parameter.
    * @return
    */
-  static SqlStatement from(String sql, Object... parameters) {
-    return SqlStatementImpl.from(sql, parameters);
+  static SqlStatement from(String sql) {
+    return SqlStatementImpl.from(sql);
   }
 
   /**

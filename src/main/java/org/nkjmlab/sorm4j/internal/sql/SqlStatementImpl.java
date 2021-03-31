@@ -42,9 +42,16 @@ public final class SqlStatementImpl implements SqlStatement {
   }
 
 
-  public static SqlStatement from(String sql, Object[] parameters) {
-    SqlStatement st = procListPlaceholder(sql, parameters);
-    return procEmbeddedPlaceholder(st.getSql(), st.getParameters());
+  public static SqlStatement from(String sql, Object... parameters) {
+    SqlStatement st = new SqlStatementImpl(sql, parameters);
+    if (parameters.length == 0) {
+      return st;
+    }
+    st = sql.contains(LIST_PLACEHOLDER) ? procListPlaceholder(sql, parameters) : st;
+    st = sql.contains(EMBEDDED_PLACEHOLDER)
+        ? procEmbeddedPlaceholder(st.getSql(), st.getParameters())
+        : st;
+    return st;
   }
 
   private static final char LIST_PLACEHOLDER_PREFIX = '<';
@@ -53,9 +60,6 @@ public final class SqlStatementImpl implements SqlStatement {
       LIST_PLACEHOLDER_PREFIX + "?" + LIST_PLACEHOLDER_SUFFIX;
 
   private static SqlStatement procListPlaceholder(String sql, Object[] parameters) {
-    if (!sql.contains(LIST_PLACEHOLDER)) {
-      return new SqlStatementImpl(sql, parameters);
-    }
     final char[] arry = sql.toCharArray();
     final List<Integer> listParametersIndexs = new ArrayList<>();
     int parameterIndex = 0;
@@ -99,9 +103,6 @@ public final class SqlStatementImpl implements SqlStatement {
       EMBEDDED_PLACEHOLDER_PREFIX + "?" + EMBEDDED_PLACEHOLDER_SUFFIX;
 
   private static SqlStatement procEmbeddedPlaceholder(String sql, Object[] parameters) {
-    if (!sql.contains(EMBEDDED_PLACEHOLDER)) {
-      return new SqlStatementImpl(sql, parameters);
-    }
 
     final char[] arry = sql.toCharArray();
     final List<Integer> embeddedParametersIndexs = new ArrayList<>();

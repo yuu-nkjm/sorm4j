@@ -19,23 +19,31 @@ class NamedParameterSqlTest {
   void testCustomer() {
     sorm.apply(conn -> conn.insert(ALICE, BOB, CAROL, DAVE));
 
-    SqlStatement statement1 = OrderedParameterSql.toSqlStatement(
-        "select * from customer where name like $?$ and address in(<?>) and id=?", "%Alice%",
-        List.of("Tokyo", "Kyoto"), 1);
-    var ret = sorm.apply(conn -> conn.readList(Customer.class, statement1));
-    System.out.println(ret);
+    {
+      SqlStatement statement = OrderedParameterSql.toSqlStatement(
+          "select * from customer where name like $?$ and address in(<?>) and id=?", "A%",
+          List.of("Tokyo", "Kyoto"), 1);
+      System.out.println(statement);
+      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
+      System.out.println(ret);
+    }
 
-
-
-    // String sql = "select * from customer where id=:id and address=:address";
-    // SqlStatement statement =
-    // NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").toSqlStatement();
-    // sorm.apply(conn -> conn.readList(Customer.class, statement));
-    //
-    // SqlStatement sqlSt = NamedParameterSql.toSqlStatement(
-    // "select * from customer where address in(:living)", Map.of("living", List.of("Kyoto")));
-    // List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, sqlSt));
-    // System.out.println(ret);
+    {
+      String sql = "select * from customer where id=:id and address=:address";
+      SqlStatement statement =
+          NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").toSqlStatement();
+      System.out.println(statement);
+      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
+      System.out.println(ret);
+    }
+    {
+      SqlStatement statement = NamedParameterSql.toSqlStatement(
+          "select * from customer where name like $:name$ and address in(<:address>) and id=:id",
+          Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "A%"));
+      System.out.println(statement);
+      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
+      System.out.println(ret);
+    }
   }
 
   @Test

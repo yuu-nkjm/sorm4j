@@ -35,8 +35,10 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    */
-
   Map<String, Object> readMapFirst(String sql, Object... parameters);
 
   /**
@@ -57,6 +59,9 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    */
   LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
 
@@ -78,6 +83,9 @@ public interface OrmMapReader {
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
    *
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
 
@@ -93,6 +101,10 @@ public interface OrmMapReader {
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
    * is thrown.
+   *
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    */
   Map<String, Object> readMapOne(String sql, Object... parameters);
 

@@ -57,8 +57,9 @@ public interface OrmReader {
    *
    * @param <T>
    * @param objectClass
-   * @param sql
-   * @param parameters
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    * @return
    */
   <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
@@ -123,7 +124,9 @@ public interface OrmReader {
    * @param <T>
    * @param objectClass
    * @param sql
-   * @param parameters
+   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
+   *        parameter) could not be used.
+   * @param parameters are ordered parameter.
    * @return
    */
   <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
