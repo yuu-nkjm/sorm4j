@@ -33,7 +33,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.2.3</version>
+   <version>1.3.0</version>
  </dependency>
 ```
 
@@ -92,16 +92,15 @@ Sorm4j is evaluated performance with the H2 database. The results show a small o
     - Next to get started, see here.
 - [Examples](https://scrapbox.io/sorm4j/Examples)
     - If you need more sample codes, please take a look at the [Examples](https://scrapbox.io/sorm4j/Examples) page and the [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample) repository.
-- [Key Features](https://scrapbox.io/sorm4j/Key_Features)
-    - The key features of Sorm4j, see here.
+- [Features](https://scrapbox.io/sorm4j/Features)
+    - The features of Sorm4j, see here.
 - [Performance](https://scrapbox.io/sorm4j/Performance)
     - If you need more benchmark results, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
 - [Developer's Guide](https://scrapbox.io/sorm4j/Developer's_Guide)
     - The detailed manual is here.
 
 ## Versioning
-The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.extension`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@deprecated` and announced release note.
-
+The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@Deprecated` and announced release note. Experimental elements are annotated by `@Experimental`.
 
 
 ## License

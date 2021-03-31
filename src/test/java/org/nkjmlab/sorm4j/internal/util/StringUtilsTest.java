@@ -9,7 +9,7 @@ class StringUtilsTest {
 
   @Test
   void testContainsIgnoreCase() {
-    assertThat(StringUtils.containsIgnoreCase(List.of("a", "b"), null));
+    assertThat(StringUtils.containsAsCanonical(List.of("a", "b"), null));
   }
 
   @Test

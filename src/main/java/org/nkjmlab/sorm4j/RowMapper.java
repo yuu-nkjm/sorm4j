@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -21,4 +23,23 @@ public interface RowMapper<T> {
    * @return
    */
   T mapRow(ResultSet resultSet, int rowNum);
+
+  /**
+   * Converts the given rowMapper to function mapping rows to object list.
+   *
+   * @param <T>
+   * @param rowMapper
+   * @return
+   */
+  static <T> FunctionHandler<ResultSet, List<T>> convertToRowsMapper(RowMapper<T> rowMapper) {
+    return resultSet -> {
+      final List<T> ret = new ArrayList<>();
+      int rowNum = 0;
+      while (resultSet.next()) {
+        rowNum++;
+        ret.add(rowMapper.mapRow(resultSet, rowNum));
+      }
+      return ret;
+    };
+  }
 }

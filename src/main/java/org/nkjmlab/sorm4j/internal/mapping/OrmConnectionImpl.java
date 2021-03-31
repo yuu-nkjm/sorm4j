@@ -10,10 +10,8 @@ import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
 
 /**
@@ -70,12 +68,6 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   }
 
   @Override
-  @Deprecated
-  public NamedParameterSql createNamedParameterSql(String sql) {
-    return NamedParameterSql.from(sql);
-  }
-
-  @Override
   public <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass,
       String sql) {
     return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
@@ -84,12 +76,6 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   @Override
   public OrderedParameterRequest createOrderedParameterRequest(String sql) {
     return OrderedParameterRequest.from(this, sql);
-  }
-
-  @Override
-  @Deprecated
-  public OrderedParameterSql createOrderedParameterSql(String sql) {
-    return OrderedParameterSql.from(sql);
   }
 
   @Override

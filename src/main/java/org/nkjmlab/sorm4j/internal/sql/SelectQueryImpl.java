@@ -62,7 +62,7 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
 
   @Override
   public SqlStatement toSqlStatement() {
-    return SqlStatement.of(buildSql());
+    return SqlStatement.from(buildSql());
   }
 
   @Override

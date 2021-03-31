@@ -16,7 +16,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
  *
  */
 public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
-    SqlExecutor, ResultSetMapper, TransactionFunction, Closeable, AutoCloseable {
+    SqlExecutor, TypedResultSetMapper<T>, ResultSetMapMapper, TransactionFunction, Closeable, AutoCloseable {
 
   /**
    * Creates a {@link NamedParameterQuery} from SQL string.

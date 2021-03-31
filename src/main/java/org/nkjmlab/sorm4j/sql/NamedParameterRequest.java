@@ -4,6 +4,13 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterRequestImpl;
 
+
+/**
+ * An executable request with named parameters.
+ *
+ * @author nkjm
+ *
+ */
 public interface NamedParameterRequest extends NamedParameterSql, Request {
 
 
@@ -13,6 +20,14 @@ public interface NamedParameterRequest extends NamedParameterSql, Request {
   @Override
   NamedParameterRequest bind(String key, Object value);
 
+
+  /**
+   * Creates a request from SQL string.
+   *
+   * @param sqlExecutor
+   * @param sql
+   * @return
+   */
   static NamedParameterRequest from(SqlExecutor sqlExecutor, String sql) {
     return new NamedParameterRequestImpl(sqlExecutor, sql);
   }

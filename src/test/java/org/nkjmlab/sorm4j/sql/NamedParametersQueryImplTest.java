@@ -26,13 +26,13 @@ class NamedParametersQueryImplTest {
           con.createNamedParameterQuery("select * from players where id=:id and name=:name")
               .toSqlStatement();
       assertThat(ret.toString()).isEqualTo(
-          SqlStatement.of("select * from players where id=:id and name=:name").toString());
+          SqlStatement.from("select * from players where id=:id and name=:name").toString());
     });
     sorm.accept(con -> {
       SqlStatement ret = con.createNamedParameterQuery(Player.class,
           "select * from players where id=:id and name=:name").toSqlStatement();
       assertThat(ret.toString()).isEqualTo(
-          SqlStatement.of("select * from players where id=:id and name=:name").toString());
+          SqlStatement.from("select * from players where id=:id and name=:name").toString());
     });
   }
 

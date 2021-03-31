@@ -154,7 +154,7 @@ public class SelectBuilderImpl implements SelectBuilder {
 
   @Override
   public SqlStatement toSqlStatement() {
-    return SqlStatement.of(buildSql());
+    return SqlStatement.from(buildSql());
   }
 
 }

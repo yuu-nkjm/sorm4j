@@ -8,17 +8,26 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.extension.Accessor;
 
 public final class ColumnToAccessorMap {
-  // key => UPPER COLUMN_NAME
   private final Map<String, Accessor> columnToAccessorMap;
 
+  /**
+   * Column map to accessor. A key converted to a canonical name.
+   *
+   * @param columnToAccessorMap
+   */
   public ColumnToAccessorMap(Map<String, Accessor> columnToAccessorMap) {
     this.columnToAccessorMap = columnToAccessorMap.entrySet().stream()
-        .collect(Collectors.toMap(e -> toUpperCase(e.getKey()), e -> e.getValue()));
+        .collect(Collectors.toMap(e -> toCanonical(e.getKey()), e -> e.getValue()));
   }
 
+  /**
+   * Gets the accessor of the given columnName. Column name is regarded as canonical name.
+   *
+   * @param columnName
+   * @return
+   */
   public Accessor get(String columnName) {
-    Accessor v = columnToAccessorMap.get(columnName);
-    return v != null ? v : columnToAccessorMap.get(toUpperCase(columnName));
+    return columnToAccessorMap.get(toCanonical(columnName));
   }
 
   public Set<String> keySet() {

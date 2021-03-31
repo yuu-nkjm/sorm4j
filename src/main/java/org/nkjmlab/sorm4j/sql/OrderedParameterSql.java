@@ -28,7 +28,6 @@ public interface OrderedParameterSql extends SqlStatementSupplier {
    */
   OrderedParameterSql addParameter(Object... parameters);
 
-
   /**
    * Creates a {@link OrderedParameterSql} object with parameters.
    *
