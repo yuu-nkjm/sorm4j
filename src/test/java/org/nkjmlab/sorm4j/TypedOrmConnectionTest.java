@@ -579,7 +579,7 @@ class TypedOrmConnectionTest {
   @Test
   void testUpdateOnT() {
     Player a = SormTestUtils.PLAYER_ALICE;
-    Player b = SormTestUtils.PLAYER_ALICE;
+    Player b = SormTestUtils.PLAYER_BOB;
 
     // auto-commit
     sorm.acceptTransactionHandler(conn -> conn.insert(a));
@@ -588,7 +588,7 @@ class TypedOrmConnectionTest {
 
     try (OrmConnection trans = sorm.openTransaction()) {
       // auto-rollback
-      trans.insert(a);
+      trans.insert(b);
     }
     num = sorm.apply(conn -> conn.readOne(Integer.class, "select count(*) from players"));
     assertThat(num).isEqualTo(1);
@@ -599,9 +599,11 @@ class TypedOrmConnectionTest {
       fail();
     }
 
+    sorm.accept(conn -> conn.deleteAll(Player.class));
+
 
     sorm.accept(Player.class, m -> {
-      m.insert(a);
+      m.insert(a, b);
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"));
       m.updateOn("players", new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED"));
