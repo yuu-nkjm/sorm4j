@@ -581,14 +581,17 @@ class TypedOrmConnectionTest {
     Player a = SormTestUtils.PLAYER_ALICE;
     Player b = SormTestUtils.PLAYER_ALICE;
 
-    // auto-rolback
-    sorm.applyTransactionHandler(conn -> conn.insert(a));
-    // auto-rolback
+    // auto-commit
     sorm.acceptTransactionHandler(conn -> conn.insert(a));
+    int num = sorm.apply(conn -> conn.readOne(Integer.class, "select count(*) from players"));
+    assertThat(num).isEqualTo(1);
+
     try (OrmConnection trans = sorm.openTransaction()) {
-      // auto-rolback
+      // auto-rollback
       trans.insert(a);
     }
+    num = sorm.apply(conn -> conn.readOne(Integer.class, "select count(*) from players"));
+    assertThat(num).isEqualTo(1);
 
     try (Connection conn = sorm.getJdbcConnection()) {
       SormFactory.toOrmConnection(conn);

@@ -69,7 +69,9 @@ public final class SormImpl implements Sorm {
   public <T, R> R applyTransactionHandler(Class<T> objectClass,
       FunctionHandler<TypedOrmTransaction<T>, R> handler) {
     try (TypedOrmTransaction<T> transaction = openTransaction(objectClass)) {
-      return handler.apply(transaction);
+      R ret = handler.apply(transaction);
+      transaction.commit();
+      return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -80,7 +82,9 @@ public final class SormImpl implements Sorm {
   @Override
   public <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler) {
     try (OrmTransaction transaction = openTransaction()) {
-      return handler.apply(transaction);
+      R ret = handler.apply(transaction);
+      transaction.commit();
+      return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -159,6 +163,7 @@ public final class SormImpl implements Sorm {
       ConsumerHandler<TypedOrmTransaction<T>> handler) {
     try (TypedOrmTransaction<T> transaction = openTransaction(objectClass)) {
       handler.accept(transaction);
+      transaction.commit();
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -168,8 +173,9 @@ public final class SormImpl implements Sorm {
 
   @Override
   public void acceptTransactionHandler(ConsumerHandler<OrmTransaction> handler) {
-    try (OrmTransaction conn = openTransaction()) {
-      handler.accept(conn);
+    try (OrmTransaction transaction = openTransaction()) {
+      handler.accept(transaction);
+      transaction.commit();
     } catch (Exception e) {
       throw Try.rethrow(e);
     }

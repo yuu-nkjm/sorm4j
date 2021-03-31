@@ -41,8 +41,11 @@ public interface Sorm {
 
   /**
    * Accepts a {@link TypedOrmTransaction} handler for a task with object-relation mapping. The
-   * transaction will be closed after the process of handler. When the transaction is not committed,
-   * the transaction will be rollback.
+   * transaction will be closed after the process of handler.
+   *
+   * The transaction will be committed and the connection will be closed after the process of
+   * handler. When the transaction throws a exception, the transaction will be rollback.
+   *
    *
    * @param <T>
    * @param objectClass
@@ -52,8 +55,10 @@ public interface Sorm {
       ConsumerHandler<TypedOrmTransaction<T>> handler);
 
   /**
-   * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping. The
-   * connection will be closed after the process of handler.
+   * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
+   *
+   * The transaction will be committed and the connection will be closed after the process of
+   * handler. When the transaction throws a exception, the transaction will be rollback.
    *
    * @param handler
    */
@@ -93,7 +98,10 @@ public interface Sorm {
 
   /**
    * Applies a {@link TypedOrmTransaction} handler for a task with object-relation mapping and gets
-   * the result. The connection will be closed after the process of handler.
+   * the result.
+   *
+   * The transaction will be committed and the connection will be closed after the process of
+   * handler. When the transaction throws a exception, the transaction will be rollback.
    *
    * @param <T>
    * @param <R>
@@ -106,7 +114,10 @@ public interface Sorm {
 
   /**
    * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
-   * result. The connection will be closed after the process of handler.
+   * result.
+   *
+   * The transaction will be committed and the connection will be closed after the process of
+   * handler. When the transaction throws a exception, the transaction will be rollback.
    *
    * @param <R>
    * @param handler
@@ -185,6 +196,8 @@ public interface Sorm {
    * or {@link #applyTransactionHandler(FunctionHandler)}. Default transaction level is
    * {@link Connection#TRANSACTION_READ_COMMITTED}.
    *
+   * Note: the transaction is automatically rollback if the transaction is not committed.
+   *
    * @return
    */
   OrmTransaction openTransaction();
@@ -195,6 +208,8 @@ public interface Sorm {
    * {@link #acceptTransactionHandler(Class, ConsumerHandler)} or
    * {@link #applyTransactionHandler(Class, FunctionHandler)}. Default transaction level is
    * {@link Connection#TRANSACTION_READ_COMMITTED}.
+   *
+   * Note: the transaction is automatically rollback if the transaction is not committed.
    *
    * @param <T>
    * @param objectClass
