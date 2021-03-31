@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.annotation.OrmColum;
+import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
@@ -83,7 +83,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
   private static Map<Column, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
-    Class<OrmColum> ann = OrmColum.class;
+    Class<OrmColumn> ann = OrmColumn.class;
     return Arrays.stream(objectClass.getDeclaredFields())
         .filter(f -> Objects.nonNull(f.getAnnotation(ann)))
         .collect(Collectors.toMap(f -> new Column(f.getAnnotation(ann).value()), f -> {
