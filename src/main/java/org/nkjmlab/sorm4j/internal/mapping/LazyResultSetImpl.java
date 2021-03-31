@@ -23,11 +23,19 @@ import org.nkjmlab.sorm4j.sql.LazyResultSet;
  * @param <T> element type in result
  */
 final class LazyResultSetImpl<T> implements LazyResultSet<T> {
+  @SuppressWarnings("rawtypes")
+  private static final Class<? extends Map> MAP_CLASS = LinkedHashMap.class;
 
   private final Class<T> objectClass;
   private final AbstractOrmMapper ormMapper;
   private final ResultSet resultSet;
   private final PreparedStatement stmt;
+
+  @SuppressWarnings("unchecked")
+  public LazyResultSetImpl(AbstractOrmMapper ormMapper, PreparedStatement stmt,
+      ResultSet resultSet) {
+    this(ormMapper, (Class<T>) MAP_CLASS, stmt, resultSet);
+  }
 
   public LazyResultSetImpl(AbstractOrmMapper ormMapper, Class<T> objectClass,
       PreparedStatement stmt, ResultSet resultSet) {
@@ -44,7 +52,8 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T one() {
-    T ret = Try.getOrThrow(() -> ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
+    T ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
+        : ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -56,7 +65,9 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T first() {
-    T ret = Try.getOrThrow(() -> ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
+    T ret =
+        Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
+            : ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -68,49 +79,18 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public List<T> toList() {
-    List<T> ret =
-        Try.getOrThrow(() -> ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+    List<T> ret = Try.getOrThrow(
+        () -> objectClass.equals(MAP_CLASS) ? (List<T>) ormMapper.mapRowsToMapList(resultSet)
+            : ormMapper.loadPojoList(objectClass, resultSet),
+        Try::rethrow);
     close();
     return ret;
   }
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrThrow(
-        () -> RowMapper.convertToRowsMapper(rowMapper).apply(resultSet), Try::rethrow);
-    close();
-    return ret;
-  }
-
-  @Override
-  public Map<String, Object> oneMap() {
-    Map<String, Object> ret = Try.getOrThrow(() -> ormMapper.loadOneMap(resultSet), Try::rethrow);
-    close();
-    return ret;
-  }
-
-  /**
-   * Returns the first row in the result set and close.
-   *
-   * @return
-   */
-  @Override
-  public Map<String, Object> firstMap() {
-    Map<String, Object> ret = Try.getOrThrow(() -> ormMapper.loadFirstMap(resultSet), Try::rethrow);
-    close();
-    return ret;
-  }
-
-
-  /**
-   * Returns results in a List of {@code Map<String, Object>}.
-   *
-   * @return
-   */
-  @Override
-  public List<Map<String, Object>> toMapList() {
-    List<Map<String, Object>> ret =
-        Try.getOrThrow(() -> ormMapper.mapRowsAux(resultSet), Try::rethrow);
+    List<T> ret = Try.getOrThrow(() -> RowMapper.convertToRowsMapper(rowMapper).apply(resultSet),
+        Try::rethrow);
     close();
     return ret;
   }
@@ -150,13 +130,14 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
     }
   }
 
+
   private final class LazyResultSetIterator<S> implements Iterator<S> {
     private final Supplier<S> getFunction;
 
     @SuppressWarnings("unchecked")
     public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(LinkedHashMap.class)
+      this.getFunction = objectClass.equals(MAP_CLASS)
           ? Try.createSupplierWithThrow(() -> (S) orMapper.mapRowAux(resultSet), Try::rethrow)
           : Try.createSupplierWithThrow(() -> orMapper.mapRowAux(objectClass, resultSet),
               Try::rethrow);

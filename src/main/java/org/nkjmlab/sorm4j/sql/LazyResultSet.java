@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.sql;
 
-import java.io.Closeable;
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.RowMapper;
 
@@ -16,7 +14,7 @@ import org.nkjmlab.sorm4j.RowMapper;
  *
  * @param <T>
  */
-public interface LazyResultSet<T> extends Iterable<T>, Closeable, AutoCloseable {
+public interface LazyResultSet<T> extends Iterable<T>, AutoCloseable {
 
   /**
    * Closes this result set. After call this method, operations to this object is invalid.
@@ -30,13 +28,6 @@ public interface LazyResultSet<T> extends Iterable<T>, Closeable, AutoCloseable 
    * @return
    */
   T first();
-
-  /**
-   * Returns the first row in the result set and close.
-   *
-   * @return
-   */
-  Map<String, Object> firstMap();
 
   /**
    * Iterates all the rows of the result set. The Iterator must be closed to release database
@@ -53,12 +44,6 @@ public interface LazyResultSet<T> extends Iterable<T>, Closeable, AutoCloseable 
    */
   T one();
 
-  /**
-   * Returns the map of one row from query and close. If the row is not unique, Exception is
-   *
-   * @return
-   */
-  Map<String, Object> oneMap();
 
   /**
    * Streams all the rows of the result set. The stream must be closed to release database
@@ -80,11 +65,5 @@ public interface LazyResultSet<T> extends Iterable<T>, Closeable, AutoCloseable 
    */
   List<T> toList(RowMapper<T> rowMapper);
 
-  /**
-   * Returns results in a List of {@code Map<String, Object>}.
-   *
-   * @return
-   */
-  List<Map<String, Object>> toMapList();
 
 }

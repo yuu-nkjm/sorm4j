@@ -33,7 +33,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.2.3</version>
+   <version>1.3.0</version>
  </dependency>
 ```
 
@@ -100,8 +100,7 @@ Sorm4j is evaluated performance with the H2 database. The results show a small o
     - The detailed manual is here.
 
 ## Versioning
-The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@deprecated` and announced release note.
-
+The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@Deprecated` and announced release note. Experimental elements are annotated by `@Experimental`.
 
 
 ## License

@@ -344,18 +344,17 @@ class TypedOrmConnectionTest {
     sorm.accept(Player.class, m -> {
       m.insert(List.of(a, b));
 
-
       Player p1 = m.readLazy(SqlStatement.of("select * from players"))
           .toList((rs, rowNum) -> m.mapRow(rs)).get(0);
       assertThat(p1.getName()).isEqualTo(a.getName());
 
 
       Map<String, Object> map =
-          m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+          m.readMapLazy(SqlStatement.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      map = m.readLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+      map = m.readMapLazy(SqlStatement.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
@@ -398,31 +397,9 @@ class TypedOrmConnectionTest {
     sorm.accept(Player.class, m -> {
       m.insert(a);
 
-      Map<String, Object> map = m.readAllLazy().oneMap();
-      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
-          .isEqualTo(a.getName());
-
-
-      assertThat(m.readAllLazy().one()).isEqualTo(a);
-
-
-      m.insert(b);
-      assertThat(m.readAllLazy().stream().collect(Collectors.toList())).contains(a, b);
-      assertThat(m.readAllLazy().toList()).contains(a, b);
-      assertThat(m.readAllLazy().first()).isEqualTo(a);
-
-      map = m.readAllLazy().firstMap();
-      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
-          .isEqualTo(a.getName());
-
-      map = m.readAllLazy().toMapList().get(0);
-      assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
-          .isEqualTo(a.getName());
-      assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
-          .isEqualTo(a.readAddress());
     });
     sorm.accept(Player.class, m -> {
-      Map<String, Object> map = m.readMapLazy("select * from players").toMapList().get(0);
+      Map<String, Object> map = m.readMapLazy("select * from players").toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -472,7 +449,7 @@ class TypedOrmConnectionTest {
     });
     sorm.accept(Player.class, m -> {
       Map<String, Object> map =
-          m.readMapLazy(SqlStatement.of("select * from players")).toMapList().get(0);
+          m.readMapLazy(SqlStatement.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });

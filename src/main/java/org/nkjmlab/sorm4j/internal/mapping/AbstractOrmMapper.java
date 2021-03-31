@@ -10,7 +10,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -490,8 +489,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final ResultSet resultSet = stmt.executeQuery();
       @SuppressWarnings({"unchecked", "rawtypes"})
       LazyResultSet<Map<String, Object>> ret =
-          (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, LinkedHashMap.class,
-              stmt, resultSet);
+          (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);
