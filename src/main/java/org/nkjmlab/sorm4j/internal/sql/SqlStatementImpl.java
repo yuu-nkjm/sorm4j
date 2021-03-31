@@ -42,7 +42,7 @@ public final class SqlStatementImpl implements SqlStatement {
   }
 
 
-  public static SqlStatement of(String sql, Object[] parameters) {
+  public static SqlStatement from(String sql, Object[] parameters) {
     SqlStatement st = procListPlaceholder(sql, parameters);
     return procEmbeddedPlaceholder(st.getSql(), st.getParameters());
   }

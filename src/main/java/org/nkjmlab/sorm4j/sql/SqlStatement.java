@@ -35,8 +35,8 @@ public interface SqlStatement {
    * @param parameters
    * @return
    */
-  static SqlStatement of(String sql, Object... parameters) {
-    return SqlStatementImpl.of(sql, parameters);
+  static SqlStatement from(String sql, Object... parameters) {
+    return SqlStatementImpl.from(sql, parameters);
   }
 
   /**

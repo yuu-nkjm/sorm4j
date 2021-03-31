@@ -22,7 +22,8 @@ class NamedParameterSqlTest {
     SqlStatement statement1 = OrderedParameterSql.toSqlStatement(
         "select * from customer where name like $?$ and address in(<?>) and id=?", "%Alice%",
         List.of("Tokyo", "Kyoto"), 1);
-    System.out.println(sorm.apply(conn -> conn.readList(Customer.class, statement1)));
+    var ret = sorm.apply(conn -> conn.readList(Customer.class, statement1));
+    System.out.println(ret);
 
 
 
@@ -48,7 +49,7 @@ class NamedParameterSqlTest {
     assertThat(sp.toString())
         .isEqualTo("sql=[select * from simple where id=? and name=?], parameters=[2, foo]");
 
-    assertThat(SqlStatement.of("select * from test").toString()).contains("[select * from test]");
+    assertThat(SqlStatement.from("select * from test").toString()).contains("[select * from test]");
   }
 
   @Test
