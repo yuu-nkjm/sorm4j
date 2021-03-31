@@ -61,7 +61,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
       orderdParams.put(pos, parameters.get(parameterName));
       resultSql = resultSql.replaceAll(namedPlaceholder, "?");
     }
-    return SqlStatement.from(resultSql, orderdParams.values().toArray());
+    return SqlStatementImpl.from(resultSql, orderdParams.values().toArray());
   }
 
 

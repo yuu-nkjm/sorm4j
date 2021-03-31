@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Location;
@@ -62,8 +63,8 @@ class TypedOrmConnectionTest {
 
     assertThat(ret2.size()).isEqualTo(2);
 
-    ret2 =
-        sorm.apply(Player.class, conn -> conn.executeQuery(SqlStatement.from("select * from players"),
+    ret2 = sorm.apply(Player.class,
+        conn -> conn.executeQuery(SqlStatement.from("select * from players"),
             (rs, rowNum) -> conn.mapRowToMap(rs)));
 
     assertThat(ret2.size()).isEqualTo(2);
@@ -368,7 +369,8 @@ class TypedOrmConnectionTest {
           .isEqualTo(a.getName());
 
 
-      map = m.readMapFirst(SqlStatement.from("select * from players WHERE id=?", 100));
+      map = m.readMapFirst(
+          OrderedParameterSql.toSqlStatement("select * from players WHERE id=?", 100));
       assertThat(map).isNull();
 
 
@@ -438,7 +440,7 @@ class TypedOrmConnectionTest {
 
     sorm.accept(Player.class, m -> {
       Map<String, Object> map =
-          m.readMapOne(SqlStatement.from("select * from players where id=?", 1));
+          m.readMapOne(OrderedParameterSql.toSqlStatement("select * from players where id=?", 1));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -474,7 +476,9 @@ class TypedOrmConnectionTest {
       m.insert(a, b);
       assertThat(m.readList("select * from players")).contains(a, b);
       assertThat(m.readList(SqlStatement.from("select * from players"))).contains(a, b);
-      assertThat(m.readOne(SqlStatement.from("select * from players where id=?", 1))).isEqualTo(a);
+      assertThat(
+          m.readOne(OrderedParameterSql.toSqlStatement("select * from players where id=?", 1)))
+              .isEqualTo(a);
       assertThat(m.readOne("select * from players where id=?", 1)).isEqualTo(a);
     });
     Player a = SormTestUtils.PLAYER_ALICE;
@@ -493,7 +497,8 @@ class TypedOrmConnectionTest {
         Guest b = SormTestUtils.GUEST_BOB;
         m.insert(a);
         m.insert(b);
-        Guest g = m.readOne(SqlStatement.from("select * from guests where id=?", 1));
+        Guest g =
+            m.readOne(OrderedParameterSql.toSqlStatement("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(SqlStatement.from("select * from guests"));

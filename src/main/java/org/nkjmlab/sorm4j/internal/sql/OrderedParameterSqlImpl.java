@@ -35,7 +35,7 @@ public class OrderedParameterSqlImpl implements OrderedParameterSql {
 
   @Override
   public SqlStatement toSqlStatement() {
-    return SqlStatement.from(sql, parameters.toArray());
+    return SqlStatementImpl.from(sql, parameters.toArray());
   }
 
 

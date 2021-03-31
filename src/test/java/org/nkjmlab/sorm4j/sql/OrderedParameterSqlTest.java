@@ -1,18 +1,16 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class OrderedParameterSqlTest {
 
   @Test
   void testToSqlStatementStringObjectArray() {
-    SqlStatement sqlSt = OrderedParameterSql.toSqlStatement(
-        "select * from a where name like $?$ and address in(<?>) and id=$?$", "%Alice%",
-        List.of("Tokyo", "Kyoto"), 1);
-
-    System.out.println(sqlSt);
+    String sql = "select * from customer where id=? and address=?";
+    SqlStatement statement =
+        OrderedParameterSql.from(sql).addParameter(1, "Kyoto").toSqlStatement();
+    System.out.println(statement);
     // assertThat(sqlSt.getParameters().length).isEqualTo(1);
     // assertThat(sqlSt.getParameters()[0]).isEqualTo("'alice', 1");
 

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
@@ -461,7 +462,7 @@ class OrmConnectionTest {
     });
     sorm.accept(m -> {
       Map<String, Object> map =
-          m.readMapOne(SqlStatement.from("select * from players where id=?", 1));
+          m.readMapOne(OrderedParameterSql.toSqlStatement("select * from players where id=?", 1));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -502,9 +503,10 @@ class OrmConnectionTest {
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readList(Player.class, "select * from players")).contains(a, b);
-      assertThat(m.readList(Player.class, SqlStatement.from("select * from players"))).contains(a, b);
-      assertThat(m.readOne(Player.class, SqlStatement.from("select * from players where id=?", 1)))
-          .isEqualTo(a);
+      assertThat(m.readList(Player.class, SqlStatement.from("select * from players"))).contains(a,
+          b);
+      assertThat(m.readOne(Player.class,
+          OrderedParameterSql.toSqlStatement("select * from players where id=?", 1))).isEqualTo(a);
       assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
 
 
@@ -519,7 +521,8 @@ class OrmConnectionTest {
         Guest b = SormTestUtils.GUEST_BOB;
         m.insert(a);
         m.insert(b);
-        Guest g = m.readOne(Guest.class, SqlStatement.from("select * from guests where id=?", 1));
+        Guest g = m.readOne(Guest.class,
+            OrderedParameterSql.toSqlStatement("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(Guest.class, SqlStatement.from("select * from guests"));
