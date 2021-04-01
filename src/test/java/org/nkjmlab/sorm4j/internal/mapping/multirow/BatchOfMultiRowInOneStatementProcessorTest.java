@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Configurator;
-import org.nkjmlab.sorm4j.OrmLogger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.SormLogger;
 import org.nkjmlab.sorm4j.tool.Guest;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
@@ -26,9 +26,9 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    OrmLogger.on();
-    OrmLogger.off();
-    OrmLogger.on();
+    SormLogger.on();
+    SormLogger.off();
+    SormLogger.on();
     SormFactory.registerConfig("BATCH_CONF", builder -> builder
         .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
 

@@ -10,8 +10,7 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 abstract class Mapping<T> {
-  static final org.slf4j.Logger log =
-      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+  static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final Class<T> objectClass;
   protected final ResultSetConverter resultSetConverter;
@@ -24,21 +23,26 @@ abstract class Mapping<T> {
     this.columnToAccessorMap = columnToAccessorMap;
   }
 
-  final Object getValue(Object object, String columnName) {
+
+  final Object getValue(Object object, Accessor acc) {
+    try {
+      return acc.get(object);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new SormException(format(
+          "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
+          (object == null ? "null" : object.getClass().getName()), acc.getFormattedString(),
+          acc.getFormattedString(), object), e);
+    }
+  }
+
+  final Accessor getAccessor(Object object, String columnName) {
     final Accessor acc = columnToAccessorMap.get(columnName);
     if (acc == null) {
       throw new SormException(format(
           "Error getting value from [{}] because column [{}] does not have a corresponding getter method or field access",
           object.getClass(), columnName));
     }
-    try {
-      return acc.get(object);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new SormException(format(
-          "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
-          (object == null ? "null" : object.getClass().getName()), columnName,
-          acc.getFormattedString(), object), e);
-    }
+    return acc;
   }
 
 

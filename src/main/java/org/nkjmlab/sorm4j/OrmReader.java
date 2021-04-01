@@ -123,7 +123,6 @@ public interface OrmReader {
    *
    * @param <T>
    * @param objectClass
-   * @param sql
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
    * @param parameters are ordered parameter.

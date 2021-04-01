@@ -26,7 +26,8 @@ class TableMappingTest {
     try {
       sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
-        tm.getValue(new Guest(), "hoge");
+        Guest g = new Guest();
+        tm.getValue(g, tm.getAccessor(g, "hoge"));
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not have a corresponding");
@@ -35,7 +36,8 @@ class TableMappingTest {
     try {
       sorm.accept(Guest.class, m -> {
         TableMapping<Guest> tm = getTableMapping(m, Guest.class);
-        tm.getValue(new String(), "id");
+        String s = new String();
+        tm.getValue(s, tm.getAccessor(s, "id"));
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Could not get a value");

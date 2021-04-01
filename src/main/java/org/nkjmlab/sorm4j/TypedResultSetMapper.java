@@ -14,7 +14,6 @@ public interface TypedResultSetMapper<T> {
   /**
    * Maps the current row in the given resultSet to an object.
    *
-   * @param <T>
    * @param resultSet
    * @return
    */
@@ -24,8 +23,6 @@ public interface TypedResultSetMapper<T> {
   /**
    * Maps the all rows in the given resultSet to an object list.
    *
-   * @param <T>
-   * @param objectClass
    * @param resultSet
    * @return
    */

@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
  * Defines column mapping to a field.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface OrmColum {
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+public @interface OrmColumn {
 
   /**
    * Name of the column mapped to the field.

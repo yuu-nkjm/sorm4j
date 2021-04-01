@@ -395,7 +395,6 @@ class TypedOrmConnectionTest {
   @Test
   void testReadAllLazy() {
     Player a = SormTestUtils.PLAYER_ALICE;
-    Player b = SormTestUtils.PLAYER_BOB;
     sorm.accept(Player.class, m -> {
       m.insert(a);
 

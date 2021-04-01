@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.tool;
 
 import java.util.Objects;
+import org.nkjmlab.sorm4j.annotation.OrmColumn;
 
 public class Guest {
 
@@ -12,6 +13,13 @@ public class Guest {
   public Guest() {}
 
   public Guest(String name, String address) {
+    this.name = name;
+    this.address = address;
+  }
+
+  public Guest(@OrmColumn("id") int id, @OrmColumn("name") String name,
+      @OrmColumn("address") String address) {
+    this.id = id;
     this.name = name;
     this.address = address;
   }

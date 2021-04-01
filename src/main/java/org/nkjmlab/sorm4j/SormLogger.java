@@ -4,21 +4,21 @@ import java.util.Arrays;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 
 /**
- * Logger for object-relation mapping.
+ * Logger for Sorm4j.
  *
  * @author nkjm
  *
  */
-public final class OrmLogger {
+public final class SormLogger {
 
-  private OrmLogger() {}
+  private SormLogger() {}
 
   static {
     on(Category.MAPPING);
   }
 
   /**
-   * Categories of {@link OrmLogger}.
+   * Categories of {@link SormLogger}.
    *
    */
   public enum Category {
@@ -26,11 +26,11 @@ public final class OrmLogger {
   }
 
   /**
-   * Enables logging for the given categories.
+   * Enables logging for the given parameter of {@link Category}.
    *
-   * @param categories
+   * @param categories are in {@link Category}
    */
-  public static void on(OrmLogger.Category... categories) {
+  public static void on(SormLogger.Category... categories) {
     Arrays.stream(categories).forEach(name -> LogPointFactory.modes.put(name, true));
   }
 
@@ -39,22 +39,22 @@ public final class OrmLogger {
    *
    * @param categories
    */
-  public static void off(OrmLogger.Category... categories) {
+  public static void off(SormLogger.Category... categories) {
     Arrays.stream(categories).forEach(name -> LogPointFactory.modes.put(name, false));
   }
 
   /**
-   * Enables logging all.
+   * Enables logging all categories. See {@link Category}.
    */
   public static void on() {
-    on(OrmLogger.Category.values());
+    on(SormLogger.Category.values());
   }
 
   /**
-   * Disables logging all.
+   * Disables logging all categories. See {@link Category}.
    */
   public static void off() {
-    off(OrmLogger.Category.values());
+    off(SormLogger.Category.values());
   }
 
 }
