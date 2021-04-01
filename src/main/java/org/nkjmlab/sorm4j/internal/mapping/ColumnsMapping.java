@@ -12,13 +12,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -39,18 +39,25 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       ColumnToAccessorMap columnToAccessorMap) {
     super(resultSetConverter, objectClass, columnToAccessorMap);
 
-    Optional<Constructor<?>> annotataedConstructor =
-        Arrays.stream(objectClass.getDeclaredConstructors()).filter(c -> {
-          Parameter[] parameters = c.getParameters();
-          return parameters.length != 0 && parameters[0].getAnnotation(OrmColumn.class) != null;
-        }).findAny();
     this.setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
         () -> objectClass.getDeclaredConstructor(),
         e -> new SormException(
             "Container class for object relation mapping must have the public default constructor (with no arguments).",
             e)));
-    this.defaultPojoCreator = annotataedConstructor.isEmpty() ? setterPojoCreator
-        : new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructor.get());
+
+    List<Constructor<?>> annotataedConstructors =
+        Arrays.stream(objectClass.getDeclaredConstructors()).filter(c -> {
+          Parameter[] parameters = c.getParameters();
+          return parameters.length != 0 && parameters[0].getAnnotation(OrmColumn.class) != null;
+        }).collect(Collectors.toList());
+
+    if (annotataedConstructors.size() > 1) {
+      throw new SormException(StringUtils.format(
+          "Constructor with parameters annotated by {} should be one or less. ", OrmColumn.class));
+    }
+
+    this.defaultPojoCreator = annotataedConstructors.isEmpty() ? setterPojoCreator
+        : new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0));
 
   }
 
@@ -165,25 +172,26 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
     private S createPojo(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet) {
-      final Object[] params = new Object[parametersLength];
       try {
-        for (int i = 1; i <= orders.length; i++) {
-          final int order = orders[i - 1];
-
-          params[order] =
-              resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
+        return createPojoAux(orders, parameterTypes, resultSet);
+      } catch (Exception e) {
+        updateParameterMapping(resultSet);
+        try {
+          return createPojoAux(orders, parameterTypes, resultSet);
+        } catch (Exception e1) {
+          throw Try.rethrow(e1);
         }
-        final S ret = constructor.newInstance(params);
-        return ret;
-      } catch (SQLException e) {
-        throw Try.rethrow(e);
-      } catch (IllegalArgumentException | SecurityException | InstantiationException
-          | IllegalAccessException | InvocationTargetException e) {
-        throw new SormException(
-            "Container class for object relation mapping must have the public default constructor (with no arguments).",
-            e);
       }
+    }
 
+    private S createPojoAux(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet)
+        throws Exception {
+      final Object[] params = new Object[parametersLength];
+      for (int i = 1; i <= orders.length; i++) {
+        params[orders[i - 1]] =
+            resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
+      }
+      return constructor.newInstance(params);
     }
 
     private List<String> createColumns(ResultSet resultSet) {
@@ -204,19 +212,25 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       if (parameterTypesOrderedByColumn != null) {
         return parameterTypesOrderedByColumn;
       }
+      updateParameterMapping(resultSet);
+      return parameterTypesOrderedByColumn;
+    }
+
+    private void updateParameterMapping(ResultSet resultSet) {
       final List<String> columns = createColumns(resultSet);
       this.parameterTypesOrderedByColumn = columns.stream()
           .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new);
-      return parameterTypesOrderedByColumn;
+      this.parameterOrderedByColumn = columns.stream()
+          .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray();
+
     }
+
 
     private int[] getParameterOrders(ResultSet resultSet) {
       if (parameterOrderedByColumn != null) {
         return parameterOrderedByColumn;
       }
-      final List<String> columns = createColumns(resultSet);
-      this.parameterOrderedByColumn = columns.stream()
-          .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray();
+      updateParameterMapping(resultSet);
       return parameterOrderedByColumn;
     }
 
