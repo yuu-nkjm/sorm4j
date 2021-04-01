@@ -50,14 +50,15 @@ final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
     try {
       setAutoCommit(con, false);
       try (PreparedStatement stmt = multiRowStatementCreator.apply(multiRowSize)) {
-        for (int partitionNum = 0; partitionNum < objsPartitions.size() - 1; partitionNum++) {
-          T[] objectsInOnePartition = objsPartitions.get(partitionNum);
+        final int partitionSizeMinusOne = objsPartitions.size() - 1;
+        for (int partitionNum = 0; partitionNum < partitionSizeMinusOne; partitionNum++) {
+          final T[] objectsInOnePartition = objsPartitions.get(partitionNum);
           parametersSetter.accept(stmt, objectsInOnePartition);
           result[partitionNum] = stmt.executeUpdate();
         }
       }
-      int lastPartition = objsPartitions.size() - 1;
-      T[] objectsInLastPartition = objsPartitions.get(lastPartition);
+      final int lastPartition = objsPartitions.size() - 1;
+      final T[] objectsInLastPartition = objsPartitions.get(lastPartition);
       try (PreparedStatement stmt = multiRowStatementCreator.apply(objectsInLastPartition.length)) {
         parametersSetter.accept(stmt, objectsInLastPartition);
         result[lastPartition] = stmt.executeUpdate();
