@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
@@ -21,28 +19,26 @@ class ResultSetMapperTest {
 
   @Test
   void testMapRowClassOfTResultSet() {
-    List<Player> ret =
-        sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
-            (rs, rowNum) -> conn.mapRow(Player.class, rs)));
+    sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
+        (rs, rowNum) -> conn.mapRow(Player.class, rs)));
   }
 
   @Test
   void testMapRowResultSet() {
-    List<Map<String, Object>> ret = sorm.apply(conn -> conn
-        .executeQuery(SqlStatement.from("select * from players"), (rs, rowNum) -> conn.mapRowToMap(rs)));
+    sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
+        (rs, rowNum) -> conn.mapRowToMap(rs)));
   }
 
   @Test
   void testMapRowsClassOfTResultSet() {
-    List<Player> ret =
-        sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
-            rs -> conn.mapRows(Player.class, rs)));
+    sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
+        rs -> conn.mapRows(Player.class, rs)));
   }
 
   @Test
   void testMapRowsResultSet() {
-    List<Map<String, Object>> ret = sorm.apply(conn -> conn
-        .executeQuery(SqlStatement.from("select * from players"), rs -> conn.mapRowsToMapList(rs)));
+    sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
+        rs -> conn.mapRowsToMapList(rs)));
   }
 
 }

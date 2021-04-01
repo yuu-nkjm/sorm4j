@@ -477,7 +477,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       sqlParameterSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      @SuppressWarnings({"unchecked", "rawtypes"})
+      @SuppressWarnings({"unchecked", "rawtypes", "resource"})
       LazyResultSet<Map<String, Object>> ret =
           (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, stmt, resultSet);
       return ret;

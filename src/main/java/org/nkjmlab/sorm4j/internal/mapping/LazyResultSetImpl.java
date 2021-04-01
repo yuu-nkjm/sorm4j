@@ -52,6 +52,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T one() {
+    @SuppressWarnings("unchecked")
     T ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
         : ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
     close();
@@ -65,6 +66,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T first() {
+    @SuppressWarnings("unchecked")
     T ret =
         Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
             : ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
@@ -79,6 +81,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public List<T> toList() {
+    @SuppressWarnings("unchecked")
     List<T> ret = Try.getOrThrow(
         () -> objectClass.equals(MAP_CLASS) ? (List<T>) ormMapper.mapRowsToMapList(resultSet)
             : ormMapper.loadPojoList(objectClass, resultSet),
