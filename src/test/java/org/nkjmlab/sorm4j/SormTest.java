@@ -23,7 +23,6 @@ class SormTest {
   void testGetFormattedStringn() throws SQLException {
     Guest a = SormTestUtils.GUEST_ALICE;
     try (OrmConnection tr = sorm.openTransaction()) {
-      tr.begin();
       tr.insert(a);
       // auto-rollback
     }
@@ -159,7 +158,6 @@ class SormTest {
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
     try (TypedOrmTransaction<Guest> tr = sorm.openTransaction(Guest.class)) {
-      tr.begin();
       tr.insert(a);
       tr.rollback();
       tr.commit();
@@ -173,7 +171,6 @@ class SormTest {
   @Test
   void testBeginTransaction() {
     try (OrmConnection tr = sorm.openTransaction()) {
-      tr.begin();
       tr.insert(a);
       // auto-rollback
     }
@@ -181,7 +178,6 @@ class SormTest {
       assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmConnection tr = sorm.openTransaction()) {
-      tr.begin();
       tr.insert(a);
       tr.commit();
     }
