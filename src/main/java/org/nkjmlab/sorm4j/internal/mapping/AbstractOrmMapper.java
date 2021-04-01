@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -259,19 +258,10 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
 
   public <T> ColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
-
-    Constructor<T> constructor = Try.createSupplierWithThrow(
-        () -> objectClass.getDeclaredConstructor(),
-        e -> new SormException(
-            "Container class for object relation mapping must have the public default constructor (with no arguments).",
-            e))
-        .get();
-    constructor.setAccessible(true);
-
     ColumnToAccessorMap columnToAccessorMap =
         new ColumnToAccessorMap(columnFieldMapper.createAccessors(objectClass));
 
-    return new ColumnsMapping<>(objectClass, resultSetConverter, columnToAccessorMap, constructor);
+    return new ColumnsMapping<>(objectClass, resultSetConverter, columnToAccessorMap);
   }
 
 
