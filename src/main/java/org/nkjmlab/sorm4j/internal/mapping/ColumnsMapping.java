@@ -31,15 +31,14 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 public final class ColumnsMapping<T> extends Mapping<T> {
 
-  private final PojoCreator<T> defaultPojoCreator;
-  private final PojoCreator<T> setterPojoCreator;
+  private final PojoCreator<T> pojoCreator;
 
   @SuppressWarnings("unchecked")
   public ColumnsMapping(Class<T> objectClass, ResultSetConverter resultSetConverter,
       ColumnToAccessorMap columnToAccessorMap) {
     super(resultSetConverter, objectClass, columnToAccessorMap);
 
-    this.setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
+    SetterPojoCreator<T> setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
         () -> objectClass.getDeclaredConstructor(),
         e -> new SormException(
             "Container class for object relation mapping must have the public default constructor (with no arguments).",
@@ -56,7 +55,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           "Constructor with parameters annotated by {} should be one or less. ", OrmColumn.class));
     }
 
-    this.defaultPojoCreator = annotataedConstructors.isEmpty() ? setterPojoCreator
+    this.pojoCreator = annotataedConstructors.isEmpty() ? setterPojoCreator
         : new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0));
 
   }
@@ -171,40 +170,22 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
 
 
-    /**
-     *
-     * At first, {@link #createPojoAux} always fails because parameter mapping is null. The database
-     * probably returns column in the table in fixed order. However, sometimes user gives select
-     * columns manually and the order is not fixed. If {@link #createPojoAux} fails,
-     * {@link #updateConstructorParameterColumnMapping} is called.
-     *
-     * @param orders
-     * @param parameterTypes
-     * @param resultSet
-     * @return
-     */
     private S createPojo(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet) {
       try {
-        return createPojoAux(orders, parameterTypes, resultSet);
-      } catch (Exception e) {
-        updateConstructorParameterColumnMapping(resultSet);
-        try {
-          return createPojoAux(getParameterOrders(resultSet), getParameterTypes(resultSet),
-              resultSet);
-        } catch (Exception e1) {
-          throw Try.rethrow(e1);
+        final Object[] params = new Object[parametersLength];
+        for (int i = 1; i <= orders.length; i++) {
+          params[orders[i - 1]] =
+              resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
         }
+        return constructor.newInstance(params);
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      } catch (IllegalArgumentException | SecurityException | InstantiationException
+          | IllegalAccessException | InvocationTargetException e) {
+        throw new SormException(
+            "Constructor with parameters of container class for object-relation mapping is not match with columns.",
+            e);
       }
-    }
-
-    private S createPojoAux(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet)
-        throws Exception {
-      final Object[] params = new Object[parametersLength];
-      for (int i = 1; i <= orders.length; i++) {
-        params[orders[i - 1]] =
-            resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
-      }
-      return constructor.newInstance(params);
     }
 
     private List<String> createColumns(ResultSet resultSet) {
@@ -229,7 +210,10 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       return parameterOrderedByColumn;
     }
 
-    private void updateConstructorParameterColumnMapping(ResultSet resultSet) {
+    private void registerConstructorParameterColumnMappingIfAbsent(ResultSet resultSet) {
+      if (parameterTypesOrderedByColumn != null && parameterOrderedByColumn != null) {
+        return;
+      }
       final List<String> columns = createColumns(resultSet);
       this.parameterTypesOrderedByColumn = columns.stream()
           .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new);
@@ -239,9 +223,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     @Override
     List<S> loadPojoList(ResultSet resultSet) throws SQLException {
+      registerConstructorParameterColumnMappingIfAbsent(resultSet);
       final int[] orders = getParameterOrders(resultSet);
       final Class<?>[] parameterTypes = getParameterTypes(resultSet);
-
       final List<S> ret = new ArrayList<>();
       while (resultSet.next()) {
         ret.add(createPojo(orders, parameterTypes, resultSet));
@@ -252,6 +236,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     @Override
     S loadPojo(ResultSet resultSet) throws SQLException {
+      registerConstructorParameterColumnMappingIfAbsent(resultSet);
       final int[] orders = getParameterOrders(resultSet);
       final Class<?>[] parameterTypes = getParameterTypes(resultSet);
       return createPojo(orders, parameterTypes, resultSet);
@@ -271,26 +256,12 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   List<T> loadPojoList(ResultSet resultSet) throws SQLException {
-    try {
-      return defaultPojoCreator.loadPojoList(resultSet);
-    } catch (Exception e) {
-      if (defaultPojoCreator == setterPojoCreator) {
-        throw Try.rethrow(e);
-      }
-      return setterPojoCreator.loadPojoList(resultSet);
-    }
+    return pojoCreator.loadPojoList(resultSet);
   }
 
 
   T loadPojo(ResultSet resultSet) throws SQLException {
-    try {
-      return defaultPojoCreator.loadPojo(resultSet);
-    } catch (Exception e) {
-      if (defaultPojoCreator == setterPojoCreator) {
-        throw Try.rethrow(e);
-      }
-      return setterPojoCreator.loadPojo(resultSet);
-    }
+    return pojoCreator.loadPojo(resultSet);
   }
 
 
