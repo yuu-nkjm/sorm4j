@@ -171,11 +171,23 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
 
 
+    /**
+     *
+     * At first, {@link #createPojoAux} always fails because parameter mapping is null. The database
+     * probably returns column in the table in fixed order. However, sometimes user gives select
+     * columns manually and the order is not fixed. If {@link #createPojoAux} fails,
+     * {@link #updateConstructorParameterColumnMapping} is called.
+     *
+     * @param orders
+     * @param parameterTypes
+     * @param resultSet
+     * @return
+     */
     private S createPojo(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet) {
       try {
         return createPojoAux(orders, parameterTypes, resultSet);
       } catch (Exception e) {
-        updateParameterMapping(resultSet);
+        updateConstructorParameterColumnMapping(resultSet);
         try {
           return createPojoAux(orders, parameterTypes, resultSet);
         } catch (Exception e1) {
@@ -209,31 +221,20 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
 
     private Class<?>[] getParameterTypes(ResultSet resultSet) {
-      if (parameterTypesOrderedByColumn != null) {
-        return parameterTypesOrderedByColumn;
-      }
-      updateParameterMapping(resultSet);
       return parameterTypesOrderedByColumn;
     }
 
-    private void updateParameterMapping(ResultSet resultSet) {
+    private int[] getParameterOrders(ResultSet resultSet) {
+      return parameterOrderedByColumn;
+    }
+
+    private void updateConstructorParameterColumnMapping(ResultSet resultSet) {
       final List<String> columns = createColumns(resultSet);
       this.parameterTypesOrderedByColumn = columns.stream()
           .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new);
       this.parameterOrderedByColumn = columns.stream()
           .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray();
-
     }
-
-
-    private int[] getParameterOrders(ResultSet resultSet) {
-      if (parameterOrderedByColumn != null) {
-        return parameterOrderedByColumn;
-      }
-      updateParameterMapping(resultSet);
-      return parameterOrderedByColumn;
-    }
-
 
     @Override
     List<S> loadPojoList(ResultSet resultSet) throws SQLException {
