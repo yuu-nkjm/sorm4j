@@ -189,7 +189,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       } catch (Exception e) {
         updateConstructorParameterColumnMapping(resultSet);
         try {
-          return createPojoAux(orders, parameterTypes, resultSet);
+          return createPojoAux(getParameterOrders(resultSet), getParameterTypes(resultSet),
+              resultSet);
         } catch (Exception e1) {
           throw Try.rethrow(e1);
         }
