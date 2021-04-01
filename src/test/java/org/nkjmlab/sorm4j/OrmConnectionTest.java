@@ -421,14 +421,14 @@ class OrmConnectionTest {
 
 
       try {
-        OrmLogger.on();
+        SormLogger.on();
         m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getCause().getMessage())
             .contains("but 1 column was expected to load data into");
       }
-      OrmLogger.off();
+      SormLogger.off();
 
 
       assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);

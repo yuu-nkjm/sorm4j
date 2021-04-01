@@ -17,7 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.OrmLogger;
+import org.nkjmlab.sorm4j.SormLogger;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.SqlExecutor;
@@ -143,7 +143,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private <R> R execStatementAndReadResultSet(String sql, Object[] parameters,
       FunctionHandler<ResultSet, R> resultSetHandler) {
-    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_QUERY);
+    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
       log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
           parameters == null ? 0 : parameters.length);
@@ -187,7 +187,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
+    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
 
     final int ret = execPreparedStatementAndClose(sqlParameterSetter, connection, sql, parameters,
         stmt -> stmt.executeUpdate());
@@ -215,7 +215,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
 
-      LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING)
+      LogPointFactory.createLogPoint(SormLogger.Category.MAPPING)
           .ifPresent(lp -> log.info(System.lineSeparator() + m.getFormattedString()));
 
       return m;
@@ -249,7 +249,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
-          LogPointFactory.createLogPoint(OrmLogger.Category.MAPPING).ifPresent(lp -> log
+          LogPointFactory.createLogPoint(SormLogger.Category.MAPPING).ifPresent(lp -> log
               .info("[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
           return m;
         }, Try::rethrow));

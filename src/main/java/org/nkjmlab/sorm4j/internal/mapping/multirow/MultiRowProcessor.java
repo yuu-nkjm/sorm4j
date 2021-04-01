@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.OrmLogger;
+import org.nkjmlab.sorm4j.SormLogger;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
@@ -94,7 +94,7 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.MULTI_ROW);
+    Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.MULTI_ROW);
 
     int[] result = exec.apply(objects);
 

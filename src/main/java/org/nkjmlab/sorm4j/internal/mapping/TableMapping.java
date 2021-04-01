@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.OrmLogger;
+import org.nkjmlab.sorm4j.SormLogger;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
@@ -122,7 +122,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
-    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
+    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
     dp.ifPresent(lp -> log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
         parameters == null ? 0 : parameters.length));
 
@@ -218,7 +218,7 @@ public final class TableMapping<T> extends Mapping<T> {
   public InsertResult<T> insertAndGet(Connection connection, T object) {
     String insertSql = sql.getInsertSql();
 
-    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(OrmLogger.Category.EXECUTE_UPDATE);
+    final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
     dp.ifPresent(lp -> log.debug("[{}] [{}]", lp.getTag(), insertSql));
 
     try (PreparedStatement stmt =
