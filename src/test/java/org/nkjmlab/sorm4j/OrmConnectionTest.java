@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.sql.JoinedRow;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 import org.nkjmlab.sorm4j.tool.Guest;
+import org.nkjmlab.sorm4j.tool.Location;
 import org.nkjmlab.sorm4j.tool.Player;
 import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
@@ -27,6 +29,26 @@ class OrmConnectionTest {
   @BeforeEach
   void setUp() {
     sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+  }
+
+  @Test
+  void testJoin() {
+    sorm.accept(m -> {
+      m.insert(GUEST_ALICE, GUEST_BOB);
+      m.insert(PLAYER_ALICE, PLAYER_BOB);
+      m.insert(SormTestUtils.LOCATION_TOKYO);
+      m.insert(SormTestUtils.LOCATION_KYOTO);
+
+      List<JoinedRow<Guest, Player>> result = m.readJoinedRowList(Guest.class, Player.class,
+          "select g.id gid, g.name gname, g.address gaddress, p.id pid, p.name pname, p.address paddress from guests g join players p on g.id=p.id");
+
+      assertThat(result.get(0).getLeft().getClass()).isEqualTo(Guest.class);
+      assertThat(result.get(0).getRight().getClass()).isEqualTo(Player.class);
+
+      List<JoinedRow<Guest, Location>> result1 = m.readJoinedRowList(Guest.class, Location.class,
+          "select g.id gid, g.name gname, g.address gaddress, l.id lid, l.name lname from guests g join locations l on g.id=l.id");
+
+    });
   }
 
   @Test

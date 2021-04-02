@@ -2,8 +2,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
@@ -53,7 +51,7 @@ abstract class Mapping<T> {
           + " of type [{}] in [{}]"
           + " because column [{}] does not have a corresponding setter method or field access =>[{}]",
           value, value.getClass().getSimpleName(), object.getClass().getName(), columnName,
-          columnToAccessorMap.keySet()));
+          columnToAccessorMap.toString()));
     }
     try {
       acc.set(object, value);
@@ -69,7 +67,7 @@ abstract class Mapping<T> {
   @Override
   public String toString() {
     return "Mapping [objectClass=" + objectClass.getName() + ", columnToAccessorMap="
-        + columnToAccessorMap.values() + "]";
+        + columnToAccessorMap.toString() + "]";
   }
 
   public Class<T> getObjectClass() {
@@ -78,14 +76,7 @@ abstract class Mapping<T> {
 
 
   protected String getColumnToAccessorString() {
-    List<String> columnStrs =
-        columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList());
-    return "COLUMNS " + columnStrs + " is mapped to [" + objectClass.getName() + "]"
-        + System.lineSeparator()
-        + String.join(System.lineSeparator(),
-            columnStrs.stream()
-                .map(e -> "  COLUM " + e + " => " + columnToAccessorMap.get(e).getFormattedString())
-                .collect(Collectors.toList()));
+    return "[" + objectClass.getName() + "] is map to " + columnToAccessorMap.toString();
   }
 
 

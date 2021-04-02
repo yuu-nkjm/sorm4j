@@ -569,7 +569,7 @@ class TypedOrmConnectionTest {
   @Test
   void testEnum() {
     sorm.accept(Location.class, m -> {
-      m.insert(new Location(Location.Place.KYOTO));
+      m.insert(SormTestUtils.LOCATION_KYOTO);
       assertThat(m.readFirst("SELECT * FROM locations").getName()).isEqualTo(Location.Place.KYOTO);
     });
 

@@ -21,7 +21,7 @@ public class SormTestUtils {
   public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
 
   private static final String SQL_CREATE_TABLE_LOCATIONS =
-      "CREATE TABLE IF NOT EXISTS locations (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR)";
+      "CREATE TABLE IF NOT EXISTS locations (id INT PRIMARY KEY, name VARCHAR)";
 
   private static final String SQL_CREATE_TABLE_GUESTS =
       "CREATE TABLE IF NOT EXISTS guests (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
@@ -30,6 +30,8 @@ public class SormTestUtils {
 
   private static final String SQL_CREATE_TABLE_PLAYERS1 =
       "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
+  public static final Location LOCATION_TOKYO = new Location(1, Location.Place.TOKYO);
+  public static final Location LOCATION_KYOTO = new Location(2, Location.Place.KYOTO);
 
   public static Sorm createSormAndDropAndCreateTableAll() {
     Sorm sorm = createSorm();
@@ -61,7 +63,7 @@ public class SormTestUtils {
   }
 
   private static void dropAndCreateLocationTable(Sorm sorm) {
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE location IF EXISTS"));
+    sorm.accept(conn -> conn.executeUpdate("DROP TABLE locations IF EXISTS"));
     sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_LOCATIONS));
   }
 
