@@ -1,5 +1,8 @@
 package org.nkjmlab.sorm4j.tool;
 
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+
+@OrmColumnAliasPrefix("L")
 public class Location {
 
   public enum Place {
@@ -11,8 +14,9 @@ public class Location {
 
   public Location() {}
 
-  public Location(Place place) {
-    this.name = place;
+  public Location(int id, Place name) {
+    this.id = id;
+    this.name = name;
   }
 
 
@@ -22,6 +26,11 @@ public class Location {
 
   public Place getName() {
     return name;
+  }
+
+  @Override
+  public String toString() {
+    return "Location [id=" + id + ", name=" + name + "]";
   }
 
 
