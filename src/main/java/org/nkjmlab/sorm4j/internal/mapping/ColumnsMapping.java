@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
@@ -47,11 +48,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
             "Container class for object relation mapping must have the public default constructor (with no arguments).",
             e)));
 
-    List<Constructor<?>> annotataedConstructors =
-        Arrays.stream(objectClass.getDeclaredConstructors()).filter(c -> {
-          Parameter[] parameters = c.getParameters();
-          return parameters.length != 0 && parameters[0].getAnnotation(OrmColumn.class) != null;
-        }).collect(Collectors.toList());
+    List<Constructor<?>> annotataedConstructors = Arrays
+        .stream(objectClass.getDeclaredConstructors())
+        .filter(c -> c.getAnnotation(OrmConstructor.class) != null).collect(Collectors.toList());
 
     if (annotataedConstructors.size() > 1) {
       throw new SormException(StringUtils.format(
@@ -163,12 +162,13 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           Optional.ofNullable(getObjectClass().getAnnotation(OrmColumnAliasPrefix.class))
               .map(a -> a.value()).orElse("");
 
-
+      String[] parameterNames = constructor.getAnnotation(OrmConstructor.class).value();
       Parameter[] parameters = constructor.getParameters();
       this.parametersLength = parameters.length;
+
       for (int i = 0; i < parametersLength; i++) {
         Parameter parameter = parameters[i];
-        String name = toCanonical(parameter.getAnnotation(OrmColumn.class).value());
+        String name = toCanonical(parameterNames[i]);
         parameterOrders.put(name, i);
         parameterTypes.put(name, parameter.getType());
         if (colmunAliasPrefix != null) {

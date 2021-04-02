@@ -1,8 +1,8 @@
 package org.nkjmlab.sorm4j.tool;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 
 @OrmColumnAliasPrefix("G")
 public class Guest {
@@ -19,8 +19,8 @@ public class Guest {
     this.address = address;
   }
 
-  public Guest(@OrmColumn("id") int id, @OrmColumn("name") String name,
-      @OrmColumn("address") String address) {
+  @OrmConstructor({"id", "name", "address"})
+  public Guest(int id, String name, String address) {
     this.id = id;
     this.name = name;
     this.address = address;

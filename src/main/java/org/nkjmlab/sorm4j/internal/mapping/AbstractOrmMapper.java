@@ -477,7 +477,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         final S o2 = m2.loadPojo(m2.createColumnsForJoin(resultSet), resultSet);
         ret1.add(new JoinedRow<>(o1, o2));
       }
-      System.out.println(ret1);
       return ret1;
     });
     return ret;

@@ -6,14 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines column mapping to a field.
+ * Defines constructor for mapping.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface OrmColumn {
+@Target({ElementType.CONSTRUCTOR})
+@Experimental
+public @interface OrmConstructor {
 
   /**
-   * Name of the column mapped to the field.
+   * Name of the columns.
    */
-  String value();
+  String[] value();
+
 }

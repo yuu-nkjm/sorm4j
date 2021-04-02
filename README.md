@@ -33,7 +33,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.3.5</version>
+   <version>1.3.6</version>
  </dependency>
 ```
 
