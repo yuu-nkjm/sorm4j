@@ -12,10 +12,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
@@ -61,20 +64,20 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
 
-  private static abstract class PojoCreator<T> {
-    protected final Constructor<T> constructor;
+  private static abstract class PojoCreator<S> {
+    protected final Constructor<S> constructor;
 
-    public PojoCreator(Constructor<T> constructor) {
+    public PojoCreator(Constructor<S> constructor) {
       this.constructor = constructor;
       constructor.setAccessible(true);
     }
 
+    abstract List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException;
 
-    abstract List<T> loadPojoList(ResultSet resultSet) throws SQLException;
-
-    abstract T loadPojo(ResultSet resultSet) throws SQLException;
+    abstract S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException;
 
   }
+
 
   private final class SetterPojoCreator<S> extends PojoCreator<S> {
     // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
@@ -88,21 +91,21 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     private List<Class<?>> getSetterParameterTypes(List<String> columns) {
       return setterParameterTypesMap.computeIfAbsent(columns,
-          k -> columns.stream()
-              .map(columnName -> columnToAccessorMap.get(columnName).getSetterParameterType())
-              .collect(Collectors.toList()));
+          k -> columns.stream().map(columnName -> {
+            Accessor acc = columnToAccessorMap.get(columnName);
+            return acc != null ? acc.getSetterParameterType() : null;
+          }).collect(Collectors.toList()));
     }
 
+
     @Override
-    public S loadPojo(ResultSet resultSet) throws SQLException {
-      final List<String> columns = createColumns(resultSet);
+    S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
       final List<Class<?>> setterParameterTypes = getSetterParameterTypes(columns);
       return createPojo(columns, setterParameterTypes, resultSet);
     }
 
     @Override
-    public List<S> loadPojoList(ResultSet resultSet) throws SQLException {
-      final List<String> columns = createColumns(resultSet);
+    public List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException {
       final List<Class<?>> setterParameterTypes = getSetterParameterTypes(columns);
 
       final List<S> ret = new ArrayList<>();
@@ -117,8 +120,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       try {
         final S ret = constructor.newInstance();
         for (int i = 1; i <= columns.size(); i++) {
-          final String columnName = columns.get(i - 1);
           final Class<?> setterParameterType = setterParameterTypes.get(i - 1);
+          if (setterParameterType == null) {
+            continue;
+          }
+          final String columnName = columns.get(i - 1);
           final Object value =
               resultSetConverter.getValueBySetterParameterType(resultSet, i, setterParameterType);
           setValue(ret, columnName, value);
@@ -134,17 +140,10 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       }
     }
 
-    private List<String> createColumns(ResultSet resultSet) throws SQLException {
-      final ResultSetMetaData metaData = resultSet.getMetaData();
-      final int colNum = metaData.getColumnCount();
-      final List<String> columns = new ArrayList<>(colNum);
-      for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnName(i));
-      }
-      return columns;
-    }
+
 
   }
+
 
   private final class ConstructorPojoCreator<S> extends PojoCreator<S> {
 
@@ -160,6 +159,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     public ConstructorPojoCreator(Constructor<S> constructor) {
       super(constructor);
 
+      String colmunAliasPrefix =
+          Optional.ofNullable(getObjectClass().getAnnotation(OrmColumnAliasPrefix.class))
+              .map(a -> a.value()).orElse("");
+
+
       Parameter[] parameters = constructor.getParameters();
       this.parametersLength = parameters.length;
       for (int i = 0; i < parametersLength; i++) {
@@ -167,6 +171,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         String name = toCanonical(parameter.getAnnotation(OrmColumn.class).value());
         parameterOrders.put(name, i);
         parameterTypes.put(name, parameter.getType());
+        if (colmunAliasPrefix != null) {
+          parameterOrders.put(toCanonical(colmunAliasPrefix + name), i);
+          parameterTypes.put(toCanonical(colmunAliasPrefix + name), parameter.getType());
+
+        }
       }
     }
 
@@ -175,7 +184,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       try {
         final Object[] params = new Object[parametersLength];
         for (int i = 1; i <= orders.length; i++) {
-          params[orders[i - 1]] =
+          final int order = orders[i - 1];
+          if (order == -1) {
+            continue;
+          }
+          params[order] =
               resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
         }
         return constructor.newInstance(params);
@@ -189,35 +202,23 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       }
     }
 
-    private List<String> createColumns(ResultSet resultSet) {
-      try {
-        final ResultSetMetaData metaData = resultSet.getMetaData();
-        final int colNum = metaData.getColumnCount();
-        final List<String> columns = new ArrayList<>(colNum);
-        for (int i = 1; i <= colNum; i++) {
-          columns.add(metaData.getColumnName(i));
-        }
-        return columns;
-      } catch (SQLException e) {
-        throw Try.rethrow(e);
-      }
-    }
 
     private Class<?>[] getParameterTypes(List<String> columns) {
       return parameterTypesOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
           .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new));
-
     }
 
     private int[] getParameterOrders(List<String> columns) {
-      return parameterOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
-          .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray());
+      return parameterOrderedByColumnMap.computeIfAbsent(columns,
+          key -> columns.stream().mapToInt(columnName -> {
+            Integer o = parameterOrders.get(toCanonical(columnName));
+            return o != null ? o.intValue() : -1;
+          }).toArray());
     }
 
 
     @Override
-    List<S> loadPojoList(ResultSet resultSet) throws SQLException {
-      final List<String> columns = createColumns(resultSet);
+    List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException {
       final int[] orders = getParameterOrders(columns);
       final Class<?>[] parameterTypes = getParameterTypes(columns);
       final List<S> ret = new ArrayList<>();
@@ -227,13 +228,14 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       return ret;
     }
 
+
     @Override
-    S loadPojo(ResultSet resultSet) throws SQLException {
-      final List<String> columns = createColumns(resultSet);
+    S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
       final int[] orders = getParameterOrders(columns);
       final Class<?>[] parameterTypes = getParameterTypes(columns);
       return createPojo(orders, parameterTypes, resultSet);
     }
+
   }
 
   String getFormattedString() {
@@ -242,11 +244,37 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
   List<T> loadPojoList(ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojoList(resultSet);
+    return pojoCreator.loadPojoList(createColumns(resultSet), resultSet);
   }
 
   T loadPojo(ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojo(resultSet);
+    return loadPojo(createColumns(resultSet), resultSet);
+  }
+
+  T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
+    return pojoCreator.loadPojo(columns, resultSet);
+  }
+
+
+  private List<String> createColumns(ResultSet resultSet) throws SQLException {
+    final ResultSetMetaData metaData = resultSet.getMetaData();
+    final int colNum = metaData.getColumnCount();
+    final List<String> columns = new ArrayList<>(colNum);
+    for (int i = 1; i <= colNum; i++) {
+      columns.add(metaData.getColumnName(i));
+    }
+    return columns;
+  }
+
+  public List<String> createColumnsForJoin(ResultSet resultSet) throws SQLException {
+    final ResultSetMetaData metaData = resultSet.getMetaData();
+    final int colNum = metaData.getColumnCount();
+    final List<String> columns = new ArrayList<>(colNum);
+    for (int i = 1; i <= colNum; i++) {
+      final String colLabel = metaData.getColumnLabel(i);
+      columns.add(colLabel);
+    }
+    return columns;
   }
 
 

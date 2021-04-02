@@ -2,7 +2,10 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.internal.sql.JoinedRow;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
@@ -131,5 +134,20 @@ public interface OrmReader {
   <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
 
 
-
+  /**
+   * Reads results as List of {@link JoinedRow} for reading JOIN SQL results typically.
+   *
+   * @see {@link OrmColumnAliasPrefix}
+   *
+   * @param <T>
+   * @param <S>
+   * @param leftClass
+   * @param rightClass
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  @Experimental
+  <T, S> List<JoinedRow<T, S>> readJoinedRowList(Class<T> leftClass, Class<S> rightClass,
+      String sql, Object... parameters);
 }
