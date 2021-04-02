@@ -152,8 +152,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     private final Map<String, Integer> parameterOrders = new HashMap<>();
     private final int parametersLength;
 
-    private volatile Class<?>[] parameterTypesOrderedByColumn;
-    private volatile int[] parameterOrderedByColumn;
+    private final Map<List<String>, Class<?>[]> parameterTypesOrderedByColumnMap =
+        new ConcurrentHashMap<>();
+    private final Map<List<String>, int[]> parameterOrderedByColumnMap = new ConcurrentHashMap<>();
 
 
     public ConstructorPojoCreator(Constructor<S> constructor) {
@@ -202,30 +203,23 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       }
     }
 
-    private Class<?>[] getParameterTypes(ResultSet resultSet) {
-      return parameterTypesOrderedByColumn;
+    private Class<?>[] getParameterTypes(List<String> columns) {
+      return parameterTypesOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
+          .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new));
+
     }
 
-    private int[] getParameterOrders(ResultSet resultSet) {
-      return parameterOrderedByColumn;
+    private int[] getParameterOrders(List<String> columns) {
+      return parameterOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
+          .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray());
     }
 
-    private void registerConstructorParameterColumnMappingIfAbsent(ResultSet resultSet) {
-      if (parameterTypesOrderedByColumn != null && parameterOrderedByColumn != null) {
-        return;
-      }
-      final List<String> columns = createColumns(resultSet);
-      this.parameterTypesOrderedByColumn = columns.stream()
-          .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new);
-      this.parameterOrderedByColumn = columns.stream()
-          .mapToInt(columnName -> parameterOrders.get(toCanonical(columnName))).toArray();
-    }
 
     @Override
     List<S> loadPojoList(ResultSet resultSet) throws SQLException {
-      registerConstructorParameterColumnMappingIfAbsent(resultSet);
-      final int[] orders = getParameterOrders(resultSet);
-      final Class<?>[] parameterTypes = getParameterTypes(resultSet);
+      final List<String> columns = createColumns(resultSet);
+      final int[] orders = getParameterOrders(columns);
+      final Class<?>[] parameterTypes = getParameterTypes(columns);
       final List<S> ret = new ArrayList<>();
       while (resultSet.next()) {
         ret.add(createPojo(orders, parameterTypes, resultSet));
@@ -233,32 +227,23 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       return ret;
     }
 
-
     @Override
     S loadPojo(ResultSet resultSet) throws SQLException {
-      registerConstructorParameterColumnMappingIfAbsent(resultSet);
-      final int[] orders = getParameterOrders(resultSet);
-      final Class<?>[] parameterTypes = getParameterTypes(resultSet);
+      final List<String> columns = createColumns(resultSet);
+      final int[] orders = getParameterOrders(columns);
+      final Class<?>[] parameterTypes = getParameterTypes(columns);
       return createPojo(orders, parameterTypes, resultSet);
     }
-
-
-
   }
-
-
 
   String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
         + System.lineSeparator() + super.getColumnToAccessorString();
   }
 
-
-
   List<T> loadPojoList(ResultSet resultSet) throws SQLException {
     return pojoCreator.loadPojoList(resultSet);
   }
-
 
   T loadPojo(ResultSet resultSet) throws SQLException {
     return pojoCreator.loadPojo(resultSet);
