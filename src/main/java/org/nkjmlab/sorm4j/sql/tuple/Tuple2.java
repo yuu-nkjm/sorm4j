@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.sql.tuple;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
- * Represents a tuple of object, which typically represents joined two rows.
+ * Represents a tuple of objects, which typically represents joined two rows.
  *
  * @author nkjm
  *
