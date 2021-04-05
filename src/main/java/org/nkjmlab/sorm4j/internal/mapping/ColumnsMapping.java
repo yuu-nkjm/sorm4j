@@ -266,7 +266,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     return columns;
   }
 
-  public List<String> createColumnsForJoin(ResultSet resultSet) throws SQLException {
+  public List<String> createColumnLabels(ResultSet resultSet) throws SQLException {
     final ResultSetMetaData metaData = resultSet.getMetaData();
     final int colNum = metaData.getColumnCount();
     final List<String> columns = new ArrayList<>(colNum);

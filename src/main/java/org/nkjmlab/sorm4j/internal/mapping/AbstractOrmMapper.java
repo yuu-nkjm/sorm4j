@@ -470,7 +470,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   private <T> T getAux(Class<T> objectClass, ResultSet resultSet) {
     final ColumnsMapping<T> m = getColumnsMapping(objectClass);
-    return Try.getOrThrow(() -> m.loadPojo(m.createColumnsForJoin(resultSet), resultSet),
+    return Try.getOrThrow(() -> m.loadPojo(m.createColumnLabels(resultSet), resultSet),
         Try::rethrow);
   }
 
