@@ -46,18 +46,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private static final org.slf4j.Logger log =
       org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
-  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
-    ResultSetMetaData metaData = resultSet.getMetaData();
-    int colNum = metaData.getColumnCount();
-    List<String> columns = new ArrayList<>(colNum);
-    List<Integer> columnTypes = new ArrayList<>(colNum);
-    for (int i = 1; i <= colNum; i++) {
-      columns.add(metaData.getColumnName(i));
-      columnTypes.add(metaData.getColumnType(i));
-    }
-    return new ColumnsAndTypes(columns, columnTypes);
-  }
-
   static final <R> R execPreparedStatementAndClose(SqlParameterSetter sqlParameterSetter,
       Connection connection, String sql, Object[] parameters,
       ThrowableFunction<PreparedStatement, R> func) {
@@ -387,7 +375,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
   public Map<String, Object> mapRowAux(ResultSet resultSet) throws SQLException {
-    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
     return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
   }
 
@@ -400,7 +388,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   public final List<Map<String, Object>> mapRowsAux(ResultSet resultSet) throws SQLException {
     final List<Map<String, Object>> ret = new ArrayList<>();
-    ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
     while (resultSet.next()) {
       ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
     }
@@ -516,7 +504,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters, resultSet -> {
-      ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       if (resultSet.next()) {
         return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
       }
@@ -544,7 +532,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
 
   public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
     return execStatementAndReadResultSet(sql, parameters, resultSet -> {
-      ColumnsAndTypes ct = createColumnsAndTypes(resultSet);
+      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       Map<String, Object> ret = null;
       if (resultSet.next()) {
         ret = resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
@@ -587,25 +575,5 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   private TableName toTableName(String tableName) {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
         k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
-  }
-
-  private static class ColumnsAndTypes {
-
-    private final List<String> columns;
-    private final List<Integer> columnTypes;
-
-    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
-      this.columns = columns;
-      this.columnTypes = columnTypes;
-    }
-
-    public List<String> getColumns() {
-      return columns;
-    }
-
-    public List<Integer> getColumnTypes() {
-      return columnTypes;
-    }
-
   }
 }
