@@ -5,9 +5,10 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.internal.sql.JoinedRow;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 
 /**
  * The interface of reading functions of object-relation mapping.
@@ -135,19 +136,44 @@ public interface OrmReader {
 
 
   /**
-   * Reads results as List of {@link JoinedRow} for reading JOIN SQL results typically.
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix}
    *
-   * @param <T>
-   * @param <S>
-   * @param leftClass
-   * @param rightClass
+   * @param <T1>
+   * @param <T2>
+   * @param t1
+   * @param t2
    * @param sql
    * @param parameters
    * @return
    */
   @Experimental
-  <T, S> List<JoinedRow<T, S>> readJoinedRowList(Class<T> leftClass, Class<S> rightClass,
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters);
+
+  /**
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
+   *
+   * @see {@link OrmColumnAliasPrefix}
+   *
+   * @param <T1>
+   * @param <T2>
+   * @param t1
+   * @param t2
+   * @param sql
+   * @return
+   */
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, SqlStatement sql);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String sql, Object... parameters);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      SqlStatement sql);
+
+
 }

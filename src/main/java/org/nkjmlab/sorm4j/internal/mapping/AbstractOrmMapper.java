@@ -30,7 +30,6 @@ import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.internal.sql.JoinedRow;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
@@ -38,6 +37,9 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.tuple.Tuples;
 
 abstract class AbstractOrmMapper implements SqlExecutor {
 
@@ -466,21 +468,46 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         resultSet -> mapRowsAux(objectClass, resultSet));
   }
 
-  public <T, S> List<JoinedRow<T, S>> readJoinedRowList(Class<T> leftClass, Class<S> rightClass,
-      String sql, Object... parameters) {
-    List<JoinedRow<T, S>> ret = execStatementAndReadResultSet(sql, parameters, resultSet -> {
-      final List<JoinedRow<T, S>> ret1 = new ArrayList<>();
+  private <T> T getAux(Class<T> objectClass, ResultSet resultSet) {
+    final ColumnsMapping<T> m = getColumnsMapping(objectClass);
+    return Try.getOrThrow(() -> m.loadPojo(m.createColumnsForJoin(resultSet), resultSet),
+        Try::rethrow);
+  }
+
+
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters) {
+    List<Tuple2<T1, T2>> ret = execStatementAndReadResultSet(sql, parameters, resultSet -> {
+      final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
       while (resultSet.next()) {
-        final ColumnsMapping<T> m1 = getColumnsMapping(leftClass);
-        final T o1 = m1.loadPojo(m1.createColumnsForJoin(resultSet), resultSet);
-        final ColumnsMapping<S> m2 = getColumnsMapping(rightClass);
-        final S o2 = m2.loadPojo(m2.createColumnsForJoin(resultSet), resultSet);
-        ret1.add(new JoinedRow<>(o1, o2));
+        ret1.add(Tuples.of(getAux(t1, resultSet), getAux(t2, resultSet)));
       }
       return ret1;
     });
     return ret;
+  }
 
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
+      Class<T3> t3, String sql, Object... parameters) {
+    List<Tuple3<T1, T2, T3>> ret = execStatementAndReadResultSet(sql, parameters, resultSet -> {
+      final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
+      while (resultSet.next()) {
+        ret1.add(Tuples.of(getAux(t1, resultSet), getAux(t2, resultSet), getAux(t3, resultSet)));
+      }
+      return ret1;
+    });
+    return ret;
+  }
+
+
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
+      SqlStatement sql) {
+    return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
+  }
+
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
+      Class<T3> t3, SqlStatement sql) {
+    return readTupleList(t1, t2, t3, sql.getSql(), sql.getParameters());
   }
 
 
