@@ -44,9 +44,8 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   @Override
   public void close() {
     Try.runOrThrow(() -> {
-      if (getJdbcConnection().isClosed()) {
-        return;
-      }
+      lazyResultSets.forEach(rs -> rs.close());
+      lazyResultSets.clear();
       getJdbcConnection().close();
     }, Try::rethrow);
   }

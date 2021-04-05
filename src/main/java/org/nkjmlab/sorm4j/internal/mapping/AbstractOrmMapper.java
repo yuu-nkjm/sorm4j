@@ -432,11 +432,6 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-
-  final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
-    return readLazyAux(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
-  }
-
   /**
    * Reads an object from the database by its primary keys.
    */
@@ -452,12 +447,20 @@ abstract class AbstractOrmMapper implements SqlExecutor {
         resultSet -> loadFirst(objectClass, resultSet));
   }
 
+  protected final List<LazyResultSet<?>> lazyResultSets = new ArrayList<>();
+
+  final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
+    return readLazyAux(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
+  }
+
   final <T> LazyResultSet<T> readLazyAux(Class<T> objectClass, String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       sqlParameterSetter.setParameters(stmt, parameters);
       final ResultSet resultSet = stmt.executeQuery();
-      return new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
+      LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
+      lazyResultSets.add(ret);
+      return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
@@ -500,8 +503,7 @@ abstract class AbstractOrmMapper implements SqlExecutor {
   }
 
 
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
-      SqlStatement sql) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, SqlStatement sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 

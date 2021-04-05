@@ -1,8 +1,6 @@
 
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static java.util.Spliterator.*;
-import static java.util.Spliterators.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +8,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -113,7 +113,9 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public Stream<T> stream() {
-    return StreamSupport.stream(spliteratorUnknownSize(iterator(), ORDERED), false);
+    return StreamSupport
+        .stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false)
+        .onClose(Try.createRunnable(() -> close(), Try::rethrow));
   }
 
   @Override
