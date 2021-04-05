@@ -1,8 +1,8 @@
-package org.nkjmlab.sorm4j.tool;
+package org.nkjmlab.sorm4j.common;
 
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 
-@OrmColumnAliasPrefix("L")
+@OrmColumnAliasPrefix("l")
 public class Location {
 
   public enum Place {

@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,9 +11,9 @@ import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.SormLogger;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Player;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 

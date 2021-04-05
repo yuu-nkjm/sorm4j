@@ -6,9 +6,9 @@ import static org.nkjmlab.sorm4j.sql.SelectBuilder.as;
 import static org.nkjmlab.sorm4j.sql.SqlStatement.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class SelectBuilderTest {
   @Test

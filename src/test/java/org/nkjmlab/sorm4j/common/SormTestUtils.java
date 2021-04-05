@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.tool;
+package org.nkjmlab.sorm4j.common;
 
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;

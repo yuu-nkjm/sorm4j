@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class DefaultTableNameMapperTest {
 

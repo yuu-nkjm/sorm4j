@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j;
 
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
-import org.nkjmlab.sorm4j.tool.Player;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class ResultSetMapperTest {
 

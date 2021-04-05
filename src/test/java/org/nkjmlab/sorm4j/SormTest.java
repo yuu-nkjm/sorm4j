@@ -7,8 +7,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class SormTest {
 

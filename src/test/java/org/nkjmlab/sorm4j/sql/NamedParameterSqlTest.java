@@ -1,13 +1,13 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.tool.Customer.*;
+import static org.nkjmlab.sorm4j.common.Customer.*;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.tool.Customer;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Customer;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class NamedParameterSqlTest {
   private String sql = "select * from simple where id=:idid and name=:name";

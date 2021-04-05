@@ -1,13 +1,13 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.tool.Player;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class NamedParametersQueryImplTest {
 

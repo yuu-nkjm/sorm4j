@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -11,16 +11,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.Location;
+import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
-import org.nkjmlab.sorm4j.internal.sql.JoinedRow;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Location;
-import org.nkjmlab.sorm4j.tool.Player;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
+import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 
 class OrmConnectionTest {
 
@@ -39,14 +40,30 @@ class OrmConnectionTest {
       m.insert(SormTestUtils.LOCATION_TOKYO);
       m.insert(SormTestUtils.LOCATION_KYOTO);
 
-      List<JoinedRow<Guest, Player>> result = m.readJoinedRowList(Guest.class, Player.class,
+      List<Location> gs = m.readList(Location.class, "select * from players");
+
+      List<Tuple2<Guest, Player>> result = m.readTupleList(Guest.class, Player.class,
           "select g.id gid, g.name gname, g.address gaddress, p.id pid, p.name pname, p.address paddress from guests g join players p on g.id=p.id");
 
-      assertThat(result.get(0).getLeft().getClass()).isEqualTo(Guest.class);
-      assertThat(result.get(0).getRight().getClass()).isEqualTo(Player.class);
+      assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
+      assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
+      assertThat(result.get(0).toString()).contains("Alice");
 
-      List<JoinedRow<Guest, Location>> result1 = m.readJoinedRowList(Guest.class, Location.class,
-          "select g.id gid, g.name gname, g.address gaddress, l.id lid, l.name lname from guests g join locations l on g.id=l.id");
+      List<Tuple3<Guest, Player, Location>> result1 =
+          m.readTupleList(Guest.class, Player.class, Location.class,
+              "select g.id gid, g.name gname, g.address gaddress, "
+                  + "p.id pid, p.name pname, p.address paddress, " + "l.id lid, l.name lname "
+                  + "from guests g " + "join players p on g.id=p.id "
+                  + "join locations l on g.id=l.id");
+
+      assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
+      assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());
+      assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
+      assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
+      assertThat(result1.get(0).getT3().getClass()).isEqualTo(Location.class);
+      assertThat(result1.get(0).getT3().getName()).isEqualTo(LOCATION_TOKYO.getName());
+      assertThat(result1.get(0).toString()).contains("Alice");
+
 
     });
   }

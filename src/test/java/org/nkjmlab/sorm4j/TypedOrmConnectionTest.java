@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.Location;
+import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.Location;
-import org.nkjmlab.sorm4j.tool.Player;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class TypedOrmConnectionTest {
 

@@ -1,5 +1,8 @@
-package org.nkjmlab.sorm4j.tool;
+package org.nkjmlab.sorm4j.common;
 
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+
+@OrmColumnAliasPrefix("c")
 public class Customer {
 
   public static final Customer ALICE = new Customer(1, "Alice", "Kyoto");

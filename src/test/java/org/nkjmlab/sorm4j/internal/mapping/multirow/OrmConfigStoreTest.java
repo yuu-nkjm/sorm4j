@@ -2,10 +2,12 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType.*;
-import static org.nkjmlab.sorm4j.tool.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
@@ -17,8 +19,6 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.mapping.ConfigStore;
-import org.nkjmlab.sorm4j.tool.Guest;
-import org.nkjmlab.sorm4j.tool.SormTestUtils;
 
 class OrmConfigStoreTest {
 

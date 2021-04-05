@@ -1,10 +1,10 @@
-package org.nkjmlab.sorm4j.tool;
+package org.nkjmlab.sorm4j.common;
 
 import java.util.Objects;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 
-@OrmColumnAliasPrefix("G")
+@OrmColumnAliasPrefix("g")
 public class Guest {
 
   private int id;
