@@ -106,7 +106,7 @@ class TableMappingTest {
 
   public static <T> TableMapping<T> getTableMapping(TypedOrmConnection<T> conn,
       Class<T> objectClass) {
-    return ((AbstractOrmMapper) conn.untype()).getTableMapping(objectClass);
+    return ((OrmMapperImpl) conn.untype()).getTableMapping(objectClass);
   }
 
 }

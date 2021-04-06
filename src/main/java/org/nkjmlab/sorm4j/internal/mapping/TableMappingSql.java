@@ -34,7 +34,6 @@ public final class TableMappingSql {
   private final String insertSql;
   private final String updateSql;
   private final String deleteSql;
-  private final String deleteAllSql;
   private final String mergeSql;
   private final String insertSqlPrefix;
   private final String mergeSqlPrefix;
@@ -79,7 +78,6 @@ public final class TableMappingSql {
         + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
     this.deleteSql =
         "delete from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
-    this.deleteAllSql = "delete from " + tableName;
   }
 
   private String createUpdateSetClause(List<String> notPrimaryKeys) {
@@ -108,12 +106,6 @@ public final class TableMappingSql {
   public List<String> getColumnsForUpdate() {
     return columnsForUpdate;
   }
-
-
-  public String getDeleteAllSql() {
-    return deleteAllSql;
-  }
-
 
   public String getDeleteSql() {
     return deleteSql;

@@ -74,7 +74,7 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public void begin() {
-    begin(ormConnection.getTransactionIsolationLevel());
+    ormConnection.begin();
   }
 
   private void setTransactionIsolation(int level) {
@@ -110,22 +110,22 @@ public class TypedOrmConnectionImpl<T> extends TypedOrmMapperImpl<T>
 
   @Override
   public T mapRow(ResultSet resultSet) {
-    return ormConnection.mapRow(objectClass, resultSet);
+    return Try.getOrThrow(() -> ormConnection.mapRowAux(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return ormConnection.mapRowToMap(resultSet);
+    return Try.getOrThrow(() -> ormConnection.mapRowAux(resultSet), Try::rethrow);
   }
 
   @Override
   public List<T> mapRows(ResultSet resultSet) {
-    return ormConnection.mapRows(objectClass, resultSet);
+    return Try.getOrThrow(() -> ormConnection.mapRowsAux(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return ormConnection.mapRowsToMapList(resultSet);
+    return Try.getOrThrow(() -> ormConnection.mapRowsAux(resultSet), Try::rethrow);
   }
 
   @Override

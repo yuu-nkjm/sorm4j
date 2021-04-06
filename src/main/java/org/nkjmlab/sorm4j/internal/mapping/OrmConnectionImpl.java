@@ -7,7 +7,6 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.QueryOrmExecutor;
 import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -28,32 +27,6 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
 
   public OrmConnectionImpl(Connection connection, ConfigStore options) {
     super(connection, options);
-  }
-
-  @Override
-  public void begin() {
-    begin(getTransactionIsolationLevel());
-  }
-
-  @Override
-  public void begin(int isolationLevel) {
-    setAutoCommit(false);
-    setTransactionIsolation(isolationLevel);
-  }
-
-  @Override
-  public void close() {
-    Try.runOrThrow(() -> {
-      lazyResultSets.forEach(rs -> rs.close());
-      lazyResultSets.clear();
-      getJdbcConnection().close();
-    }, Try::rethrow);
-  }
-
-
-  @Override
-  public void commit() {
-    Try.runOrThrow(() -> getJdbcConnection().commit(), Try::rethrow);
   }
 
   @Override
@@ -80,28 +53,16 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   @Override
   public <T> SelectQuery<T> createSelectQuery(Class<T> objectClass) {
     SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryOrmExecutor<>(this, objectClass));
-    ret.from(getTableMapping(objectClass).getTableName());
+    ret.from(getTableName(objectClass));
     return ret;
   }
 
-  @Override
-  public void rollback() {
-    Try.runOrThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
-  }
-
-  @Override
-  public void setAutoCommit(final boolean autoCommit) {
-    Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
-  }
-
-  private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
-  }
 
   @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
     return new TypedOrmConnectionImpl<>(objectClass, this);
   }
+
 
 
 }

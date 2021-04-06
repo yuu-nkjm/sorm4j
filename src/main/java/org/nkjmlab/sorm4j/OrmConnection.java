@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import java.io.Closeable;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -15,7 +14,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
  *
  */
 public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlExecutor,
-    ResultSetMapper, ResultSetMapMapper, TransactionFunction, Closeable, AutoCloseable {
+    ResultSetMapper, ResultSetMapMapper, TransactionFunction, AutoCloseable {
 
 
   /**
@@ -61,13 +60,6 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    */
   <T> SelectQuery<T> createSelectQuery(Class<T> objectClass);
 
-  /**
-   * Gets table name corresponding to the given object class.
-   *
-   * @param objectClass
-   * @return
-   */
-  String getTableName(Class<?> objectClass);
 
   /**
    * Creates a {@link TypedOrmConnection}
@@ -77,5 +69,13 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @return
    */
   <T> TypedOrmConnection<T> type(Class<T> objectClass);
+
+  /**
+   * Gets table name corresponding to the given object class.
+   *
+   * @param objectClass
+   * @return
+   */
+  String getTableName(Class<?> objectClass);
 
 }
