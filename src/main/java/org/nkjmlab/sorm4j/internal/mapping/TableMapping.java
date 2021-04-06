@@ -137,7 +137,8 @@ public final class TableMapping<T> extends Mapping<T> {
     dp.ifPresent(lp -> log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
         parameters == null ? 0 : parameters.length));
 
-    int ret = OrmMapperImpl.executeUpdateAndClose(connection, sqlParameterSetter, sql, parameters);
+    int ret =
+        OrmConnectionImpl.executeUpdateAndClose(connection, sqlParameterSetter, sql, parameters);
     dp.ifPresent(lp -> {
       log.trace("[{}] Parameters = {}", lp.getTag(), parameters);
       log.debug("{} Call executeUpdate for [{}] to [{}] Table at [{}]", lp.getTagAndElapsedTime(),

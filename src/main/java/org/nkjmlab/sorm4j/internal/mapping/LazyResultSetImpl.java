@@ -27,16 +27,16 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   private static final Class<? extends Map> MAP_CLASS = LinkedHashMap.class;
 
   private final Class<T> objectClass;
-  private final OrmMapperImpl ormMapper;
+  private final OrmConnectionImpl ormMapper;
   private final ResultSet resultSet;
   private final PreparedStatement stmt;
 
   @SuppressWarnings("unchecked")
-  public LazyResultSetImpl(OrmMapperImpl ormMapper, PreparedStatement stmt, ResultSet resultSet) {
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt, ResultSet resultSet) {
     this(ormMapper, (Class<T>) MAP_CLASS, stmt, resultSet);
   }
 
-  public LazyResultSetImpl(OrmMapperImpl ormMapper, Class<T> objectClass, PreparedStatement stmt,
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, Class<T> objectClass, PreparedStatement stmt,
       ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;
@@ -135,12 +135,13 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
 
   private final class LazyResultSetIterator<S> implements Iterator<S> {
-    private final Supplier<S> getFunction;
+    private final Supplier<S> nextSupplier;
 
     @SuppressWarnings("unchecked")
-    public LazyResultSetIterator(OrmMapperImpl ormMapper, Class<S> objectClass,
+    public LazyResultSetIterator(
+        OrmConnectionImpl ormMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(MAP_CLASS)
+      this.nextSupplier = objectClass.equals(MAP_CLASS)
           ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowAux(resultSet), Try::rethrow)
           : Try.createSupplierWithThrow(() -> ormMapper.mapRowAux(objectClass, resultSet),
               Try::rethrow);
@@ -162,7 +163,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
     @Override
     public S next() {
-      return getFunction.get();
+      return nextSupplier.get();
     }
 
     @Override

@@ -220,9 +220,9 @@ public final class SormImpl implements Sorm {
   public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
       implements TypedOrmTransaction<T> {
 
-    public TypedOrmTransactionImpl(Class<T> objectClass, OrmConnectionImpl ormConnection) {
-      super(objectClass, ormConnection);
-      ormConnection.begin();
+    public TypedOrmTransactionImpl(Class<T> objectClass, OrmTransactionImpl ormTransaction) {
+      super(objectClass, ormTransaction);
+      ormTransaction.begin();
     }
 
     @Override
