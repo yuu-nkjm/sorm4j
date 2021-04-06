@@ -12,8 +12,7 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  *
  * @param <T>
  */
-public class NamedParameterQueryImpl<T> extends AbstractQuery<T>
-    implements NamedParameterQuery<T> {
+public class NamedParameterQueryImpl<T> extends AbstractQuery<T> implements NamedParameterQuery<T> {
 
   private final NamedParameterSql namedParameterSql;
 
@@ -45,5 +44,11 @@ public class NamedParameterQueryImpl<T> extends AbstractQuery<T>
     return new NamedParameterQueryImpl<>(executor, sql);
   }
 
+
+  @Override
+  public NamedParameterQuery<T> bindBean(Object bean) {
+    namedParameterSql.bindBean(bean);
+    return this;
+  }
 
 }

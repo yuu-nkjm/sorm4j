@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
 
 /**
@@ -23,6 +24,10 @@ public interface SelectQuery<T>
 
   @Override
   NamedParameterQuery<T> bind(String key, Object value);
+
+  @Override
+  @Experimental
+  NamedParameterQuery<T> bindBean(Object bean);
 
 
   @Override

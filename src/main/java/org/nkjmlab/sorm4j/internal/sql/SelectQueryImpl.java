@@ -59,6 +59,13 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
     ret.bind(key, value);
     return ret;
   }
+  @Override
+  public NamedParameterQuery<T> bindBean(Object bean) {
+    NamedParameterQuery<T> ret = withNamedParameter();
+    ret.bindBean(bean);
+    return ret;
+  }
+
 
   @Override
   public SqlStatement toSqlStatement() {
@@ -156,6 +163,7 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
     selectBuilder.where(expr);
     return this;
   }
+
 
 }
 

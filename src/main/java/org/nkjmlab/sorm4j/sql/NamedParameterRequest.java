@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.SqlExecutor;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterRequestImpl;
 
 
@@ -20,6 +21,9 @@ public interface NamedParameterRequest extends NamedParameterSql, Request {
   @Override
   NamedParameterRequest bind(String key, Object value);
 
+  @Override
+  @Experimental
+  NamedParameterRequest bindBean(Object bean);
 
   /**
    * Creates a request from SQL string.

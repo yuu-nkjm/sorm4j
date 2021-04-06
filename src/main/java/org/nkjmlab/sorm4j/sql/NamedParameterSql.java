@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
 
 /**
@@ -29,6 +31,14 @@ public interface NamedParameterSql extends SqlStatementSupplier {
   NamedParameterSql bind(String key, Object value);
 
   /**
+   *
+   * @param bean
+   * @return
+   */
+  @Experimental
+  NamedParameterSql bindBean(Object bean);
+
+  /**
    * Creates {@link NamedParameterSql} object. the named parameters should have the given prefix and
    * suffix.
    *
@@ -37,8 +47,9 @@ public interface NamedParameterSql extends SqlStatementSupplier {
    * @param suffix
    * @return
    */
-  static NamedParameterSql from(String sql, String prefix, String suffix) {
-    return new NamedParameterSqlImpl(sql, prefix, suffix);
+  static NamedParameterSql from(String sql, char prefix, char suffix,
+      ColumnFieldMapper columnFieldMapper) {
+    return new NamedParameterSqlImpl(sql, prefix, suffix, columnFieldMapper);
   }
 
   /**

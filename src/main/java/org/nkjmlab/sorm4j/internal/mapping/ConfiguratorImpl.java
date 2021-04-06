@@ -1,13 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType.*;
-import java.sql.Connection;
 import org.nkjmlab.sorm4j.Configurator;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.DefaultSqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
@@ -19,22 +13,6 @@ import org.nkjmlab.sorm4j.extension.TableNameMapper;
  *
  */
 public class ConfiguratorImpl implements Configurator {
-
-  public static final int DEFAULT_TRANSACTION_ISOLATION_LEVEL =
-      Connection.TRANSACTION_READ_COMMITTED;
-
-  public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
-
-  public static final SqlParameterSetter DEFAULT_SQL_PARAMETER_SETTER =
-      new DefaultSqlParameterSetter();
-
-  public static final ResultSetConverter DEFAULT_RESULT_SET_CONVERTER =
-      new DefaultResultSetConverter();
-
-  public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
-
-  public static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
-      new DefaultColumnFieldMapper();
 
   private final String configName;
   private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;

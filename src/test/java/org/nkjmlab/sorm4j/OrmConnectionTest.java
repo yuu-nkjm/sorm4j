@@ -69,8 +69,20 @@ class OrmConnectionTest {
   }
 
   @Test
+  void testNamedRequest1() {
+    AtomicInteger id = new AtomicInteger(10);
+    int row = sorm.apply(
+        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+            .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
+    assertThat(row).isEqualTo(1);
+    Player p = sorm.apply(conn -> conn.readAll(Player.class)).get(0);
+  }
+
+  @Test
   void testNamedRequest() {
     AtomicInteger id = new AtomicInteger(10);
+
+
     int row = sorm.apply(
         conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
             .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
@@ -85,7 +97,8 @@ class OrmConnectionTest {
 
     row = sorm.apply(conn -> {
       NamedParameterSql sql =
-          NamedParameterSql.from("insert into players values(`id`, `name`, `address`)", "`", "`");
+          NamedParameterSql.from("insert into players values(`id`, `name`, `address`)", '`', '`',
+              Configurator.DEFAULT_COLUMN_FIELD_MAPPER);
       sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
       return conn.executeUpdate(sql.toSqlStatement());
     });
