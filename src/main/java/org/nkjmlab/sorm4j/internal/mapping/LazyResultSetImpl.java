@@ -1,8 +1,6 @@
 
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static java.util.Spliterator.*;
-import static java.util.Spliterators.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +8,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -27,18 +27,17 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   private static final Class<? extends Map> MAP_CLASS = LinkedHashMap.class;
 
   private final Class<T> objectClass;
-  private final AbstractOrmMapper ormMapper;
+  private final OrmConnectionImpl ormMapper;
   private final ResultSet resultSet;
   private final PreparedStatement stmt;
 
   @SuppressWarnings("unchecked")
-  public LazyResultSetImpl(AbstractOrmMapper ormMapper, PreparedStatement stmt,
-      ResultSet resultSet) {
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt, ResultSet resultSet) {
     this(ormMapper, (Class<T>) MAP_CLASS, stmt, resultSet);
   }
 
-  public LazyResultSetImpl(AbstractOrmMapper ormMapper, Class<T> objectClass,
-      PreparedStatement stmt, ResultSet resultSet) {
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, Class<T> objectClass, PreparedStatement stmt,
+      ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;
     this.stmt = stmt;
@@ -82,10 +81,9 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   @Override
   public List<T> toList() {
     @SuppressWarnings("unchecked")
-    List<T> ret = Try.getOrThrow(
-        () -> objectClass.equals(MAP_CLASS) ? (List<T>) ormMapper.mapRowsToMapList(resultSet)
-            : ormMapper.loadPojoList(objectClass, resultSet),
-        Try::rethrow);
+    List<T> ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS)
+        ? (List<T>) Try.getOrThrow(() -> ormMapper.mapRowsAux(resultSet), Try::rethrow)
+        : ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }
@@ -113,7 +111,9 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public Stream<T> stream() {
-    return StreamSupport.stream(spliteratorUnknownSize(iterator(), ORDERED), false);
+    return StreamSupport
+        .stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false)
+        .onClose(Try.createRunnable(() -> close(), Try::rethrow));
   }
 
   @Override
@@ -135,14 +135,15 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
 
   private final class LazyResultSetIterator<S> implements Iterator<S> {
-    private final Supplier<S> getFunction;
+    private final Supplier<S> nextSupplier;
 
     @SuppressWarnings("unchecked")
-    public LazyResultSetIterator(AbstractOrmMapper orMapper, Class<S> objectClass,
+    public LazyResultSetIterator(
+        OrmConnectionImpl ormMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
-      this.getFunction = objectClass.equals(MAP_CLASS)
-          ? Try.createSupplierWithThrow(() -> (S) orMapper.mapRowAux(resultSet), Try::rethrow)
-          : Try.createSupplierWithThrow(() -> orMapper.mapRowAux(objectClass, resultSet),
+      this.nextSupplier = objectClass.equals(MAP_CLASS)
+          ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowAux(resultSet), Try::rethrow)
+          : Try.createSupplierWithThrow(() -> ormMapper.mapRowAux(objectClass, resultSet),
               Try::rethrow);
     }
 
@@ -162,7 +163,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
     @Override
     public S next() {
-      return getFunction.get();
+      return nextSupplier.get();
     }
 
     @Override

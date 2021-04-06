@@ -38,6 +38,7 @@ public final class ConfigStore {
   private final int batchSizeWithMultiRow;
   private final int transactionIsolationLevel;
 
+  private final Mappings mappings;
 
   public ConfigStore(String cacheName, ColumnFieldMapper fieldNameMapper,
       TableNameMapper tableNameMapper, ResultSetConverter resultSetConverter,
@@ -54,8 +55,10 @@ public final class ConfigStore {
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
     this.multiRowProcessorFactory = MultiRowProcessorFactory.createMultiRowProcessorFactory(
         sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
-
     this.transactionIsolationLevel = transactionIsolationLevel;
+    this.mappings = new Mappings(tableNameMapper, fieldNameMapper, multiRowProcessorFactory,
+        resultSetConverter, sqlParameterSetter, getTableMappings(), getColumnsMappings(),
+        getClassNameToValidTableNameMap(), getTableNameToValidTableNameMaps());
   }
 
   public String getConfigName() {
@@ -145,6 +148,10 @@ public final class ConfigStore {
 
   public int getBatchSizeWithMultiRow() {
     return batchSizeWithMultiRow;
+  }
+
+  public Mappings getMappings() {
+    return mappings;
   }
 
   @Override

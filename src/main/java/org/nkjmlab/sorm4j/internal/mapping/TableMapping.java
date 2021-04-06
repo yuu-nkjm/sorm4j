@@ -137,8 +137,8 @@ public final class TableMapping<T> extends Mapping<T> {
     dp.ifPresent(lp -> log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
         parameters == null ? 0 : parameters.length));
 
-    int ret = AbstractOrmMapper.execPreparedStatementAndClose(sqlParameterSetter, connection, sql,
-        parameters, stmt -> stmt.executeUpdate());
+    int ret =
+        OrmConnectionImpl.executeUpdateAndClose(connection, sqlParameterSetter, sql, parameters);
     dp.ifPresent(lp -> {
       log.trace("[{}] Parameters = {}", lp.getTag(), parameters);
       log.debug("{} Call executeUpdate for [{}] to [{}] Table at [{}]", lp.getTagAndElapsedTime(),
@@ -211,11 +211,6 @@ public final class TableMapping<T> extends Mapping<T> {
     throwExeptionIfPrimaryKeysIsNotExist();
     return batch(connection, sql.getDeleteSql(), obj -> getDeleteParameters(obj), objects);
   }
-
-  public int deleteAll(Connection connection) {
-    return executeUpdate(connection, sql.getDeleteAllSql());
-  }
-
 
   public int insert(Connection connection, T object) {
     return executeUpdate(connection, sql.getInsertSql(), getInsertParameters(object));

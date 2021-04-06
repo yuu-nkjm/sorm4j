@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import java.io.Closeable;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -16,7 +15,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
  *
  */
 public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
-    SqlExecutor, TypedResultSetMapper<T>, ResultSetMapMapper, TransactionFunction, Closeable, AutoCloseable {
+    SqlExecutor, TypedResultSetMapper<T>, ResultSetMapMapper, TransactionFunction, AutoCloseable {
 
   /**
    * Creates a {@link NamedParameterQuery} from SQL string.

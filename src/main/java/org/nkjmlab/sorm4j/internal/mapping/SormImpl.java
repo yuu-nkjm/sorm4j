@@ -221,8 +221,8 @@ public final class SormImpl implements Sorm {
       implements TypedOrmTransaction<T> {
 
     public TypedOrmTransactionImpl(Class<T> objectClass, OrmTransactionImpl ormTransaction) {
-      super(objectClass, (OrmConnectionImpl) ormTransaction);
-      begin(ormTransaction.getTransactionIsolationLevel());
+      super(objectClass, ormTransaction);
+      ormTransaction.begin();
     }
 
     @Override
