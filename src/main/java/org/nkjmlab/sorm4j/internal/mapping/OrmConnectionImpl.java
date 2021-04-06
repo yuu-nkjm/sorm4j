@@ -104,5 +104,4 @@ public class OrmConnectionImpl extends OrmMapperImpl implements OrmConnection {
   }
 
 
-
 }
