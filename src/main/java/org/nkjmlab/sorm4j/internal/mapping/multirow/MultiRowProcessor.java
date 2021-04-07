@@ -13,8 +13,6 @@ import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessor<T> {
-  private static final org.slf4j.Logger log =
-      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final int batchSize;
   private final SqlParameterSetter sqlParameterSetter;
@@ -99,8 +97,9 @@ public abstract class MultiRowProcessor<T> {
 
     final int[] result = exec.apply(objects);
 
-    dp.ifPresent(sw -> log.debug("{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
-        sw.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
+    dp.ifPresent(lp -> lp.debug(getClass(),
+        "{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
+        lp.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
         tableMapping.getObjectClass(), tableMapping.getTableName(),
         Try.getOrNull(() -> con.getMetaData().getURL())));
     return result;

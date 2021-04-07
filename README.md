@@ -21,7 +21,7 @@ List<Customer> customers =
 
 ```
 
-Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has only one dependency on a logging facade (SLF4J). It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
+Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has no runtime dependencies. It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
 
 Sorm4j requires Java 11 (or above) to run and build.
 
@@ -33,7 +33,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.3.8</version>
+   <version>1.3.9</version>
  </dependency>
 ```
 

@@ -19,4 +19,19 @@ public final class LogPoint {
   public String getTag() {
     return name + ":" + (hashCode() / 10000);
   }
+
+
+  public void info(Class<?> clazz, String msg, Object... params) {
+    LoggerFactory.info(clazz, msg, params);
+  }
+
+  public void debug(Class<?> clazz, String msg, Object... params) {
+    LoggerFactory.debug(clazz, msg, params);
+  }
+
+  public void trace(Class<?> clazz, String msg, Object... params) {
+    LoggerFactory.trace(clazz, msg, params);
+  }
+
+
 }

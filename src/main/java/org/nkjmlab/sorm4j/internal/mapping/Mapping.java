@@ -8,7 +8,6 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 abstract class Mapping<T> {
-  static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final Class<T> objectClass;
   protected final ResultSetConverter resultSetConverter;

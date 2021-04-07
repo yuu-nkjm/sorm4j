@@ -51,7 +51,6 @@ import org.nkjmlab.sorm4j.sql.tuple.Tuples;
  *
  */
 public class OrmConnectionImpl implements OrmConnection {
-  static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @SuppressWarnings("unchecked")
   private static <T, R> R applytoArray(List<T> objects, Function<T[], R> sqlFunc) {
@@ -62,17 +61,17 @@ public class OrmConnectionImpl implements OrmConnection {
       String sql, Object[] parameters, FunctionHandler<ResultSet, R> resultSetHandler) {
     final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
-      log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
+      lp.debug(OrmConnectionImpl.class, "[{}] [{}] with {} parameters", lp.getTag(), sql,
           parameters == null ? 0 : parameters.length);
-      log.trace("[{}] Parameters = {}", lp.getTag(), parameters);
+      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {}", lp.getTag(), parameters);
     });
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
         R ret = resultSetHandler.apply(resultSet);
-        dp.ifPresent(sw -> log.debug("{} Read [{}] objects from [{}]", sw.getTagAndElapsedTime(),
-            ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
+        dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} Read [{}] objects from [{}]",
+            lp.getTagAndElapsedTime(), ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
             Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
@@ -274,9 +273,9 @@ public class OrmConnectionImpl implements OrmConnection {
         LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
 
     final int ret = executeUpdateAndClose(connection, sqlParameterSetter, sql, parameters);
-    dp.ifPresent(sw -> {
-      log.trace("[{}] Parameters = {} ", sw.getTag(), parameters);
-      log.debug("{} Call [{}] [{}]", sw.getTagAndElapsedTime(), sql,
+    dp.ifPresent(lp -> {
+      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(), parameters);
+      lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(), sql,
           Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
     });
     return ret;

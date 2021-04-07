@@ -34,6 +34,7 @@ class OrmConnectionTest {
 
   @Test
   void testJoin() {
+    SormLogger.on();
     sorm.accept(m -> {
       m.insert(GUEST_ALICE, GUEST_BOB);
       m.insert(PLAYER_ALICE, PLAYER_BOB);
