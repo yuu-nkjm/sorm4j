@@ -112,7 +112,7 @@ class OrmConnectionTest {
     assertThat(ret.size()).isEqualTo(1);
 
     ret = sorm.apply(conn -> conn.createNamedParameterRequest("select * from players where id=:id")
-        .bind("id", id.get()).executeQuery(rs -> conn.mapRows(Player.class, rs)));
+        .bind("id", id.get()).executeQuery(rs -> conn.mapRowList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
   }
@@ -127,7 +127,7 @@ class OrmConnectionTest {
 
     List<Player> ret = sorm.apply(
         conn -> conn.createOrderedParameterRequest("select * from players where id=? and name=?")
-            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRows(Player.class, rs)));
+            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRowList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
 

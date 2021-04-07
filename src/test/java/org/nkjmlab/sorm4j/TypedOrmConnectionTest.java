@@ -55,7 +55,7 @@ class TypedOrmConnectionTest {
 
     assertThat(ret1.size()).isEqualTo(2);
     ret1 = sorm.apply(Player.class, conn -> conn
-        .executeQuery(SqlStatement.from("select * from players"), rs -> conn.mapRows(rs)));
+        .executeQuery(SqlStatement.from("select * from players"), rs -> conn.mapRowList(rs)));
     assertThat(ret1.size()).isEqualTo(2);
 
     List<Map<String, Object>> ret2 = sorm.apply(Player.class, conn -> conn

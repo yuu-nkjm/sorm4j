@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.QueryTypedOrmExecutor;
 import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
@@ -38,37 +37,31 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   protected Class<T> objectClass;
-  protected OrmConnectionImpl ormConnection;
+  protected OrmConnectionImpl conn;
 
   public TypedOrmConnectionImpl(Class<T> objectClass, OrmConnectionImpl ormMapper) {
-    this.ormConnection = ormMapper;
+    this.conn = ormMapper;
     this.objectClass = objectClass;
   }
 
   @Override
   public void begin() {
-    ormConnection.begin();
+    conn.begin();
   }
 
   @Override
   public void begin(int transactionIsolationLevel) {
-    setAutoCommit(false);
-    setTransactionIsolation(transactionIsolationLevel);
+    conn.begin(transactionIsolationLevel);
   }
 
   @Override
   public void close() {
-    Try.runOrThrow(() -> {
-      if (getJdbcConnection().isClosed()) {
-        return;
-      }
-      getJdbcConnection().close();
-    }, Try::rethrow);
+    conn.close();
   }
 
   @Override
   public void commit() {
-    Try.runOrThrow(() -> getJdbcConnection().commit(), Try::rethrow);
+    conn.commit();
   }
 
 
@@ -106,361 +99,363 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
   @Override
   public int[] delete(List<T> objects) {
-    return ormConnection.delete(objects);
+    return conn.delete(objects);
   }
 
 
 
   @Override
   public int delete(T object) {
-    return ormConnection.delete(object);
+    return conn.delete(object);
   }
 
 
   @Override
   public int[] delete(@SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.delete(objects);
+    return conn.delete(objects);
   }
 
 
   @Override
   public int deleteAll() {
-    return ormConnection.deleteAll(objectClass);
+    return conn.deleteAll(objectClass);
   }
 
 
   @Override
   public int deleteAllOn(String tableName) {
-    return ormConnection.deleteAllOn(tableName);
+    return conn.deleteAllOn(tableName);
   }
 
 
   @Override
   public int[] deleteOn(String tableName, List<T> objects) {
-    return ormConnection.deleteOn(tableName, objects);
+    return conn.deleteOn(tableName, objects);
   }
 
 
   @Override
   public int deleteOn(String tableName, T object) {
-    return ormConnection.deleteOn(tableName, object);
+    return conn.deleteOn(tableName, object);
   }
 
 
   @Override
   public int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.deleteOn(tableName, objects);
+    return conn.deleteOn(tableName, objects);
   }
 
   @Override
   public <S> S executeQuery(SqlStatement sql, FunctionHandler<ResultSet, S> resultSetHandler) {
-    return ormConnection.executeQuery(sql, resultSetHandler);
+    return conn.executeQuery(sql, resultSetHandler);
   }
 
 
 
   @Override
   public <S> List<S> executeQuery(SqlStatement sql, RowMapper<S> rowMapper) {
-    return ormConnection.executeQuery(sql, rowMapper);
+    return conn.executeQuery(sql, rowMapper);
   }
 
 
   @Override
   public int executeUpdate(SqlStatement sql) {
-    return ormConnection.executeUpdate(sql);
+    return conn.executeUpdate(sql);
   }
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-    return ormConnection.executeUpdate(sql, parameters);
+    return conn.executeUpdate(sql, parameters);
   }
 
 
   @Override
   public Connection getJdbcConnection() {
-    return ormConnection.getJdbcConnection();
+    return conn.getJdbcConnection();
   }
 
 
 
   @Override
   public String getTableName() {
-    return ormConnection.getTableName(objectClass);
+    return conn.getTableName(objectClass);
   }
 
 
   @Override
   public int[] insert(List<T> objects) {
-    return ormConnection.insert(objects);
+    return conn.insert(objects);
   }
 
 
   @Override
   public int insert(T object) {
-    return ormConnection.insert(object);
+    return conn.insert(object);
   }
 
 
   @Override
   public int[] insert(@SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.insert(objects);
+    return conn.insert(objects);
   }
 
 
   @Override
   public InsertResult<T> insertAndGet(List<T> objects) {
-    return ormConnection.insertAndGet(objects);
+    return conn.insertAndGet(objects);
   }
 
 
 
   @Override
   public InsertResult<T> insertAndGet(T object) {
-    return ormConnection.insertAndGet(object);
+    return conn.insertAndGet(object);
   }
 
 
   @Override
   public InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.insertAndGet(objects);
+    return conn.insertAndGet(objects);
   }
 
 
   @Override
   public InsertResult<T> insertAndGetOn(String tableName, List<T> objects) {
-    return ormConnection.insertAndGetOn(tableName, objects);
+    return conn.insertAndGetOn(tableName, objects);
   }
 
 
   @Override
   public InsertResult<T> insertAndGetOn(String tableName, T object) {
-    return ormConnection.insertAndGetOn(tableName, object);
+    return conn.insertAndGetOn(tableName, object);
   }
 
 
   @Override
   public InsertResult<T> insertAndGetOn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.insertAndGetOn(tableName, objects);
+    return conn.insertAndGetOn(tableName, objects);
   }
 
 
   @Override
   public int[] insertOn(String tableName, List<T> objects) {
-    return ormConnection.insertOn(tableName, objects);
+    return conn.insertOn(tableName, objects);
   }
 
 
   @Override
   public int insertOn(String tableName, T object) {
-    return ormConnection.insertOn(tableName, object);
+    return conn.insertOn(tableName, object);
   }
 
 
   @Override
   public int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.insertOn(tableName, objects);
+    return conn.insertOn(tableName, objects);
   }
 
 
   @Override
   public T mapRow(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRow(objectClass, resultSet), Try::rethrow);
+    return conn.mapRow(objectClass, resultSet);
   }
 
 
   @Override
-  public List<T> mapRows(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRows(objectClass, resultSet), Try::rethrow);
+  public List<T> mapRowList(ResultSet resultSet) {
+    return conn.mapRowList(objectClass, resultSet);
   }
 
   @Override
   public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowsToMapList(resultSet), Try::rethrow);
+    return conn.mapRowsToMapList(resultSet);
   }
 
   @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowToMap(resultSet), Try::rethrow);
+    return conn.mapRowToMap(resultSet);
   }
 
   @Override
   public int[] merge(List<T> objects) {
-    return ormConnection.merge(objects);
+    return conn.merge(objects);
   }
 
   @Override
   public int merge(T object) {
-    return ormConnection.merge(object);
+    return conn.merge(object);
   }
 
   @Override
   public int[] merge(@SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.merge(objects);
+    return conn.merge(objects);
   }
 
   @Override
   public int[] mergeOn(String tableName, List<T> objects) {
-    return ormConnection.mergeOn(tableName, objects);
+    return conn.mergeOn(tableName, objects);
   }
 
   @Override
   public int mergeOn(String tableName, T object) {
-    return ormConnection.mergeOn(tableName, object);
+    return conn.mergeOn(tableName, object);
   }
 
   @Override
   public int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.mergeOn(tableName, objects);
+    return conn.mergeOn(tableName, objects);
   }
 
   @Override
   public final List<T> readAll() {
-    return ormConnection.readAll(objectClass);
+    return conn.readAll(objectClass);
   }
 
   @Override
   public LazyResultSet<T> readAllLazy() {
-    return ormConnection.readAllLazy(objectClass);
+    return conn.readAllLazy(objectClass);
   }
 
   @Override
   public T readByPrimaryKey(Object... primaryKeyValues) {
-    return ormConnection.readByPrimaryKey(objectClass, primaryKeyValues);
+    return conn.readByPrimaryKey(objectClass, primaryKeyValues);
+  }
+
+  @Override
+  public T readByPrimaryKeyOf(T object) {
+    return conn.readByPrimaryKey(objectClass, object);
   }
 
   @Override
   public T readFirst(SqlStatement sql) {
-    return readFirst(sql.getSql(), sql.getParameters());
+    return conn.readFirst(objectClass, sql);
   }
 
   @Override
   public T readFirst(String sql, Object... parameters) {
-    return ormConnection.readFirst(objectClass, sql, parameters);
+    return conn.readFirst(objectClass, sql, parameters);
   }
 
   @Override
   public LazyResultSet<T> readLazy(SqlStatement sql) {
-    return readLazy(sql.getSql(), sql.getParameters());
+    return conn.readLazy(objectClass, sql);
   }
 
   @Override
   public LazyResultSet<T> readLazy(String sql, Object... parameters) {
-    return ormConnection.readLazy(objectClass, sql, parameters);
+    return conn.readLazy(objectClass, sql, parameters);
   }
 
   @Override
   public List<T> readList(SqlStatement sql) {
-    return readList(sql.getSql(), sql.getParameters());
+    return conn.readList(objectClass, sql);
   }
 
   @Override
   public List<T> readList(String sql, Object... parameters) {
-    return ormConnection.readList(objectClass, sql, parameters);
+    return conn.readList(objectClass, sql, parameters);
   }
 
   @Override
   public Map<String, Object> readMapFirst(SqlStatement sql) {
-    return ormConnection.readMapFirst(sql.getSql(), sql.getParameters());
+    return conn.readMapFirst(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public Map<String, Object> readMapFirst(String sql, Object... parameters) {
-    return ormConnection.readMapFirst(sql, parameters);
+    return conn.readMapFirst(sql, parameters);
   }
 
   @Override
   public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
-    return ormConnection.readMapLazy(sql.getSql(), sql.getParameters());
+    return conn.readMapLazy(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
-    return ormConnection.readMapLazy(sql, parameters);
+    return conn.readMapLazy(sql, parameters);
   }
 
   @Override
   public List<Map<String, Object>> readMapList(SqlStatement sql) {
-    return ormConnection.readMapList(sql.getSql(), sql.getParameters());
+    return conn.readMapList(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public List<Map<String, Object>> readMapList(String sql, Object... parameters) {
-    return ormConnection.readMapList(sql, parameters);
+    return conn.readMapList(sql, parameters);
   }
 
   @Override
   public Map<String, Object> readMapOne(SqlStatement sql) {
-    return ormConnection.readMapOne(sql.getSql(), sql.getParameters());
+    return conn.readMapOne(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public Map<String, Object> readMapOne(String sql, Object... parameters) {
-    return ormConnection.readMapOne(sql, parameters);
+    return conn.readMapOne(sql, parameters);
   }
 
   @Override
   public T readOne(SqlStatement sql) {
-    return ormConnection.readOne(objectClass, sql.getSql(), sql.getParameters());
+    return conn.readOne(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
   public T readOne(String sql, Object... parameters) {
-    return ormConnection.readOne(objectClass, sql, parameters);
+    return conn.readOne(objectClass, sql, parameters);
   }
 
   @Override
   public void rollback() {
-    Try.runOrThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
+    conn.rollback();
   }
 
   @Override
   public void setAutoCommit(final boolean autoCommit) {
-    Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
-  }
-
-  private void setTransactionIsolation(int level) {
-    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(level), Try::rethrow);
+    conn.setAutoCommit(autoCommit);
   }
 
   @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
-    return new TypedOrmConnectionImpl<>(objectClass, ormConnection);
+    return new TypedOrmConnectionImpl<>(objectClass, conn);
   }
 
   @Override
   public OrmConnection untype() {
-    return ormConnection;
+    return conn;
   }
 
   @Override
   public int[] update(List<T> objects) {
-    return ormConnection.update(objects);
+    return conn.update(objects);
   }
 
   @Override
   public int update(T object) {
-    return ormConnection.update(object);
+    return conn.update(object);
   }
 
   @Override
   public int[] update(@SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.update(objects);
+    return conn.update(objects);
   }
 
   @Override
   public int[] updateOn(String tableName, List<T> objects) {
-    return ormConnection.updateOn(tableName, objects);
+    return conn.updateOn(tableName, objects);
   }
 
   @Override
   public int updateOn(String tableName, T object) {
-    return ormConnection.updateOn(tableName, object);
+    return conn.updateOn(tableName, object);
   }
 
   @Override
   public int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return ormConnection.updateOn(tableName, objects);
+    return conn.updateOn(tableName, objects);
   }
+
 
 }

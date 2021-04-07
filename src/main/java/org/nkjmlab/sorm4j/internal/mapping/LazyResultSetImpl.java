@@ -91,7 +91,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrThrow(() -> RowMapper.convertToRowsMapper(rowMapper).apply(resultSet),
+    List<T> ret = Try.getOrThrow(() -> RowMapper.convertToRowListMapper(rowMapper).apply(resultSet),
         Try::rethrow);
     close();
     return ret;

@@ -26,6 +26,6 @@ public interface TypedResultSetMapper<T> {
    * @param resultSet
    * @return
    */
-  List<T> mapRows(ResultSet resultSet);
+  List<T> mapRowList(ResultSet resultSet);
 
 }

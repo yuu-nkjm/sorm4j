@@ -32,7 +32,7 @@ class ResultSetMapperTest {
   @Test
   void testMapRowsClassOfTResultSet() {
     sorm.apply(conn -> conn.executeQuery(SqlStatement.from("select * from players"),
-        rs -> conn.mapRows(Player.class, rs)));
+        rs -> conn.mapRowList(Player.class, rs)));
   }
 
   @Test

@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
@@ -36,6 +37,15 @@ public interface TypedOrmReader<T> {
    * @return
    */
   T readByPrimaryKey(Object... primaryKeyValues);
+
+  /**
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
+  @Experimental
+  T readByPrimaryKeyOf(T object);
 
   /**
    * Reads an object from the database.

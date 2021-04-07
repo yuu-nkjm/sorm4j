@@ -30,6 +30,6 @@ public interface ResultSetMapper {
    * @param resultSet
    * @return
    */
-  <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet);
+  <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet);
 
 }

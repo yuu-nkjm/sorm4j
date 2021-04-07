@@ -259,7 +259,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql.getSql(),
-        sql.getParameters(), RowMapper.convertToRowsMapper(rowMapper));
+        sql.getParameters(), RowMapper.convertToRowListMapper(rowMapper));
   }
 
   @Override
@@ -492,7 +492,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet) {
+  public <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet) {
     return Try.getOrThrow(() -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
         ? loadNativeObjectList(objectClass, resultSet)
         : loadPojoList(objectClass, resultSet), Try::rethrow);
@@ -627,7 +627,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters,
-        resultSet -> mapRows(objectClass, resultSet));
+        resultSet -> mapRowList(objectClass, resultSet));
   }
 
   @Override
