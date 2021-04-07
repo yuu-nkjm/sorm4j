@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
@@ -21,7 +22,6 @@ import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 public class DefaultResultSetConverter implements ResultSetConverter {
 
-  private static org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @Override
   public final Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
@@ -68,7 +68,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
           return (str == null) ? null : str.toCharArray();
         }
         default:
-          log.debug(
+          LoggerFactory.debug(getClass(),
               "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
               name, column);
           return resultSet.getObject(column);

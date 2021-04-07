@@ -265,23 +265,23 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
   @Override
   public T mapRow(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowAux(objectClass, resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> ormConnection.mapRow(objectClass, resultSet), Try::rethrow);
   }
 
 
   @Override
   public List<T> mapRows(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowsAux(objectClass, resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> ormConnection.mapRows(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowsAux(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> ormConnection.mapRowsToMapList(resultSet), Try::rethrow);
   }
 
   @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return Try.getOrThrow(() -> ormConnection.mapRowAux(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> ormConnection.mapRowToMap(resultSet), Try::rethrow);
   }
 
   @Override

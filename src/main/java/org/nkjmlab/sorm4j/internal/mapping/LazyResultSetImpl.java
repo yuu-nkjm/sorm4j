@@ -32,12 +32,13 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   private final PreparedStatement stmt;
 
   @SuppressWarnings("unchecked")
-  public LazyResultSetImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt, ResultSet resultSet) {
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt,
+      ResultSet resultSet) {
     this(ormMapper, (Class<T>) MAP_CLASS, stmt, resultSet);
   }
 
-  public LazyResultSetImpl(OrmConnectionImpl ormMapper, Class<T> objectClass, PreparedStatement stmt,
-      ResultSet resultSet) {
+  public LazyResultSetImpl(OrmConnectionImpl ormMapper, Class<T> objectClass,
+      PreparedStatement stmt, ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;
     this.stmt = stmt;
@@ -82,7 +83,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   public List<T> toList() {
     @SuppressWarnings("unchecked")
     List<T> ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS)
-        ? (List<T>) Try.getOrThrow(() -> ormMapper.mapRowsAux(resultSet), Try::rethrow)
+        ? (List<T>) Try.getOrThrow(() -> ormMapper.mapRowsToMapList(resultSet), Try::rethrow)
         : ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
@@ -138,12 +139,11 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
     private final Supplier<S> nextSupplier;
 
     @SuppressWarnings("unchecked")
-    public LazyResultSetIterator(
-        OrmConnectionImpl ormMapper, Class<S> objectClass,
+    public LazyResultSetIterator(OrmConnectionImpl ormMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.nextSupplier = objectClass.equals(MAP_CLASS)
-          ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowAux(resultSet), Try::rethrow)
-          : Try.createSupplierWithThrow(() -> ormMapper.mapRowAux(objectClass, resultSet),
+          ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowToMap(resultSet), Try::rethrow)
+          : Try.createSupplierWithThrow(() -> ormMapper.mapRow(objectClass, resultSet),
               Try::rethrow);
     }
 

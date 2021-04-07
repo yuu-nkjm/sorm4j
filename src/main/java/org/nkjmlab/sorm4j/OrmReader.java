@@ -47,6 +47,16 @@ public interface OrmReader {
   <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
 
   /**
+   *
+   * @param <T>
+   * @param object
+   * @return
+   */
+  @Experimental
+  <T> T readByPrimaryKeyOf(T object);
+
+
+  /**
    * Reads an object from the database.
    *
    * @param <T>

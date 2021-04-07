@@ -51,7 +51,6 @@ import org.nkjmlab.sorm4j.sql.tuple.Tuples;
  *
  */
 public class OrmConnectionImpl implements OrmConnection {
-  static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @SuppressWarnings("unchecked")
   private static <T, R> R applytoArray(List<T> objects, Function<T[], R> sqlFunc) {
@@ -62,17 +61,17 @@ public class OrmConnectionImpl implements OrmConnection {
       String sql, Object[] parameters, FunctionHandler<ResultSet, R> resultSetHandler) {
     final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
-      log.debug("[{}] [{}] with {} parameters", lp.getTag(), sql,
+      lp.debug(OrmConnectionImpl.class, "[{}] [{}] with {} parameters", lp.getTag(), sql,
           parameters == null ? 0 : parameters.length);
-      log.trace("[{}] Parameters = {}", lp.getTag(), parameters);
+      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {}", lp.getTag(), parameters);
     });
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParameterSetter.setParameters(stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
         R ret = resultSetHandler.apply(resultSet);
-        dp.ifPresent(sw -> log.debug("{} Read [{}] objects from [{}]", sw.getTagAndElapsedTime(),
-            ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
+        dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} Read [{}] objects from [{}]",
+            lp.getTagAndElapsedTime(), ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
             Try.getOrNull(() -> connection.getMetaData().getURL())));
         return ret;
       }
@@ -274,18 +273,12 @@ public class OrmConnectionImpl implements OrmConnection {
         LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
 
     final int ret = executeUpdateAndClose(connection, sqlParameterSetter, sql, parameters);
-    dp.ifPresent(sw -> {
-      log.trace("[{}] Parameters = {} ", sw.getTag(), parameters);
-      log.debug("{} Call [{}] [{}]", sw.getTagAndElapsedTime(), sql,
+    dp.ifPresent(lp -> {
+      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(), parameters);
+      lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(), sql,
           Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
     });
     return ret;
-  }
-
-  private <T> T getAux(Class<T> objectClass, ResultSet resultSet) {
-    final ColumnsMapping<T> m = getColumnsMapping(objectClass);
-    return Try.getOrThrow(() -> m.loadPojo(m.createColumnLabels(resultSet), resultSet),
-        Try::rethrow);
   }
 
   private <T> TableMapping<T> getCastedTableMapping(Class<?> objectClass) {
@@ -307,7 +300,14 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  <T> TableMapping<T> getTableMapping(Class<T> objectClass) {
+  /**
+   * Gets {@link TableMapping}. This method is for internal use.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
+  public <T> TableMapping<T> getTableMapping(Class<T> objectClass) {
     return mappings.getTableMapping(connection, objectClass);
   }
 
@@ -404,7 +404,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     if (resultSet.next()) {
-      return mapRowAux(objectClass, resultSet);
+      return mapRow(objectClass, resultSet);
     }
     return null;
   }
@@ -413,7 +413,7 @@ public class OrmConnectionImpl implements OrmConnection {
   Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
-      ret = mapRowAux(resultSet);
+      ret = mapRowToMap(resultSet);
     }
     return ret;
   }
@@ -441,7 +441,7 @@ public class OrmConnectionImpl implements OrmConnection {
   <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     T ret = null;
     if (resultSet.next()) {
-      ret = mapRowAux(objectClass, resultSet);
+      ret = mapRow(objectClass, resultSet);
     }
     if (resultSet.next()) {
       throw new RuntimeException("Non-unique result returned");
@@ -453,7 +453,7 @@ public class OrmConnectionImpl implements OrmConnection {
   Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
-      ret = mapRowAux(resultSet);
+      ret = mapRowToMap(resultSet);
     }
     if (resultSet.next()) {
       throw new SormException("Non-unique result returned");
@@ -465,68 +465,58 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    ColumnsMapping<T> mapping = mappings.getColumnsMapping(objectClass);
+    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
     return mapping.loadPojoList(resultSet);
   }
 
 
   private final <T> T loadSinglePojo(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    ColumnsMapping<T> mapping = mappings.getColumnsMapping(objectClass);
+    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
     return mapping.loadPojo(resultSet);
   }
 
+  private <T> T loadSinglePojoByColumnLabels(Class<T> objectClass, ResultSet resultSet) {
+    final ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
+    return Try.getOrThrow(() -> mapping.loadPojo(mapping.createColumnLabels(resultSet), resultSet),
+        Try::rethrow);
+  }
 
   @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRowAux(objectClass, resultSet), Try::rethrow);
-  }
-
-
-  <T> T mapRowAux(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
+    return Try.getOrThrow(() -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
         ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
-        : loadSinglePojo(objectClass, resultSet);
-  }
-
-
-  Map<String, Object> mapRowAux(ResultSet resultSet) throws SQLException {
-    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-    return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+        : loadSinglePojo(objectClass, resultSet), Try::rethrow);
   }
 
 
 
   @Override
   public <T> List<T> mapRows(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRowsAux(objectClass, resultSet), Try::rethrow);
-  }
-
-  final <T> List<T> mapRowsAux(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return resultSetConverter.isEnableToConvertNativeObject(objectClass)
+    return Try.getOrThrow(() -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
         ? loadNativeObjectList(objectClass, resultSet)
-        : loadPojoList(objectClass, resultSet);
-  }
-
-
-  final List<Map<String, Object>> mapRowsAux(ResultSet resultSet) throws SQLException {
-    final List<Map<String, Object>> ret = new ArrayList<>();
-    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-    while (resultSet.next()) {
-      ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
-    }
-    return ret;
+        : loadPojoList(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
   public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRowsAux(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> {
+      final List<Map<String, Object>> ret = new ArrayList<>();
+      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
+      while (resultSet.next()) {
+        ret.add(resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
+      }
+      return ret;
+    }, Try::rethrow);
   }
 
 
   @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return Try.getOrThrow(() -> mapRowAux(resultSet), Try::rethrow);
+    return Try.getOrThrow(() -> {
+      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
+      return resultSetConverter.toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+    }, Try::rethrow);
   }
 
 
@@ -569,42 +559,33 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public final <T> List<T> readAll(Class<T> objectClass) {
-    return readAllAux(objectClass);
+    return readList(objectClass, getCastedTableMapping(objectClass).getSql().getSelectAllSql());
   }
-
-  /**
-   * Reads a list of all objects in the database mapped to the given object class.
-   */
-  final <T> List<T> readAllAux(final Class<T> objectClass) {
-    return readListAux(objectClass, getCastedTableMapping(objectClass).getSql().getSelectAllSql());
-  }
-
 
   @Override
   public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
-    return readAllLazyAux(objectClass);
-  }
-
-
-  final <T> LazyResultSet<T> readAllLazyAux(Class<T> objectClass) {
-    return readLazyAux(objectClass,
-        mappings.getTableMapping(connection, objectClass).getSql().getSelectAllSql());
+    return readLazy(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
   @Override
   public <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
-    return readByPrimaryKeyAux(objectClass, primaryKeyValues);
-  }
-
-  /**
-   * Reads an object from the database by its primary keys.
-   */
-  final <T> T readByPrimaryKeyAux(final Class<T> objectClass, final Object... primaryKeyValues) {
-    final TableMapping<T> mapping = mappings.getTableMapping(connection, objectClass);
+    final TableMapping<T> mapping = getTableMapping(objectClass);
     mapping.throwExeptionIfPrimaryKeysIsNotExist();
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
-    return readFirstAux(objectClass, sql, primaryKeyValues);
+    return readFirst(objectClass, sql, primaryKeyValues);
   }
+
+  @Override
+  public <T> T readByPrimaryKeyOf(T object) {
+    if (object == null) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    Class<T> objectClass = (Class<T>) object.getClass();
+    final TableMapping<T> mapping = getTableMapping(objectClass);
+    return readByPrimaryKey(objectClass, mapping.getReadPrimaryKeyParameters(object));
+  }
+
 
 
   @Override
@@ -614,10 +595,6 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return readFirstAux(objectClass, sql, parameters);
-  }
-
-  final <T> T readFirstAux(Class<T> objectClass, String sql, Object... parameters) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters,
         resultSet -> loadFirst(objectClass, resultSet));
   }
@@ -629,10 +606,6 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
-    return readLazyAux(objectClass, sql, parameters);
-  }
-
-  final <T> LazyResultSet<T> readLazyAux(Class<T> objectClass, String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       sqlParameterSetter.setParameters(stmt, parameters);
@@ -645,6 +618,7 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
+
   @Override
   public <T> List<T> readList(Class<T> objectClass, SqlStatement sql) {
     return readList(objectClass, sql.getSql(), sql.getParameters());
@@ -652,12 +626,8 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return readListAux(objectClass, sql, parameters);
-  }
-
-  final <T> List<T> readListAux(Class<T> objectClass, String sql, Object... parameters) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters,
-        resultSet -> mapRowsAux(objectClass, resultSet));
+        resultSet -> mapRows(objectClass, resultSet));
   }
 
   @Override
@@ -708,7 +678,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters,
-        resultSet -> mapRowsAux(resultSet));
+        resultSet -> mapRowsToMapList(resultSet));
   }
 
   @Override
@@ -734,21 +704,16 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readOne(Class<T> objectClass, SqlStatement sql) {
-    return readOneAux(objectClass, sql.getSql(), sql.getParameters());
+    return readOne(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return readOneAux(objectClass, sql, parameters);
-  }
-
-
-  final <T> T readOneAux(final Class<T> objectClass, final String sql, Object... parameters) {
     return executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters,
         resultSet -> {
           T ret = null;
           if (resultSet.next()) {
-            ret = mapRowAux(objectClass, resultSet);
+            ret = mapRow(objectClass, resultSet);
           }
           if (resultSet.next()) {
             throw new SormException("Non-unique result returned");
@@ -756,6 +721,7 @@ public class OrmConnectionImpl implements OrmConnection {
           return ret;
         });
   }
+
 
 
   @Override
@@ -771,8 +737,9 @@ public class OrmConnectionImpl implements OrmConnection {
         executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(
-                Tuples.of(getAux(t1, resultSet), getAux(t2, resultSet), getAux(t3, resultSet)));
+            ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
+                loadSinglePojoByColumnLabels(t2, resultSet),
+                loadSinglePojoByColumnLabels(t3, resultSet)));
           }
           return ret1;
         });
@@ -791,7 +758,8 @@ public class OrmConnectionImpl implements OrmConnection {
         executeQueryAndRead(getJdbcConnection(), sqlParameterSetter, sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuples.of(getAux(t1, resultSet), getAux(t2, resultSet)));
+            ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
+                loadSinglePojoByColumnLabels(t2, resultSet)));
           }
           return ret1;
         });

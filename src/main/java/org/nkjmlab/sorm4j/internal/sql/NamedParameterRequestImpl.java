@@ -52,5 +52,10 @@ public class NamedParameterRequestImpl implements NamedParameterRequest {
     return this;
   }
 
+  @Override
+  public NamedParameterRequest bindBean(Object bean) {
+    sql.bindBean(bean);
+    return this;
+  }
 
 }

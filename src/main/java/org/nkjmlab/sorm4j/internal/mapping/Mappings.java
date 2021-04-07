@@ -22,8 +22,7 @@ import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-class Mappings {
-  static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+final class Mappings {
 
   private final TableNameMapper tableNameMapper;
   private final ColumnFieldMapper columnFieldMapper;
@@ -80,7 +79,7 @@ class Mappings {
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
           LogPointFactory.createLogPoint(SormLogger.Category.MAPPING)
-              .ifPresent(lp -> log.info("[{}]" + System.lineSeparator() + "{}",
+              .ifPresent(lp -> lp.info(Mappings.class, "[{}]" + System.lineSeparator() + "{}",
                   lp.getTag(), m.getFormattedString()));
           return m;
         }, Try::rethrow));
@@ -149,7 +148,7 @@ class Mappings {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
 
       LogPointFactory.createLogPoint(SormLogger.Category.MAPPING).ifPresent(
-          lp -> log.info(System.lineSeparator() + m.getFormattedString()));
+          lp -> lp.info(Mappings.class, System.lineSeparator() + m.getFormattedString()));
 
       return m;
     });

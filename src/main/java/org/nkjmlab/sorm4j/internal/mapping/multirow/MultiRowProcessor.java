@@ -13,8 +13,6 @@ import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessor<T> {
-  private static final org.slf4j.Logger log =
-      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final int batchSize;
   private final SqlParameterSetter sqlParameterSetter;
@@ -56,34 +54,29 @@ public abstract class MultiRowProcessor<T> {
   public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
       T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects, nonNullObjects -> {
-      return batchAux(con, sql, obj -> parameterCreator.apply(obj), nonNullObjects);
+      int[] result = new int[0];
+      boolean origAutoCommit = getAutoCommit(con);
+
+      try (PreparedStatement stmt = con.prepareStatement(sql)) {
+        setAutoCommit(con, false);
+        final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
+        for (int i = 0; i < objects.length; i++) {
+          T obj = objects[i];
+          this.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
+          batchHelper.addBatchAndExecuteIfReachedThreshold();
+        }
+        result = batchHelper.finish();
+        return result;
+      } catch (Exception e) {
+        rollbackIfRequired(con, origAutoCommit);
+        throw Try.rethrow(e);
+      } finally {
+        commitIfRequired(con, origAutoCommit);
+        setAutoCommit(con, origAutoCommit);
+      }
     });
   }
 
-  private final int[] batchAux(Connection con, String sql, Function<T, Object[]> parameterCreator,
-      T[] objects) {
-
-    int[] result = new int[0];
-    boolean origAutoCommit = getAutoCommit(con);
-
-    try (PreparedStatement stmt = con.prepareStatement(sql)) {
-      setAutoCommit(con, false);
-      final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
-      for (int i = 0; i < objects.length; i++) {
-        T obj = objects[i];
-        this.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
-        batchHelper.addBatchAndExecuteIfReachedThreshold();
-      }
-      result = batchHelper.finish();
-      return result;
-    } catch (Exception e) {
-      rollbackIfRequired(con, origAutoCommit);
-      throw Try.rethrow(e);
-    } finally {
-      commitIfRequired(con, origAutoCommit);
-      setAutoCommit(con, origAutoCommit);
-    }
-  }
 
 
   /**
@@ -99,8 +92,9 @@ public abstract class MultiRowProcessor<T> {
 
     final int[] result = exec.apply(objects);
 
-    dp.ifPresent(sw -> log.debug("{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
-        sw.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
+    dp.ifPresent(lp -> lp.debug(getClass(),
+        "{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
+        lp.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
         tableMapping.getObjectClass(), tableMapping.getTableName(),
         Try.getOrNull(() -> con.getMetaData().getURL())));
     return result;
