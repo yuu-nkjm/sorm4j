@@ -233,12 +233,12 @@ public final class SormImpl implements Sorm {
 
     @Override
     public <S> TypedOrmTransaction<S> type(Class<S> objectClass) {
-      return new TypedOrmTransactionImpl<>(objectClass, (OrmTransactionImpl) ormConnection);
+      return new TypedOrmTransactionImpl<>(objectClass, (OrmTransactionImpl) conn);
     }
 
     @Override
     public OrmTransaction untype() {
-      return (OrmTransactionImpl) ormConnection;
+      return (OrmTransactionImpl) conn;
     }
 
   }

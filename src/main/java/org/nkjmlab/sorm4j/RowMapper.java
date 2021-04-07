@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  *
@@ -31,7 +32,8 @@ public interface RowMapper<T> {
    * @param rowMapper
    * @return
    */
-  static <T> FunctionHandler<ResultSet, List<T>> convertToRowsMapper(RowMapper<T> rowMapper) {
+  @Experimental
+  static <T> FunctionHandler<ResultSet, List<T>> convertToRowListMapper(RowMapper<T> rowMapper) {
     return resultSet -> {
       final List<T> ret = new ArrayList<>();
       int rowNum = 0;
