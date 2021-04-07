@@ -4,7 +4,6 @@ import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
@@ -77,10 +76,5 @@ public final class ColumnToAccessorMap {
         + "  OrmColumnAliasPrefix=[" + columnAliasPrefix + "]";
 
   }
-
-  public Set<String> keySet() {
-    return columnToAccessorMap.keySet();
-  }
-
 
 }
