@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
@@ -41,6 +42,8 @@ public final class SqlStatementImpl implements SqlStatement {
     return parameters;
   }
 
+  private static final String LIST_PLACEHOLDER = "<?>";
+  private static final String EMBEDDED_PLACEHOLDER = "$?$";
 
   public static SqlStatement from(String sql, Object... parameters) {
     SqlStatement st = new SqlStatementImpl(sql, parameters);
@@ -54,86 +57,63 @@ public final class SqlStatementImpl implements SqlStatement {
     return st;
   }
 
-  private static final char LIST_PLACEHOLDER_PREFIX = '<';
-  private static final char LIST_PLACEHOLDER_SUFFIX = '>';
-  private static final String LIST_PLACEHOLDER =
-      LIST_PLACEHOLDER_PREFIX + "?" + LIST_PLACEHOLDER_SUFFIX;
 
   private static SqlStatement procListPlaceholder(String sql, Object[] parameters) {
-    final char[] arry = sql.toCharArray();
-    final List<Integer> listParametersIndexs = new ArrayList<>();
-    int parameterIndex = 0;
+    final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '<', '?', '>');
 
-    for (int i = 0; i < arry.length; i++) {
-      char c = arry[i];
-      if (c == '?' && i - 1 >= 0 && arry[i - 1] == LIST_PLACEHOLDER_PREFIX && i + 1 < arry.length
-          && arry[i + 1] == LIST_PLACEHOLDER_SUFFIX) {
-        listParametersIndexs.add(parameterIndex);
-        parameterIndex++;
-      } else if (c == '?') {
-        parameterIndex++;
-      }
-    }
-    String expanddedSql = sql;
-
-    for (int i = 0; i < listParametersIndexs.size(); i++) {
-      int index = expanddedSql.indexOf(LIST_PLACEHOLDER);
-      List<?> parameter = (List<?>) parameters[listParametersIndexs.get(i)];
-      expanddedSql = expanddedSql.subSequence(0, index)
-          + "?,".repeat(parameter.size()).substring(0, 2 * parameter.size() - 1)
-          + expanddedSql.substring(index + 3, expanddedSql.length());
-    }
-    List<Object> afterEmbeddedParams = new ArrayList<>();
+    List<Object> flattenListParams = new ArrayList<>();
     for (int i = 0; i < parameters.length; i++) {
-      if (listParametersIndexs.contains(i)) {
-        List<?> parameter = (List<?>) parameters[i];
-        parameter.forEach(p -> afterEmbeddedParams.add(p));
+      if (specialParameterIndexes.contains(i)) {
+        ((List<?>) parameters[i]).forEach(p -> flattenListParams.add(p));
       } else {
-        afterEmbeddedParams.add(parameters[i]);
+        flattenListParams.add(parameters[i]);
       }
     }
-
-    return new SqlStatementImpl(expanddedSql, afterEmbeddedParams.toArray());
+    String _sql =
+        StringUtils.replacePlaceholder(sql, LIST_PLACEHOLDER, specialParameterIndexes.size(), index -> {
+          int parameterLength = ((List<?>) parameters[specialParameterIndexes.get(index)]).size();
+          return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
+        });
+    return new SqlStatementImpl(_sql, flattenListParams.toArray());
 
   }
 
-  private static final char EMBEDDED_PLACEHOLDER_PREFIX = '$';
-  private static final char EMBEDDED_PLACEHOLDER_SUFFIX = '$';
-  private static final String EMBEDDED_PLACEHOLDER =
-      EMBEDDED_PLACEHOLDER_PREFIX + "?" + EMBEDDED_PLACEHOLDER_SUFFIX;
 
   private static SqlStatement procEmbeddedPlaceholder(String sql, Object[] parameters) {
 
-    final char[] arry = sql.toCharArray();
-    final List<Integer> embeddedParametersIndexs = new ArrayList<>();
+    final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '$', '?', '$');
+
+    List<Object> removedEmbeddedParams = new ArrayList<>();
+    for (int i = 0; i < parameters.length; i++) {
+      if (!specialParameterIndexes.contains(i)) {
+        removedEmbeddedParams.add(parameters[i]);
+      }
+    }
+    String _sql = StringUtils.replacePlaceholder(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
+        index -> SqlUtils.literal(parameters[specialParameterIndexes.get(index)]));
+
+    return new SqlStatementImpl(_sql, removedEmbeddedParams.toArray());
+  }
+
+
+  private static List<Integer> createSpecialParameterIndexes(String str, char prefix,
+      char normalPlaceholder, char suffix) {
+    final char[] arry = str.toCharArray();
+
+    final List<Integer> ret = new ArrayList<>();
     int parameterIndex = 0;
 
     for (int i = 0; i < arry.length; i++) {
       char c = arry[i];
-      if (c == '?' && i - 1 >= 0 && arry[i - 1] == EMBEDDED_PLACEHOLDER_PREFIX
-          && i + 1 < arry.length && arry[i + 1] == EMBEDDED_PLACEHOLDER_SUFFIX) {
-        embeddedParametersIndexs.add(parameterIndex);
+      if (c == normalPlaceholder && i - 1 >= 0 && arry[i - 1] == prefix && i + 1 < arry.length
+          && arry[i + 1] == suffix) {
+        ret.add(parameterIndex);
         parameterIndex++;
-      } else if (c == '?') {
+      } else if (c == normalPlaceholder) {
         parameterIndex++;
       }
     }
-    String embeddedSql = sql;
-
-    for (int i = 0; i < embeddedParametersIndexs.size(); i++) {
-      int index = embeddedSql.indexOf(EMBEDDED_PLACEHOLDER);
-      embeddedSql = embeddedSql.subSequence(0, index)
-          + SqlUtils.literal(parameters[embeddedParametersIndexs.get(i)])
-          + embeddedSql.substring(index + 3, embeddedSql.length());
-    }
-    List<Object> afterEmbeddedParams = new ArrayList<>();
-    for (int i = 0; i < parameters.length; i++) {
-      if (!embeddedParametersIndexs.contains(i)) {
-        afterEmbeddedParams.add(parameters[i]);
-      }
-    }
-
-    return new SqlStatementImpl(embeddedSql, afterEmbeddedParams.toArray());
+    return ret;
   }
 
 
