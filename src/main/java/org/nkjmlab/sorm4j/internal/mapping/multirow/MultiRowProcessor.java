@@ -54,34 +54,29 @@ public abstract class MultiRowProcessor<T> {
   public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
       T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects, nonNullObjects -> {
-      return batchAux(con, sql, obj -> parameterCreator.apply(obj), nonNullObjects);
+      int[] result = new int[0];
+      boolean origAutoCommit = getAutoCommit(con);
+
+      try (PreparedStatement stmt = con.prepareStatement(sql)) {
+        setAutoCommit(con, false);
+        final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
+        for (int i = 0; i < objects.length; i++) {
+          T obj = objects[i];
+          this.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
+          batchHelper.addBatchAndExecuteIfReachedThreshold();
+        }
+        result = batchHelper.finish();
+        return result;
+      } catch (Exception e) {
+        rollbackIfRequired(con, origAutoCommit);
+        throw Try.rethrow(e);
+      } finally {
+        commitIfRequired(con, origAutoCommit);
+        setAutoCommit(con, origAutoCommit);
+      }
     });
   }
 
-  private final int[] batchAux(Connection con, String sql, Function<T, Object[]> parameterCreator,
-      T[] objects) {
-
-    int[] result = new int[0];
-    boolean origAutoCommit = getAutoCommit(con);
-
-    try (PreparedStatement stmt = con.prepareStatement(sql)) {
-      setAutoCommit(con, false);
-      final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
-      for (int i = 0; i < objects.length; i++) {
-        T obj = objects[i];
-        this.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
-        batchHelper.addBatchAndExecuteIfReachedThreshold();
-      }
-      result = batchHelper.finish();
-      return result;
-    } catch (Exception e) {
-      rollbackIfRequired(con, origAutoCommit);
-      throw Try.rethrow(e);
-    } finally {
-      commitIfRequired(con, origAutoCommit);
-      setAutoCommit(con, origAutoCommit);
-    }
-  }
 
 
   /**
