@@ -40,7 +40,6 @@ public interface TypedOrmReader<T> {
 
   /**
    *
-   * @param <T>
    * @param object
    * @return
    */
