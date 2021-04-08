@@ -71,61 +71,77 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       constructor.setAccessible(true);
     }
 
-    abstract List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException;
+    abstract List<S> loadPojoList(ResultSet resultSet, List<String> columns) throws SQLException;
 
-    abstract S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException;
+    abstract S loadPojo(ResultSet resultSet, List<String> columns) throws SQLException;
 
   }
 
+  private final Map<List<String>, int[]> columnTypesMap = new ConcurrentHashMap<>();
+
+  private int[] getColumnTypes(ResultSet resultSet, List<String> columns) {
+    return columnTypesMap.computeIfAbsent(columns, k -> Try.getOrThrow(() -> {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      int n = metaData.getColumnCount();
+      int[] ret = new int[n];
+
+      for (int i = 1; i <= ret.length; i++) {
+        ret[i - 1] = metaData.getColumnType(i);
+      }
+      return ret;
+    }, Try::rethrow));
+  }
 
   private final class SetterPojoCreator<S> extends PojoCreator<S> {
     // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
     // https://github.com/yuu-nkjm/sorm4j/issues/26
-    private final Map<List<String>, List<Class<?>>> setterParameterTypesMap =
-        new ConcurrentHashMap<>();
+    private final Map<List<String>, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
 
     public SetterPojoCreator(Constructor<S> constructor) {
       super(constructor);
     }
 
-    private List<Class<?>> getSetterParameterTypes(List<String> columns) {
-      return setterParameterTypesMap.computeIfAbsent(columns,
-          k -> columns.stream().map(columnName -> {
-            Accessor acc = columnToAccessorMap.get(columnName);
-            return acc != null ? acc.getSetterParameterType() : null;
-          }).collect(Collectors.toList()));
+    private Class<?>[] getSetterTypes(List<String> columns) {
+      return setterTypesMap.computeIfAbsent(columns, k -> columns.stream().map(columnName -> {
+        Accessor acc = columnToAccessorMap.get(columnName);
+        return acc != null ? acc.getSetterParameterType() : null;
+      }).toArray(Class[]::new));
     }
 
 
     @Override
-    S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
-      final List<Class<?>> setterParameterTypes = getSetterParameterTypes(columns);
-      return createPojo(columns, setterParameterTypes, resultSet);
+    S loadPojo(ResultSet resultSet, List<String> columns) throws SQLException {
+      final Class<?>[] setterTypes = getSetterTypes(columns);
+      final int[] columnTypes = getColumnTypes(resultSet, columns);
+      return createPojo(resultSet, columns, columnTypes, setterTypes);
     }
 
+
+
     @Override
-    public List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException {
-      final List<Class<?>> setterParameterTypes = getSetterParameterTypes(columns);
+    public List<S> loadPojoList(ResultSet resultSet, List<String> columns) throws SQLException {
+      final Class<?>[] setterTypes = getSetterTypes(columns);
+      final int[] columnTypes = getColumnTypes(resultSet, columns);
 
       final List<S> ret = new ArrayList<>();
       while (resultSet.next()) {
-        ret.add(createPojo(columns, setterParameterTypes, resultSet));
+        ret.add(createPojo(resultSet, columns, columnTypes, setterTypes));
       }
       return ret;
     }
 
-    private S createPojo(List<String> columns, List<Class<?>> setterParameterTypes,
-        ResultSet resultSet) {
+    private S createPojo(ResultSet resultSet, List<String> columns, int[] sqlTypes,
+        Class<?>[] setterTypes) {
       try {
         final S ret = constructor.newInstance();
         for (int i = 1; i <= columns.size(); i++) {
-          final Class<?> setterParameterType = setterParameterTypes.get(i - 1);
-          if (setterParameterType == null) {
+          final Class<?> setterType = setterTypes[i - 1];
+          final int sqlType = sqlTypes[i - 1];
+          if (setterType == null) {
             continue;
           }
           final String columnName = columns.get(i - 1);
-          final Object value =
-              resultSetConverter.getValueBySetterParameterType(resultSet, i, setterParameterType);
+          final Object value = resultSetConverter.getColumnValue(resultSet, i, sqlType, setterType);
           setValue(ret, columnName, value);
         }
         return ret;
@@ -180,7 +196,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
 
 
-    private S createPojo(int[] orders, Class<?>[] parameterTypes, ResultSet resultSet) {
+    private S createPojo(ResultSet resultSet, int[] sqlTypes, Class<?>[] parameterTypes,
+        int[] orders) {
       try {
         final Object[] params = new Object[parametersLength];
         for (int i = 1; i <= orders.length; i++) {
@@ -188,8 +205,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           if (order == -1) {
             continue;
           }
-          params[order] =
-              resultSetConverter.getValueBySetterParameterType(resultSet, i, parameterTypes[i - 1]);
+          params[order] = resultSetConverter.getColumnValue(resultSet, i, sqlTypes[i - 1],
+              parameterTypes[i - 1]);
         }
         return constructor.newInstance(params);
       } catch (SQLException e) {
@@ -218,22 +235,24 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
     @Override
-    List<S> loadPojoList(List<String> columns, ResultSet resultSet) throws SQLException {
-      final int[] orders = getParameterOrders(columns);
+    List<S> loadPojoList(ResultSet resultSet, List<String> columns) throws SQLException {
+      final int[] columnTypes = getColumnTypes(resultSet, columns);
       final Class<?>[] parameterTypes = getParameterTypes(columns);
+      final int[] orders = getParameterOrders(columns);
       final List<S> ret = new ArrayList<>();
       while (resultSet.next()) {
-        ret.add(createPojo(orders, parameterTypes, resultSet));
+        ret.add(createPojo(resultSet, columnTypes, parameterTypes, orders));
       }
       return ret;
     }
 
 
     @Override
-    S loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
-      final int[] orders = getParameterOrders(columns);
+    S loadPojo(ResultSet resultSet, List<String> columns) throws SQLException {
+      final int[] columnTypes = getColumnTypes(resultSet, columns);
       final Class<?>[] parameterTypes = getParameterTypes(columns);
-      return createPojo(orders, parameterTypes, resultSet);
+      final int[] orders = getParameterOrders(columns);
+      return createPojo(resultSet, columnTypes, parameterTypes, orders);
     }
 
   }
@@ -244,7 +263,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
   List<T> loadPojoList(ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojoList(createColumns(resultSet), resultSet);
+    return pojoCreator.loadPojoList(resultSet, createColumns(resultSet));
   }
 
   T loadPojo(ResultSet resultSet) throws SQLException {
@@ -252,7 +271,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
   T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojo(columns, resultSet);
+    return pojoCreator.loadPojo(resultSet, columns);
   }
 
 

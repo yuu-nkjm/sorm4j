@@ -108,11 +108,9 @@ public final class TableMapping<T> extends Mapping<T> {
       List<Object> ret = new ArrayList<>();
       while (resultSet.next()) {
         String columnName = metaData.getColumnName(1);
-        // Don't user type from metadata (metaData.getColumnType(1)) because object class of
-        // container is prior.
+        int columnType = metaData.getColumnType(1);
         Class<?> classType = getSetterParamType(columnName);
-        final Object value =
-            resultSetConverter.getValueBySetterParameterType(resultSet, 1, classType);
+        final Object value = resultSetConverter.getColumnValue(resultSet, 1, columnType, classType);
         setValue(object, columnName, value);
         ret.add(value);
       }

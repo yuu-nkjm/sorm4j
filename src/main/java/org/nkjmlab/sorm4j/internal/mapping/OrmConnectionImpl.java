@@ -421,22 +421,28 @@ public class OrmConnectionImpl implements OrmConnection {
 
   private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
-    Try.runOrThrow(() -> {
-      ResultSetMetaData metaData = resultSet.getMetaData();
-      if (metaData.getColumnCount() != 1) {
-        throw new SormException("ResultSet returned [" + metaData.getColumnCount()
-            + "] columns but 1 column was expected to load data into an instance of ["
-            + objectClass.getName() + "]");
-      }
-    }, Try::rethrow);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(resultSetConverter.toSingleNativeObject(resultSet, objectClass));
+      ret.add(resultSetConverter.toSingleNativeObject(resultSet,
+          getSingeSqlType(objectClass, resultSet), objectClass));
     }
     return ret;
 
   }
 
+
+  private int getSingeSqlType(Class<?> objectClass, ResultSet resultSet) {
+    return Try.getOrThrow(() -> {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+
+      if (metaData.getColumnCount() != 1) {
+        throw new SormException("ResultSet returned [" + metaData.getColumnCount()
+            + "] columns but 1 column was expected to load data into an instance of ["
+            + objectClass.getName() + "]");
+      }
+      return metaData.getColumnType(1);
+    }, Try::rethrow);
+  }
 
   <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     T ret = null;
@@ -485,7 +491,8 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
     return Try.getOrThrow(() -> resultSetConverter.isEnableToConvertNativeObject(objectClass)
-        ? resultSetConverter.toSingleNativeObject(resultSet, objectClass)
+        ? resultSetConverter.toSingleNativeObject(resultSet,
+            getSingeSqlType(objectClass, resultSet), objectClass)
         : loadSinglePojo(objectClass, resultSet), Try::rethrow);
   }
 

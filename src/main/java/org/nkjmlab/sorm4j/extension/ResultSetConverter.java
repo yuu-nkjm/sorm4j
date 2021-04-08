@@ -31,12 +31,13 @@ public interface ResultSetConverter {
    *
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
-   * @param setterParameterType {@link java.lang.Class} of the object to be returned
+   * @param columnType TODO
+   * @param setterType {@link java.lang.Class} of the object to be returned
    * @throws SQLException
    *
    */
-  Object getValueBySetterParameterType(ResultSet resultSet, int column,
-      Class<?> setterParameterType) throws SQLException;
+  Object getColumnValue(ResultSet resultSet, int column, int columnType, Class<?> setterType)
+      throws SQLException;
 
   /**
    * Returns the given type could be converted to the native object or not.
@@ -65,11 +66,13 @@ public interface ResultSetConverter {
    *
    * @param <T>
    * @param resultSet
+   * @param columnType
    * @param objectClass
    * @return
    * @throws SQLException
    */
-  <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass) throws SQLException;
+  <T> T toSingleNativeObject(ResultSet resultSet, int columnType, Class<T> objectClass)
+      throws SQLException;
 
 
 
