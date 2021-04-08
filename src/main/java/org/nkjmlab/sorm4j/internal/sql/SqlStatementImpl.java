@@ -1,8 +1,11 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
@@ -64,13 +67,23 @@ public final class SqlStatementImpl implements SqlStatement {
     List<Object> flattenListParams = new ArrayList<>();
     for (int i = 0; i < parameters.length; i++) {
       if (specialParameterIndexes.contains(i)) {
-        ((List<?>) parameters[i]).forEach(p -> flattenListParams.add(p));
+        Object o = parameters[i];
+        if (o instanceof Collection) {
+          ((Collection<?>) o).forEach(p -> flattenListParams.add(p));
+        } else if (o.getClass().isArray()) {
+          int length = Array.getLength(o);
+          for (int j = 0; j < length; j++) {
+            flattenListParams.add(Array.get(o, j));
+          }
+        } else {
+          throw new SormException("<?> parameter should be bind Collection or Array");
+        }
       } else {
         flattenListParams.add(parameters[i]);
       }
     }
-    String _sql =
-        StringUtils.replacePlaceholder(sql, LIST_PLACEHOLDER, specialParameterIndexes.size(), index -> {
+    String _sql = StringUtils.replacePlaceholder(sql, LIST_PLACEHOLDER,
+        specialParameterIndexes.size(), index -> {
           int parameterLength = ((List<?>) parameters[specialParameterIndexes.get(index)]).size();
           return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
         });
@@ -89,8 +102,9 @@ public final class SqlStatementImpl implements SqlStatement {
         removedEmbeddedParams.add(parameters[i]);
       }
     }
-    String _sql = StringUtils.replacePlaceholder(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
-        index -> SqlUtils.literal(parameters[specialParameterIndexes.get(index)]));
+    String _sql =
+        StringUtils.replacePlaceholder(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
+            index -> SqlUtils.literal(parameters[specialParameterIndexes.get(index)]));
 
     return new SqlStatementImpl(_sql, removedEmbeddedParams.toArray());
   }
