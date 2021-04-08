@@ -1,17 +1,11 @@
 package org.nkjmlab.sorm4j.extension;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
  * Default implementation of {@link ResultSetConverter}
@@ -20,44 +14,19 @@ import org.nkjmlab.sorm4j.internal.util.StringUtils;
  *
  */
 
-public class DefaultResultSetConverter implements ResultSetConverter {
-
-
-  @Override
-  public final Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException {
-    final Map<String, Object> ret = new LinkedHashMap<>();
-    for (int i = 1; i <= columns.size(); i++) {
-      int type = columnTypes.get(i - 1);
-      Object value = getValueBySqlType(resultSet, i, type);
-      ret.put(StringUtils.toLowerCase(columns.get(i - 1)), value);
-    }
-    return ret;
-  }
-
-  @Override
-  public final <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass)
-      throws SQLException {
-    // Don't user type from metadata (metaData.getColumnType(1)) because object class of container
-    // is prior.
-    Object value = getValueBySetterParameterType(resultSet, 1, objectClass);
-    @SuppressWarnings("unchecked")
-    T valueT = (T) value;
-    return valueT;
-  }
-
+public class DefaultResultSetConverter extends AbstractResultSetConverter {
 
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
   // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
   @Override
-  public Object getValueBySetterParameterType(ResultSet resultSet, int column,
-      Class<?> setterParameterType) throws SQLException {
-    if (setterParameterType.isEnum()) {
+  public Object getColumnValue(ResultSet resultSet, int column, int columnType, Class<?> setterType)
+      throws SQLException {
+    if (setterType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(setterParameterType.getEnumConstants())
-          .filter(o -> o.toString().equals(v)).findAny().orElse(null);
-    } else if (setterParameterType.isArray()) {
-      final String name = setterParameterType.getComponentType().getName();
+      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
+          .findAny().orElse(null);
+    } else if (setterType.isArray()) {
+      final String name = setterType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -69,12 +38,12 @@ public class DefaultResultSetConverter implements ResultSetConverter {
         }
         default:
           LoggerFactory.debug(getClass(),
-              "Could not find coresponding converter for type [{}] on column [{}]. ResultSet.getObject method will be used.",
+              "Could not find any coresponding convert rule for type [{}] on column [{}]. ResultSet#getArray method will be used.",
               name, column);
           return resultSet.getObject(column);
       }
     } else {
-      final String name = setterParameterType.getName();
+      final String name = setterType.getName();
       switch (name) {
         case "boolean":
           return resultSet.getBoolean(column);
@@ -156,7 +125,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
         case "java.lang.Object":
           return resultSet.getObject(column);
         default:
-          // Could not find corresponding converter. ResultSet.getObject method will be used.
+          // Could not find corresponding converter. ResultSet#getObject method will be used.
           return resultSet.getObject(column);
       }
     }
@@ -177,7 +146,8 @@ public class DefaultResultSetConverter implements ResultSetConverter {
    * @return
    * @throws SQLException
    */
-  protected Object getValueBySqlType(ResultSet resultSet, int column, int sqlType)
+  @Override
+  protected Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
     switch (sqlType) {
@@ -244,33 +214,9 @@ public class DefaultResultSetConverter implements ResultSetConverter {
       case java.sql.Types.OTHER:
         return resultSet.getObject(column);
       default:
-        // Could not find corresponding converter. ResultSet.getObject method will be used.
+        // Could not find corresponding converter. ResultSet#getObject method will be used.
         return resultSet.getObject(column);
     }
-  }
-
-  private static final Set<Class<?>> nativeSqlTypes = Set.of(boolean.class, Boolean.class,
-      byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
-      Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
-      byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-      java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-      java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-      Object.class);
-
-  /**
-   * Returns the given type is enable to convert native object.
-   *
-   * Following classes are regarded as native class: boolean.class, Boolean.class, byte.class,
-   * Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class,
-   * float.class, Float.class, double.class, Double.class, char.class, Character.class,
-   * byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-   * java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-   * java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-   * Object.class
-   */
-  @Override
-  public boolean isEnableToConvertNativeObject(Class<?> objectClass) {
-    return nativeSqlTypes.contains(objectClass);
   }
 
 }
