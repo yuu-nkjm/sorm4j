@@ -12,7 +12,8 @@ import org.nkjmlab.sorm4j.OrmConnection;
 
 public class BeanTest {
 
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log =
+      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
 
   public static void test(Class<?> caller, OrmConnection persist, BeanMap beanMap) {
@@ -134,9 +135,12 @@ public class BeanTest {
 
           // check if the result is not null and has the same data as the object being tested
           if (ret == null) {
-            log.error("{}, {}", fieldValueConverted, persist.readAll(obj.getClass()));
+            List<? extends Object> all = persist.readAll(obj.getClass());
+            log.error("{}, {}", fieldValueConverted, all);
             throw new AssertionError("Expected not null value but got null as result of [" + sql
-                + "] with parameter [" + fieldValue + "]");
+                + "] with parameter [" + fieldValue + "] , converted = [" + fieldValueConverted
+                + "] type [" + (fieldValue == null ? "null" : fieldValue.getClass())
+                + "] converted [" + fieldType + "]" + System.lineSeparator() + all);
           }
           if (!obj.equals(ret)) {
             throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
@@ -282,7 +286,7 @@ public class BeanTest {
    */
   private static String dbName(String s) {
     String name = s.replaceAll("([A-Z])", "_$1").toLowerCase();
-    return (name.charAt(0) == '_' ? name.substring(1) : name).toUpperCase();
+    return (name.charAt(0) == '_' ? name.substring(1) : name).toUpperCase().toLowerCase();
   }
 
 }

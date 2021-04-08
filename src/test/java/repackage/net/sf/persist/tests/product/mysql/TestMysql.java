@@ -2,21 +2,17 @@
 
 package repackage.net.sf.persist.tests.product.mysql;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import org.h2.jdbcx.JdbcConnectionPool;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.common.SormTestUtils;
 import repackage.net.sf.persist.tests.product.framework.BeanMap;
 import repackage.net.sf.persist.tests.product.framework.BeanTest;
 import repackage.net.sf.persist.tests.product.framework.FieldMap;
@@ -24,19 +20,18 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestMysql {
 
-  private static final JdbcConnectionPool connectionPool = JdbcConnectionPool
-      .create("jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE", "persist", "persist");
+
+  private static DataSource dataSource;
+
+  public static void main(String[] args) {
+    beforAll();
+  }
 
   @BeforeAll
   static void beforAll() {
-    try (Connection conn = connectionPool.getConnection()) {
-      Statement st = conn.createStatement();
-      String sql = String.join(System.lineSeparator(),
-          Files.readAllLines(new File(TestMysql.class.getResource("mysql.sql").toURI()).toPath()));
-      st.executeUpdate(sql);
-    } catch (SQLException | URISyntaxException | IOException e) {
-      e.printStackTrace();
-    }
+    dataSource = SormTestUtils.getDataSource(TestMysql.class,
+        "jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE");
+    SormTestUtils.executeTableSchema(TestMysql.class, dataSource);
 
   }
 
@@ -44,7 +39,7 @@ public class TestMysql {
 
   @Test
   public void testStringTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
+    try (Connection conn = dataSource.getConnection()) {
       OrmConnection persist = SormFactory.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
@@ -70,7 +65,7 @@ public class TestMysql {
   @Test
   public void testNumericTypes() throws SQLException {
 
-    try (Connection conn = connectionPool.getConnection()) {
+    try (Connection conn = dataSource.getConnection()) {
       OrmConnection persist = SormFactory.toOrmConnection(conn);
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -99,18 +94,12 @@ public class TestMysql {
 
   @Test
   public void testDatetimeTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
+    try (Connection conn = dataSource.getConnection()) {
       OrmConnection persist = SormFactory.toOrmConnection(conn);
 
-      // not testing timestamp here, it doesn't support null values
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
-          .addField(
-              new FieldMap("datetimeCol").setTypes(java.sql.Timestamp.class, java.util.Date.class))
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
-          // .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class, java.util.Date.class))
-          .addField(new FieldMap("year2Col").setTypes(Short.class, short.class)
-              .setBoundaries(01, 99).setSupportsCompareMapValue(false))
           .addField(new FieldMap("year4Col").setTypes(Short.class, short.class)
               .setBoundaries(1901, 1999).setSupportsCompareMapValue(false));
 
@@ -120,7 +109,7 @@ public class TestMysql {
 
   @Test
   public void testBinaryTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
+    try (Connection conn = dataSource.getConnection()) {
       OrmConnection persist = SormFactory.toOrmConnection(conn);
 
       Class<?>[] binaryTypes =
