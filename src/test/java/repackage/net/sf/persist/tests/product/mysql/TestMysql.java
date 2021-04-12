@@ -20,7 +20,6 @@ import repackage.net.sf.persist.tests.product.framework.FieldMap;
 
 public class TestMysql {
 
-
   private static DataSource dataSource;
 
   public static void main(String[] args) {
@@ -32,15 +31,13 @@ public class TestMysql {
     dataSource = SormTestUtils.getDataSource(TestMysql.class,
         "jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE");
     SormTestUtils.executeTableSchema(TestMysql.class, dataSource);
-
   }
 
-  // several tests are inherited from TestSimple
 
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection persist = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
@@ -58,7 +55,7 @@ public class TestMysql {
           .addField(new FieldMap("enumCol").setTypes(characterTypes).setSize(1));
       // .addField(new FieldMap("setCol").setTypes(characterTypes).setSize(1));
 
-      BeanTest.test(getClass(), persist, beanMap);
+      BeanTest.test(getClass(), ormConn, beanMap);
     }
   }
 

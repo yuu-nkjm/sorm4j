@@ -16,8 +16,8 @@ public class BeanTest {
       org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
 
-  public static void test(Class<?> caller, OrmConnection persist, BeanMap beanMap) {
-    Connection connection = persist.getJdbcConnection();
+  public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap) {
+    Connection connection = ormConn.getJdbcConnection();
     Class<?> cls = DynamicBean.createBeanClass(caller, beanMap);
 
     String tableName = dbName(beanMap.getClassName());
@@ -27,7 +27,7 @@ public class BeanTest {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-    BeanTest.testAll(persist, cls, beanMap);
+    BeanTest.testAll(ormConn, cls, beanMap);
 
 
     try {
@@ -35,7 +35,7 @@ public class BeanTest {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-    BeanTest.testAllNull(persist, cls, beanMap);
+    BeanTest.testAllNull(ormConn, cls, beanMap);
 
 
   }

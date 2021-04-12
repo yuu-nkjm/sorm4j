@@ -1,10 +1,4 @@
-
-create table simple (
-	id serial,
-	string_col varchar(255),
-	int_col int,
-	primary key (id)
-);
+drop table if exists numeric_types, datetime_types, string_types, binary_types;
 
 create table numeric_types (
 	smallint_col smallint,
