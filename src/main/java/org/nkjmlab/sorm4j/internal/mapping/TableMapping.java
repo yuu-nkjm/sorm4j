@@ -113,7 +113,7 @@ public final class TableMapping<T> extends Mapping<T> {
         int columnType = metaData.getColumnType(1);
         Class<?> classType = getSetterParamType(columnName);
         final Object value =
-            resultSetConverter.getColumnValue(options, resultSet, 1, columnType, classType);
+            resultSetConverter.convertColumnValueTo(options, resultSet, 1, columnType, classType);
         setValue(object, columnName, value);
         ret.add(value);
       }

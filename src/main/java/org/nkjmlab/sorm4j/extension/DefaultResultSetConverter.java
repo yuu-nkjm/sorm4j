@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -47,17 +50,48 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
     return nativeSqlTypes.contains(objectClass);
   }
 
+  private final List<ColumnValueConverter> converters;
+
+  public DefaultResultSetConverter() {
+    this.converters = Collections.emptyList();
+  }
+
+  public DefaultResultSetConverter(List<ColumnValueConverter> converters) {
+    this.converters = new ArrayList<>(converters);
+  }
+
+
+  public static interface ColumnValueConverter {
+    boolean isConvertable(SormOptions options, ResultSet resultSet, int column, int columnType,
+        Class<?> toType);
+
+    Object convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+        Class<?> toType);
+  }
+
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
   // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
+
+
   @Override
-  public Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> setterType) throws SQLException {
-    if (setterType.isEnum()) {
+  public Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column,
+      int columnType, Class<?> toType) throws SQLException {
+
+    if (converters.size() != 0) {
+      Optional<ColumnValueConverter> conv = converters.stream()
+          .filter(co -> co.isConvertable(options, resultSet, column, columnType, toType))
+          .findFirst();
+      if (conv.isPresent()) {
+        return conv.get().convertTo(options, resultSet, column, columnType, toType);
+      }
+    }
+
+    if (toType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
-          .findAny().orElse(null);
-    } else if (setterType.isArray()) {
-      final String name = setterType.getComponentType().getName();
+      return Arrays.stream(toType.getEnumConstants()).filter(o -> o.toString().equals(v)).findAny()
+          .orElse(null);
+    } else if (toType.isArray()) {
+      final String name = toType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -71,7 +105,7 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
           return resultSet.getObject(column);
       }
     } else {
-      final String name = setterType.getName();
+      final String name = toType.getName();
       switch (name) {
         case "boolean":
           return resultSet.getBoolean(column);

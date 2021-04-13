@@ -21,8 +21,8 @@ import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -143,7 +143,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           }
           final String columnName = columns.get(i - 1);
           final Object value =
-              resultSetConverter.getColumnValue(options, resultSet, i, sqlType, setterType);
+              resultSetConverter.convertColumnValueTo(options, resultSet, i, sqlType, setterType);
           setValue(ret, columnName, value);
         }
         return ret;
@@ -207,8 +207,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           if (order == -1) {
             continue;
           }
-          params[order] = resultSetConverter.getColumnValue(options, resultSet, i, sqlTypes[i - 1],
-              parameterTypes[i - 1]);
+          params[order] = resultSetConverter.convertColumnValueTo(options, resultSet, i,
+              sqlTypes[i - 1], parameterTypes[i - 1]);
         }
         return constructor.newInstance(params);
       } catch (SQLException e) {

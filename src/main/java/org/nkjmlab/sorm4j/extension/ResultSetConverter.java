@@ -33,13 +33,13 @@ public interface ResultSetConverter {
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
    * @param columnType
-   * @param setterType {@link java.lang.Class} of the object to be returned
+   * @param toType {@link java.lang.Class} of the object to be returned
    *
    * @throws SQLException
    *
    */
-  Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> setterType) throws SQLException;
+  Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+      Class<?> toType) throws SQLException;
 
   /**
    * Returns the given type could be converted to the native object or not.
