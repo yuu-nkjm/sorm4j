@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -54,11 +57,16 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
     if (type.isEnum()) {
       stmt.setString(column, parameter.toString());
     } else if (type.isArray()) {
-      procArray(type, stmt, column, parameter);
+      final String name = type.getComponentType().getName();
+      procArray(name, stmt, column, parameter);
+    } else if (List.class.isAssignableFrom(type)) {
+      procList(stmt, column, (List) parameter);
     } else {
       procObject(type, stmt, column, parameter);
     }
   }
+
+
 
   /**
    * Treats object.
@@ -148,6 +156,17 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
           stmt.setTimestamp(column,
               parameter == null ? null : new Timestamp(((java.util.Date) parameter).getTime()));
           return;
+        case "java.time.OffsetTime":
+          stmt.setTime(column, parameter == null ? null
+              : java.sql.Time.valueOf(((java.time.OffsetTime) parameter).toLocalTime()));
+          return;
+        case "java.time.OffsetDateTime":
+          stmt.setTimestamp(column, parameter == null ? null
+              : Timestamp.valueOf(((java.time.OffsetDateTime) parameter).toLocalDateTime()));
+          return;
+        case "java.net.URL":
+          stmt.setString(column, parameter == null ? null : ((URL) parameter).toString());
+          return;
         default:
           stmt.setObject(column, parameter);
           return;
@@ -194,10 +213,9 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
    * @param parameter
    * @throws SQLException
    */
-  protected void procArray(Class<?> type, PreparedStatement stmt, int column, Object parameter)
+  protected void procArray(String className, PreparedStatement stmt, int column, Object parameter)
       throws SQLException {
-    final String name = type.getComponentType().getName();
-    switch (name) {
+    switch (className) {
       case "char": {
         stmt.setString(column, parameter == null ? null : String.valueOf((char[]) parameter));
         return;
@@ -224,12 +242,31 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
         stmt.setBytes(column, dst);
         return;
       }
+      case "java.lang.String": {
+        stmt.setArray(column, stmt.getConnection().createArrayOf("varchar", (Object[]) parameter));
+        return;
+      }
+      case "java.lang.Integer": {
+        stmt.setArray(column, stmt.getConnection().createArrayOf("int", (Object[]) parameter));
+        return;
+      }
+      case "java.lang.Double":
+      case "java.lang.Float": {
+        stmt.setArray(column, stmt.getConnection().createArrayOf("float", (Object[]) parameter));
+        return;
+      }
       default: {
         stmt.setObject(column, parameter);
         return;
       }
     }
+  }
 
+  private void procList(PreparedStatement stmt, int column, List<?> parameter) throws SQLException {
+    if (parameter.size() == 0) {
+      throw new SormException("Size of parameter which type is List should be at least one. ");
+    }
+    procArray(parameter.get(0).getClass().getName(), stmt, column, parameter.toArray());
   }
 
 

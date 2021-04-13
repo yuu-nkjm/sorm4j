@@ -73,7 +73,8 @@ public final class SqlStatementImpl implements SqlStatement {
         } else if (o.getClass().isArray()) {
           int length = Array.getLength(o);
           for (int j = 0; j < length; j++) {
-            flattenListParams.add(Array.get(o, j));
+            Object elem = Array.get(o, j);
+            flattenListParams.add(elem);
           }
         } else {
           throw new SormException("<?> parameter should be bind Collection or Array");
@@ -84,11 +85,22 @@ public final class SqlStatementImpl implements SqlStatement {
     }
     String _sql = StringUtils.replacePlaceholder(sql, LIST_PLACEHOLDER,
         specialParameterIndexes.size(), index -> {
-          int parameterLength = ((List<?>) parameters[specialParameterIndexes.get(index)]).size();
+          int parameterLength = getSize(parameters[specialParameterIndexes.get(index)]);
           return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
         });
     return new SqlStatementImpl(_sql, flattenListParams.toArray());
 
+  }
+
+
+  private static int getSize(Object object) {
+    if (object instanceof Collection) {
+      return ((Collection) object).size();
+    } else if (object.getClass().isArray()) {
+      return Array.getLength(object);
+    } else {
+      throw new SormException("<?> parameter should be bind Collection or Array");
+    }
   }
 
 
