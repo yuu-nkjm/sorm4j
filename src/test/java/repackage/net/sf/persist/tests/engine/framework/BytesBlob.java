@@ -18,7 +18,6 @@ public class BytesBlob implements Blob {
   byte[] b;
 
   public BytesBlob(byte[] b) {
-    super();
     this.b = b;
   }
 

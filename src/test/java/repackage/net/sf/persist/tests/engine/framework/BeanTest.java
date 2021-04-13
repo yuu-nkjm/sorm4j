@@ -3,7 +3,6 @@
 
 package repackage.net.sf.persist.tests.engine.framework;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -15,12 +14,11 @@ public class BeanTest {
   private static final org.slf4j.Logger log =
       org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
-  private static Map<String, Class<?>> beanClasses = new HashMap<>();
 
   public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
     ormConn.deleteAllOn(dbName(beanMap.getClassName()));
-    Object obj = DynamicBean.createInstance(getBeanClass(caller, beanMap), beanMap, false);
+    Object obj = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
     tester.accept(obj);
   }
 
@@ -28,15 +26,8 @@ public class BeanTest {
   public static void testNull(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
     ormConn.deleteAllOn(dbName(beanMap.getClassName()));
-    Object objNull = DynamicBean.createInstance(getBeanClass(caller, beanMap), beanMap, true);
+    Object objNull = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
     tester.accept(objNull);
-  }
-
-  private static Class<?> getBeanClass(Class<?> caller, BeanMap beanMap) {
-    String className = DynamicBean.class.getPackageName() + "." + caller.getSimpleName() + "."
-        + beanMap.getClassName();
-    return beanClasses.computeIfAbsent(className,
-        k -> DynamicBean.createBeanClass(className, beanMap));
   }
 
   /**
@@ -249,7 +240,7 @@ public class BeanTest {
    */
   private static String dbName(String s) {
     String name = s.replaceAll("([A-Z])", "_$1").toLowerCase();
-    return (name.charAt(0) == '_' ? name.substring(1) : name).toUpperCase().toLowerCase();
+    return (name.charAt(0) == '_' ? name.substring(1) : name).toLowerCase();
   }
 
 }
