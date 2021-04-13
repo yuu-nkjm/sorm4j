@@ -19,7 +19,7 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
   // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
   @Override
-  public Object getColumnValue(ResultSet resultSet, int column, int columnType, Class<?> setterType)
+  public Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType, Class<?> setterType)
       throws SQLException {
     if (setterType.isEnum()) {
       final String v = resultSet.getString(column);

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.extension;
 
 import java.util.Arrays;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;

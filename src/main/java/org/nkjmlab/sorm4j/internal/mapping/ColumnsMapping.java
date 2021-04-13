@@ -21,6 +21,7 @@ import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -38,9 +39,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final PojoCreator<T> pojoCreator;
 
   @SuppressWarnings("unchecked")
-  public ColumnsMapping(Class<T> objectClass, ResultSetConverter resultSetConverter,
-      ColumnToAccessorMap columnToAccessorMap) {
-    super(resultSetConverter, objectClass, columnToAccessorMap);
+  public ColumnsMapping(SormOptions options, Class<T> objectClass,
+      ResultSetConverter resultSetConverter, ColumnToAccessorMap columnToAccessorMap) {
+    super(options, resultSetConverter, objectClass, columnToAccessorMap);
 
     SetterPojoCreator<T> setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
         () -> objectClass.getDeclaredConstructor(),
@@ -141,7 +142,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
             continue;
           }
           final String columnName = columns.get(i - 1);
-          final Object value = resultSetConverter.getColumnValue(resultSet, i, sqlType, setterType);
+          final Object value =
+              resultSetConverter.getColumnValue(options, resultSet, i, sqlType, setterType);
           setValue(ret, columnName, value);
         }
         return ret;
@@ -205,7 +207,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           if (order == -1) {
             continue;
           }
-          params[order] = resultSetConverter.getColumnValue(resultSet, i, sqlTypes[i - 1],
+          params[order] = resultSetConverter.getColumnValue(options, resultSet, i, sqlTypes[i - 1],
               parameterTypes[i - 1]);
         }
         return constructor.newInstance(params);

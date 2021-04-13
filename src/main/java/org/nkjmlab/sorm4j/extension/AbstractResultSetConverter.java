@@ -31,13 +31,13 @@ public abstract class AbstractResultSetConverter implements ResultSetConverter {
    * Object.class
    */
   @Override
-  public boolean isEnableToConvertNativeObject(Class<?> objectClass) {
+  public boolean isEnableToConvertNativeObject(SormOptions options, Class<?> objectClass) {
     return nativeSqlTypes.contains(objectClass);
   }
 
   @Override
-  public final Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException {
+  public final Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet,
+      List<String> columns, List<Integer> columnTypes) throws SQLException {
     final int cSize = columns.size();
     final Map<String, Object> ret = new LinkedHashMap<>(cSize);
     for (int i = 1; i <= cSize; i++) {
@@ -49,9 +49,9 @@ public abstract class AbstractResultSetConverter implements ResultSetConverter {
 
   @Override
   @SuppressWarnings("unchecked")
-  public final <T> T toSingleNativeObject(ResultSet resultSet, int sqlType, Class<T> objectClass)
+  public final <T> T toSingleNativeObject(SormOptions options, ResultSet resultSet, int sqlType, Class<T> objectClass)
       throws SQLException {
-    return (T) getColumnValue(resultSet, 1, sqlType, objectClass);
+    return (T) getColumnValue(options, resultSet, 1, sqlType, objectClass);
   }
 
   abstract protected Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)

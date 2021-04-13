@@ -20,11 +20,10 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 
 public class DefaultSqlParameterSetter implements SqlParameterSetter {
-  // private static org.slf4j.Logger log =
-  // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @Override
-  public void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException {
+  public void setParameters(SormOptions options, PreparedStatement stmt, Object... parameters)
+      throws SQLException {
     if (parameters == null || parameters.length == 0) {
       return;
     }
@@ -37,6 +36,8 @@ public class DefaultSqlParameterSetter implements SqlParameterSetter {
       }
     }
   }
+
+
 
   /**
    * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.

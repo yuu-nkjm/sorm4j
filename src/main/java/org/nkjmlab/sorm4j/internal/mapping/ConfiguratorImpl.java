@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import org.nkjmlab.sorm4j.Configurator;
+import java.util.HashMap;
+import java.util.Map;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
@@ -24,6 +26,7 @@ public class ConfiguratorImpl implements Configurator {
   private int multiRowSize = 32;
   private int batchSizeWithMultiRow = 5;
   private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
+  private Map<String, Object> options = new HashMap<>();
 
   public ConfiguratorImpl(String configName) {
     this.configName = configName;
@@ -40,13 +43,14 @@ public class ConfiguratorImpl implements Configurator {
     this.multiRowSize = configStore.getMultiRowSize();
     this.batchSizeWithMultiRow = configStore.getBatchSizeWithMultiRow();
     this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
+    this.options = configStore.getOptions();
 
   }
 
   public ConfigStore build() {
-    return new ConfigStore(configName, columnFieldMapper, tableNameMapper, resultSetConverter,
-        sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow,
-        transactionIsolationLevel);
+    return new ConfigStore(configName, options, columnFieldMapper, tableNameMapper,
+        resultSetConverter, sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize,
+        batchSizeWithMultiRow, transactionIsolationLevel);
   }
 
 
@@ -101,6 +105,12 @@ public class ConfiguratorImpl implements Configurator {
   @Override
   public Configurator setTransactionIsolationLevel(int level) {
     this.transactionIsolationLevel = level;
+    return this;
+  }
+
+  @Override
+  public Configurator setOption(String name, Object value) {
+    this.options.put(name, value);
     return this;
   }
 

@@ -9,11 +9,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.SormLogger;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.Column;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
@@ -38,14 +39,17 @@ final class Mappings {
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
 
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
+  private final SormOptions options;
 
 
-  public Mappings(TableNameMapper tableNameMapper, ColumnFieldMapper columnFieldMapper,
-      MultiRowProcessorFactory multiRowProcessorFactory, ResultSetConverter resultSetConverter,
-      SqlParameterSetter sqlParameterSetter, ConcurrentMap<String, TableMapping<?>> tableMappings,
+  public Mappings(SormOptions options, TableNameMapper tableNameMapper,
+      ColumnFieldMapper columnFieldMapper, MultiRowProcessorFactory multiRowProcessorFactory,
+      ResultSetConverter resultSetConverter, SqlParameterSetter sqlParameterSetter,
+      ConcurrentMap<String, TableMapping<?>> tableMappings,
       ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings,
       ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap,
       ConcurrentMap<String, TableName> tableNameToValidTableNameMap) {
+    this.options = options;
     this.tableNameMapper = tableNameMapper;
     this.columnFieldMapper = columnFieldMapper;
     this.multiRowProcessorFactory = multiRowProcessorFactory;
@@ -91,7 +95,7 @@ final class Mappings {
     ColumnToAccessorMap columnToAccessorMap =
         new ColumnToAccessorMap(objectClass, columnFieldMapper.createAccessors(objectClass));
 
-    return new ColumnsMapping<>(objectClass, resultSetConverter, columnToAccessorMap);
+    return new ColumnsMapping<>(options, objectClass, resultSetConverter, columnToAccessorMap);
   }
 
   public <T> TableMapping<T> createTableMapping(Class<T> objectClass, String tableName,
@@ -128,7 +132,7 @@ final class Mappings {
 
     ColumnToAccessorMap columnToAccessorMap = new ColumnToAccessorMap(objectClass, accessors);
 
-    return new TableMapping<>(resultSetConverter, objectClass, columnToAccessorMap,
+    return new TableMapping<>(options, resultSetConverter, objectClass, columnToAccessorMap,
         sqlParameterSetter, multiRowProcessorFactory, sql);
   }
 
@@ -178,5 +182,9 @@ final class Mappings {
 
   public SqlParameterSetter getSqlParameterSetter() {
     return sqlParameterSetter;
+  }
+
+  public SormOptions getOptions() {
+    return options;
   }
 }

@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
@@ -33,8 +35,6 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  */
 
 public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
-  // private static final org.slf4j.Logger log =
-  // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   protected Class<T> objectClass;
   protected OrmConnectionImpl conn;
@@ -455,6 +455,18 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.updateOn(tableName, objects);
+  }
+
+  @Override
+  public <S> S applyPreparedStatementHandler(SqlStatement sql,
+      FunctionHandler<PreparedStatement, S> handler) {
+    return conn.applyPreparedStatementHandler(sql, handler);
+  }
+
+  @Override
+  public void acceptPreparedStatementHandler(SqlStatement sql,
+      ConsumerHandler<PreparedStatement> handler) {
+    conn.acceptPreparedStatementHandler(sql, handler);
   }
 
 

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.internal.mapping.ConfigStore;
 import org.nkjmlab.sorm4j.internal.mapping.ConfiguratorImpl;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
