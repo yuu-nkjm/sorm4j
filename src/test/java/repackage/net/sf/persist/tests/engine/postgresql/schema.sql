@@ -34,5 +34,3 @@ create table binary_types (
 	blob_col oid
 );
 
-
-

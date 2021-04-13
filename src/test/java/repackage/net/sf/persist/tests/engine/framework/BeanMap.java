@@ -1,4 +1,4 @@
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
 import java.util.ArrayList;
 import java.util.List;

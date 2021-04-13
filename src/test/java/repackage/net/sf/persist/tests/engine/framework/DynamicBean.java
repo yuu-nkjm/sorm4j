@@ -1,4 +1,4 @@
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,11 +26,10 @@ public class DynamicBean {
 
   private static final String DYNAMICBEAN_CLASS = DynamicBean.class.getName();
 
-  public static Class<?> createBeanClass(Class<?> caller, BeanMap beanMap) {
+  public static Class<?> createBeanClass(String className, BeanMap beanMap) {
 
     ClassPool pool = ClassPool.getDefault();
-    CtClass cc = pool.makeClass(DynamicBean.class.getPackageName() + "." + caller.getSimpleName()
-        + "." + beanMap.getClassName());
+    CtClass cc = pool.makeClass(className);
 
 
     try {

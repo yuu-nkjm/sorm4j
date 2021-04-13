@@ -15,8 +15,7 @@ create table numeric_types (
 
 create table datetime_types (
   date_col date,
-  -- datetime_col datetime,
-  -- timestamp_col timestamp,
+  datetime_col datetime,
   time_col time,
   year4_col year
 );
