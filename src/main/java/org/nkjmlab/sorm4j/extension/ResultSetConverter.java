@@ -29,47 +29,58 @@ public interface ResultSetConverter {
    * Integer it will be able to receive a null value from the ResultSet; on the other hand, if a
    * field is of type int it will receive 0 for a null value from the {@link java.sql.ResultSet}.
    *
+   * @param options
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
-   * @param setterParameterType {@link java.lang.Class} of the object to be returned
+   * @param columnType
+   * @param setterType {@link java.lang.Class} of the object to be returned
+   *
    * @throws SQLException
    *
    */
-  Object getValueBySetterParameterType(ResultSet resultSet, int column,
-      Class<?> setterParameterType) throws SQLException;
+  Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType,
+      Class<?> setterType) throws SQLException;
 
   /**
    * Returns the given type could be converted to the native object or not.
    *
+   * @param options
    * @param objectClass
+   *
    * @return
    */
-  boolean isEnableToConvertNativeObject(Class<?> objectClass);
+  boolean isEnableToConvertNativeObject(SormOptions options, Class<?> objectClass);
 
   /**
    * Converts the result from database to a map objects. The data of the column is extracted by
    * corresponding column types.
    *
+   * @param options
    * @param resultSet
    * @param columns
    * @param columnTypes SQL types from {@link java.sql.Types}
+   *
    * @return
    * @throws SQLException
    */
-  Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
+  Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) throws SQLException;
 
 
   /**
    * Converts to a single native object of the given object class.
    *
-   * @param <T>
+   * @param options
    * @param resultSet
+   * @param columnType
    * @param objectClass
+   *
+   * @param <T>
    * @return
    * @throws SQLException
    */
-  <T> T toSingleNativeObject(ResultSet resultSet, Class<T> objectClass) throws SQLException;
+  <T> T toSingleNativeObject(SormOptions options, ResultSet resultSet, int columnType,
+      Class<T> objectClass) throws SQLException;
 
 
 

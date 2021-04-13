@@ -8,7 +8,11 @@ public final class SqlTypeUtils {
   private SqlTypeUtils() {}
 
   public static final String sqlTypeToString(final int type) {
-    return typeStringMap.getOrDefault(type, "");
+    return typeStringMap.getOrDefault(type, String.valueOf(type));
+  }
+
+  public static final String sqlTypeToFormattedString(final int type) {
+    return sqlTypeToString(type) + "(" + type + ")";
   }
 
   private static final Map<Integer, String> typeStringMap = initalizeTypeStringMap();
@@ -46,6 +50,10 @@ public final class SqlTypeUtils {
     typeStringMap.put(java.sql.Types.TINYINT, "TINYINT");
     typeStringMap.put(java.sql.Types.VARBINARY, "VARBINARY");
     typeStringMap.put(java.sql.Types.VARCHAR, "VARCHAR");
+    typeStringMap.put(java.sql.Types.NCHAR, "NCHAR");
+    typeStringMap.put(java.sql.Types.NVARCHAR, "NVARCHAR");
+    typeStringMap.put(java.sql.Types.LONGNVARCHAR, "LONGNVARCHAR");
+
     return typeStringMap;
   }
 

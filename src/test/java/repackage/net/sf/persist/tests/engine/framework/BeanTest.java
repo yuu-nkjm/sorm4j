@@ -1,64 +1,33 @@
 
 // $Id$
 
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.OrmConnection;
 
 
 public class BeanTest {
 
-  private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+  private static final org.slf4j.Logger log =
+      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
 
-  public static void test(Class<?> caller, OrmConnection persist, BeanMap beanMap) {
-    Connection connection = persist.getJdbcConnection();
-    Class<?> cls = DynamicBean.createBeanClass(caller, beanMap);
-
-    String tableName = dbName(beanMap.getClassName());
-
-    try {
-      connection.createStatement().execute("delete from " + tableName);
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-    BeanTest.testAll(persist, cls, beanMap);
-
-
-    try {
-      connection.createStatement().execute("delete from " + tableName);
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-    BeanTest.testAllNull(persist, cls, beanMap);
-
-
+  public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
+      Consumer<Object> tester) {
+    ormConn.deleteAllOn(dbName(beanMap.getClassName()));
+    Object obj = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
+    tester.accept(obj);
   }
 
-  /**
-   * Perform tests using a bean with non-null values
-   */
-  public static void testAll(OrmConnection persist, Class<?> cls, BeanMap beanMap) {
-    Object obj = DynamicBean.createInstance(cls, beanMap, false);
-    BeanTest.testInsert(persist, obj, beanMap);
-    BeanTest.testSelectByFields(persist, obj, beanMap);
-    BeanTest.testSelectFields(persist, obj, beanMap, false);
-    BeanTest.testSelectMap(persist, obj, beanMap);
-  }
 
-  /**
-   * Perform tests using a bean with null values
-   */
-  public static void testAllNull(OrmConnection persist, Class<?> cls, BeanMap beanMap) {
-    Object objNull = DynamicBean.createInstance(cls, beanMap, true);
-    BeanTest.testInsert(persist, objNull, beanMap);
-    BeanTest.testSelectByFieldsNull(persist, objNull, beanMap);
-    BeanTest.testSelectFields(persist, objNull, beanMap, true);
-    BeanTest.testSelectMap(persist, objNull, beanMap);
+  public static void testNull(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
+      Consumer<Object> tester) {
+    ormConn.deleteAllOn(dbName(beanMap.getClassName()));
+    Object objNull = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
+    tester.accept(objNull);
   }
 
   /**
@@ -87,22 +56,6 @@ public class BeanTest {
     }
   }
 
-  /**
-   * tests reading with NoTable class
-   */
-  public static void testReadNoTable(OrmConnection persist, Object obj, Class<?> clsNoTable) {
-
-    String tableName = dbName(obj.getClass().getSimpleName());
-
-    // now read with NoTable (assumes previously inserted data)
-    Object objNoTable = persist.readFirst(clsNoTable, "select * from " + tableName);
-
-    // compare values
-    if (!DynamicBean.compareBeansFromDifferentClasses(obj, objNoTable)) {
-      throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
-          + DynamicBean.toString(objNoTable) + "]");
-    }
-  }
 
   /**
    * For each field and each field type, execute a query in the format select * from tableName where
@@ -134,9 +87,12 @@ public class BeanTest {
 
           // check if the result is not null and has the same data as the object being tested
           if (ret == null) {
-            log.error("{}, {}", fieldValueConverted, persist.readAll(obj.getClass()));
+            List<? extends Object> all = persist.readAll(obj.getClass());
+            log.error("{}, {}", fieldValueConverted, all);
             throw new AssertionError("Expected not null value but got null as result of [" + sql
-                + "] with parameter [" + fieldValue + "]");
+                + "] with parameter [" + fieldValue + "] , converted = [" + fieldValueConverted
+                + "] type [" + (fieldValue == null ? "null" : fieldValue.getClass())
+                + "] converted [" + fieldType + "]" + System.lineSeparator() + all);
           }
           if (!obj.equals(ret)) {
             throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
@@ -166,9 +122,11 @@ public class BeanTest {
         // correctly
         String sql = "select * from " + tableName + " where " + columnName + " is null";
         Object ret = persist.readFirst(cls, sql);
-        if (ret == null)
+        if (ret == null) {
+          System.out.println(persist.readList(cls, "select * from " + tableName));
           throw new AssertionError(
               "Expected not null value but got null as result of [" + sql + "]");
+        }
         if (!obj.equals(ret)) {
           throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
               + DynamicBean.toString(ret) + "] as result of [" + sql + "]");
@@ -282,7 +240,7 @@ public class BeanTest {
    */
   private static String dbName(String s) {
     String name = s.replaceAll("([A-Z])", "_$1").toLowerCase();
-    return (name.charAt(0) == '_' ? name.substring(1) : name).toUpperCase();
+    return (name.charAt(0) == '_' ? name.substring(1) : name).toLowerCase();
   }
 
 }

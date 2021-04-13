@@ -1,15 +1,9 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.Configurator.MultiRowProcessorType.*;
+import static org.nkjmlab.sorm4j.extension.Configurator.MultiRowProcessorType.*;
 import java.sql.Connection;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.DefaultSqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
 
 /**
@@ -101,6 +95,17 @@ public interface Configurator {
    * @return
    */
   Configurator setTransactionIsolationLevel(int level);
+
+  /**
+   * Sets a option.
+   *
+   * @param name
+   * @param value
+   * @return
+   */
+  @Experimental
+  Configurator setOption(String name, Object value);
+
 
   public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
 

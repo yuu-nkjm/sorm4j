@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.util;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
-import org.nkjmlab.sorm4j.SormLogger;
+import org.nkjmlab.sorm4j.extension.SormLogger;
 
 public final class LogPointFactory {
 

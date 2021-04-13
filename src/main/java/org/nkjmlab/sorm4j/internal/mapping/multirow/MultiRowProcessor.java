@@ -5,7 +5,8 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.SormLogger;
+import org.nkjmlab.sorm4j.extension.SormLogger;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
@@ -18,9 +19,11 @@ public abstract class MultiRowProcessor<T> {
   private final SqlParameterSetter sqlParameterSetter;
 
   final TableMapping<T> tableMapping;
+  final SormOptions options;
 
-  MultiRowProcessor(SqlParameterSetter sqlParameterSetter, TableMapping<T> tableMapping,
-      int batchSize) {
+  MultiRowProcessor(SormOptions options, SqlParameterSetter sqlParameterSetter,
+      TableMapping<T> tableMapping, int batchSize) {
+    this.options = options;
     this.sqlParameterSetter = sqlParameterSetter;
     this.tableMapping = tableMapping;
     this.batchSize = batchSize;
@@ -51,8 +54,8 @@ public abstract class MultiRowProcessor<T> {
     return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), Try::rethrow).get();
   }
 
-  public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
-      T[] objects) {
+  public final int[] batch(SormOptions options, Connection con, String sql,
+      Function<T, Object[]> parameterCreator, T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects, nonNullObjects -> {
       int[] result = new int[0];
       boolean origAutoCommit = getAutoCommit(con);
@@ -62,7 +65,7 @@ public abstract class MultiRowProcessor<T> {
         final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
         for (int i = 0; i < objects.length; i++) {
           T obj = objects[i];
-          this.sqlParameterSetter.setParameters(stmt, parameterCreator.apply(obj));
+          this.sqlParameterSetter.setParameters(options, stmt, parameterCreator.apply(obj));
           batchHelper.addBatchAndExecuteIfReachedThreshold();
         }
         result = batchHelper.finish();

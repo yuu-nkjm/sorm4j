@@ -1,7 +1,7 @@
 
 // $Id$
 
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -18,7 +18,6 @@ public class BytesBlob implements Blob {
   byte[] b;
 
   public BytesBlob(byte[] b) {
-    super();
     this.b = b;
   }
 

@@ -1,4 +1,4 @@
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,14 +26,19 @@ public class DynamicBean {
 
   private static final String DYNAMICBEAN_CLASS = DynamicBean.class.getName();
 
-  public static Class<?> createBeanClass(Class<?> caller, BeanMap beanMap) {
+  private static Map<String, Class<?>> beanClasses = new HashMap<>();
 
-    ClassPool pool = ClassPool.getDefault();
-    CtClass cc = pool.makeClass(DynamicBean.class.getPackageName() + "." + caller.getSimpleName()
-        + "." + beanMap.getClassName());
+  public static Class<?> getBeanClass(Class<?> caller, BeanMap beanMap) {
+    String className = DynamicBean.class.getPackageName() + "." + caller.getSimpleName() + "."
+        + beanMap.getClassName();
+    return DynamicBean.beanClasses.computeIfAbsent(className,
+        k -> createBeanClass(className, beanMap));
+  }
 
-
+  public static Class<?> createBeanClass(String className, BeanMap beanMap) {
     try {
+      ClassPool pool = ClassPool.getDefault();
+      CtClass cc = pool.makeClass(className);
 
       for (FieldMap fieldMap : beanMap.getFields()) {
 
@@ -43,30 +48,29 @@ public class DynamicBean {
         String fieldNameU = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
         String fieldTypeName = fieldType.getCanonicalName();
 
+        cc.addField(new CtField(pool.get(fieldTypeName), fieldName, cc));
+
         String getterCode =
             "public " + fieldTypeName + " get" + fieldNameU + "() { return " + fieldName + "; }";
+        cc.addMethod(CtNewMethod.make(getterCode, cc));
+
         String setterCode = "public void set" + fieldNameU + "(" + fieldTypeName + " " + fieldName
             + ") { this." + fieldName + "=" + fieldName + "; }";
-
-        CtField cf = new CtField(pool.get(fieldTypeName), fieldName, cc);
-        cc.addField(cf);
-
-        CtMethod cm = CtNewMethod.make(getterCode, cc);
-        cc.addMethod(cm);
-
-        cm = CtNewMethod.make(setterCode, cc);
-        cc.addMethod(cm);
+        cc.addMethod(CtNewMethod.make(setterCode, cc));
       }
 
-      String toStringCode =
-          "public String toString() { return " + DYNAMICBEAN_CLASS + ".toString(this); }";
-      CtMethod cm = CtNewMethod.make(toStringCode, cc);
-      cc.addMethod(cm);
-
-      String equalsCode = "public boolean equals(Object obj) { return " + DYNAMICBEAN_CLASS
-          + " .compareBeans(this,obj); }";
-      cm = CtNewMethod.make(equalsCode, cc);
-      cc.addMethod(cm);
+      {
+        String toStringCode =
+            "public String toString() { return " + DYNAMICBEAN_CLASS + ".toString(this); }";
+        CtMethod cm = CtNewMethod.make(toStringCode, cc);
+        cc.addMethod(cm);
+      }
+      {
+        String equalsCode = "public boolean equals(Object obj) { return " + DYNAMICBEAN_CLASS
+            + " .compareBeans(this,obj); }";
+        CtMethod cm = CtNewMethod.make(equalsCode, cc);
+        cc.addMethod(cm);
+      }
 
       return cc.toClass();
 
@@ -76,17 +80,16 @@ public class DynamicBean {
   }
 
   public static Object createInstance(Class<?> cls, BeanMap beanMap, boolean useNulls) {
-    Object obj = null;
     try {
-      obj = cls.getDeclaredConstructor().newInstance();
+      Object obj = cls.getDeclaredConstructor().newInstance();
+      for (Field field : cls.getDeclaredFields()) {
+        FieldMap fieldMap = beanMap.getField(field.getName());
+        setRandomValue(obj, field, fieldMap, useNulls);
+      }
+      return obj;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    for (Field field : cls.getDeclaredFields()) {
-      FieldMap fieldMap = beanMap.getField(field.getName());
-      setRandomValue(obj, field, fieldMap, useNulls);
-    }
-    return obj;
   }
 
   private static void setRandomValue(Object obj, Field field, FieldMap fieldMap, boolean useNull) {
@@ -784,5 +787,6 @@ public class DynamicBean {
   public static long randomTimestamp() {
     return (long) (Math.random() * System.currentTimeMillis());
   }
+
 
 }

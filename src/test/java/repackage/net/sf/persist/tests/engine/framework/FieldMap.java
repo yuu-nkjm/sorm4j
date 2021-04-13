@@ -1,7 +1,7 @@
 
 // $Id$
 
-package repackage.net.sf.persist.tests.product.framework;
+package repackage.net.sf.persist.tests.engine.framework;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class FieldMap {
 
-  private String fieldName;
+  private final String fieldName;
 
   /**
    * Some databases don't allow for queries using fields of some types. For instance, Oracle does
@@ -46,11 +46,6 @@ public class FieldMap {
 
   public String getFieldName() {
     return fieldName;
-  }
-
-  public FieldMap setFieldName(String fieldName) {
-    this.fieldName = fieldName;
-    return this;
   }
 
   public List<Class<?>> getTypes() {

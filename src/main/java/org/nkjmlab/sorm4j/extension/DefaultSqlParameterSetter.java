@@ -6,7 +6,6 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -21,25 +20,24 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 
 public class DefaultSqlParameterSetter implements SqlParameterSetter {
-  // private static org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   @Override
-  public void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException {
+  public void setParameters(SormOptions options, PreparedStatement stmt, Object... parameters)
+      throws SQLException {
     if (parameters == null || parameters.length == 0) {
       return;
     }
-
-    ParameterMetaData metaData = null;
     for (int i = 1; i <= parameters.length; i++) {
       final Object parameter = parameters[i - 1];
       if (parameter == null) {
-        metaData = metaData == null ? stmt.getParameterMetaData() : metaData;
-        stmt.setNull(i, metaData.getParameterType(i));
+        stmt.setNull(i, java.sql.Types.NULL);
       } else {
         setParameter(stmt, i, parameter);
       }
     }
   }
+
+
 
   /**
    * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.

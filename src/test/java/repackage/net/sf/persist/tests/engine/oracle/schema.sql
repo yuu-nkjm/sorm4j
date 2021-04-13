@@ -1,9 +1,13 @@
-begin;
+drop table numeric_types;
+
+drop table datetime_types;
+
+drop table string_types;
+
+drop table binary_types;
 
 create table numeric_types (
-	number_col number,
-	binary_float_col float,
-	binary_double_col double
+	number_col number
 );
 
 create table datetime_types (
@@ -33,5 +37,4 @@ create table binary_types (
 	--bfile_col bfile
 );
 
-commit;
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class StringUtils {
@@ -73,44 +74,39 @@ public final class StringUtils {
 
   }
 
-  private static final String PLACEHOLDER = "{}";
-  private static final int LENGTH_OF_PLACEHOLDER = PLACEHOLDER.length();
 
   public static String format(String msg, Object... params) {
     if (params == null || params.length == 0) {
       return msg;
     }
-
-    final StringBuilder sbuf = new StringBuilder(msg.length() + 50);
-
-    int i = 0;
-    int j;
-    for (int indexOfParameter = 0; indexOfParameter < params.length; indexOfParameter++) {
-
-      j = msg.indexOf(PLACEHOLDER, i);
-
-      if (j == -1) {
-        break;
+    return replacePlaceholder(msg, "{}", params.length, index -> {
+      Object o = params[index];
+      if (o == null) {
+        return "null";
+      } else if (o.getClass().isArray()) {
+        String s = Arrays.deepToString(new Object[] {o});
+        return s.substring(1, s.length());
+      } else {
+        return o.toString();
       }
-
-      sbuf.append(msg, i, j);
-      Object o = params[indexOfParameter];
-      appendObjectString(sbuf, o);
-      i = j + LENGTH_OF_PLACEHOLDER;
-    }
-    sbuf.append(msg, i, msg.length());
-    return sbuf.toString();
+    });
   }
 
-  private static void appendObjectString(StringBuilder sbuf, Object o) {
-    if (o == null) {
-      sbuf.append("null");
-    } else if (o.getClass().isArray()) {
-      String s = Arrays.deepToString(new Object[] {o});
-      sbuf.append(s.substring(1, s.length()));
-    } else {
-      sbuf.append(o);
+
+  public static String replacePlaceholder(String messege, String placeholder, int numOfPlaceholder,
+      Function<Integer, String> placeholderReplacer) {
+    final int placeholderLength = placeholder.length();
+    final StringBuilder sbuf = new StringBuilder(messege.length() + 50);
+    int i = 0;
+    int j;
+    for (int p = 0; p < numOfPlaceholder; p++) {
+      j = messege.indexOf(placeholder, i);
+      sbuf.append(messege, i, j);
+      sbuf.append(placeholderReplacer.apply(p));
+      i = j + placeholderLength;
     }
+    sbuf.append(messege, i, messege.length());
+    return sbuf.toString();
   }
 
 }

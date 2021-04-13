@@ -4,17 +4,20 @@ import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.lang.reflect.InvocationTargetException;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 abstract class Mapping<T> {
 
   private final Class<T> objectClass;
+  protected final SormOptions options;
   protected final ResultSetConverter resultSetConverter;
   protected final ColumnToAccessorMap columnToAccessorMap;
 
-  Mapping(ResultSetConverter resultSetConverter, Class<T> objectClass,
+  Mapping(SormOptions options, ResultSetConverter resultSetConverter, Class<T> objectClass,
       ColumnToAccessorMap columnToAccessorMap) {
+    this.options = options;
     this.resultSetConverter = resultSetConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
@@ -30,10 +31,10 @@ public interface OrmMapReader {
    * {@link java.util.Map}.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(ResultSet, List, List)}.
+   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object... )}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
@@ -54,10 +55,10 @@ public interface OrmMapReader {
    * parametrized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(ResultSet, List, List)}.
+   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object... )}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
@@ -78,10 +79,10 @@ public interface OrmMapReader {
    * {@link java.util.Map} containing data from the execution of the provided parameterized SQL and
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(ResultSet, List, List)}.
+   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(PreparedStatement, Object... )}
+   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object... )}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
