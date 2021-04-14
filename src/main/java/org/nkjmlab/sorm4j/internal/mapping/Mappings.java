@@ -15,7 +15,7 @@ import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormLogger;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
@@ -30,7 +30,7 @@ final class Mappings {
   private final ColumnFieldMapper columnFieldMapper;
   private final MultiRowProcessorFactory multiRowProcessorFactory;
   private final ResultSetConverter resultSetConverter;
-  private final SqlParameterSetter sqlParameterSetter;
+  private final SqlParametersSetter sqlParametersSetter;
 
   private final ConcurrentMap<String, TableMapping<?>> tableMappings;
 
@@ -44,7 +44,7 @@ final class Mappings {
 
   public Mappings(SormOptions options, TableNameMapper tableNameMapper,
       ColumnFieldMapper columnFieldMapper, MultiRowProcessorFactory multiRowProcessorFactory,
-      ResultSetConverter resultSetConverter, SqlParameterSetter sqlParameterSetter,
+      ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       ConcurrentMap<String, TableMapping<?>> tableMappings,
       ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings,
       ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap,
@@ -54,7 +54,7 @@ final class Mappings {
     this.columnFieldMapper = columnFieldMapper;
     this.multiRowProcessorFactory = multiRowProcessorFactory;
     this.resultSetConverter = resultSetConverter;
-    this.sqlParameterSetter = sqlParameterSetter;
+    this.sqlParametersSetter = sqlParametersSetter;
     this.tableMappings = tableMappings;
     this.columnsMappings = columnsMappings;
     this.classNameToValidTableNameMap = classNameToValidTableNameMap;
@@ -133,7 +133,7 @@ final class Mappings {
     ColumnToAccessorMap columnToAccessorMap = new ColumnToAccessorMap(objectClass, accessors);
 
     return new TableMapping<>(options, resultSetConverter, objectClass, columnToAccessorMap,
-        sqlParameterSetter, multiRowProcessorFactory, sql);
+        sqlParametersSetter, multiRowProcessorFactory, sql);
   }
 
 
@@ -180,8 +180,8 @@ final class Mappings {
     return resultSetConverter;
   }
 
-  public SqlParameterSetter getSqlParameterSetter() {
-    return sqlParameterSetter;
+  public SqlParametersSetter getSqlParametersSetter() {
+    return sqlParametersSetter;
   }
 
   public SormOptions getOptions() {

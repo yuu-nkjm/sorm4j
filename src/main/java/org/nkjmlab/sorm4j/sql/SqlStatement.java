@@ -35,7 +35,7 @@ public interface SqlStatement {
    * @return
    */
   static SqlStatement from(String sql) {
-    return SqlStatementImpl.from(sql);
+    return SqlStatementImpl.parse(sql);
   }
 
   /**

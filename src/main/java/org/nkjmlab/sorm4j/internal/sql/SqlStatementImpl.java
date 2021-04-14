@@ -46,9 +46,9 @@ public final class SqlStatementImpl implements SqlStatement {
   }
 
   private static final String LIST_PLACEHOLDER = "<?>";
-  private static final String EMBEDDED_PLACEHOLDER = "$?$";
+  private static final String EMBEDDED_PLACEHOLDER = "{?}";
 
-  public static SqlStatement from(String sql, Object... parameters) {
+  public static SqlStatement parse(String sql, Object... parameters) {
     SqlStatement st = new SqlStatementImpl(sql, parameters);
     if (parameters.length == 0) {
       return st;
@@ -106,7 +106,7 @@ public final class SqlStatementImpl implements SqlStatement {
 
   private static SqlStatement procEmbeddedPlaceholder(String sql, Object[] parameters) {
 
-    final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '$', '?', '$');
+    final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '{', '?', '}');
 
     List<Object> removedEmbeddedParams = new ArrayList<>();
     for (int i = 0; i < parameters.length; i++) {

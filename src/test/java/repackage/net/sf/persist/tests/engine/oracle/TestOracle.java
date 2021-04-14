@@ -23,7 +23,7 @@ public class TestOracle {
   @BeforeAll
   static void beforAll() {
     dataSource = DbEngineTestUtils.getDataSource(TestOracle.class, "jdbc:h2:mem:oracle;MODE=Oracle");
-    DbEngineTestUtils.executeTableSchema(TestOracle.class, dataSource);
+    DbEngineTestUtils.executeSql(dataSource, TestOracle.class, "schema.sql");
   }
 
   public static void main(String[] args) {

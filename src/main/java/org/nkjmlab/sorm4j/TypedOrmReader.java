@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
@@ -99,7 +99,7 @@ public interface TypedOrmReader<T> {
    * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object[])}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.

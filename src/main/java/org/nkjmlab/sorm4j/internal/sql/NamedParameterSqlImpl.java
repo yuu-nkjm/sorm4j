@@ -95,7 +95,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
         }
       }
     }
-    return SqlStatementImpl.from(resultSql, orderdParams.values().toArray());
+    return SqlStatementImpl.parse(resultSql, orderdParams.values().toArray());
   }
 
   private List<String> createParameters() {

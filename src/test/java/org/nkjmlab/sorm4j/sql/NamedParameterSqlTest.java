@@ -21,7 +21,7 @@ class NamedParameterSqlTest {
 
     {
       SqlStatement statement = OrderedParameterSql.toSqlStatement(
-          "select * from customer where name like $?$ and address in(<?>) and id=?", "A%",
+          "select * from customer where name like {?} and address in(<?>) and id=?", "A%",
           List.of("Tokyo", "Kyoto"), 1);
       System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
@@ -38,7 +38,7 @@ class NamedParameterSqlTest {
     }
     {
       SqlStatement statement = NamedParameterSql.toSqlStatement(
-          "select * from customer where name like $:name$ and address in(<:address>) and id=:id",
+          "select * from customer where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "A%"));
       System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));

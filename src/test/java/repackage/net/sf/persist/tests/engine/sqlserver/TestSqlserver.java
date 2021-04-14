@@ -25,7 +25,7 @@ public class TestSqlserver {
   static void beforAll() {
     dataSource =
         DbEngineTestUtils.getDataSource(TestSqlserver.class, "jdbc:h2:mem:sqlserver;MODE=MSSQLServer");
-    DbEngineTestUtils.executeTableSchema(TestSqlserver.class, dataSource);
+    DbEngineTestUtils.executeSql(dataSource, TestSqlserver.class, "schema.sql");
     SormFactory
         .updateDefaultConfig(configurator -> configurator.setOption("dbEngine", "MSSQLServer"));
 

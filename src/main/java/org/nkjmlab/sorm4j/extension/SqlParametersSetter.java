@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * @author nkjm
  *
  */
-public interface SqlParameterSetter {
+public interface SqlParametersSetter {
 
   /**
    * Sets parameters into the given prepared statement. i.e. Convert from java objects to SQL.

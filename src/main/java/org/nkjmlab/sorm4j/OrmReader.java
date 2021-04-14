@@ -5,7 +5,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
@@ -93,7 +93,7 @@ public interface OrmReader {
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions,PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
    *
    *
    */
@@ -118,7 +118,7 @@ public interface OrmReader {
    * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object[])}
    *
    */
   <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);

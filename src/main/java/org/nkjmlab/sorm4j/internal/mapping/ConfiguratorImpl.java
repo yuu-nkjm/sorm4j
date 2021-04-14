@@ -5,7 +5,7 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 
 /**
@@ -20,7 +20,7 @@ public class ConfiguratorImpl implements Configurator {
   private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
   private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
   private ResultSetConverter resultSetConverter = DEFAULT_RESULT_SET_CONVERTER;
-  private SqlParameterSetter sqlParameterSetter = DEFAULT_SQL_PARAMETER_SETTER;
+  private SqlParametersSetter sqlParametersSetter = DEFAULT_SQL_PARAMETER_SETTER;
   private MultiRowProcessorType multiRowProcessorType = DEFAULT_MULTI_ROW_PROCESSOR;
   private int batchSize = 32;
   private int multiRowSize = 32;
@@ -37,7 +37,7 @@ public class ConfiguratorImpl implements Configurator {
     this.columnFieldMapper = configStore.getColumnFieldMapper();
     this.tableNameMapper = configStore.getTableNameMapper();
     this.resultSetConverter = configStore.getResultSetConverter();
-    this.sqlParameterSetter = configStore.getSqlParameterSetter();
+    this.sqlParametersSetter = configStore.getSqlParametersSetter();
     this.multiRowProcessorType = configStore.getMultiRowProcessorType();
     this.batchSize = configStore.getBatchSize();
     this.multiRowSize = configStore.getMultiRowSize();
@@ -49,7 +49,7 @@ public class ConfiguratorImpl implements Configurator {
 
   public ConfigStore build() {
     return new ConfigStore(configName, options, columnFieldMapper, tableNameMapper,
-        resultSetConverter, sqlParameterSetter, multiRowProcessorType, batchSize, multiRowSize,
+        resultSetConverter, sqlParametersSetter, multiRowProcessorType, batchSize, multiRowSize,
         batchSizeWithMultiRow, transactionIsolationLevel);
   }
 
@@ -73,8 +73,8 @@ public class ConfiguratorImpl implements Configurator {
   }
 
   @Override
-  public Configurator setSqlParameterSetter(SqlParameterSetter sqlParameterSetter) {
-    this.sqlParameterSetter = sqlParameterSetter;
+  public Configurator setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
+    this.sqlParametersSetter = sqlParametersSetter;
     return this;
   }
 

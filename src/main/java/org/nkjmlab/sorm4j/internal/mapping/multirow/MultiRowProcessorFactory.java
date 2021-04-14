@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.extension.Configurator.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 
 public final class MultiRowProcessorFactory {
@@ -20,18 +20,18 @@ public final class MultiRowProcessorFactory {
   }
 
   public static MultiRowProcessorFactory createMultiRowProcessorFactory(SormOptions options,
-      SqlParameterSetter sqlParameterSetter, MultiRowProcessorType multiRowProcessorType,
+      SqlParametersSetter sqlParametersSetter, MultiRowProcessorType multiRowProcessorType,
       int batchSize, int multiRowSize, int batchSizeWithMultiRow) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
         return new MultiRowProcessorFactory(
-            t -> new SimpleBatchProcessor<>(options, sqlParameterSetter, t, batchSize));
+            t -> new SimpleBatchProcessor<>(options, sqlParametersSetter, t, batchSize));
       case MULTI_ROW:
         return new MultiRowProcessorFactory(t -> new MultiRowInOneStatementProcessor<>(options,
-            sqlParameterSetter, t, batchSize, multiRowSize));
+            sqlParametersSetter, t, batchSize, multiRowSize));
       case MULTI_ROW_AND_BATCH:
         return new MultiRowProcessorFactory(t -> new BatchOfMultiRowInOneStatementProcessor<>(
-            options, sqlParameterSetter, t, batchSize, multiRowSize, batchSizeWithMultiRow));
+            options, sqlParametersSetter, t, batchSize, multiRowSize, batchSizeWithMultiRow));
       default:
         return null;
     }

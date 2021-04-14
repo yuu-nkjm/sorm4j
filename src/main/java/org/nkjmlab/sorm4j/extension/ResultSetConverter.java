@@ -49,7 +49,7 @@ public interface ResultSetConverter {
    *
    * @return
    */
-  boolean isEnableToConvertNativeObject(SormOptions options, Class<?> objectClass);
+  boolean isStandardClass(SormOptions options, Class<?> objectClass);
 
   /**
    * Converts the result from database to a map objects. The data of the column is extracted by
@@ -79,7 +79,7 @@ public interface ResultSetConverter {
    * @return
    * @throws SQLException
    */
-  <T> T toSingleNativeObject(SormOptions options, ResultSet resultSet, int columnType,
+  <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int columnType,
       Class<T> objectClass) throws SQLException;
 
 

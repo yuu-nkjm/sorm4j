@@ -71,12 +71,12 @@ public interface Configurator {
   Configurator setResultSetConverter(ResultSetConverter resultSetConverter);
 
   /**
-   * Sets {@link SqlParameterSetter}
+   * Sets {@link SqlParametersSetter}
    *
-   * @param sqlParameterSetter
+   * @param sqlParametersSetter
    * @return
    */
-  Configurator setSqlParameterSetter(SqlParameterSetter sqlParameterSetter);
+  Configurator setSqlParametersSetter(SqlParametersSetter sqlParametersSetter);
 
   /**
    * Sets {@link TableNameMapper}
@@ -109,8 +109,8 @@ public interface Configurator {
 
   public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR = MULTI_ROW;
 
-  public static final SqlParameterSetter DEFAULT_SQL_PARAMETER_SETTER =
-      new DefaultSqlParameterSetter();
+  public static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
+      new DefaultSqlParametersSetter();
 
   public static final ResultSetConverter DEFAULT_RESULT_SET_CONVERTER =
       new DefaultResultSetConverter();

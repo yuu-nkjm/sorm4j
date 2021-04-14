@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.SqlStatement;
 
 /**
@@ -45,7 +45,7 @@ public interface SqlExecutor {
    * This method wraps {@link PreparedStatement#executeQuery(String)}
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object...)}
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object...)}
    *
    * @param <T>
    * @param sql SQL code to be executed.
@@ -71,7 +71,7 @@ public interface SqlExecutor {
    * This method wraps {@link PreparedStatement#executeUpdate(String)}
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object...)}
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object...)}
    *
    * @param sql SQL code to be executed.
    * @param parameters Parameters to be used in the PreparedStatement.
