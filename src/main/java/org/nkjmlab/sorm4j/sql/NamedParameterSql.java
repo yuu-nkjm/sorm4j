@@ -31,6 +31,7 @@ public interface NamedParameterSql extends SqlStatementSupplier {
   NamedParameterSql bind(String key, Object value);
 
   /**
+   * Binds a bean. The field names map to keys of parameter by {@link ColumnFieldMapper}.
    *
    * @param bean
    * @return

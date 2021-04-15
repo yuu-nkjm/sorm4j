@@ -29,7 +29,8 @@ public interface SqlStatement {
 
 
   /**
-   * Creates {@link SqlStatement} object from the given SQL string.
+   * Creates {@link SqlStatement} object from the given SQL string. When you use a SQL statement
+   * with parameter, use {@link NamedParameterSql}, {@link OrderedParameterSql}.
    *
    * @param sql without parameter.
    * @return
