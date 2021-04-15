@@ -399,8 +399,7 @@ public class TestSimple {
       simpleOrMapper.readByPrimaryKey(Simple04.class, 1);
       fail("Object with incompatible getter and setter did not trigger exception");
     } catch (Exception e) {
-      org.assertj.core.api.Assertions.assertThat(e.getCause().getMessage())
-          .contains("Could not set a value");
+      org.assertj.core.api.Assertions.assertThat(e.getMessage()).contains("Could not set a value");
     }
   }
 
@@ -475,7 +474,7 @@ public class TestSimple {
       OrmConnection simpleOrMapper = SormFactory.toOrmConnection(conn);
       simpleOrMapper.insert(new Simple11());
     } catch (Exception e) {
-      assertThat(e.getCause().getMessage()).contains("does not match any field");
+      assertThat(e.getMessage()).contains("does not match any field");
     }
   }
 
@@ -487,7 +486,7 @@ public class TestSimple {
       simpleOrMapper.insert(new Simple12(1));
       simpleOrMapper.readAll(Simple12.class);
     } catch (Exception e) {
-      assertThat(e.getCause().getMessage()).contains("default constructor");
+      assertThat(e.getMessage()).contains("default constructor");
     }
   }
 

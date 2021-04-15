@@ -504,7 +504,7 @@ class TypedOrmConnectionTest {
         failBecauseExceptionWasNotThrown(SormException.class);
       });
     } catch (SormException e) {
-      assertThat(e.getCause().getMessage()).contains("Non-unique");
+      assertThat(e.getMessage()).contains("Non-unique");
     }
 
   }

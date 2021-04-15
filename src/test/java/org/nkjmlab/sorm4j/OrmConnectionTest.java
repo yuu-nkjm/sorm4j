@@ -480,8 +480,7 @@ class OrmConnectionTest {
         m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
-        assertThat(e.getCause().getMessage())
-            .contains("but 1 column was expected to load data into");
+        assertThat(e.getMessage()).contains("but 1 column was expected to load data into");
       }
       SormLogger.off();
 
@@ -584,7 +583,7 @@ class OrmConnectionTest {
         failBecauseExceptionWasNotThrown(SormException.class);
       });
     } catch (SormException e) {
-      assertThat(e.getCause().getMessage()).contains("Non-unique");
+      assertThat(e.getMessage()).contains("Non-unique");
     }
 
   }
