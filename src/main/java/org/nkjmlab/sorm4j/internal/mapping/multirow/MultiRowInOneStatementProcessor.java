@@ -28,7 +28,7 @@ final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
             num -> con.prepareStatement(tableMapping.getSql().getMultirowInsertSql(num)),
-            (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
+            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
   @Override
@@ -37,7 +37,7 @@ final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
             num -> con.prepareStatement(tableMapping.getSql().getMultirowMergeSql(num)),
-            (stmt, objs) -> tableMapping.setPrameters(stmt, objs), nonNullObjects));
+            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
 
