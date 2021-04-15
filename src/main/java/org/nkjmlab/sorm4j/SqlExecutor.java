@@ -17,17 +17,6 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  */
 public interface SqlExecutor {
 
-  /**
-   * Applys handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param <T>
-   * @param sql
-   * @param handler
-   * @return
-   */
-  @Experimental
-  <T> T applyPreparedStatementHandler(SqlStatement sql,
-      FunctionHandler<PreparedStatement, T> handler);
 
   /**
    * Accepts handler for {@link PreparedStatement} which has sets the given parameters.
@@ -38,6 +27,18 @@ public interface SqlExecutor {
   @Experimental
   void acceptPreparedStatementHandler(SqlStatement sql, ConsumerHandler<PreparedStatement> handler);
 
+
+  /**
+   * Applies handler for {@link PreparedStatement} which has sets the given parameters.
+   *
+   * @param <T>
+   * @param sql
+   * @param handler
+   * @return
+   */
+  @Experimental
+  <T> T applyPreparedStatementHandler(SqlStatement sql,
+      FunctionHandler<PreparedStatement, T> handler);
 
   /**
    * Executes a query and apply the given handler to the returned result set.
