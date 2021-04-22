@@ -36,7 +36,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 import org.nkjmlab.sorm4j.sql.tuple.Tuples;
@@ -260,7 +260,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public void acceptPreparedStatementHandler(SqlStatement sql,
+  public void acceptPreparedStatementHandler(ParameterizedSql sql,
       ConsumerHandler<PreparedStatement> handler) {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
       sqlParametersSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
@@ -279,7 +279,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T applyPreparedStatementHandler(SqlStatement sql,
+  public <T> T applyPreparedStatementHandler(ParameterizedSql sql,
       FunctionHandler<PreparedStatement, T> handler) {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
       sqlParametersSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
@@ -299,18 +299,18 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
+  public <T> T executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, T> resultSetHandler) {
     return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter,
         sql.getSql(), sql.getParameters(), resultSetHandler);
   }
 
   @Override
-  public <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper) {
+  public <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper) {
     return executeQuery(sql, RowMapper.convertToRowListMapper(rowMapper));
   }
 
   @Override
-  public int executeUpdate(SqlStatement sql) {
+  public int executeUpdate(ParameterizedSql sql) {
     return executeUpdate(sql.getSql(), sql.getParameters());
   }
 
@@ -640,7 +640,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public <T> T readFirst(Class<T> objectClass, SqlStatement sql) {
+  public <T> T readFirst(Class<T> objectClass, ParameterizedSql sql) {
     return readFirst(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -651,7 +651,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql) {
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
     return readLazy(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -675,7 +675,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public <T> List<T> readList(Class<T> objectClass, SqlStatement sql) {
+  public <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql) {
     return readList(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -686,7 +686,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public Map<String, Object> readMapFirst(SqlStatement sql) {
+  public Map<String, Object> readMapFirst(ParameterizedSql sql) {
     return readMapFirst(sql.getSql(), sql.getParameters());
   }
 
@@ -706,7 +706,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
     return readMapLazy(sql.getSql(), sql.getParameters());
   }
 
@@ -735,7 +735,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public List<Map<String, Object>> readMapList(SqlStatement sql) {
+  public List<Map<String, Object>> readMapList(ParameterizedSql sql) {
     return readMapList(sql.getSql(), sql.getParameters());
   }
 
@@ -746,7 +746,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public Map<String, Object> readMapOne(SqlStatement sql) {
+  public Map<String, Object> readMapOne(ParameterizedSql sql) {
     return readMapOne(sql.getSql(), sql.getParameters());
   }
 
@@ -768,7 +768,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T readOne(Class<T> objectClass, SqlStatement sql) {
+  public <T> T readOne(Class<T> objectClass, ParameterizedSql sql) {
     return readOne(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -791,7 +791,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, SqlStatement sql) {
+      Class<T3> t3, ParameterizedSql sql) {
     return readTupleList(t1, t2, t3, sql.getSql(), sql.getParameters());
   }
 
@@ -812,7 +812,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, SqlStatement sql) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 

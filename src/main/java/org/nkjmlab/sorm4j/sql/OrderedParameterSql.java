@@ -4,13 +4,13 @@ import java.util.List;
 import org.nkjmlab.sorm4j.internal.sql.OrderedParameterSqlImpl;
 
 /**
- * SQL with ordered parameters. The instance could be convert to {@link SqlStatement}. The class
+ * SQL with ordered parameters. The instance could be convert to {@link ParameterizedSql}. The class
  * could treat {@link List} parameter.
  *
  * @author nkjm
  *
  */
-public interface OrderedParameterSql extends SqlStatementSupplier {
+public interface OrderedParameterSql extends ParameterizedSqlParser {
 
   /**
    * Add one parameter to the SQL statement sequentially.
@@ -35,8 +35,8 @@ public interface OrderedParameterSql extends SqlStatementSupplier {
    * @param parameters
    * @return
    */
-  static SqlStatement toSqlStatement(String sql, Object... parameters) {
-    return from(sql).addParameter(parameters).toSqlStatement();
+  static ParameterizedSql parse(String sql, Object... parameters) {
+    return from(sql).addParameter(parameters).parse();
   }
 
   /**

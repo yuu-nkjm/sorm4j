@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * The typed interface of reading functions of object-relation mapping.
@@ -53,7 +53,7 @@ public interface TypedOrmReader<T> {
    * @param sql
    * @return
    */
-  T readFirst(SqlStatement sql);
+  T readFirst(ParameterizedSql sql);
 
   /**
    * Reads an object from the database.
@@ -71,7 +71,7 @@ public interface TypedOrmReader<T> {
    * @param sql
    * @return
    */
-  LazyResultSet<T> readLazy(SqlStatement sql);
+  LazyResultSet<T> readLazy(ParameterizedSql sql);
 
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
@@ -91,7 +91,7 @@ public interface TypedOrmReader<T> {
    * @param sql
    * @return
    */
-  List<T> readList(SqlStatement sql);
+  List<T> readList(ParameterizedSql sql);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -114,7 +114,7 @@ public interface TypedOrmReader<T> {
    * @param sql
    * @return
    */
-  T readOne(SqlStatement sql);
+  T readOne(ParameterizedSql sql);
 
   /**
    * Reads only one object from the database.

@@ -36,7 +36,7 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
@@ -201,9 +201,9 @@ public class TestPostgreSQLSqlMapper {
   private void bindInTest(OrmConnection c, String column, Object param) {
     String messagePrefix = "bindIn: " + column + "(" + param.getClass() + ") ";
     try {
-      SqlStatement statement = OrderedParameterSql
+      ParameterizedSql statement = OrderedParameterSql
           .from("SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
-          .addParameter(param).toSqlStatement();
+          .addParameter(param).parse();
       Map<String, Object> ret = c.readMapFirst(statement);
       if (ret != null) {
         System.out.println(messagePrefix + "success => " + ret);

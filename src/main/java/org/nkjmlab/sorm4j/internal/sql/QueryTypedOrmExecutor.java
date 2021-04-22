@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.List;
 import org.nkjmlab.sorm4j.TypedOrmReader;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public class QueryTypedOrmExecutor<T> implements QueryExecutor<T> {
 
@@ -14,23 +14,23 @@ public class QueryTypedOrmExecutor<T> implements QueryExecutor<T> {
   }
 
   @Override
-  public T readOne(SqlStatement sqlStatement) {
-    return conn.readOne(sqlStatement);
+  public T readOne(ParameterizedSql parameterizedSql) {
+    return conn.readOne(parameterizedSql);
   }
 
   @Override
-  public T readFirst(SqlStatement sqlStatement) {
-    return conn.readFirst(sqlStatement);
+  public T readFirst(ParameterizedSql parameterizedSql) {
+    return conn.readFirst(parameterizedSql);
   }
 
   @Override
-  public LazyResultSet<T> readLazy(SqlStatement sqlStatement) {
-    return conn.readLazy(sqlStatement);
+  public LazyResultSet<T> readLazy(ParameterizedSql parameterizedSql) {
+    return conn.readLazy(parameterizedSql);
   }
 
   @Override
-  public List<T> readList(SqlStatement sqlStatement) {
-    return conn.readList(sqlStatement);
+  public List<T> readList(ParameterizedSql parameterizedSql) {
+    return conn.readList(parameterizedSql);
   }
 
 

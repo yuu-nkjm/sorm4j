@@ -3,12 +3,11 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.List;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.Query;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 
-public abstract class AbstractQuery<T> implements Query<T> {
+public abstract class AbstractQuery<T> implements Query<T>, ParameterizedSqlParser {
   protected final QueryExecutor<T> executor;
 
-  abstract SqlStatement toSqlStatement();
 
   public AbstractQuery(QueryExecutor<T> executor) {
     this.executor = executor;
@@ -16,22 +15,22 @@ public abstract class AbstractQuery<T> implements Query<T> {
 
   @Override
   public T readOne() {
-    return executor.readOne(toSqlStatement());
+    return executor.readOne(parse());
   }
 
   @Override
   public T readFirst() {
-    return executor.readFirst(toSqlStatement());
+    return executor.readFirst(parse());
   }
 
   @Override
   public LazyResultSet<T> readLazy() {
-    return executor.readLazy(toSqlStatement());
+    return executor.readLazy(parse());
   }
 
   @Override
   public List<T> readList() {
-    return executor.readList(toSqlStatement());
+    return executor.readList(parse());
   }
 
 }

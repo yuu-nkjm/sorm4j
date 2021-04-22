@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public class OrderedParameterRequestImpl implements OrderedParameterRequest {
 
@@ -21,22 +21,22 @@ public class OrderedParameterRequestImpl implements OrderedParameterRequest {
 
   @Override
   public <T> T executeQuery(FunctionHandler<ResultSet, T> resultSetHandler) {
-    return sqlExecutor.executeQuery(toSqlStatement(), resultSetHandler);
+    return sqlExecutor.executeQuery(parse(), resultSetHandler);
   }
 
   @Override
   public <T> List<T> executeQuery(RowMapper<T> rowMapper) {
-    return sqlExecutor.executeQuery(toSqlStatement(), rowMapper);
+    return sqlExecutor.executeQuery(parse(), rowMapper);
   }
 
   @Override
   public int executeUpdate() {
-    return sqlExecutor.executeUpdate(toSqlStatement());
+    return sqlExecutor.executeUpdate(parse());
   }
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return sql.toSqlStatement();
+  public ParameterizedSql parse() {
+    return sql.parse();
   }
 
   @Override

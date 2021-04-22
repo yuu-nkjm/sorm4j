@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.internal.sql.SelectBuilderImpl;
  * @author nkjm
  *
  */
-public interface SelectBuilder extends SqlStatementSupplier {
+public interface SelectBuilder extends ParameterizedSqlParser {
 
   /**
    * Value object represents conditions of where clause or having clause. This object could include

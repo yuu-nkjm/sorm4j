@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.Map;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * An implementation of {@link NamedParameterQuery}
@@ -35,8 +35,8 @@ public class NamedParameterQueryImpl<T> extends AbstractQuery<T> implements Name
   }
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return namedParameterSql.toSqlStatement();
+  public ParameterizedSql parse() {
+    return namedParameterSql.parse();
   }
 
 

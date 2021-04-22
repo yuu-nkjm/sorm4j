@@ -8,7 +8,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * This class represents a sql statement with ordered parameters.
@@ -16,14 +16,14 @@ import org.nkjmlab.sorm4j.sql.SqlStatement;
  * @author nkjm
  *
  */
-public final class SqlStatementImpl implements SqlStatement {
+public final class ParameterizedSqlImpl implements ParameterizedSql {
 
   // with ? placeholder
   private final String sql;
   // ordered parameters
   private final Object[] parameters;
 
-  private SqlStatementImpl(String sql, Object... parameters) {
+  private ParameterizedSqlImpl(String sql, Object... parameters) {
     this.sql = sql;
     this.parameters = parameters;
   }
@@ -48,8 +48,8 @@ public final class SqlStatementImpl implements SqlStatement {
   private static final String LIST_PLACEHOLDER = "<?>";
   private static final String EMBEDDED_PLACEHOLDER = "{?}";
 
-  public static SqlStatement parse(String sql, Object... parameters) {
-    SqlStatement st = new SqlStatementImpl(sql, parameters);
+  public static ParameterizedSql parse(String sql, Object... parameters) {
+    ParameterizedSql st = new ParameterizedSqlImpl(sql, parameters);
     if (parameters.length == 0) {
       return st;
     }
@@ -61,7 +61,7 @@ public final class SqlStatementImpl implements SqlStatement {
   }
 
 
-  private static SqlStatement procListPlaceholder(String sql, Object[] parameters) {
+  private static ParameterizedSql procListPlaceholder(String sql, Object[] parameters) {
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '<', '?', '>');
 
     List<Object> flattenListParams = new ArrayList<>();
@@ -88,7 +88,7 @@ public final class SqlStatementImpl implements SqlStatement {
           int parameterLength = getSize(parameters[specialParameterIndexes.get(index)]);
           return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
         });
-    return new SqlStatementImpl(_sql, flattenListParams.toArray());
+    return new ParameterizedSqlImpl(_sql, flattenListParams.toArray());
 
   }
 
@@ -104,7 +104,7 @@ public final class SqlStatementImpl implements SqlStatement {
   }
 
 
-  private static SqlStatement procEmbeddedPlaceholder(String sql, Object[] parameters) {
+  private static ParameterizedSql procEmbeddedPlaceholder(String sql, Object[] parameters) {
 
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '{', '?', '}');
 
@@ -118,7 +118,7 @@ public final class SqlStatementImpl implements SqlStatement {
         StringUtils.replacePlaceholder(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
             index -> SqlUtils.literal(parameters[specialParameterIndexes.get(index)]));
 
-    return new SqlStatementImpl(_sql, removedEmbeddedParams.toArray());
+    return new ParameterizedSqlImpl(_sql, removedEmbeddedParams.toArray());
   }
 
 

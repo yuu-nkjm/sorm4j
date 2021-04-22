@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.sql.SelectBuilder;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * An builder of select SQL.
@@ -153,8 +153,8 @@ public class SelectBuilderImpl implements SelectBuilder {
   }
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return SqlStatement.from(buildSql());
+  public ParameterizedSql parse() {
+    return ParameterizedSql.from(buildSql());
   }
 
 }

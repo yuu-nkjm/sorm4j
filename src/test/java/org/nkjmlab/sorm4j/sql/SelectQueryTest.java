@@ -109,7 +109,7 @@ class SelectQueryTest {
       String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
 
       assertThat(sql).isEqualTo(sql2);
-      assertThat(builder.toSqlStatement().getSql()).isEqualTo(sql2);
+      assertThat(builder.parse().getSql()).isEqualTo(sql2);
       assertThat(builder.toPrettyString()).isEqualTo(bs.toPrettyString());
       assertThat(builder.toPrettyString(true)).isEqualTo(bs.toPrettyString(true));
     });

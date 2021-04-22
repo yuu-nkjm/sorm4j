@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * An implementation of {@link OrderedParameterSql}
@@ -34,8 +34,8 @@ public class OrderedParameterSqlImpl implements OrderedParameterSql {
   }
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return SqlStatementImpl.parse(sql, parameters.toArray());
+  public ParameterizedSql parse() {
+    return ParameterizedSqlImpl.parse(sql, parameters.toArray());
   }
 
 

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * An implementation of {@link OrderedParameterQuery}
@@ -34,8 +34,8 @@ public class OrderedParameterQueryImpl<T> extends AbstractQuery<T>
   }
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return orderedParameterSql.toSqlStatement();
+  public ParameterizedSql parse() {
+    return orderedParameterSql.parse();
   }
 
 

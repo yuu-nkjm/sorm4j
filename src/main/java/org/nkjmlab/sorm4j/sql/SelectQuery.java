@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  * @param <T>
  */
 public interface SelectQuery<T>
-    extends SelectBuilder, NamedParameterSql, OrderedParameterSql, SqlStatementSupplier, Query<T> {
+    extends SelectBuilder, NamedParameterSql, OrderedParameterSql, ParameterizedSqlParser, Query<T> {
   @Override
   OrderedParameterQuery<T> addParameter(Object... parameters);
 

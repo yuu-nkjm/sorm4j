@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 
 /**
@@ -24,7 +24,7 @@ public interface OrmMapReader {
    * @param sql
    * @return
    */
-  Map<String, Object> readMapFirst(SqlStatement sql);
+  Map<String, Object> readMapFirst(ParameterizedSql sql);
 
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
@@ -48,7 +48,7 @@ public interface OrmMapReader {
    * @param sql
    * @return
    */
-  LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql);
+  LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql);
 
   /**
    * Returns an {@link LazyResultSet} instance containing data from the execution of the provided
@@ -72,7 +72,7 @@ public interface OrmMapReader {
    * @param sql
    * @return
    */
-  List<Map<String, Object>> readMapList(SqlStatement sql);
+  List<Map<String, Object>> readMapList(ParameterizedSql sql);
 
   /**
    * Reads a list of objects from the database by mapping the SQL execution results to instances of
@@ -96,7 +96,7 @@ public interface OrmMapReader {
    * @param sql
    * @return
    */
-  Map<String, Object> readMapOne(SqlStatement sql);
+  Map<String, Object> readMapOne(ParameterizedSql sql);
 
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of

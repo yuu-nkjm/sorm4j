@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.SelectBuilder;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * This class represents a select query. This class has functions as SQL select builder.
@@ -68,8 +68,8 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
 
 
   @Override
-  public SqlStatement toSqlStatement() {
-    return SqlStatement.from(buildSql());
+  public ParameterizedSql parse() {
+    return ParameterizedSql.from(buildSql());
   }
 
   @Override

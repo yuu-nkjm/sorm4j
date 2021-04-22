@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * A database connection with object-relation mapping function with type. The main class for the
@@ -146,20 +146,20 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public <S> S executeQuery(SqlStatement sql, FunctionHandler<ResultSet, S> resultSetHandler) {
+  public <S> S executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, S> resultSetHandler) {
     return conn.executeQuery(sql, resultSetHandler);
   }
 
 
 
   @Override
-  public <S> List<S> executeQuery(SqlStatement sql, RowMapper<S> rowMapper) {
+  public <S> List<S> executeQuery(ParameterizedSql sql, RowMapper<S> rowMapper) {
     return conn.executeQuery(sql, rowMapper);
   }
 
 
   @Override
-  public int executeUpdate(SqlStatement sql) {
+  public int executeUpdate(ParameterizedSql sql) {
     return conn.executeUpdate(sql);
   }
 
@@ -328,7 +328,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public T readFirst(SqlStatement sql) {
+  public T readFirst(ParameterizedSql sql) {
     return conn.readFirst(objectClass, sql);
   }
 
@@ -338,7 +338,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public LazyResultSet<T> readLazy(SqlStatement sql) {
+  public LazyResultSet<T> readLazy(ParameterizedSql sql) {
     return conn.readLazy(objectClass, sql);
   }
 
@@ -348,7 +348,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public List<T> readList(SqlStatement sql) {
+  public List<T> readList(ParameterizedSql sql) {
     return conn.readList(objectClass, sql);
   }
 
@@ -358,7 +358,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public Map<String, Object> readMapFirst(SqlStatement sql) {
+  public Map<String, Object> readMapFirst(ParameterizedSql sql) {
     return conn.readMapFirst(sql.getSql(), sql.getParameters());
   }
 
@@ -368,7 +368,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
     return conn.readMapLazy(sql.getSql(), sql.getParameters());
   }
 
@@ -378,7 +378,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public List<Map<String, Object>> readMapList(SqlStatement sql) {
+  public List<Map<String, Object>> readMapList(ParameterizedSql sql) {
     return conn.readMapList(sql.getSql(), sql.getParameters());
   }
 
@@ -388,7 +388,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public Map<String, Object> readMapOne(SqlStatement sql) {
+  public Map<String, Object> readMapOne(ParameterizedSql sql) {
     return conn.readMapOne(sql.getSql(), sql.getParameters());
   }
 
@@ -398,7 +398,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public T readOne(SqlStatement sql) {
+  public T readOne(ParameterizedSql sql) {
     return conn.readOne(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -458,13 +458,13 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public <S> S applyPreparedStatementHandler(SqlStatement sql,
+  public <S> S applyPreparedStatementHandler(ParameterizedSql sql,
       FunctionHandler<PreparedStatement, S> handler) {
     return conn.applyPreparedStatementHandler(sql, handler);
   }
 
   @Override
-  public void acceptPreparedStatementHandler(SqlStatement sql,
+  public void acceptPreparedStatementHandler(ParameterizedSql sql,
       ConsumerHandler<PreparedStatement> handler) {
     conn.acceptPreparedStatementHandler(sql, handler);
   }

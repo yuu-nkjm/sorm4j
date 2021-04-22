@@ -12,10 +12,10 @@ import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
- * SQL with named parameters. The instance could be convert to {@link SqlStatement}.The class could
+ * SQL with named parameters. The instance could be convert to {@link ParameterizedSql}.The class could
  * treat {@link List} parameter.
  *
  * @author nkjm
@@ -64,7 +64,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
 
 
   @Override
-  public SqlStatement toSqlStatement() {
+  public ParameterizedSql parse() {
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
     String resultSql = this.sql;
 
@@ -95,7 +95,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
         }
       }
     }
-    return SqlStatementImpl.parse(resultSql, orderdParams.values().toArray());
+    return ParameterizedSqlImpl.parse(resultSql, orderdParams.values().toArray());
   }
 
   private List<String> createParameters() {

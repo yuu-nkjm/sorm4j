@@ -3,34 +3,34 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.List;
 import org.nkjmlab.sorm4j.TypedOrmReader;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public interface QueryExecutor<T> {
   /**
-   * see {@link TypedOrmReader#readOne(SqlStatement)}
+   * see {@link TypedOrmReader#readOne(ParameterizedSql)}
    *
    * @return
    */
-  T readOne(SqlStatement sqlStatement);
+  T readOne(ParameterizedSql parameterizedSql);
 
   /**
-   * see {@link TypedOrmReader#readFirst(SqlStatement)}
+   * see {@link TypedOrmReader#readFirst(ParameterizedSql)}
    *
    * @return
    */
-  T readFirst(SqlStatement sqlStatement);
+  T readFirst(ParameterizedSql parameterizedSql);
 
   /**
-   * see {@link TypedOrmReader#readLazy(SqlStatement)}
+   * see {@link TypedOrmReader#readLazy(ParameterizedSql)}
    *
    * @return
    */
-  LazyResultSet<T> readLazy(SqlStatement sqlStatement);
+  LazyResultSet<T> readLazy(ParameterizedSql parameterizedSql);
 
   /**
-   * see {@link TypedOrmReader#readList(SqlStatement)}
+   * see {@link TypedOrmReader#readList(ParameterizedSql)}
    *
    * @return
    */
-  List<T> readList(SqlStatement sqlStatement);
+  List<T> readList(ParameterizedSql parameterizedSql);
 }

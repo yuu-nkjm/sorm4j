@@ -22,17 +22,17 @@ class NamedParametersQueryImplTest {
   void testToSqlStatement() {
     sorm.accept(Player.class, con -> {
       con.insert(PLAYER_ALICE);
-      SqlStatement ret =
+      ParameterizedSql ret =
           con.createNamedParameterQuery("select * from players where id=:id and name=:name")
-              .toSqlStatement();
+              .parse();
       assertThat(ret.getSql()).isEqualTo(
-          SqlStatement.from("select * from players where id=:id and name=:name").getSql());
+          ParameterizedSql.from("select * from players where id=:id and name=:name").getSql());
     });
     sorm.accept(con -> {
-      SqlStatement ret = con.createNamedParameterQuery(Player.class,
-          "select * from players where id=:id and name=:name").toSqlStatement();
+      ParameterizedSql ret = con.createNamedParameterQuery(Player.class,
+          "select * from players where id=:id and name=:name").parse();
       assertThat(ret.getSql()).isEqualTo(
-          SqlStatement.from("select * from players where id=:id and name=:name").getSql());
+          ParameterizedSql.from("select * from players where id=:id and name=:name").getSql());
     });
   }
 

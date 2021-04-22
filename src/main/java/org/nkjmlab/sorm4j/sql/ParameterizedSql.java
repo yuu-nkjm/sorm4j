@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
-import org.nkjmlab.sorm4j.internal.sql.SqlStatementImpl;
+import java.util.Map;
+import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
 
@@ -11,7 +12,7 @@ import org.nkjmlab.sorm4j.internal.util.SqlUtils;
  *
  */
 
-public interface SqlStatement {
+public interface ParameterizedSql {
 
   /**
    * Gets this SQL statement.
@@ -27,16 +28,23 @@ public interface SqlStatement {
    */
   Object[] getParameters();
 
+  static ParameterizedSql parseAsOrdered(String sql, Object... orderedParameters) {
+    return OrderedParameterSql.parse(sql, orderedParameters);
+  }
+
+  static ParameterizedSql parseAsNamed(String sql, Map<String, Object> namedParameters) {
+    return NamedParameterSql.parse(sql, namedParameters);
+  }
 
   /**
-   * Creates {@link SqlStatement} object from the given SQL string. When you use a SQL statement
+   * Creates {@link ParameterizedSql} object from the given SQL string. When you use a SQL statement
    * with parameter, use {@link NamedParameterSql}, {@link OrderedParameterSql}.
    *
    * @param sql without parameter.
    * @return
    */
-  static SqlStatement from(String sql) {
-    return SqlStatementImpl.parse(sql);
+  static ParameterizedSql from(String sql) {
+    return ParameterizedSqlImpl.parse(sql);
   }
 
   /**

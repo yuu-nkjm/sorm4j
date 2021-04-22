@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j;
 
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
@@ -14,6 +15,7 @@ import org.nkjmlab.sorm4j.sql.SelectQuery;
  * @author nkjm
  *
  */
+@Experimental
 public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
     SqlExecutor, TypedResultSetMapper<T>, ResultSetMapMapper, TransactionFunction, AutoCloseable {
 

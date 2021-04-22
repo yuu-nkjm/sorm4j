@@ -7,7 +7,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
  * A interface for executing SQL with parameters.
@@ -25,7 +25,7 @@ public interface SqlExecutor {
    * @param handler
    */
   @Experimental
-  void acceptPreparedStatementHandler(SqlStatement sql, ConsumerHandler<PreparedStatement> handler);
+  void acceptPreparedStatementHandler(ParameterizedSql sql, ConsumerHandler<PreparedStatement> handler);
 
 
   /**
@@ -37,7 +37,7 @@ public interface SqlExecutor {
    * @return
    */
   @Experimental
-  <T> T applyPreparedStatementHandler(SqlStatement sql,
+  <T> T applyPreparedStatementHandler(ParameterizedSql sql,
       FunctionHandler<PreparedStatement, T> handler);
 
   /**
@@ -53,7 +53,7 @@ public interface SqlExecutor {
    * @param resultSetHandler
    * @return
    */
-  <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler);
+  <T> T executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, T> resultSetHandler);
 
 
   /**
@@ -64,7 +64,7 @@ public interface SqlExecutor {
    * @param rowMapper
    * @return
    */
-  <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper);
+  <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper);
 
   /**
    * Executes an update and returns the number of rows modified.
@@ -86,7 +86,7 @@ public interface SqlExecutor {
    * @param sql
    * @return
    */
-  int executeUpdate(SqlStatement sql);
+  int executeUpdate(ParameterizedSql sql);
 
   /**
    * Gets {@link Connection}.
