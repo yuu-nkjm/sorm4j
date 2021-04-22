@@ -237,7 +237,6 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
   /**
    * Treats array.
    *
-   * @param type
    * @param stmt
    * @param parameterIndex
    * @param parameter
