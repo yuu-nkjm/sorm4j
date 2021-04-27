@@ -23,7 +23,7 @@ public class OrderedParameterSqlImpl implements OrderedParameterSql {
 
   @Override
   public OrderedParameterSql addParameter(Object... parameters) {
-    Arrays.asList(parameters).forEach(v -> addParameter(v));
+    this.parameters.addAll(Arrays.asList(parameters));
     return this;
   }
 
@@ -37,7 +37,6 @@ public class OrderedParameterSqlImpl implements OrderedParameterSql {
   public ParameterizedSql parse() {
     return ParameterizedSqlImpl.parse(sql, parameters.toArray());
   }
-
 
 
 }

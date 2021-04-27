@@ -53,15 +53,15 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     if (parameters.length == 0) {
       return st;
     }
-    st = sql.contains(LIST_PLACEHOLDER) ? procListPlaceholder(sql, parameters) : st;
+    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
     st = sql.contains(EMBEDDED_PLACEHOLDER)
-        ? procEmbeddedPlaceholder(st.getSql(), st.getParameters())
+        ? parseEmbeddedPlaceholder(st.getSql(), st.getParameters())
         : st;
     return st;
   }
 
 
-  private static ParameterizedSql procListPlaceholder(String sql, Object[] parameters) {
+  private static ParameterizedSql parseListPlaceholder(String sql, Object[] parameters) {
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '<', '?', '>');
 
     List<Object> flattenListParams = new ArrayList<>();
@@ -104,7 +104,7 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
   }
 
 
-  private static ParameterizedSql procEmbeddedPlaceholder(String sql, Object[] parameters) {
+  public static ParameterizedSql parseEmbeddedPlaceholder(String sql, Object... parameters) {
 
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '{', '?', '}');
 
@@ -140,6 +140,16 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
       }
     }
     return ret;
+  }
+
+
+  @Override
+  public String getBindedSql() {
+    String sql = this.sql;
+    for (int i = 0; i < parameters.length; i++) {
+      sql = sql.replaceFirst("\\?", ParameterizedSql.literal(parameters[i]));
+    }
+    return sql;
   }
 
 

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
@@ -28,10 +29,16 @@ public interface ParameterizedSql {
    */
   Object[] getParameters();
 
+  @Experimental
+  String getBindedSql();
+
+
+  @Experimental
   static ParameterizedSql parseAsOrdered(String sql, Object... orderedParameters) {
     return OrderedParameterSql.parse(sql, orderedParameters);
   }
 
+  @Experimental
   static ParameterizedSql parseAsNamed(String sql, Map<String, Object> namedParameters) {
     return NamedParameterSql.parse(sql, namedParameters);
   }
@@ -53,6 +60,7 @@ public interface ParameterizedSql {
    * @param element
    * @return
    */
+  @Experimental
   static String literal(Object element) {
     return SqlUtils.literal(element);
   }
@@ -63,6 +71,7 @@ public interface ParameterizedSql {
    * @param expr
    * @return
    */
+  @Experimental
   static String quote(String expr) {
     return SqlUtils.quote(expr);
   }
