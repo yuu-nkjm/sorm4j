@@ -87,7 +87,7 @@ class OrmConnectionTest {
   void testNamedRequest1() {
     AtomicInteger id = new AtomicInteger(10);
     int row = sorm.apply(
-        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+        conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
     assertThat(row).isEqualTo(1);
     Player p = sorm.apply(conn -> conn.readAll(Player.class)).get(0);
@@ -99,13 +99,14 @@ class OrmConnectionTest {
 
 
     int row = sorm.apply(
-        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+        conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
             .executeUpdate());
     assertThat(row).isEqualTo(1);
 
     row = sorm.apply(
-        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+        conn -> conn
+            .createCommand("insert into players values(:id, :name, :address)")
             .bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo")
             .executeUpdate());
     assertThat(row).isEqualTo(1);
@@ -119,13 +120,12 @@ class OrmConnectionTest {
     });
     assertThat(row).isEqualTo(1);
 
-    List<Player> ret =
-        sorm.apply(conn -> conn.createNamedParameterRequest("select * from players where id=:id")
-            .bind("id", id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
+    List<Player> ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
+        .bind("id", id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
 
-    ret = sorm.apply(conn -> conn.createNamedParameterRequest("select * from players where id=:id")
+    ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
         .bind("id", id.get()).executeQuery(rs -> conn.mapRowList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
@@ -135,23 +135,23 @@ class OrmConnectionTest {
   void testOrderedRequest() {
     AtomicInteger id = new AtomicInteger(10);
     int row =
-        sorm.apply(conn -> conn.createOrderedParameterRequest("insert into players values(?,?,?)")
+        sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
             .addParameter(id.incrementAndGet(), "Frank", "Tokyo").executeUpdate());
     assertThat(row).isEqualTo(1);
 
     List<Player> ret = sorm.apply(
-        conn -> conn.createOrderedParameterRequest("select * from players where id=? and name=?")
+        conn -> conn.createCommand("select * from players where id=? and name=?")
             .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRowList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
 
-    row = sorm.apply(conn -> conn.createOrderedParameterRequest("insert into players values(?,?,?)")
+    row = sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
         .executeUpdate());
     assertThat(row).isEqualTo(1);
 
 
-    ret = sorm.apply(conn -> conn.createOrderedParameterRequest("select * from players where id=?")
+    ret = sorm.apply(conn -> conn.createCommand("select * from players where id=?")
         .addParameter(id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);

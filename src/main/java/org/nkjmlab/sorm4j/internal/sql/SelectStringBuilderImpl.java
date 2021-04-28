@@ -10,9 +10,9 @@ import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
  * @author nkjm
  *
  */
-public class SelectBuilderImpl implements SelectStringBuilder {
+public class SelectStringBuilderImpl implements SelectStringBuilder {
 
-  public SelectBuilderImpl() {}
+  public SelectStringBuilderImpl() {}
 
   private boolean distinct;
 

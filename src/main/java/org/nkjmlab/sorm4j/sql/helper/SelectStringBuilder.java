@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.sql.helper;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.internal.sql.SelectBuilderImpl;
+import org.nkjmlab.sorm4j.internal.sql.SelectStringBuilderImpl;
 
 
 /**
@@ -118,7 +118,7 @@ public interface SelectStringBuilder {
    * @return
    */
   public static SelectStringBuilder create() {
-    return new SelectBuilderImpl();
+    return new SelectStringBuilderImpl();
   }
 
   /**

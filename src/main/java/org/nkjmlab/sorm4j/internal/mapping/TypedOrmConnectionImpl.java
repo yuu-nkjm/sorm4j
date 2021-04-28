@@ -5,22 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.BasicCommand;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
-import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.QueryTypedOrmExecutor;
-import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
@@ -64,37 +56,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     conn.commit();
   }
 
-
-  @Override
-  public NamedParameterQuery<T> createNamedParameterQuery(String sql) {
-    return NamedParameterQueryImpl.createFrom(new QueryTypedOrmExecutor<>(this), sql);
-  }
-
-  @Override
-  public NamedParameterRequest createNamedParameterRequest(String sql) {
-    return NamedParameterRequest.from(this, sql);
-  }
-
-
-  @Override
-  public OrderedParameterQuery<T> createOrderedParameterQuery(String sql) {
-    return OrderedParameterQueryImpl.createFrom(new QueryTypedOrmExecutor<>(this), sql);
-  }
-
-
-  @Override
-  public OrderedParameterRequest createOrderedParameterRequest(String sql) {
-    return OrderedParameterRequest.from(this, sql);
-  }
-
-
-
-  @Override
-  public SelectQuery<T> createSelectQuery() {
-    SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryTypedOrmExecutor<>(this));
-    ret.from(getTableName());
-    return ret;
-  }
 
 
   @Override
@@ -468,6 +429,12 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
       ConsumerHandler<PreparedStatement> handler) {
     conn.acceptPreparedStatementHandler(sql, handler);
   }
+
+  @Override
+  public BasicCommand createCommand(String sql) {
+    return BasicCommand.from(conn, sql);
+  }
+
 
 
 }

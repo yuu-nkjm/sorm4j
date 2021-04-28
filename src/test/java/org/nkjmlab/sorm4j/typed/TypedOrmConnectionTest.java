@@ -53,14 +53,14 @@ class TypedOrmConnectionTest {
   void testOrderedRequest() {
     AtomicInteger id = new AtomicInteger(10);
 
-    int row = sorm.apply(
-        conn -> conn.createNamedParameterRequest("insert into players values(:id, :name, :address)")
+    int row =
+        sorm.apply(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
             .executeUpdate());
     assertThat(row).isEqualTo(1);
 
 
-    row = sorm.apply(conn -> conn.createOrderedParameterRequest("insert into players values(?,?,?)")
+    row = sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
         .executeUpdate());
     assertThat(row).isEqualTo(1);

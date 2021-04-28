@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.nkjmlab.sorm4j.BasicCommand;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
@@ -21,21 +22,12 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.QueryOrmExecutor;
-import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 import org.nkjmlab.sorm4j.sql.tuple.Tuples;
@@ -160,36 +152,9 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> NamedParameterQuery<T> createNamedParameterQuery(Class<T> objectClass, String sql) {
-    return NamedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
+  public BasicCommand createCommand(String sql) {
+    return BasicCommand.from(this, sql);
   }
-
-
-  @Override
-  public NamedParameterRequest createNamedParameterRequest(String sql) {
-    return NamedParameterRequest.from(this, sql);
-  }
-
-
-  @Override
-  public <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass,
-      String sql) {
-    return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
-  }
-
-  @Override
-  public OrderedParameterRequest createOrderedParameterRequest(String sql) {
-    return OrderedParameterRequest.from(this, sql);
-  }
-
-
-  @Override
-  public <T> SelectQuery<T> createSelectQuery(Class<T> objectClass) {
-    SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryOrmExecutor<>(this, objectClass));
-    ret.from(getTableName(objectClass));
-    return ret;
-  }
-
 
   @Override
   public <T> int[] delete(List<T> objects) {
@@ -812,7 +777,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
+      ParameterizedSql sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 
@@ -884,5 +850,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
   }
+
 
 }

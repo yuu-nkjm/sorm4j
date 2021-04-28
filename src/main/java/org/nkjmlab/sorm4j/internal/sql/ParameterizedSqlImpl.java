@@ -53,10 +53,10 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     if (parameters.length == 0) {
       return st;
     }
+    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
     st = sql.contains(EMBEDDED_PLACEHOLDER)
         ? parseEmbeddedPlaceholder(st.getSql(), st.getParameters())
         : st;
-    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
     return st;
   }
 
