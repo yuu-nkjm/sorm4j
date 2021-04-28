@@ -1,8 +1,8 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
 
 /**
  * An implementation of {@link OrderedParameterQuery}

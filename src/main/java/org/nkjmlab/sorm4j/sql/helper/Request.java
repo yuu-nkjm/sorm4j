@@ -1,9 +1,10 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
 
 import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.RowMapper;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
 
 /**
@@ -12,6 +13,7 @@ import org.nkjmlab.sorm4j.RowMapper;
  * @author nkjm
  *
  */
+@Experimental
 public interface Request {
 
   /**

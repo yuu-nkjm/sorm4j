@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ import org.nkjmlab.sorm4j.internal.sql.SelectBuilderImpl;
  *
  */
 @Experimental
-public interface SelectBuilder extends ParameterizedSqlParser {
+public interface SelectStringBuilder {
 
   /**
    * Value object represents conditions of where clause or having clause. This object could include
@@ -74,8 +74,8 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param conds condition in String or Condition
    * @return
    */
-  public static SelectBuilder.Condition and(Object... conds) {
-    return new SelectBuilder.Condition("and", conds);
+  public static SelectStringBuilder.Condition and(Object... conds) {
+    return new SelectStringBuilder.Condition("and", conds);
   }
 
   /**
@@ -95,7 +95,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
 
   /**
    * <p>
-   * Creates {@link SelectBuilder.Condition} instance.
+   * Creates {@link SelectStringBuilder.Condition} instance.
    *
    * <p>
    * For example,
@@ -104,20 +104,20 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * and(cond("id=?"), "name=?")  returns "id=? and name=?"
    * </pre>
    */
-  public static SelectBuilder.Condition cond(String cond) {
-    return new SelectBuilder.Condition(cond);
+  public static SelectStringBuilder.Condition cond(String cond) {
+    return new SelectStringBuilder.Condition(cond);
   }
 
-  public static SelectBuilder.Condition cond(String left, String op, String right) {
-    return new SelectBuilder.Condition(left, op, right);
+  public static SelectStringBuilder.Condition cond(String left, String op, String right) {
+    return new SelectStringBuilder.Condition(left, op, right);
   }
 
   /**
-   * Create {@link SelectBuilder} object.
+   * Create {@link SelectStringBuilder} object.
    *
    * @return
    */
-  public static SelectBuilder create() {
+  public static SelectStringBuilder create() {
     return new SelectBuilderImpl();
   }
 
@@ -131,19 +131,19 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * or("id=?", "name=?") returns "id=? or name=?"
    * </pre>
    */
-  public static SelectBuilder.Condition or(Object... conds) {
-    return new SelectBuilder.Condition("or", conds);
+  public static SelectStringBuilder.Condition or(Object... conds) {
+    return new SelectStringBuilder.Condition("or", conds);
   }
 
   /**
-   * Create {@link SelectBuilder.OrderBy} objects.
+   * Create {@link SelectStringBuilder.OrderBy} objects.
    *
    * @param column
    * @param ascOrDesc
    * @return
    */
-  public static SelectBuilder.OrderBy order(String column, String ascOrDesc) {
-    return new SelectBuilder.OrderBy(column, ascOrDesc);
+  public static SelectStringBuilder.OrderBy order(String column, String ascOrDesc) {
+    return new SelectStringBuilder.OrderBy(column, ascOrDesc);
   }
 
 
@@ -152,12 +152,12 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    *
    * @return
    */
-  String buildSql();
+  String build();
 
   /**
    * Add distinct keyword to SQL.
    */
-  SelectBuilder distinct();
+  SelectStringBuilder distinct();
 
   /**
    * Create from clause.
@@ -170,7 +170,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param table
    * @return
    */
-  SelectBuilder from(String table);
+  SelectStringBuilder from(String table);
 
   /**
    * Create group by clause.
@@ -178,15 +178,15 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param columns
    * @return
    */
-  SelectBuilder groupBy(String... columns);
+  SelectStringBuilder groupBy(String... columns);
 
   /**
-   * Create having clause with the given {@link SelectBuilder.Condition}.
+   * Create having clause with the given {@link SelectStringBuilder.Condition}.
    *
    * @param condition
    * @return
    */
-  SelectBuilder having(SelectBuilder.Condition condition);
+  SelectStringBuilder having(SelectStringBuilder.Condition condition);
 
 
   /**
@@ -195,7 +195,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param expr
    * @return
    */
-  SelectBuilder having(String expr);
+  SelectStringBuilder having(String expr);
 
   /**
    * Create limit clause.
@@ -203,7 +203,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param limit
    * @return
    */
-  SelectBuilder limit(int limit);
+  SelectStringBuilder limit(int limit);
 
 
   /**
@@ -212,7 +212,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param limit
    * @return
    */
-  SelectBuilder limit(int limit, int offset);
+  SelectStringBuilder limit(int limit, int offset);
 
   /**
    * Create order by clause.
@@ -220,7 +220,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param orderBys
    * @return
    */
-  SelectBuilder orderBy(SelectBuilder.OrderBy... orderBys);
+  SelectStringBuilder orderBy(SelectStringBuilder.OrderBy... orderBys);
 
   /**
    * Create order by clause.
@@ -229,7 +229,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param ascOrDesc
    * @return
    */
-  SelectBuilder orderBy(String column, String ascOrDesc);
+  SelectStringBuilder orderBy(String column, String ascOrDesc);
 
   /**
    * Create select clause. The default value is "*".
@@ -243,7 +243,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param columns
    * @return
    */
-  SelectBuilder select(String... columns);
+  SelectStringBuilder select(String... columns);
 
   /**
    * Create prettified string.
@@ -268,7 +268,7 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param condition
    * @return
    */
-  SelectBuilder where(SelectBuilder.Condition condition);
+  SelectStringBuilder where(SelectStringBuilder.Condition condition);
 
   /**
    * Create where clause.
@@ -276,5 +276,5 @@ public interface SelectBuilder extends ParameterizedSqlParser {
    * @param expr
    * @return
    */
-  SelectBuilder where(String expr);
+  SelectStringBuilder where(String expr);
 }

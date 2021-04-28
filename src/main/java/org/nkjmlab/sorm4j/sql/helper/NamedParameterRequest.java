@@ -1,9 +1,10 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterRequestImpl;
+import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 
 
 /**

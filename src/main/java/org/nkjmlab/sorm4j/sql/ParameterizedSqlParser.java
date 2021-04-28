@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 public interface ParameterizedSqlParser {
   /**
-   * Convert {@link ParameterizedSql} objects.
+   * Parse to {@link ParameterizedSql} objects.
    *
    * @return
    */

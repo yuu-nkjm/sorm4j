@@ -23,7 +23,6 @@ class NamedParameterSqlTest {
       ParameterizedSql statement = OrderedParameterSql.parse(
           "select * from customer where name like {?} and address in(<?>) and id=?", "A%",
           List.of("Tokyo", "Kyoto"), 1);
-      System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
@@ -32,7 +31,6 @@ class NamedParameterSqlTest {
       String sql = "select * from customer where id=:id and address=:address";
       ParameterizedSql statement =
           NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").parse();
-      System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
@@ -40,7 +38,6 @@ class NamedParameterSqlTest {
       ParameterizedSql statement = NamedParameterSql.parse(
           "select * from customer where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "A%"));
-      System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
@@ -57,7 +54,8 @@ class NamedParameterSqlTest {
     assertThat(sp.toString())
         .isEqualTo("sql=[select * from simple where id=? and name=?], parameters=[2, foo]");
 
-    assertThat(ParameterizedSql.from("select * from test").toString()).contains("[select * from test]");
+    assertThat(ParameterizedSql.from("select * from test").toString())
+        .contains("[select * from test]");
   }
 
   @Test
@@ -71,8 +69,8 @@ class NamedParameterSqlTest {
   @Test
   void testBind() {
 
-    ParameterizedSql sp = NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1).bind("idid", 2)
-        .parse();
+    ParameterizedSql sp =
+        NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1).bind("idid", 2).parse();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
     assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});

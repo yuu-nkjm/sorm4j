@@ -2,8 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
-import static org.nkjmlab.sorm4j.sql.SelectBuilder.*;
-import static org.nkjmlab.sorm4j.sql.SelectBuilder.as;
+import static org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder.*;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,8 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
+import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 
 class SelectQueryTest {
 
@@ -92,19 +93,19 @@ class SelectQueryTest {
       builder.groupBy("TEAM");
       builder.having("avg(age)>0");
       builder.distinct();
-      String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
+      String sql = builder.from("GUESTS").orderBy("age", "desc").limit(10).build();
       System.out.println(sql);
       assertThat(sql).contains(
           "select distinct avg(AGE) as AVERAGE_AGE, TEAM from GUESTS where ((ID>100 and COUNTRY IN (?)) or YEAR>2001) group by TEAM having avg(age)>0 order by age desc limit 10");
 
-      SelectBuilder bs = SelectBuilder.create();
+      SelectStringBuilder bs = SelectStringBuilder.create();
       bs.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
       bs.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
       bs.groupBy("TEAM");
       bs.having("avg(age)>0");
       bs.distinct();
       bs.toString();
-      String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).buildSql();
+      String sql2 = bs.from("GUESTS").orderBy("age", "desc").limit(10).build();
 
       assertThat(sql).isEqualTo(sql2);
       assertThat(builder.parse().getSql()).isEqualTo(sql2);

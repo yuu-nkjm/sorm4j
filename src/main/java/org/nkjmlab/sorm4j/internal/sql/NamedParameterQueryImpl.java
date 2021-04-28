@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
 
 /**
  * An implementation of {@link NamedParameterQuery}

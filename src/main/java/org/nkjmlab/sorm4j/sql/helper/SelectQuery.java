@@ -1,7 +1,10 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 
 
 /**
@@ -11,8 +14,9 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  * @param <T>
  */
-public interface SelectQuery<T>
-    extends SelectBuilder, NamedParameterSql, OrderedParameterSql, ParameterizedSqlParser, Query<T> {
+@Experimental
+public interface SelectQuery<T> extends SelectStringBuilder, NamedParameterSql, OrderedParameterSql,
+    ParameterizedSqlParser, Query<T> {
   @Override
   OrderedParameterQuery<T> addParameter(Object... parameters);
 
@@ -47,7 +51,7 @@ public interface SelectQuery<T>
   SelectQuery<T> groupBy(String... columns);
 
   @Override
-  SelectQuery<T> having(SelectBuilder.Condition condition);
+  SelectQuery<T> having(SelectStringBuilder.Condition condition);
 
   @Override
   SelectQuery<T> having(String expr);
@@ -62,10 +66,10 @@ public interface SelectQuery<T>
   SelectQuery<T> orderBy(String column, String ascOrDesc);
 
   @Override
-  SelectQuery<T> orderBy(SelectBuilder.OrderBy... orderBys);
+  SelectQuery<T> orderBy(SelectStringBuilder.OrderBy... orderBys);
 
   @Override
-  String buildSql();
+  String build();
 
   @Override
   String toPrettyString();
@@ -74,7 +78,7 @@ public interface SelectQuery<T>
   String toPrettyString(boolean prettyPrint);
 
   @Override
-  SelectQuery<T> where(SelectBuilder.Condition condition);
+  SelectQuery<T> where(SelectStringBuilder.Condition condition);
 
   @Override
   SelectQuery<T> where(String expr);

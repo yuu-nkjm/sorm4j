@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.SelectBuilder;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
+import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
@@ -16,20 +16,20 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  */
 public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<T> {
 
-  private final SelectBuilder selectBuilder;
+  private final SelectStringBuilder selectStringBuilder;
 
 
   public SelectQueryImpl(QueryExecutor<T> executor) {
     super(executor);
-    this.selectBuilder = SelectBuilder.create();
+    this.selectStringBuilder = SelectStringBuilder.create();
   }
 
   private NamedParameterQuery<T> withNamedParameter() {
-    return NamedParameterQueryImpl.createFrom(executor, buildSql());
+    return NamedParameterQueryImpl.createFrom(executor, build());
   }
 
   private OrderedParameterQuery<T> withOrderedParameter() {
-    return OrderedParameterQueryImpl.createFrom(executor, buildSql());
+    return OrderedParameterQueryImpl.createFrom(executor, build());
   }
 
   @Override
@@ -69,98 +69,98 @@ public class SelectQueryImpl<T> extends AbstractQuery<T> implements SelectQuery<
 
   @Override
   public ParameterizedSql parse() {
-    return ParameterizedSql.from(buildSql());
+    return ParameterizedSql.from(build());
   }
 
   @Override
   public SelectQuery<T> select(String... columns) {
-    selectBuilder.select(columns);
+    selectStringBuilder.select(columns);
     return this;
   }
 
   @Override
   public SelectQuery<T> distinct() {
-    selectBuilder.distinct();
+    selectStringBuilder.distinct();
     return this;
   }
 
   @Override
   public SelectQuery<T> from(String table) {
-    selectBuilder.from(table);
+    selectStringBuilder.from(table);
     return this;
   }
 
   @Override
   public SelectQuery<T> groupBy(String... columns) {
-    selectBuilder.groupBy(columns);
+    selectStringBuilder.groupBy(columns);
     return this;
   }
 
   @Override
-  public SelectQuery<T> having(SelectBuilder.Condition condition) {
-    selectBuilder.having(condition);
+  public SelectQuery<T> having(SelectStringBuilder.Condition condition) {
+    selectStringBuilder.having(condition);
     return this;
   }
 
   @Override
   public SelectQuery<T> having(String expr) {
-    selectBuilder.having(expr);
+    selectStringBuilder.having(expr);
     return this;
   }
 
   @Override
   public SelectQuery<T> limit(int limit) {
-    selectBuilder.limit(limit);
+    selectStringBuilder.limit(limit);
     return this;
   }
 
   @Override
   public SelectQuery<T> limit(int limit, int offset) {
-    selectBuilder.limit(limit, offset);
+    selectStringBuilder.limit(limit, offset);
     return this;
   }
 
   @Override
   public SelectQuery<T> orderBy(String column, String ascOrDesc) {
-    selectBuilder.orderBy(column, ascOrDesc);
+    selectStringBuilder.orderBy(column, ascOrDesc);
     return this;
   }
 
   @Override
-  public SelectQuery<T> orderBy(SelectBuilder.OrderBy... orderBys) {
-    selectBuilder.orderBy(orderBys);
+  public SelectQuery<T> orderBy(SelectStringBuilder.OrderBy... orderBys) {
+    selectStringBuilder.orderBy(orderBys);
     return this;
   }
 
   @Override
-  public String buildSql() {
-    return selectBuilder.buildSql();
+  public String build() {
+    return selectStringBuilder.build();
   }
 
   @Override
   public String toString() {
-    return selectBuilder.buildSql();
+    return selectStringBuilder.build();
   }
 
   @Override
   public String toPrettyString() {
-    return selectBuilder.toPrettyString();
+    return selectStringBuilder.toPrettyString();
   }
 
   @Override
   public String toPrettyString(boolean prettyPrint) {
-    return selectBuilder.toPrettyString(prettyPrint);
+    return selectStringBuilder.toPrettyString(prettyPrint);
   }
 
   @Override
-  public SelectQuery<T> where(SelectBuilder.Condition condition) {
-    selectBuilder.where(condition);
+  public SelectQuery<T> where(SelectStringBuilder.Condition condition) {
+    selectStringBuilder.where(condition);
     return this;
   }
 
   @Override
   public SelectQuery<T> where(String expr) {
-    selectBuilder.where(expr);
+    selectStringBuilder.where(expr);
     return this;
   }
 

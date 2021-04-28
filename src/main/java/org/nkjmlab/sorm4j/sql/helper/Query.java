@@ -1,6 +1,8 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
 
 import java.util.List;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.LazyResultSet;
 
 /**
  * A query for reading and mapping a relation to object.
@@ -9,7 +11,7 @@ import java.util.List;
  *
  * @param <T>
  */
-
+@Experimental
 public interface Query<T> {
 
   /**

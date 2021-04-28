@@ -2,8 +2,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.sql.SelectBuilder;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
 
 /**
  * An builder of select SQL.
@@ -11,7 +10,7 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  * @author nkjm
  *
  */
-public class SelectBuilderImpl implements SelectBuilder {
+public class SelectBuilderImpl implements SelectStringBuilder {
 
   public SelectBuilderImpl() {}
 
@@ -32,67 +31,67 @@ public class SelectBuilderImpl implements SelectBuilder {
   private String limit;
 
   @Override
-  public SelectBuilder select(String... columns) {
+  public SelectStringBuilder select(String... columns) {
     this.columns = String.join(", ", Arrays.stream(columns).collect(Collectors.toList()));
     return this;
   }
 
   @Override
-  public SelectBuilder distinct() {
+  public SelectStringBuilder distinct() {
     this.distinct = true;
     return this;
   }
 
   @Override
-  public SelectBuilder from(String table) {
+  public SelectStringBuilder from(String table) {
     this.table = table;
     return this;
   }
 
   @Override
-  public SelectBuilder groupBy(String... columns) {
+  public SelectStringBuilder groupBy(String... columns) {
     groupBy = String.join(",", Arrays.stream(columns).collect(Collectors.toList()));
     return this;
   }
 
   @Override
-  public SelectBuilder having(SelectBuilder.Condition condition) {
+  public SelectStringBuilder having(SelectStringBuilder.Condition condition) {
     having(condition.toString());
     return this;
   }
 
   @Override
-  public SelectBuilder having(String expr) {
+  public SelectStringBuilder having(String expr) {
     having = expr;
     return this;
   }
 
   @Override
-  public SelectBuilder limit(int limit) {
+  public SelectStringBuilder limit(int limit) {
     return limit(limit, 0);
   }
 
   @Override
-  public SelectBuilder limit(int limit, int offset) {
+  public SelectStringBuilder limit(int limit, int offset) {
     this.limit = limit + (offset > 0 ? " offset " + offset : "");
     return this;
   }
 
   @Override
-  public SelectBuilder orderBy(String column, String ascOrDesc) {
-    orderBy(new SelectBuilder.OrderBy(column, ascOrDesc));
+  public SelectStringBuilder orderBy(String column, String ascOrDesc) {
+    orderBy(new SelectStringBuilder.OrderBy(column, ascOrDesc));
     return this;
   }
 
   @Override
-  public SelectBuilder orderBy(SelectBuilder.OrderBy... orderBys) {
+  public SelectStringBuilder orderBy(SelectStringBuilder.OrderBy... orderBys) {
     this.orderBy = String.join(", ",
         Arrays.stream(orderBys).map(ob -> ob.toString()).collect(Collectors.toList()));
     return this;
   }
 
   @Override
-  public String buildSql() {
+  public String build() {
     return toPrettyString(false);
   }
 
@@ -141,20 +140,15 @@ public class SelectBuilderImpl implements SelectBuilder {
   }
 
   @Override
-  public SelectBuilder where(SelectBuilder.Condition condition) {
+  public SelectStringBuilder where(SelectStringBuilder.Condition condition) {
     where(condition.toString());
     return this;
   }
 
   @Override
-  public SelectBuilder where(String expr) {
+  public SelectStringBuilder where(String expr) {
     where = expr;
     return this;
-  }
-
-  @Override
-  public ParameterizedSql parse() {
-    return ParameterizedSql.from(buildSql());
   }
 
 }

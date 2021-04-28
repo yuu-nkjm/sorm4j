@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.Query;
 import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
+import org.nkjmlab.sorm4j.sql.helper.Query;
 
 public abstract class AbstractQuery<T> implements Query<T>, ParameterizedSqlParser {
   protected final QueryExecutor<T> executor;

@@ -1,4 +1,6 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.helper;
+
+import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 
 /**
  * Query with ordered parameters.

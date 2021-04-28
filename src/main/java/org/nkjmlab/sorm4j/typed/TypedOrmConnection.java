@@ -6,11 +6,11 @@ import org.nkjmlab.sorm4j.ResultSetMapMapper;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.TransactionFunction;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 
 /**
  * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},

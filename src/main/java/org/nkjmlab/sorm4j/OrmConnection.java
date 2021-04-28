@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**

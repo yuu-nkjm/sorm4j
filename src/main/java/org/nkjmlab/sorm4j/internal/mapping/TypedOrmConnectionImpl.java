@@ -15,12 +15,12 @@ import org.nkjmlab.sorm4j.internal.sql.QueryTypedOrmExecutor;
 import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.NamedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterQuery;
+import org.nkjmlab.sorm4j.sql.helper.OrderedParameterRequest;
+import org.nkjmlab.sorm4j.sql.helper.SelectQuery;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
