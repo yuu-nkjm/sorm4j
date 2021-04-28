@@ -11,6 +11,7 @@ import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.internal.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
 import org.nkjmlab.sorm4j.internal.mapping.TypedOrmConnectionImpl;
+import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * Main entry point of this library. It creates {@link Sorm} object.

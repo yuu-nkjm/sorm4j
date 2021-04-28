@@ -19,16 +19,17 @@ class OrderedParametersQueryTest {
 
   @Test
   void testAddObjectArray() {
-    sorm.accept(Player.class, conn -> {
+    sorm.accept(conn -> {
       conn.insert(PLAYER_ALICE);
-      Player ret = conn.createOrderedParameterQuery("select * from PLAYERS where ID=?").addParameter(1)
-          .readList().get(0);
+      Player ret =
+          conn.type(Player.class).createOrderedParameterQuery("select * from PLAYERS where ID=?")
+              .addParameter(1).readList().get(0);
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
     sorm.accept(conn -> {
       Player ret =
-          conn.createOrderedParameterQuery(Player.class, "select * from PLAYERS where ID=?").addParameter(1)
-              .readList().get(0);
+          conn.createOrderedParameterQuery(Player.class, "select * from PLAYERS where ID=?")
+              .addParameter(1).readList().get(0);
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
   }

@@ -24,6 +24,7 @@ import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 class OrmConnectionTest {
 
@@ -32,6 +33,17 @@ class OrmConnectionTest {
   @BeforeEach
   void setUp() {
     sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+  }
+
+  @Test
+  void testApplyPreparedStatementHandler() {
+    sorm.accept(conn -> {
+      conn.acceptPreparedStatementHandler(
+          ParameterizedSql.parse("select * from guests where id=?", 1), pstmt -> pstmt.execute());
+      conn.applyPreparedStatementHandler(
+          ParameterizedSql.parse("select * from guests where id=?", 1), pstmt -> pstmt.execute());
+    });
+
   }
 
   @Test
@@ -510,7 +522,8 @@ class OrmConnectionTest {
           .isEqualTo(a.getName());
     });
     sorm.accept(m -> {
-      Map<String, Object> map = m.readMapList(ParameterizedSql.from("select * from players")).get(0);
+      Map<String, Object> map =
+          m.readMapList(ParameterizedSql.from("select * from players")).get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -557,10 +570,11 @@ class OrmConnectionTest {
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readList(Player.class, "select * from players")).contains(a, b);
-      assertThat(m.readList(Player.class, ParameterizedSql.from("select * from players"))).contains(a,
-          b);
-      assertThat(m.readOne(Player.class,
-          OrderedParameterSql.parse("select * from players where id=?", 1))).isEqualTo(a);
+      assertThat(m.readList(Player.class, ParameterizedSql.from("select * from players")))
+          .contains(a, b);
+      assertThat(
+          m.readOne(Player.class, OrderedParameterSql.parse("select * from players where id=?", 1)))
+              .isEqualTo(a);
       assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
 
 
@@ -575,8 +589,8 @@ class OrmConnectionTest {
         Guest b = SormTestUtils.GUEST_BOB;
         m.insert(a);
         m.insert(b);
-        Guest g = m.readOne(Guest.class,
-            OrderedParameterSql.parse("select * from guests where id=?", 1));
+        Guest g =
+            m.readOne(Guest.class, OrderedParameterSql.parse("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(Guest.class, ParameterizedSql.from("select * from guests"));
@@ -616,17 +630,17 @@ class OrmConnectionTest {
         b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
     try {
-      sorm.createWith("isole").acceptTransactionHandler(Guest.class, m -> {
+      sorm.createWith("isole").acceptTransactionHandler(m -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("is not registered");
     }
-    sorm.createWith("isolev").acceptTransactionHandler(Guest.class, m -> {
+    sorm.createWith("isolev").acceptTransactionHandler(m -> {
       assertThat(m.getJdbcConnection().getTransactionIsolation())
           .isEqualTo(Connection.TRANSACTION_SERIALIZABLE);
     });
-    sorm.acceptTransactionHandler(Guest.class, m -> {
+    sorm.acceptTransactionHandler(m -> {
       assertThat(m.getJdbcConnection().getTransactionIsolation())
           .isEqualTo(Connection.TRANSACTION_READ_COMMITTED);
     });

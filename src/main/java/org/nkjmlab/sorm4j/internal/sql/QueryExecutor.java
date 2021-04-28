@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.TypedOrmReader;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.typed.TypedOrmReader;
 
 public interface QueryExecutor<T> {
   /**

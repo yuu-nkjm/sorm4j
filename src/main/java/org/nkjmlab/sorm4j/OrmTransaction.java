@@ -1,5 +1,7 @@
 package org.nkjmlab.sorm4j;
 
+import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
+
 /**
  * An transaction with object relation mapping.
  *

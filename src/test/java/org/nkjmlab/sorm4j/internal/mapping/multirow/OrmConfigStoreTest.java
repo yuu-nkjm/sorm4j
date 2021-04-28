@@ -82,7 +82,7 @@ class OrmConfigStoreTest {
     Sorm sormImpl = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
-    sormImpl.accept(Guest.class, con -> con.insert(new Guest[0]));
+    sormImpl.accept(con -> con.insert(new Guest[0]));
 
 
     sormImpl = SormFactory.create(jdbcUrl, user, password);

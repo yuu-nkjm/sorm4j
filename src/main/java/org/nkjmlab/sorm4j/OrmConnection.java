@@ -1,10 +1,12 @@
 package org.nkjmlab.sorm4j;
 
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
 import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * Main API for object relation mapping. The api consists of {@link OrmReader}, {@link OrmUpdater},
@@ -68,6 +70,7 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @param objectClass
    * @return
    */
+  @Experimental
   <T> TypedOrmConnection<T> type(Class<T> objectClass);
 
   /**

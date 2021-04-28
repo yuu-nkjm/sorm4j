@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
 import org.nkjmlab.sorm4j.internal.sql.QueryTypedOrmExecutor;
@@ -20,8 +19,9 @@ import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
+import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * A database connection with object-relation mapping function with type. The main class for the

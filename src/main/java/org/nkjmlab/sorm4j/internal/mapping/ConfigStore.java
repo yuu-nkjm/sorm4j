@@ -59,7 +59,7 @@ public final class ConfigStore {
     this.multiRowSize = multiRowSize;
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
     this.options = options;
-    SormOptions _options = new OrmOptionsImpl(options);
+    SormOptions _options = new SormOptionsImpl(options);
     this.multiRowProcessorFactory =
         MultiRowProcessorFactory.createMultiRowProcessorFactory(_options, sqlParametersSetter,
             multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);

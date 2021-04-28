@@ -7,6 +7,7 @@ class MethodInvokerTest {
 
   @Test
   void testGetSummary() {
+    assertThat(MethodInvoker.getSummary(0, "DEBUG")).contains("MethodInvoker");
     assertThat(MethodInvoker.getSummary(2, "DEBUG")).contains("testGetSummary");
   }
 

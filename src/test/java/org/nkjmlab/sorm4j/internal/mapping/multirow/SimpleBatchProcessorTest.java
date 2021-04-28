@@ -39,7 +39,7 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowInsert() {
-    sorm.accept(Player.class, conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
+    sorm.accept(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
     sorm.acceptTransactionHandler(tr -> {
       try {
         tr.insert(PLAYER_ALICE, null);
@@ -54,13 +54,13 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sorm.accept(Guest.class, conn -> conn
+    sorm.accept(conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.accept(Player.class, conn -> conn
+    sorm.accept(conn -> conn
         .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
 

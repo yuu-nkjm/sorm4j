@@ -19,13 +19,13 @@ class SelectQueryTest {
   @BeforeEach
   void testBeforeEach() {
     this.sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    sorm.accept(Player.class, con -> con.insert(SormTestUtils.PLAYER_ALICE));
+    sorm.accept(con -> con.insert(SormTestUtils.PLAYER_ALICE));
   }
 
   @Test
   void testExecBindQuery() {
-    sorm.accept(Player.class,
-        con -> assertThat(con.createSelectQuery().where("id=:id").bind("id", 1).readLazy().one())
+    sorm.accept(con -> assertThat(
+        con.type(Player.class).createSelectQuery().where("id=:id").bind("id", 1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
     sorm.accept(con -> assertThat(
         con.createSelectQuery(Player.class).where("id=:id").bind("id", 1).readLazy().one())
@@ -36,38 +36,36 @@ class SelectQueryTest {
             .bind("id", 1).readLazy().one()).isEqualTo(PLAYER_ALICE));
 
     sorm.accept(con -> assertThat(
-        con.createOrderedParameterQuery(Player.class, "select * from players where id=?").addParameter(1)
-            .readLazy().one()).isEqualTo(PLAYER_ALICE));
+        con.createOrderedParameterQuery(Player.class, "select * from players where id=?")
+            .addParameter(1).readLazy().one()).isEqualTo(PLAYER_ALICE));
 
   }
 
   @Test
   void testExecBindAllQuery() {
-    sorm.accept(Player.class,
-        con -> assertThat(
-            con.createSelectQuery().where("id=:id").bindAll(Map.of("id", 1)).readLazy().one())
-                .isEqualTo(PLAYER_ALICE));
+    sorm.accept(con -> assertThat(con.type(Player.class).createSelectQuery().where("id=:id")
+        .bindAll(Map.of("id", 1)).readLazy().one()).isEqualTo(PLAYER_ALICE));
   }
 
   @Test
   void testExecAddQuery() {
-    sorm.accept(Player.class,
-        con -> assertThat(con.createSelectQuery().where("id=?").addParameter(1).readLazy().one())
+    sorm.accept(con -> assertThat(
+        con.type(Player.class).createSelectQuery().where("id=?").addParameter(1).readLazy().one())
             .isEqualTo(PLAYER_ALICE));
   }
 
   @Test
   void testExecAddAllQuery() {
-    sorm.accept(Player.class,
-        con -> assertThat(con.createSelectQuery().where(and("id=?", "name=?"))
+    sorm.accept(
+        con -> assertThat(con.type(Player.class).createSelectQuery().where(and("id=?", "name=?"))
             .addParameter(PLAYER_ALICE.getId(), PLAYER_ALICE.getName()).readLazy().one())
                 .isEqualTo(PLAYER_ALICE));
   }
 
   @Test
   void testSelectQueryCond() {
-    sorm.accept(Guest.class, con -> {
-      SelectQuery<Guest> builder = con.createSelectQuery();
+    sorm.accept(con -> {
+      SelectQuery<Guest> builder = con.type(Guest.class).createSelectQuery();
       builder.orderBy(order("id", "asc"));
       builder.having("avg(age)>100");
       assertThat(builder.toString())
@@ -87,8 +85,8 @@ class SelectQueryTest {
 
   @Test
   void testCompareSelectBuilderAndSelectQuery() {
-    sorm.accept(Guest.class, con -> {
-      SelectQuery<Guest> builder = con.createSelectQuery();
+    sorm.accept(con -> {
+      SelectQuery<Guest> builder = con.type(Guest.class).createSelectQuery();
       builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
       builder.where(or(and("ID>100", "COUNTRY IN (?)"), "YEAR>2001"));
       builder.groupBy("TEAM");

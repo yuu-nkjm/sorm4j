@@ -1,32 +1,23 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.nkjmlab.sorm4j.sql.ParameterizedSql.*;
 import static org.nkjmlab.sorm4j.sql.SelectBuilder.*;
 import static org.nkjmlab.sorm4j.sql.SelectBuilder.as;
-import static org.nkjmlab.sorm4j.sql.ParameterizedSql.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
 class SelectBuilderTest {
-  @Test
-  void testSqlStatement() {
-    assertThat(ParameterizedSql.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
-    assertThat(SqlUtils.literal(null)).isEqualTo("null");
-    assertThat(SqlUtils.literal("?")).isEqualTo("?");
-    assertThat(SqlUtils.literal("test")).isEqualTo("'test'");
-
-  }
 
   @Test
   void testBuildSorm() {
     Sorm sormImpl = SormTestUtils.createSorm();
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
-    sormImpl.accept(Guest.class, con -> {
-      String sql = SelectBuilder.create().from(con.getTableName()).buildSql();
+    sormImpl.accept(con -> {
+      String sql = SelectBuilder.create().from(con.type(Guest.class).getTableName()).buildSql();
       assertThat(sql).contains("select * from GUESTS");
     });
 

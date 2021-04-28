@@ -20,11 +20,10 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testToSqlStatement() {
-    sorm.accept(Player.class, con -> {
+    sorm.accept(con -> {
       con.insert(PLAYER_ALICE);
-      ParameterizedSql ret =
-          con.createNamedParameterQuery("select * from players where id=:id and name=:name")
-              .parse();
+      ParameterizedSql ret = con.type(Player.class)
+          .createNamedParameterQuery("select * from players where id=:id and name=:name").parse();
       assertThat(ret.getSql()).isEqualTo(
           ParameterizedSql.from("select * from players where id=:id and name=:name").getSql());
     });
@@ -38,11 +37,11 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testBindAll() {
-    sorm.accept(Player.class, con -> {
+    sorm.accept(con -> {
       con.insert(PLAYER_ALICE);
-      Player ret =
-          con.createNamedParameterQuery("select * from players where id=:id and name=:name")
-              .bindAll(Map.of("id", 1, "name", "Alice")).readOne();
+      Player ret = con.type(Player.class)
+          .createNamedParameterQuery("select * from players where id=:id and name=:name")
+          .bindAll(Map.of("id", 1, "name", "Alice")).readOne();
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
     sorm.accept(con -> {
@@ -56,10 +55,11 @@ class NamedParametersQueryImplTest {
 
   @Test
   void testBind() {
-    sorm.accept(Player.class, con -> {
+    sorm.accept(con -> {
       con.insert(PLAYER_ALICE);
-      Player ret = con.createNamedParameterQuery("select * from players where id=:id").bind("id", 1)
-          .readFirst();
+      Player ret =
+          con.type(Player.class).createNamedParameterQuery("select * from players where id=:id")
+              .bind("id", 1).readFirst();
       assertThat(ret).isEqualTo(PLAYER_ALICE);
     });
     sorm.accept(con -> {

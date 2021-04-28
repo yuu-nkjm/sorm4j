@@ -17,7 +17,6 @@ import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.extension.SormOptions;
@@ -35,11 +34,12 @@ import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
 import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
 import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
 import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.SelectQuery;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 import org.nkjmlab.sorm4j.sql.tuple.Tuples;
+import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper

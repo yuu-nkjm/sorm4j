@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.SelectBuilderImpl;
 
 
@@ -11,6 +12,7 @@ import org.nkjmlab.sorm4j.internal.sql.SelectBuilderImpl;
  * @author nkjm
  *
  */
+@Experimental
 public interface SelectBuilder extends ParameterizedSqlParser {
 
   /**

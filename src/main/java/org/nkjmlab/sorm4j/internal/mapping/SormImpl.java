@@ -11,9 +11,8 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.TypedOrmTransaction;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 /**
  * An entry point of object-relation mapping.
@@ -40,38 +39,11 @@ public final class SormImpl implements Sorm {
     return new OrmTransactionImpl(getJdbcConnection(), configStore);
   }
 
-  @Override
-  public <T> TypedOrmTransaction<T> openTransaction(Class<T> objectClass) {
-    return new TypedOrmTransactionImpl<>(objectClass,
-        new OrmTransactionImpl(getJdbcConnection(), configStore));
-  }
-
-
-  @Override
-  public <T, R> R apply(Class<T> objectClass, FunctionHandler<TypedOrmConnection<T>, R> handler) {
-    try (TypedOrmConnection<T> conn = openConnection(objectClass)) {
-      return handler.apply(conn);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
 
   @Override
   public <R> R apply(FunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = openConnection()) {
       return handler.apply(conn);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  @Override
-  public <T, R> R applyTransactionHandler(Class<T> objectClass,
-      FunctionHandler<TypedOrmTransaction<T>, R> handler) {
-    try (TypedOrmTransaction<T> transaction = openTransaction(objectClass)) {
-      R ret = handler.apply(transaction);
-      transaction.commit();
-      return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -118,12 +90,6 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public <T> TypedOrmConnection<T> openConnection(Class<T> objectClass) {
-    return new TypedOrmConnectionImpl<T>(objectClass,
-        new OrmConnectionImpl(getJdbcConnection(), configStore));
-  }
-
-  @Override
   public DataSource getDataSource() {
     return this.dataSource;
   }
@@ -138,32 +104,11 @@ public final class SormImpl implements Sorm {
   }
 
 
-  @Override
-  public <T> void accept(Class<T> objectClass, ConsumerHandler<TypedOrmConnection<T>> handler) {
-    try (TypedOrmConnection<T> conn = openConnection(objectClass)) {
-      try {
-        handler.accept(conn);
-      } catch (Exception e) {
-        throw Try.rethrow(e);
-      }
-    }
-  }
 
   @Override
   public void accept(ConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = openConnection()) {
       handler.accept(conn);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  @Override
-  public <T> void acceptTransactionHandler(Class<T> objectClass,
-      ConsumerHandler<TypedOrmTransaction<T>> handler) {
-    try (TypedOrmTransaction<T> transaction = openTransaction(objectClass)) {
-      handler.accept(transaction);
-      transaction.commit();
     } catch (Exception e) {
       throw Try.rethrow(e);
     }

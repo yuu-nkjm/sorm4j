@@ -34,12 +34,12 @@ public interface ParameterizedSql {
 
 
   @Experimental
-  static ParameterizedSql parseAsOrdered(String sql, Object... orderedParameters) {
+  static ParameterizedSql parse(String sql, Object... orderedParameters) {
     return OrderedParameterSql.parse(sql, orderedParameters);
   }
 
   @Experimental
-  static ParameterizedSql parseAsNamed(String sql, Map<String, Object> namedParameters) {
+  static ParameterizedSql parse(String sql, Map<String, Object> namedParameters) {
     return NamedParameterSql.parse(sql, namedParameters);
   }
 

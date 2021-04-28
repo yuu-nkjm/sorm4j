@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 
-public class OrmOptionsImpl implements SormOptions {
+public class SormOptionsImpl implements SormOptions {
   private final Map<String, Object> options;
 
-  public OrmOptionsImpl(Map<String, Object> options) {
+  public SormOptionsImpl(Map<String, Object> options) {
     this.options = new HashMap<>(options);
   }
 

@@ -36,19 +36,19 @@ class MultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsert() {
-    sorm.accept(Player.class, conn -> conn.insert(a, b));
+    sorm.accept(conn -> conn.insert(a, b));
   }
 
   @Test
   void testMultiRowInsertNull() {
     try {
-      sorm.accept(Player.class, conn -> conn.insert(a, b, c, a));
+      sorm.accept(conn -> conn.insert(a, b, c, a));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Unique index or primary key violation");
     }
     try {
-      sorm.accept(Player.class, conn -> conn.insert(a, b, null));
+      sorm.accept(conn -> conn.insert(a, b, null));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Fail to get value from");
@@ -57,13 +57,13 @@ class MultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sorm.accept(Guest.class, conn -> conn
+    sorm.accept(conn -> conn
         .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.accept(Player.class, conn -> conn
+    sorm.accept(conn -> conn
         .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
 

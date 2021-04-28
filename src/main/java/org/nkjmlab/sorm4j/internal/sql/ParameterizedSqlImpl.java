@@ -95,7 +95,7 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
 
   private static int getSize(Object object) {
     if (object instanceof Collection) {
-      return ((Collection) object).size();
+      return ((Collection<?>) object).size();
     } else if (object.getClass().isArray()) {
       return Array.getLength(object);
     } else {
@@ -151,6 +151,5 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     }
     return sql;
   }
-
 
 }
