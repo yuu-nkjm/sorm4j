@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.sql.helper;
 
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.OrderedParameterCommandImpl;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 
@@ -10,6 +11,7 @@ import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
  * @author nkjm
  *
  */
+@Experimental
 public interface OrderedParameterCommand extends OrderedParameterSql, Command {
 
   @Override

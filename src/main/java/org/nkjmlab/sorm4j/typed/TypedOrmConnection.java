@@ -27,6 +27,7 @@ public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdate
    * @param sql
    * @return
    */
+  @Experimental
   BasicCommand createCommand(String sql);
 
 

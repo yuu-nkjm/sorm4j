@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSql;
  * @author nkjm
  *
  */
+@Experimental
 public interface NamedParameterCommand extends NamedParameterSql, Command {
 
 
