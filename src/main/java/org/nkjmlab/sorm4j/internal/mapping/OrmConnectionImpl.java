@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,34 +12,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.nkjmlab.sorm4j.BasicCommand;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.TypedOrmConnection;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormLogger;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.internal.sql.NamedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.OrderedParameterQueryImpl;
-import org.nkjmlab.sorm4j.internal.sql.QueryOrmExecutor;
-import org.nkjmlab.sorm4j.internal.sql.SelectQueryImpl;
+import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.NamedParameterQuery;
-import org.nkjmlab.sorm4j.sql.NamedParameterRequest;
-import org.nkjmlab.sorm4j.sql.OrderedParameterQuery;
-import org.nkjmlab.sorm4j.sql.OrderedParameterRequest;
-import org.nkjmlab.sorm4j.sql.SelectQuery;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 import org.nkjmlab.sorm4j.sql.tuple.Tuples;
+import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -60,7 +51,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   static <R> R executeQueryAndRead(SormOptions options, Connection connection,
-      SqlParameterSetter sqlParameterSetter, String sql, Object[] parameters,
+      SqlParametersSetter sqlParametersSetter, String sql, Object[] parameters,
       FunctionHandler<ResultSet, R> resultSetHandler) {
     final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
@@ -70,7 +61,7 @@ public class OrmConnectionImpl implements OrmConnection {
     });
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-      sqlParameterSetter.setParameters(options, stmt, parameters);
+      sqlParametersSetter.setParameters(options, stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
         R ret = resultSetHandler.apply(resultSet);
         dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} Read [{}] objects from [{}]",
@@ -79,18 +70,25 @@ public class OrmConnectionImpl implements OrmConnection {
         return ret;
       }
     } catch (Exception e) {
-      String msg = (parameters == null || parameters.length == 0) ? format("Error in sql=[{}]", sql)
-          : format("Fail to execute sql=[{}], parameters={}", sql, parameters);
-      throw new SormException(msg + System.lineSeparator() + e.getMessage(), e);
+      throw Try.rethrow(e);
     }
   }
 
   static final int executeUpdateAndClose(SormOptions options, Connection connection,
-      SqlParameterSetter sqlParameterSetter, String sql, Object[] parameters) {
+      SqlParametersSetter sqlParametersSetter, String sql, Object[] parameters) {
+    final Optional<LogPoint> dp =
+        LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
+
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-      sqlParameterSetter.setParameters(options, stmt, parameters);
-      return stmt.executeUpdate();
-    } catch (Exception e) {
+      sqlParametersSetter.setParameters(options, stmt, parameters);
+      int ret = stmt.executeUpdate();
+      dp.ifPresent(lp -> {
+        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(), parameters);
+        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(), sql,
+            Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
+      });
+      return ret;
+    } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
@@ -102,7 +100,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   private final ResultSetConverter resultSetConverter;
 
-  private final SqlParameterSetter sqlParameterSetter;
+  private final SqlParametersSetter sqlParametersSetter;
 
 
   private final int transactionIsolationLevel;
@@ -122,7 +120,7 @@ public class OrmConnectionImpl implements OrmConnection {
     this.connection = connection;
     this.mappings = configStore.getMappings();
     this.resultSetConverter = mappings.getResultSetConverter();
-    this.sqlParameterSetter = mappings.getSqlParameterSetter();
+    this.sqlParametersSetter = mappings.getSqlParametersSetter();
     this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
   }
 
@@ -154,36 +152,9 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> NamedParameterQuery<T> createNamedParameterQuery(Class<T> objectClass, String sql) {
-    return NamedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
+  public BasicCommand createCommand(String sql) {
+    return BasicCommand.from(this, sql);
   }
-
-
-  @Override
-  public NamedParameterRequest createNamedParameterRequest(String sql) {
-    return NamedParameterRequest.from(this, sql);
-  }
-
-
-  @Override
-  public <T> OrderedParameterQuery<T> createOrderedParameterQuery(Class<T> objectClass,
-      String sql) {
-    return OrderedParameterQueryImpl.createFrom(new QueryOrmExecutor<>(this, objectClass), sql);
-  }
-
-  @Override
-  public OrderedParameterRequest createOrderedParameterRequest(String sql) {
-    return OrderedParameterRequest.from(this, sql);
-  }
-
-
-  @Override
-  public <T> SelectQuery<T> createSelectQuery(Class<T> objectClass) {
-    SelectQueryImpl<T> ret = new SelectQueryImpl<T>(new QueryOrmExecutor<>(this, objectClass));
-    ret.from(getTableName(objectClass));
-    return ret;
-  }
-
 
   @Override
   public <T> int[] delete(List<T> objects) {
@@ -254,57 +225,65 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T applyPreparedStatementHandler(SqlStatement sql,
-      FunctionHandler<PreparedStatement, T> handler) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      sqlParameterSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
-      return handler.apply(stmt);
-    } catch (Exception e) {
-      throw new SormException(sql + System.lineSeparator() + e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public void acceptPreparedStatementHandler(SqlStatement sql,
+  public void acceptPreparedStatementHandler(ParameterizedSql sql,
       ConsumerHandler<PreparedStatement> handler) {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      sqlParameterSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
+      sqlParametersSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
+      final Optional<LogPoint> dp =
+          LogPointFactory.createLogPoint(SormLogger.Category.HANDLE_PREPAREDSTATEMENT);
       handler.accept(stmt);
+      dp.ifPresent(lp -> {
+        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(),
+            sql.getParameters());
+        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(),
+            sql.getSql(), Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
+      });
     } catch (Exception e) {
-      throw new SormException(sql + System.lineSeparator() + e.getMessage(), e);
+      throw Try.rethrow(e);
     }
-
   }
 
   @Override
-  public <T> T executeQuery(SqlStatement sql, FunctionHandler<ResultSet, T> resultSetHandler) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter,
+  public <T> T applyPreparedStatementHandler(ParameterizedSql sql,
+      FunctionHandler<PreparedStatement, T> handler) {
+    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
+      sqlParametersSetter.setParameters(mappings.getOptions(), stmt, sql.getParameters());
+      final Optional<LogPoint> dp =
+          LogPointFactory.createLogPoint(SormLogger.Category.HANDLE_PREPAREDSTATEMENT);
+      T ret = handler.apply(stmt);
+      dp.ifPresent(lp -> {
+        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(),
+            sql.getParameters());
+        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(),
+            sql.getSql(), Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
+      });
+      return ret;
+    } catch (Exception e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  @Override
+  public <T> T executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, T> resultSetHandler) {
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter,
         sql.getSql(), sql.getParameters(), resultSetHandler);
   }
 
   @Override
-  public <T> List<T> executeQuery(SqlStatement sql, RowMapper<T> rowMapper) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter,
-        sql.getSql(), sql.getParameters(), RowMapper.convertToRowListMapper(rowMapper));
+  public <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper) {
+    return executeQuery(sql, RowMapper.convertToRowListMapper(rowMapper));
   }
 
   @Override
-  public int executeUpdate(SqlStatement sql) {
+  public int executeUpdate(ParameterizedSql sql) {
     return executeUpdate(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-    final Optional<LogPoint> dp =
-        LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_UPDATE);
 
-    final int ret = executeUpdateAndClose(mappings.getOptions(), connection, sqlParameterSetter,
+    final int ret = executeUpdateAndClose(mappings.getOptions(), connection, sqlParametersSetter,
         sql, parameters);
-    dp.ifPresent(lp -> {
-      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(), parameters);
-      lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(), sql,
-          Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
-    });
     return ret;
   }
 
@@ -449,19 +428,18 @@ public class OrmConnectionImpl implements OrmConnection {
   private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
     final List<T> ret = new ArrayList<>();
+    final int sqlType = getOneSqlType(objectClass, resultSet);
     while (resultSet.next()) {
-      ret.add(resultSetConverter.toSingleNativeObject(mappings.getOptions(), resultSet,
-          getSingeSqlType(objectClass, resultSet), objectClass));
+      ret.add(resultSetConverter.toSingleStandardObject(mappings.getOptions(), resultSet, sqlType,
+          objectClass));
     }
     return ret;
 
   }
 
-
-  private int getSingeSqlType(Class<?> objectClass, ResultSet resultSet) {
+  private int getOneSqlType(Class<?> objectClass, ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       ResultSetMetaData metaData = resultSet.getMetaData();
-
       if (metaData.getColumnCount() != 1) {
         throw new SormException("ResultSet returned [" + metaData.getColumnCount()
             + "] columns but 1 column was expected to load data into an instance of ["
@@ -477,7 +455,7 @@ public class OrmConnectionImpl implements OrmConnection {
       ret = mapRow(objectClass, resultSet);
     }
     if (resultSet.next()) {
-      throw new RuntimeException("Non-unique result returned");
+      throw new SormException("Non-unique result returned");
     }
     return ret;
   }
@@ -517,23 +495,21 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(
-        () -> resultSetConverter.isEnableToConvertNativeObject(mappings.getOptions(), objectClass)
-            ? resultSetConverter.toSingleNativeObject(mappings.getOptions(), resultSet,
-                getSingeSqlType(objectClass, resultSet), objectClass)
-            : loadSinglePojo(objectClass, resultSet),
-        Try::rethrow);
+    return Try
+        .getOrThrow(() -> resultSetConverter.isStandardClass(mappings.getOptions(), objectClass)
+            ? resultSetConverter.toSingleStandardObject(mappings.getOptions(), resultSet,
+                getOneSqlType(objectClass, resultSet), objectClass)
+            : loadSinglePojo(objectClass, resultSet), Try::rethrow);
   }
 
 
 
   @Override
   public <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(
-        () -> resultSetConverter.isEnableToConvertNativeObject(mappings.getOptions(), objectClass)
+    return Try
+        .getOrThrow(() -> resultSetConverter.isStandardClass(mappings.getOptions(), objectClass)
             ? loadNativeObjectList(objectClass, resultSet)
-            : loadPojoList(objectClass, resultSet),
-        Try::rethrow);
+            : loadPojoList(objectClass, resultSet), Try::rethrow);
   }
 
   @Override
@@ -629,18 +605,18 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public <T> T readFirst(Class<T> objectClass, SqlStatement sql) {
+  public <T> T readFirst(Class<T> objectClass, ParameterizedSql sql) {
     return readFirst(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> loadFirst(objectClass, resultSet));
   }
 
   @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql) {
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
     return readLazy(objectClass, sql.getSql(), sql.getParameters());
   }
 
@@ -648,9 +624,13 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
-      sqlParameterSetter.setParameters(mappings.getOptions(), stmt, parameters);
+      sqlParametersSetter.setParameters(mappings.getOptions(), stmt, parameters);
+      final Optional<LogPoint> dp =
+          LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
       final ResultSet resultSet = stmt.executeQuery();
       LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
+      dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} readLazy from [{}]",
+          lp.getTagAndElapsedTime(), Try.getOrNull(() -> connection.getMetaData().getURL())));
       lazyResultSets.add(ret);
       return ret;
     } catch (SQLException e) {
@@ -660,18 +640,18 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public <T> List<T> readList(Class<T> objectClass, SqlStatement sql) {
+  public <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql) {
     return readList(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> mapRowList(objectClass, resultSet));
   }
 
   @Override
-  public Map<String, Object> readMapFirst(SqlStatement sql) {
+  public Map<String, Object> readMapFirst(ParameterizedSql sql) {
     return readMapFirst(sql.getSql(), sql.getParameters());
   }
 
@@ -679,7 +659,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           if (resultSet.next()) {
@@ -691,7 +671,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(SqlStatement sql) {
+  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
     return readMapLazy(sql.getSql(), sql.getParameters());
   }
 
@@ -700,8 +680,16 @@ public class OrmConnectionImpl implements OrmConnection {
   public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
-      sqlParameterSetter.setParameters(mappings.getOptions(), stmt, parameters);
+      sqlParametersSetter.setParameters(mappings.getOptions(), stmt, parameters);
+
+      final Optional<LogPoint> dp =
+          LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
+
       final ResultSet resultSet = stmt.executeQuery();
+
+      dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} readMapLazy from [{}]",
+          lp.getTagAndElapsedTime(), Try.getOrNull(() -> connection.getMetaData().getURL())));
+
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
       LazyResultSet<Map<String, Object>> ret =
           (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, stmt, resultSet);
@@ -712,24 +700,24 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public List<Map<String, Object>> readMapList(SqlStatement sql) {
+  public List<Map<String, Object>> readMapList(ParameterizedSql sql) {
     return readMapList(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> mapRowsToMapList(resultSet));
   }
 
   @Override
-  public Map<String, Object> readMapOne(SqlStatement sql) {
+  public Map<String, Object> readMapOne(ParameterizedSql sql) {
     return readMapOne(sql.getSql(), sql.getParameters());
   }
 
   @Override
   public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           Map<String, Object> ret = null;
@@ -745,13 +733,13 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T readOne(Class<T> objectClass, SqlStatement sql) {
+  public <T> T readOne(Class<T> objectClass, ParameterizedSql sql) {
     return readOne(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParameterSetter, sql,
+    return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
         parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
@@ -768,7 +756,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, SqlStatement sql) {
+      Class<T3> t3, ParameterizedSql sql) {
     return readTupleList(t1, t2, t3, sql.getSql(), sql.getParameters());
   }
 
@@ -776,7 +764,7 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, String sql, Object... parameters) {
     List<Tuple3<T1, T2, T3>> ret = executeQueryAndRead(mappings.getOptions(), getJdbcConnection(),
-        sqlParameterSetter, sql, parameters, resultSet -> {
+        sqlParametersSetter, sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
             ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
@@ -789,7 +777,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, SqlStatement sql) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
+      ParameterizedSql sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 
@@ -797,7 +786,7 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters) {
     List<Tuple2<T1, T2>> ret = executeQueryAndRead(mappings.getOptions(), getJdbcConnection(),
-        sqlParameterSetter, sql, parameters, resultSet -> {
+        sqlParametersSetter, sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
             ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
@@ -861,7 +850,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
   }
-
 
 
 }

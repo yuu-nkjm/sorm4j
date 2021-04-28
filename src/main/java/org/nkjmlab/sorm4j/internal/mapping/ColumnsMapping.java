@@ -16,13 +16,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -45,17 +44,18 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     SetterPojoCreator<T> setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
         () -> objectClass.getDeclaredConstructor(),
-        e -> new SormException(
-            "Container class for object relation mapping must have the public default constructor (with no arguments).",
-            e)));
+        e -> new SormException(StringUtils.format(
+            "The given container class [{}] should have the public default constructor (with no arguments) or {} annotated constructor.",
+            objectClass, OrmConstructor.class.getName()), e)));
 
     List<Constructor<?>> annotataedConstructors = Arrays
         .stream(objectClass.getDeclaredConstructors())
         .filter(c -> c.getAnnotation(OrmConstructor.class) != null).collect(Collectors.toList());
 
     if (annotataedConstructors.size() > 1) {
-      throw new SormException(StringUtils.format(
-          "Constructor with parameters annotated by {} should be one or less. ", OrmColumn.class));
+      throw new SormException(
+          StringUtils.format("Constructor with parameters annotated by {} should be one or less. ",
+              OrmConstructor.class.getName()));
     }
 
     this.pojoCreator = annotataedConstructors.isEmpty() ? setterPojoCreator
@@ -143,7 +143,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           }
           final String columnName = columns.get(i - 1);
           final Object value =
-              resultSetConverter.getColumnValue(options, resultSet, i, sqlType, setterType);
+              resultSetConverter.convertColumnValueTo(options, resultSet, i, sqlType, setterType);
           setValue(ret, columnName, value);
         }
         return ret;
@@ -207,8 +207,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           if (order == -1) {
             continue;
           }
-          params[order] = resultSetConverter.getColumnValue(options, resultSet, i, sqlTypes[i - 1],
-              parameterTypes[i - 1]);
+          params[order] = resultSetConverter.convertColumnValueTo(options, resultSet, i,
+              sqlTypes[i - 1], parameterTypes[i - 1]);
         }
         return constructor.newInstance(params);
       } catch (SQLException e) {

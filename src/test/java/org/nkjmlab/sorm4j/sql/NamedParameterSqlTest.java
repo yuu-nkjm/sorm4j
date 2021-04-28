@@ -20,27 +20,24 @@ class NamedParameterSqlTest {
     sorm.apply(conn -> conn.insert(ALICE, BOB, CAROL, DAVE));
 
     {
-      SqlStatement statement = OrderedParameterSql.toSqlStatement(
-          "select * from customer where name like $?$ and address in(<?>) and id=?", "A%",
+      ParameterizedSql statement = OrderedParameterSql.parse(
+          "select * from customer where name like {?} and address in(<?>) and id=?", "A%",
           List.of("Tokyo", "Kyoto"), 1);
-      System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
 
     {
       String sql = "select * from customer where id=:id and address=:address";
-      SqlStatement statement =
-          NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").toSqlStatement();
-      System.out.println(statement);
+      ParameterizedSql statement =
+          NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").parse();
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
     {
-      SqlStatement statement = NamedParameterSql.toSqlStatement(
-          "select * from customer where name like $:name$ and address in(<:address>) and id=:id",
+      ParameterizedSql statement = NamedParameterSql.parse(
+          "select * from customer where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "A%"));
-      System.out.println(statement);
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
@@ -48,7 +45,7 @@ class NamedParameterSqlTest {
 
   @Test
   void testCreate() {
-    SqlStatement sp = NamedParameterSql.toSqlStatement(sql, namedParams);
+    ParameterizedSql sp = NamedParameterSql.parse(sql, namedParams);
 
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
@@ -57,12 +54,13 @@ class NamedParameterSqlTest {
     assertThat(sp.toString())
         .isEqualTo("sql=[select * from simple where id=? and name=?], parameters=[2, foo]");
 
-    assertThat(SqlStatement.from("select * from test").toString()).contains("[select * from test]");
+    assertThat(ParameterizedSql.from("select * from test").toString())
+        .contains("[select * from test]");
   }
 
   @Test
   void testBindAll() {
-    SqlStatement sp = NamedParameterSql.from(sql).bindAll(namedParams).toSqlStatement();
+    ParameterizedSql sp = NamedParameterSql.from(sql).bindAll(namedParams).parse();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
@@ -71,8 +69,8 @@ class NamedParameterSqlTest {
   @Test
   void testBind() {
 
-    SqlStatement sp = NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1).bind("idid", 2)
-        .toSqlStatement();
+    ParameterizedSql sp =
+        NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1).bind("idid", 2).parse();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
     assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
@@ -81,8 +79,8 @@ class NamedParameterSqlTest {
   @Test
   void testBindList() {
 
-    SqlStatement sp = NamedParameterSql.from("select * from where ID in(<:names>)")
-        .bind("names", List.of("foo", "bar")).toSqlStatement();
+    ParameterizedSql sp = NamedParameterSql.from("select * from where ID in(<:names>)")
+        .bind("names", List.of("foo", "bar")).parse();
 
     System.out.println(sp);
 

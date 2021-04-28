@@ -10,7 +10,6 @@ import org.nkjmlab.sorm4j.internal.mapping.ConfiguratorImpl;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.internal.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
-import org.nkjmlab.sorm4j.internal.mapping.TypedOrmConnectionImpl;
 
 /**
  * Main entry point of this library. It creates {@link Sorm} object.
@@ -135,38 +134,6 @@ public final class SormFactory {
     return toOrmConnection(connection, ConfigStore.getDefaultConfigStore());
   }
 
-  /**
-   * Create a {@link TypedOrmConnection} wrapping the given JDBC Connection.
-   *
-   * @param <T>
-   * @param conn
-   * @param objectClass
-   * @return
-   */
-  public static <T> TypedOrmConnection<T> toOrmConnection(Connection conn, Class<T> objectClass) {
-    return toOrmConnection(conn, objectClass, ConfigStore.getDefaultConfigStore());
-  }
-
-  private static <T> TypedOrmConnection<T> toOrmConnection(Connection connection,
-      Class<T> objectClass, ConfigStore configStore) {
-    return new TypedOrmConnectionImpl<T>(objectClass,
-        new OrmConnectionImpl(connection, configStore));
-  }
-
-  /**
-   * Create a {@link TypedOrmConnection} wrapping the given JDBC Connection with the specified
-   * configurations
-   *
-   * @param <T>
-   * @param conn
-   * @param objectClass
-   * @param configName
-   * @return
-   */
-  public static <T> TypedOrmConnection<T> toOrmConnection(Connection conn, Class<T> objectClass,
-      String configName) {
-    return toOrmConnection(conn, objectClass, ConfigStore.get(configName));
-  }
 
   private static OrmConnection toOrmConnection(Connection connection, ConfigStore configStore) {
     return new OrmConnectionImpl(connection, configStore);

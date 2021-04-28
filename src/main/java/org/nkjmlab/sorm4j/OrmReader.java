@@ -5,9 +5,9 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
 import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
 
@@ -65,7 +65,7 @@ public interface OrmReader {
    * @param sql
    * @return
    */
-  <T> T readFirst(Class<T> objectClass, SqlStatement sql);
+  <T> T readFirst(Class<T> objectClass, ParameterizedSql sql);
 
   /**
    * Reads an object from the database.
@@ -87,13 +87,13 @@ public interface OrmReader {
    * @param sql
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> objectClass, SqlStatement sql);
+  <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql);
 
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions,PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
    *
    *
    */
@@ -110,7 +110,7 @@ public interface OrmReader {
    * @return
    */
 
-  <T> List<T> readList(Class<T> objectClass, SqlStatement sql);
+  <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -118,7 +118,7 @@ public interface OrmReader {
    * set into the object instance.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParameterSetter#setParameters(SormOptions, PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object[])}
    *
    */
   <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);
@@ -131,7 +131,7 @@ public interface OrmReader {
    * @param sql
    * @return
    */
-  <T> T readOne(Class<T> objectClass, SqlStatement sql);
+  <T> T readOne(Class<T> objectClass, ParameterizedSql sql);
 
   /**
    * Reads only one object from the database.
@@ -176,7 +176,7 @@ public interface OrmReader {
    * @return
    */
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, SqlStatement sql);
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
@@ -212,7 +212,7 @@ public interface OrmReader {
    */
   @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      SqlStatement sql);
+      ParameterizedSql sql);
 
 
 }

@@ -33,13 +33,13 @@ public interface ResultSetConverter {
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param column column index in the result set (starting with 1)
    * @param columnType
-   * @param setterType {@link java.lang.Class} of the object to be returned
+   * @param toType {@link java.lang.Class} of the object to be returned
    *
    * @throws SQLException
    *
    */
-  Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> setterType) throws SQLException;
+  Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+      Class<?> toType) throws SQLException;
 
   /**
    * Returns the given type could be converted to the native object or not.
@@ -49,7 +49,7 @@ public interface ResultSetConverter {
    *
    * @return
    */
-  boolean isEnableToConvertNativeObject(SormOptions options, Class<?> objectClass);
+  boolean isStandardClass(SormOptions options, Class<?> objectClass);
 
   /**
    * Converts the result from database to a map objects. The data of the column is extracted by
@@ -79,7 +79,7 @@ public interface ResultSetConverter {
    * @return
    * @throws SQLException
    */
-  <T> T toSingleNativeObject(SormOptions options, ResultSet resultSet, int columnType,
+  <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int columnType,
       Class<T> objectClass) throws SQLException;
 
 

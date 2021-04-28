@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
  * @author nkjm
  *
  */
-public interface NamedParameterSql extends SqlStatementSupplier {
+public interface NamedParameterSql extends ParameterizedSqlParser {
 
   /**
    * Binds key-value pairs to named parameters in a SQL statement.
@@ -31,6 +31,7 @@ public interface NamedParameterSql extends SqlStatementSupplier {
   NamedParameterSql bind(String key, Object value);
 
   /**
+   * Binds a bean. The field names map to keys of parameter by {@link ColumnFieldMapper}.
    *
    * @param bean
    * @return
@@ -47,7 +48,8 @@ public interface NamedParameterSql extends SqlStatementSupplier {
    * @param suffix
    * @return
    */
-  static NamedParameterSql from(String sql, char prefix, char suffix,
+  @Experimental
+  static NamedParameterSql parse(String sql, char prefix, char suffix,
       ColumnFieldMapper columnFieldMapper) {
     return new NamedParameterSqlImpl(sql, prefix, suffix, columnFieldMapper);
   }
@@ -70,8 +72,8 @@ public interface NamedParameterSql extends SqlStatementSupplier {
    * @param namedParameters
    * @return
    */
-  static SqlStatement toSqlStatement(String sql, Map<String, Object> namedParameters) {
-    return NamedParameterSql.from(sql).bindAll(namedParameters).toSqlStatement();
+  static ParameterizedSql parse(String sql, Map<String, Object> namedParameters) {
+    return NamedParameterSql.from(sql).bindAll(namedParameters).parse();
   }
 
 

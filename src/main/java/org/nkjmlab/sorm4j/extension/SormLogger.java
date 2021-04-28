@@ -22,7 +22,7 @@ public final class SormLogger {
    *
    */
   public enum Category {
-    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE;
+    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE, HANDLE_PREPAREDSTATEMENT;
   }
 
   /**

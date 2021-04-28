@@ -15,12 +15,12 @@ import org.nkjmlab.sorm4j.SormFactory;
 
 public class DbEngineTestUtils {
 
-  public static void executeTableSchema(Class<?> clazz, DataSource dataSource) {
+  public static void executeSql(DataSource dataSource, Class<?> clazz, String fileName) {
     try (Connection conn = dataSource.getConnection()) {
       Statement st = conn.createStatement();
       String[] sqls = String
           .join(System.lineSeparator(),
-              Files.readAllLines(new File(clazz.getResource("schema.sql").toURI()).toPath()))
+              Files.readAllLines(new File(clazz.getResource(fileName).toURI()).toPath()))
           .split(";");
       Arrays.asList(sqls).forEach(sql -> {
         try {
@@ -37,7 +37,7 @@ public class DbEngineTestUtils {
     } catch (SQLException | URISyntaxException | IOException e) {
       System.err.println(e.getMessage());
     }
-  
+
   }
 
   public static DataSource getDataSource(Class<?> clazz, String defaultJdbcUrl) {

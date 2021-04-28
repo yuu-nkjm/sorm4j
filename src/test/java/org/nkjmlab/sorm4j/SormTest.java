@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 class SormTest {
 
@@ -72,7 +73,7 @@ class SormTest {
     } catch (Exception e) {
     }
     try {
-      sormImpl.apply(Guest.class, con -> {
+      sormImpl.apply(con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
@@ -86,7 +87,7 @@ class SormTest {
     } catch (Exception e) {
     }
     try {
-      sormImpl.applyTransactionHandler(Guest.class, con -> {
+      sormImpl.applyTransactionHandler(con -> {
         return 1;
       });
       failBecauseExceptionWasNotThrown(Exception.class);
@@ -105,7 +106,7 @@ class SormTest {
     } catch (Exception e) {
     }
     try {
-      sormImpl.accept(Guest.class, con -> {
+      sormImpl.accept(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
@@ -117,7 +118,7 @@ class SormTest {
     } catch (Exception e) {
     }
     try {
-      sormImpl.acceptTransactionHandler(Guest.class, con -> {
+      sormImpl.acceptTransactionHandler(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
@@ -157,13 +158,13 @@ class SormTest {
 
   @Test
   void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
-    try (TypedOrmTransaction<Guest> tr = sorm.openTransaction(Guest.class)) {
+    try (TypedOrmTransaction<Guest> tr = sorm.openTransaction().type(Guest.class)) {
       tr.insert(a);
       tr.rollback();
       tr.commit();
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -175,14 +176,14 @@ class SormTest {
       // auto-rollback
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmConnection tr = sorm.openTransaction()) {
       tr.insert(a);
       tr.commit();
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con, Guest.class).readAll().size()).isEqualTo(1);
+      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(1);
     });
   }
 

@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -20,44 +23,73 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class DefaultResultSetConverter extends AbstractResultSetConverter {
 
-  private static final Set<Class<?>> nativeSqlTypes = Set.of(boolean.class, Boolean.class,
+  private static final Set<Class<?>> standardObjectClasses = Set.of(boolean.class, Boolean.class,
       byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
       Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
       byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-      java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-      java.time.LocalDate.class, java.time.LocalTime.class, java.time.LocalDateTime.class,
-      java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-      java.util.UUID.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
-      java.net.Inet4Address.class, java.net.URL.class, java.net.Inet6Address.class, int[].class,
-      Integer[].class, String[].class, Object.class);
+      java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class,
+      java.sql.Timestamp.class, java.time.LocalDate.class, java.time.LocalTime.class,
+      java.time.LocalDateTime.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
+      java.util.Date.class, java.util.UUID.class, java.io.InputStream.class, java.io.Reader.class,
+      java.net.URL.class, java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class);
 
   /**
-   * Returns the given type is enable to convert native object.
+   * Returns the given type is enable to convert element object.
    *
-   * Following classes are regarded as native class: boolean.class, Boolean.class, byte.class,
-   * Byte.class, short.class, Short.class, int.class, Integer.class, long.class, Long.class,
-   * float.class, Float.class, double.class, Double.class, char.class, Character.class,
-   * byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-   * java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-   * java.io.InputStream.class, java.io.Reader.class, java.sql.Clob.class, java.sql.Blob.class,
-   * Object.class
+   * Following classes and Array are regarded as native class.
+   *
+   * boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class, int.class,
+   * Integer.class, long.class, Long.class, float.class, Float.class, double.class, Double.class,
+   * char.class, Character.class, byte[].class, Byte[].class, char[].class, Character[].class,
+   * String.class, BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
+   * java.sql.Time.class, java.sql.Timestamp.class, java.time.LocalDate.class,
+   * java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
+   * java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
+   * java.io.InputStream.class, java.io.Reader.class, java.net.URL.class,
+   * java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class
    */
   @Override
-  public boolean isEnableToConvertNativeObject(SormOptions options, Class<?> objectClass) {
-    return nativeSqlTypes.contains(objectClass);
+  public boolean isStandardClass(SormOptions options, Class<?> objectClass) {
+    return standardObjectClasses.contains(objectClass) || objectClass.isArray();
   }
+
+  private final List<ColumnValueConverter> converters;
+
+  public DefaultResultSetConverter() {
+    this.converters = Collections.emptyList();
+  }
+
+  public DefaultResultSetConverter(List<ColumnValueConverter> converters) {
+    this.converters = new ArrayList<>(converters);
+  }
+
+  public DefaultResultSetConverter(ColumnValueConverter... converters) {
+    this(Arrays.asList(converters));
+  }
+
 
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
   // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
+
   @Override
-  public Object getColumnValue(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> setterType) throws SQLException {
-    if (setterType.isEnum()) {
+  public Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column,
+      int columnType, Class<?> toType) throws SQLException {
+
+    if (converters.size() != 0) {
+      Optional<ColumnValueConverter> conv = converters.stream()
+          .filter(co -> co.isApplicable(options, resultSet, column, columnType, toType))
+          .findFirst();
+      if (conv.isPresent()) {
+        return conv.get().convertTo(options, resultSet, column, columnType, toType);
+      }
+    }
+
+    if (toType.isEnum()) {
       final String v = resultSet.getString(column);
-      return Arrays.stream(setterType.getEnumConstants()).filter(o -> o.toString().equals(v))
-          .findAny().orElse(null);
-    } else if (setterType.isArray()) {
-      final String name = setterType.getComponentType().getName();
+      return Arrays.stream(toType.getEnumConstants()).filter(o -> o.toString().equals(v)).findAny()
+          .orElse(null);
+    } else if (toType.isArray()) {
+      final String name = toType.getComponentType().getName();
       switch (name) {
         case "byte":
         case "java.lang.Byte":
@@ -71,7 +103,7 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
           return resultSet.getObject(column);
       }
     } else {
-      final String name = setterType.getName();
+      final String name = toType.getName();
       switch (name) {
         case "boolean":
           return resultSet.getBoolean(column);

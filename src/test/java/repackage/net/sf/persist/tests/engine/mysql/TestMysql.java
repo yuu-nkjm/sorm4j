@@ -26,7 +26,7 @@ public class TestMysql {
   static void beforAll() {
     dataSource = DbEngineTestUtils.getDataSource(TestMysql.class,
         "jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE");
-    DbEngineTestUtils.executeTableSchema(TestMysql.class, dataSource);
+    DbEngineTestUtils.executeSql(dataSource, TestMysql.class, "schema.sql");
   }
 
   public static void main(String[] args) {

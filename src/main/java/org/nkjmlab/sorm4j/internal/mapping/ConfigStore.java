@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.Configurator.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
@@ -32,7 +32,7 @@ public final class ConfigStore {
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
   private final ResultSetConverter resultSetConverter;
-  private final SqlParameterSetter sqlParameterSetter;
+  private final SqlParametersSetter sqlParametersSetter;
   private final MultiRowProcessorFactory multiRowProcessorFactory;
   private final MultiRowProcessorType multiRowProcessorType;
   private final int batchSize;
@@ -46,27 +46,27 @@ public final class ConfigStore {
 
   public ConfigStore(String cacheName, Map<String, Object> options,
       ColumnFieldMapper fieldNameMapper, TableNameMapper tableNameMapper,
-      ResultSetConverter resultSetConverter, SqlParameterSetter sqlParameterSetter,
+      ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
       int batchSizeWithMultiRow, int transactionIsolationLevel) {
     this.configName = cacheName;
     this.columnFieldMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
     this.resultSetConverter = resultSetConverter;
-    this.sqlParameterSetter = sqlParameterSetter;
+    this.sqlParametersSetter = sqlParametersSetter;
     this.multiRowProcessorType = multiRowProcessorType;
     this.batchSize = batchSize;
     this.multiRowSize = multiRowSize;
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
     this.options = options;
-    SormOptions _options = new OrmOptionsImpl(options);
+    SormOptions _options = new SormOptionsImpl(options);
     this.multiRowProcessorFactory =
-        MultiRowProcessorFactory.createMultiRowProcessorFactory(_options, sqlParameterSetter,
+        MultiRowProcessorFactory.createMultiRowProcessorFactory(_options, sqlParametersSetter,
             multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
     this.transactionIsolationLevel = transactionIsolationLevel;
     this.mappings =
         new Mappings(_options, tableNameMapper, fieldNameMapper, multiRowProcessorFactory,
-            resultSetConverter, sqlParameterSetter, getTableMappings(), getColumnsMappings(),
+            resultSetConverter, sqlParametersSetter, getTableMappings(), getColumnsMappings(),
             getClassNameToValidTableNameMap(), getTableNameToValidTableNameMaps());
   }
 
@@ -90,8 +90,8 @@ public final class ConfigStore {
     return multiRowProcessorFactory;
   }
 
-  public SqlParameterSetter getSqlParameterSetter() {
-    return sqlParameterSetter;
+  public SqlParametersSetter getSqlParametersSetter() {
+    return sqlParametersSetter;
   }
 
   public ConcurrentMap<String, TableMapping<?>> getTableMappings() {
@@ -167,7 +167,7 @@ public final class ConfigStore {
   public String toString() {
     return "ConfigStore [configName=" + configName + ", columnFieldMapper=" + columnFieldMapper
         + ", tableNameMapper=" + tableNameMapper + ", resultSetConverter=" + resultSetConverter
-        + ", sqlParameterSetter=" + sqlParameterSetter + ", multiRowProcessorType="
+        + ", sqlParametersSetter=" + sqlParametersSetter + ", multiRowProcessorType="
         + multiRowProcessorType + ", batchSize=" + batchSize + ", multiRowSize=" + multiRowSize
         + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow + ", transactionIsolationLevel="
         + transactionIsolationLevel + "]";

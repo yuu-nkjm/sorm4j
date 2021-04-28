@@ -12,11 +12,11 @@ import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
-import org.nkjmlab.sorm4j.sql.SqlStatement;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
- * SQL with named parameters. The instance could be convert to {@link SqlStatement}.The class could
- * treat {@link List} parameter.
+ * SQL with named parameters. The instance could be convert to {@link ParameterizedSql}.The class
+ * could treat {@link List} parameter.
  *
  * @author nkjm
  *
@@ -29,7 +29,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
   private final char prefix;
   private final char suffix;
   private final ColumnFieldMapper columnFieldMapper;
-  private final Map<String, Object> parameters = new HashMap<>();
+  private final Map<String, Object> parameters;
   private Object bean;
 
   public NamedParameterSqlImpl(String sql, char prefix, char suffix,
@@ -38,7 +38,9 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
     this.prefix = prefix;
     this.suffix = suffix;
     this.columnFieldMapper = columnFieldMapper;
+    this.parameters = new HashMap<>();
   }
+
 
   public NamedParameterSqlImpl(String sql) {
     this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, Configurator.DEFAULT_COLUMN_FIELD_MAPPER);
@@ -46,7 +48,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
 
   @Override
   public NamedParameterSql bindAll(Map<String, Object> namedParams) {
-    namedParams.entrySet().stream().forEach(e -> bind(e.getKey(), e.getValue()));
+    this.parameters.putAll(namedParams);
     return this;
   }
 
@@ -64,7 +66,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
 
 
   @Override
-  public SqlStatement toSqlStatement() {
+  public ParameterizedSql parse() {
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
     String resultSql = this.sql;
 
@@ -95,7 +97,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
         }
       }
     }
-    return SqlStatementImpl.from(resultSql, orderdParams.values().toArray());
+    return ParameterizedSqlImpl.parse(resultSql, orderdParams.values().toArray());
   }
 
   private List<String> createParameters() {

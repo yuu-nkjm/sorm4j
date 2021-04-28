@@ -6,7 +6,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class Try {
-  // private static final org.slf4j.Logger log = org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private Try() {}
 
@@ -128,6 +127,12 @@ public final class Try {
   public static <T> T getOrNull(ThrowableSupplier<T> onTry) {
     return createSupplier(onTry, e -> {
       return null;
+    }).get();
+  }
+
+  public static <T> T getOrDefault(ThrowableSupplier<T> onTry, T defaultValue) {
+    return createSupplier(onTry, e -> {
+      return defaultValue;
     }).get();
   }
 

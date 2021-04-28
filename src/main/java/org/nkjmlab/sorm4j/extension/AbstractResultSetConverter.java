@@ -23,9 +23,9 @@ public abstract class AbstractResultSetConverter implements ResultSetConverter {
 
   @Override
   @SuppressWarnings("unchecked")
-  public final <T> T toSingleNativeObject(SormOptions options, ResultSet resultSet, int sqlType,
+  public final <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int sqlType,
       Class<T> objectClass) throws SQLException {
-    return (T) getColumnValue(options, resultSet, 1, sqlType, objectClass);
+    return (T) convertColumnValueTo(options, resultSet, 1, sqlType, objectClass);
   }
 
   abstract protected Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)

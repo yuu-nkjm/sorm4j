@@ -6,6 +6,14 @@ import org.junit.jupiter.api.Test;
 class TryTest {
 
   @Test
+  void testGetOrDefault() {
+    String s = Try.getOrDefault(() -> {
+      throw new RuntimeException("error");
+    }, "test");
+    assertThat(s).isEqualTo("test");
+  }
+
+  @Test
   void testCreateRunnable() {
     try {
       Try.createRunnable(() -> {

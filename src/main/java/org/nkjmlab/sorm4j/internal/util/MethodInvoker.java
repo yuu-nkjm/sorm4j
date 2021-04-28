@@ -18,21 +18,15 @@ class MethodInvoker {
    */
   public static String getSummary(int depth, String label) {
     StackTraceElement e = getStackTraceElement(depth);
-    return dateTimeFormatter.format(LocalDateTime.now()) + " " + String.format("%5s", label)
-        + " [" + Thread.currentThread().getName() + "] " + getInvokerClassName(e) + "."
+    return dateTimeFormatter.format(LocalDateTime.now()) + " " + String.format("%5s", label) + " ["
+        + Thread.currentThread().getName() + "] " + getInvokerClassName(e) + "."
         + getInvokerMethodName(e) + "(" + getInvokerFileName(e) + ":" + getInvokerLineNumber(e)
         + ")";
   }
 
   private static StackTraceElement getStackTraceElement(int index) {
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    if (index < 0) {
-      return stackTrace[0];
-    } else if (index >= stackTrace.length) {
-      return stackTrace[stackTrace.length - 1];
-    } else {
-      return stackTrace[index];
-    }
+    return stackTrace[Math.max(Math.min(index, stackTrace.length - 1), 0)];
   }
 
   private static String getInvokerClassName(StackTraceElement e) {
