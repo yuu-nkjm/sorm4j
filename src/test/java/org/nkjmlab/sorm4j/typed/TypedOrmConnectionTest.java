@@ -37,6 +37,19 @@ class TypedOrmConnectionTest {
   }
 
   @Test
+  void testApplyPreparedStatementHandler() {
+    sorm.accept(conn -> {
+      TypedOrmConnection<Player> m = conn.type(Player.class);
+
+      m.acceptPreparedStatementHandler(ParameterizedSql.parse("select * from guests where id=?", 1),
+          pstmt -> pstmt.execute());
+      m.applyPreparedStatementHandler(ParameterizedSql.parse("select * from guests where id=?", 1),
+          pstmt -> pstmt.execute());
+    });
+
+  }
+
+  @Test
   void testOrderedRequest() {
     AtomicInteger id = new AtomicInteger(10);
 
@@ -568,7 +581,6 @@ class TypedOrmConnectionTest {
 
     sorm.acceptTransactionHandler(conn -> {
       TypedOrmConnection<Guest> m = conn.type(Guest.class);
-
       m.insert(a);
       m = m.type(Player.class).type(Guest.class);
       m = m.untype().type(Guest.class);
@@ -581,6 +593,11 @@ class TypedOrmConnectionTest {
 
     Guest g = sorm.applyTransactionHandler(m -> m.readFirst(Guest.class, "SELECT * FROM GUESTS"));
     assertThat(g.getAddress()).isEqualTo(a.getAddress());
+
+    sorm.acceptTransactionHandler(conn -> {
+      TypedOrmConnection<Guest> m = conn.type(Guest.class);
+      m.begin(java.sql.Connection.TRANSACTION_READ_COMMITTED);
+    });
 
 
   }
