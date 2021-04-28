@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
+import java.util.TreeMap;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.SqlUtils;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 
 /**
@@ -34,14 +36,46 @@ public interface ParameterizedSql {
 
 
   @Experimental
-  static ParameterizedSql parse(String sql, Object... orderedParameters) {
-    return OrderedParameterSql.parse(sql, orderedParameters);
+  static ParameterizedSql parse(String sql, Object... parameters) {
+    return OrderedParameterSql.parse(sql, parameters);
   }
 
   @Experimental
-  static ParameterizedSql parse(String sql, Map<String, Object> namedParameters) {
-    return NamedParameterSql.parse(sql, namedParameters);
+  static ParameterizedSql parse(String sql, Map<String, Object> parameters) {
+    return NamedParameterSql.parse(sql, parameters);
   }
+
+  @Experimental
+  public static String embededParameter(String sql, Object... parameters) {
+    if (parameters == null || parameters.length == 0) {
+      return sql;
+    }
+    return StringUtils.replacePlaceholder(sql, "{?}", parameters.length,
+        index -> SqlUtils.literal(parameters[index]));
+  }
+
+  @Experimental
+  public static String embededParameter(String sql, Map<String, Object> parameters) {
+    if (parameters == null || parameters.size() == 0) {
+      return sql;
+    }
+    TreeMap<Integer, Object> orderdParams = new TreeMap<>();
+
+    parameters.keySet().stream().forEach(key -> {
+      int pos = sql.indexOf("{:" + key + "}");
+      if (pos == -1) {
+        return;
+      }
+      orderdParams.put(pos, parameters.get(key));
+    });
+    String _sql = sql.replaceAll("\\{:.*?\\}", "{?}");
+    Object[] _params = orderdParams.values().toArray();
+
+    return StringUtils.replacePlaceholder(_sql, "{?}", _params.length,
+        index -> SqlUtils.literal(_params[index]));
+  }
+
+
 
   /**
    * Creates {@link ParameterizedSql} object from the given SQL string. When you use a SQL statement

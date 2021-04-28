@@ -45,18 +45,18 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     return parameters;
   }
 
-  private static final String LIST_PLACEHOLDER = "<?>";
   private static final String EMBEDDED_PLACEHOLDER = "{?}";
+  private static final String LIST_PLACEHOLDER = "<?>";
 
   public static ParameterizedSql parse(String sql, Object... parameters) {
     ParameterizedSql st = new ParameterizedSqlImpl(sql, parameters);
     if (parameters.length == 0) {
       return st;
     }
-    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
     st = sql.contains(EMBEDDED_PLACEHOLDER)
         ? parseEmbeddedPlaceholder(st.getSql(), st.getParameters())
         : st;
+    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
     return st;
   }
 

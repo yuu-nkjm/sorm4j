@@ -14,12 +14,11 @@ class ParameterizedSqlTest {
     assertThat(SqlUtils.literal(null)).isEqualTo("null");
     assertThat(SqlUtils.literal("?")).isEqualTo("?");
     assertThat(SqlUtils.literal("test")).isEqualTo("'test'");
+    assertThat(ParameterizedSql.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
   }
 
   @Test
   void testParseAsOrdered() {
-    assertThat(ParameterizedSql.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
-
     String sql = "select * from guest where id=?";
     Object[] params = {1};
     ParameterizedSql ps = ParameterizedSql.parse(sql, params);
@@ -40,7 +39,22 @@ class ParameterizedSqlTest {
 
     assertThat(ps.getBindedSql()).contains("select * from guest where id=1");
     assertThat(ps.toString()).contains("sql=[select * from guest where id=?], parameters=[1]");
+  }
 
+  @Test
+  void testEmbeddedOrdered() {
+    String sql = "select * from guest where id={?}";
+    Object[] params = {1};
+    assertThat(ParameterizedSql.embededParameter(sql, params))
+        .contains("select * from guest where id=1");
+  }
+
+  @Test
+  void testEmbeddedMap() {
+    String sql = "select * from guest where id={:id}";
+    Map<String, Object> params = Map.of("id", 1);
+    assertThat(ParameterizedSql.embededParameter(sql, params))
+        .contains("select * from guest where id=1");
   }
 
 }
