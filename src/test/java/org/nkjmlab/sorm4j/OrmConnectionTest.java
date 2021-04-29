@@ -18,12 +18,12 @@ import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.extension.Configurator;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
-import org.nkjmlab.sorm4j.sql.InsertResult;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.Tuple2;
+import org.nkjmlab.sorm4j.sql.result.Tuple3;
 import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 class OrmConnectionTest {

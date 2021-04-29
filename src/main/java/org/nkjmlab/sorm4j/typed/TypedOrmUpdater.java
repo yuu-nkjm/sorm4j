@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.typed;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.sql.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 /**
  * A typed interface for updating database.

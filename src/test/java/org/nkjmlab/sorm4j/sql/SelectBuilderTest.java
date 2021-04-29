@@ -2,12 +2,11 @@ package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sql.ParameterizedSql.*;
-import static org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder.*;
+import static org.nkjmlab.sorm4j.sql.SelectStringBuilder.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
 
 class SelectBuilderTest {
 

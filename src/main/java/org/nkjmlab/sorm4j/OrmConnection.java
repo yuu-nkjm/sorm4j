@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**

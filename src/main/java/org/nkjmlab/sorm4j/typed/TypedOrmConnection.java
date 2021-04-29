@@ -1,12 +1,12 @@
 package org.nkjmlab.sorm4j.typed;
 
-import org.nkjmlab.sorm4j.BasicCommand;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmMapReader;
 import org.nkjmlab.sorm4j.ResultSetMapMapper;
 import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.TransactionFunction;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.BasicCommand;
 
 /**
  * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},

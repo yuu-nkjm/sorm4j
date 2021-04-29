@@ -6,10 +6,10 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.result.Tuple2;
+import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 /**
  * The interface of reading functions of object-relation mapping.

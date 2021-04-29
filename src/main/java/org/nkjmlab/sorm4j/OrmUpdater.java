@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.sql.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 /**
  * <p>

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.sql.result;
 
 import java.sql.ResultSet;
 import java.util.Iterator;

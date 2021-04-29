@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql.schema;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.sql.schema.TableSchema.TableSchemaKeyword.*;
+import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
 import org.junit.jupiter.api.Test;
 
 class TableSchemaTest {

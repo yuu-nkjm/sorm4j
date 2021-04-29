@@ -1,9 +1,8 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.sql.helper.Command;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.internal.sql.BasicCommandImpl;
 
 public interface BasicCommand extends Command {
 
