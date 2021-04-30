@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
@@ -19,6 +19,14 @@ import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
  */
 public interface OrmMapReader {
   /**
+   * Maps the all rows in the given resultSet to a map list.
+   *
+   * @param resultSet
+   * @return
+   */
+  List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet);
+
+  /**
    * See {@link OrmMapReader#readMapFirst(String, Object...)}
    *
    * @param sql
@@ -31,7 +39,8 @@ public interface OrmMapReader {
    * {@link java.util.Map}.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * correspondence defined in
+   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
@@ -55,7 +64,8 @@ public interface OrmMapReader {
    * parametrized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * correspondence defined in
+   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
@@ -79,7 +89,8 @@ public interface OrmMapReader {
    * {@link java.util.Map} containing data from the execution of the provided parameterized SQL and
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * correspondence defined in
+   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}

@@ -10,7 +10,10 @@ import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
+import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
@@ -129,19 +132,15 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.executeUpdate(sql, parameters);
   }
 
-
   @Override
   public Connection getJdbcConnection() {
     return conn.getJdbcConnection();
   }
 
-
-
   @Override
   public String getTableName() {
     return conn.getTableName(objectClass);
   }
-
 
   @Override
   public int[] insert(List<T> objects) {
@@ -216,13 +215,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.insertOn(tableName, objects);
   }
 
-
-  @Override
-  public T mapRow(ResultSet resultSet) {
-    return conn.mapRow(objectClass, resultSet);
-  }
-
-
   @Override
   public List<T> mapRowList(ResultSet resultSet) {
     return conn.mapRowList(objectClass, resultSet);
@@ -231,11 +223,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
     return conn.mapRowsToMapList(resultSet);
-  }
-
-  @Override
-  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return conn.mapRowToMap(resultSet);
   }
 
   @Override
@@ -428,6 +415,27 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public BasicCommand createCommand(String sql) {
     return BasicCommand.from(conn, sql);
+  }
+
+  @Override
+  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
+    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+  }
+
+  @Override
+  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
+    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+  }
+
+
+  @Override
+  public TableMetaData getTableMetaData() {
+    return conn.getTableMetaData(objectClass);
+  }
+
+  @Override
+  public TableMetaData getTableMetaData(String tableName) {
+    return conn.getTableMetaData(objectClass, tableName);
   }
 
 

@@ -25,6 +25,8 @@ import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
+import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
@@ -158,6 +160,17 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
+    return OrderedParameterCommand.from(this, sql).addParameter(parameters);
+  }
+
+  @Override
+  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
+    return NamedParameterCommand.from(this, sql).bindAll(parameters);
+  }
+
+
+  @Override
   public <T> int[] delete(List<T> objects) {
     return applytoArray(objects, array -> delete(array));
   }
@@ -282,7 +295,6 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-
     final int ret = executeUpdateAndClose(mappings.getOptions(), connection, sqlParametersSetter,
         sql, parameters);
     return ret;
@@ -494,7 +506,6 @@ public class OrmConnectionImpl implements OrmConnection {
         Try::rethrow);
   }
 
-  @Override
   public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
     return Try
         .getOrThrow(() -> resultSetConverter.isStandardClass(mappings.getOptions(), objectClass)
@@ -527,7 +538,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
@@ -848,6 +858,5 @@ public class OrmConnectionImpl implements OrmConnection {
   public TableMetaData getTableMetaData(Class<?> objectClass, String tableName) {
     return mappings.getTableMapping(connection, tableName, objectClass).getTableMetaData();
   }
-
 
 }

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.typed;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
@@ -116,5 +117,13 @@ public interface TypedOrmReader<T> {
    * @return
    */
   T readOne(String sql, Object... parameters);
+
+  /**
+   * Maps the all rows in the given resultSet to an object list.
+   *
+   * @param resultSet
+   * @return
+   */
+  List<T> mapRowList(ResultSet resultSet);
 
 }

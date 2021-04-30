@@ -1,42 +1,18 @@
 package org.nkjmlab.sorm4j.typed;
 
+import org.nkjmlab.sorm4j.OrmCommonFunction;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmMapReader;
-import org.nkjmlab.sorm4j.ResultSetMapMapper;
-import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.TransactionFunction;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.sql.BasicCommand;
 
 /**
- * Main API for typed object relation mapping. The api consists of {@link TypedOrmReader<T>},
- * {@link TypedOrmUpdater<T>}, {@link OrmMapReader}, {@link SqlExecutor}and
- * {@link TransactionFunction}.
+ * Main API for typed object relation mapping.
  *
  * @author nkjm
  *
  */
 @Experimental
-public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
-    SqlExecutor, TypedResultSetMapper<T>, ResultSetMapMapper, TransactionFunction, AutoCloseable {
-
-
-  /**
-   * Creates a {@link BasicCommand} from SQL string.
-   *
-   * @param sql
-   * @return
-   */
-  @Experimental
-  BasicCommand createCommand(String sql);
-
-
-  /**
-   * Gets the table name mapping to this objects.
-   *
-   * @return
-   */
-  String getTableName();
+public interface TypedOrmConnection<T>
+    extends TypedOrmReader<T>, TypedOrmUpdater<T>, TypedMetaDataHandler<T>, OrmCommonFunction {
 
   /**
    * Creates {@link TypedOrmConnection}

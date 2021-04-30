@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
@@ -204,5 +205,13 @@ public interface OrmReader {
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters);
 
-
+  /**
+   * Maps the all rows in the given resultSet to an object list.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param resultSet
+   * @return
+   */
+  <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet);
 }
