@@ -20,6 +20,7 @@ class TableSchemaTest {
       addColumnDefinition(NAME, VARCHAR);
       addColumnDefinition(TEL, VARCHAR);
       addUniqueConstraint(TEL);
+      addIndexColumn(TEL);
       setPrimaryKey(ID);
     }
 
@@ -34,7 +35,7 @@ class TableSchemaTest {
 
   @Test
   void testGetName() {
-    assertThat(guestTable.getName()).isEqualToIgnoringCase("guests");
+    assertThat(guestTable.getTableName()).isEqualToIgnoringCase("guests");
   }
 
   @Test
@@ -45,7 +46,7 @@ class TableSchemaTest {
 
   @Test
   void testGetIndexSchema() {
-    assertThat(guestTable.getIndexSchema(GuestTable.TEL))
+    assertThat(guestTable.getCreateIndexStatements().get(0))
         .isEqualToIgnoringCase("CREATE INDEX IF NOT EXISTS index_guests_tel ON guests(tel)");
   }
 

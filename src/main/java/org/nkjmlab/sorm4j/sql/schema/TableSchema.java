@@ -11,16 +11,19 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 @Experimental
 public class TableSchema {
 
-  private final String name;
+  private final String tableName;
   private final Map<String, String[]> columnDefinitions;
   private final List<String[]> uniqueColumnPairs;
   private String[] primaryKeys;
 
+  private final List<String[]> indexColumns;
 
-  public TableSchema(String name) {
-    this.name = name;
+
+  public TableSchema(String tableName) {
+    this.tableName = tableName;
     this.columnDefinitions = new LinkedHashMap<>();
     this.uniqueColumnPairs = new ArrayList<>();
+    this.indexColumns = new ArrayList<>();
   }
 
   /**
@@ -60,8 +63,8 @@ public class TableSchema {
     return getColumunNames(columnDefinitions);
   }
 
-  public String getName() {
-    return name;
+  public String getTableName() {
+    return tableName;
   }
 
   /**
@@ -71,13 +74,18 @@ public class TableSchema {
    */
 
   public String getTableSchema() {
-    return getTableSchema(getName(), columnDefinitions, primaryKeys, uniqueColumnPairs);
+    return getTableSchema(getTableName(), columnDefinitions, primaryKeys, uniqueColumnPairs);
   }
 
-  public String getIndexSchema(String... columns) {
-    final String indexName = "index_" + name + "_" + join("_", columns);
-    return createIndexOn(indexName, name, columns);
+  /**
+   * Adds a column pair for an index key.
+   *
+   * @param indexColumnPair
+   */
+  public void addIndexColumn(String... indexColumnPair) {
+    indexColumns.add(indexColumnPair);
   }
+
 
   /**
    * Sets attributes as primary key attributes.
@@ -95,10 +103,6 @@ public class TableSchema {
     this.primaryKeys = attributes;
   }
 
-  private static String createIndexOn(String indexName, String tableName, String... columns) {
-    return "create index if not exists " + indexName + " on " + tableName + "("
-        + String.join(", ", columns) + ")";
-  }
 
 
   private static String createPrimaryKeyConstraint(String[] primaryKeys) {
@@ -129,12 +133,31 @@ public class TableSchema {
     return schema;
   }
 
-
-
   private static List<String> getColumuns(Map<String, String[]> columnDefinisions) {
     return columnDefinisions.keySet().stream()
         .map(columnName -> columnName + " " + join(" ", columnDefinisions.get(columnName)))
         .collect(Collectors.toList());
+  }
+
+  public String getDropTableStatement() {
+    return "drop table if exists " + tableName;
+  }
+
+  public String getCreateTableStatement() {
+    return "create table if not exists " + getTableSchema();
+  }
+
+  public List<String> getCreateIndexStatements() {
+    return indexColumns.stream()
+        .map(columns -> getCreateIndexOnStatement("index_" + tableName + "_" + join("_", columns),
+            tableName, columns))
+        .collect(Collectors.toList());
+  }
+
+  private static String getCreateIndexOnStatement(String indexName, String tableName,
+      String... columns) {
+    return "create index if not exists " + indexName + " on " + tableName + "("
+        + String.join(", ", columns) + ")";
   }
 
 }
