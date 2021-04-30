@@ -26,4 +26,6 @@ public interface TableMetaData {
 
   List<String> getNotPrimaryKeys();
 
+  String getColumnAliases();
+
 }
