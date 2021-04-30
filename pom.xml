@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>1.3.12</version>
+  <version>1.3.13</version>
   <name>sorm4j</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
   <url>https://github.com/yuu-nkjm/sorm4j</url>
