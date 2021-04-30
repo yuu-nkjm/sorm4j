@@ -23,7 +23,7 @@ public interface RowMapper<T> {
    * @param rowNum Starts 1. e.g. 1, 2, ...
    * @return
    */
-  T mapRow(ResultSet resultSet, int rowNum);
+  T mapRow(ResultSet resultSet, int rowNum) throws Exception;
 
   /**
    * Converts the given rowMapper to function mapping rows to object list.
