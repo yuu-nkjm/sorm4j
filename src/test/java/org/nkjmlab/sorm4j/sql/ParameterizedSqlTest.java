@@ -45,7 +45,7 @@ class ParameterizedSqlTest {
   void testEmbeddedOrdered() {
     String sql = "select * from guest where id={?}";
     Object[] params = {1};
-    assertThat(ParameterizedSql.embededParameter(sql, params))
+    assertThat(ParameterizedSql.embedParameter(sql, params))
         .contains("select * from guest where id=1");
   }
 
@@ -53,7 +53,7 @@ class ParameterizedSqlTest {
   void testEmbeddedMap() {
     String sql = "select * from guest where id={:id}";
     Map<String, Object> params = Map.of("id", 1);
-    assertThat(ParameterizedSql.embededParameter(sql, params))
+    assertThat(ParameterizedSql.embedParameter(sql, params))
         .contains("select * from guest where id=1");
   }
 

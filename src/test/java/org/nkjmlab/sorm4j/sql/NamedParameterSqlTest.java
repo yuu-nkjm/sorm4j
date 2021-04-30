@@ -14,19 +14,13 @@ class NamedParameterSqlTest {
   private Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
 
   private static Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+  static {
+    sorm.apply(conn -> conn.insert(ALICE, BOB, CAROL, DAVE));
+
+  }
 
   @Test
   void testCustomer() {
-    sorm.apply(conn -> conn.insert(ALICE, BOB, CAROL, DAVE));
-
-    {
-      ParameterizedSql statement = OrderedParameterSql.parse(
-          "select * from customer where name like {?} and address in(<?>) and id=?", "A%",
-          List.of("Tokyo", "Kyoto"), 1);
-      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
-      System.out.println(ret);
-    }
-
     {
       String sql = "select * from customer where id=:id and address=:address";
       ParameterizedSql statement =
@@ -37,7 +31,7 @@ class NamedParameterSqlTest {
     {
       ParameterizedSql statement = NamedParameterSql.parse(
           "select * from customer where name like {:name} and address in(<:address>) and id=:id",
-          Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "A%"));
+          Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
       List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
       System.out.println(ret);
     }
@@ -54,7 +48,7 @@ class NamedParameterSqlTest {
     assertThat(sp.toString())
         .isEqualTo("sql=[select * from simple where id=? and name=?], parameters=[2, foo]");
 
-    assertThat(ParameterizedSql.from("select * from test").toString())
+    assertThat(ParameterizedSql.of("select * from test").toString())
         .contains("[select * from test]");
   }
 

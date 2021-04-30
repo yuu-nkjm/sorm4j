@@ -86,8 +86,8 @@ class OrmConnectionTest {
   @Test
   void testNamedRequest1() {
     AtomicInteger id = new AtomicInteger(10);
-    int row = sorm.apply(
-        conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+    int row =
+        sorm.apply(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
     assertThat(row).isEqualTo(1);
     Player p = sorm.apply(conn -> conn.readAll(Player.class)).get(0);
@@ -98,17 +98,15 @@ class OrmConnectionTest {
     AtomicInteger id = new AtomicInteger(10);
 
 
-    int row = sorm.apply(
-        conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+    int row =
+        sorm.apply(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
             .executeUpdate());
     assertThat(row).isEqualTo(1);
 
-    row = sorm.apply(
-        conn -> conn
-            .createCommand("insert into players values(:id, :name, :address)")
-            .bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo")
-            .executeUpdate());
+    row = sorm.apply(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+        .bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo")
+        .executeUpdate());
     assertThat(row).isEqualTo(1);
 
     row = sorm.apply(conn -> {
@@ -120,39 +118,9 @@ class OrmConnectionTest {
     });
     assertThat(row).isEqualTo(1);
 
-    List<Player> ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
-        .bind("id", id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
 
-    assertThat(ret.size()).isEqualTo(1);
-
-    ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
+    var ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
         .bind("id", id.get()).executeQuery(rs -> conn.mapRowList(Player.class, rs)));
-
-    assertThat(ret.size()).isEqualTo(1);
-  }
-
-  @Test
-  void testOrderedRequest() {
-    AtomicInteger id = new AtomicInteger(10);
-    int row =
-        sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
-            .addParameter(id.incrementAndGet(), "Frank", "Tokyo").executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-    List<Player> ret = sorm.apply(
-        conn -> conn.createCommand("select * from players where id=? and name=?")
-            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRowList(Player.class, rs)));
-
-    assertThat(ret.size()).isEqualTo(1);
-
-    row = sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
-        .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
-        .executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-
-    ret = sorm.apply(conn -> conn.createCommand("select * from players where id=?")
-        .addParameter(id.get()).executeQuery((rs, rowNum) -> conn.mapRow(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
   }
@@ -330,7 +298,7 @@ class OrmConnectionTest {
     sorm.accept(m -> {
       m.insert(a);
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
-      m.executeUpdate(ParameterizedSql.from("DROP TABLE IF EXISTS PLAYERS1"));
+      m.executeUpdate(ParameterizedSql.of("DROP TABLE IF EXISTS PLAYERS1", new Object[0]));
 
     });
   }
@@ -404,11 +372,11 @@ class OrmConnectionTest {
     sorm.accept(m -> {
       m.insert(List.of(a, b));
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.from("select * from players")).toList().get(0);
+          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      map = m.readMapFirst(ParameterizedSql.from("select * from players"));
+      map = m.readMapFirst(ParameterizedSql.of("select * from players"));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
@@ -522,8 +490,7 @@ class OrmConnectionTest {
           .isEqualTo(a.getName());
     });
     sorm.accept(m -> {
-      Map<String, Object> map =
-          m.readMapList(ParameterizedSql.from("select * from players")).get(0);
+      Map<String, Object> map = m.readMapList(ParameterizedSql.of("select * from players")).get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -535,7 +502,7 @@ class OrmConnectionTest {
     });
     sorm.accept(m -> {
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.from("select * from players")).toList().get(0);
+          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -570,8 +537,8 @@ class OrmConnectionTest {
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readList(Player.class, "select * from players")).contains(a, b);
-      assertThat(m.readList(Player.class, ParameterizedSql.from("select * from players")))
-          .contains(a, b);
+      assertThat(m.readList(Player.class, ParameterizedSql.of("select * from players"))).contains(a,
+          b);
       assertThat(
           m.readOne(Player.class, OrderedParameterSql.parse("select * from players where id=?", 1)))
               .isEqualTo(a);
@@ -593,7 +560,7 @@ class OrmConnectionTest {
             m.readOne(Guest.class, OrderedParameterSql.parse("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
-        g = m.readOne(Guest.class, ParameterizedSql.from("select * from guests"));
+        g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));
         failBecauseExceptionWasNotThrown(SormException.class);
       });
     } catch (SormException e) {
@@ -618,7 +585,7 @@ class OrmConnectionTest {
       m.insert(a);
       Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
-      g = m.readFirst(Guest.class, ParameterizedSql.from("SELECT * FROM GUESTS"));
+      g = m.readFirst(Guest.class, ParameterizedSql.of("SELECT * FROM GUESTS"));
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
     });
   }

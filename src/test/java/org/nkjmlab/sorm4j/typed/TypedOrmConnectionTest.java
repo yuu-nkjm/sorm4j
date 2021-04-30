@@ -66,22 +66,18 @@ class TypedOrmConnectionTest {
     assertThat(row).isEqualTo(1);
 
 
-    List<Player> ret1 = sorm.apply(conn -> conn.type(Player.class).executeQuery(
-        ParameterizedSql.from("select * from players"), (rs, rn) -> conn.mapRow(Player.class, rs)));
+    List<Player> ret1 = sorm.apply(
+        conn -> conn.type(Player.class).executeQuery(ParameterizedSql.of("select * from players"),
+            (rs, rn) -> new Player(rs.getInt(1), rs.getString(2), rs.getString(3))));
 
     assertThat(ret1.size()).isEqualTo(2);
     ret1 = sorm.apply(conn -> conn.type(Player.class).executeQuery(
-        ParameterizedSql.from("select * from players"), rs -> conn.mapRowList(Player.class, rs)));
+        ParameterizedSql.of("select * from players"), rs -> conn.mapRowList(Player.class, rs)));
     assertThat(ret1.size()).isEqualTo(2);
 
     List<Map<String, Object>> ret2 =
-        sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
+        sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
             rs -> conn.mapRowsToMapList(rs)));
-
-    assertThat(ret2.size()).isEqualTo(2);
-
-    ret2 = sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
-        (rs, rowNum) -> conn.mapRowToMap(rs)));
 
     assertThat(ret2.size()).isEqualTo(2);
 
@@ -357,7 +353,7 @@ class TypedOrmConnectionTest {
     sorm.accept(m -> {
       m.insert(a);
       m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
-      m.executeUpdate(ParameterizedSql.from("DROP TABLE IF EXISTS PLAYERS1"));
+      m.executeUpdate(ParameterizedSql.of("DROP TABLE IF EXISTS PLAYERS1"));
 
     });
   }
@@ -373,22 +369,23 @@ class TypedOrmConnectionTest {
 
       m.insert(List.of(a, b));
 
-      Player p1 = m.readLazy(ParameterizedSql.from("select * from players"))
-          .toList((rs, rowNum) -> m.mapRow(rs)).get(0);
+      Player p1 = m.readLazy(ParameterizedSql.of("select * from players"))
+          .toList((rs, rowNum) -> new Player(rs.getInt(1), rs.getString(2), rs.getString(3)))
+          .get(0);
       assertThat(p1.getName()).isEqualTo(a.getName());
 
 
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.from("select * from players")).toList().get(0);
+          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      map = m.readMapLazy(ParameterizedSql.from("select * from players")).toList().get(0);
+      map = m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
 
-      map = m.readMapFirst(ParameterizedSql.from("select * from players"));
+      map = m.readMapFirst(ParameterizedSql.of("select * from players"));
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
@@ -455,8 +452,7 @@ class TypedOrmConnectionTest {
 
 
     sorm.accept(m -> {
-      Map<String, Object> map =
-          m.readMapList(ParameterizedSql.from("select * from players")).get(0);
+      Map<String, Object> map = m.readMapList(ParameterizedSql.of("select * from players")).get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -480,7 +476,7 @@ class TypedOrmConnectionTest {
     });
     sorm.accept(m -> {
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.from("select * from players")).toList().get(0);
+          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -506,7 +502,7 @@ class TypedOrmConnectionTest {
       Player b = SormTestUtils.PLAYER_BOB;
       m.insert(a, b);
       assertThat(m.readList("select * from players")).contains(a, b);
-      assertThat(m.readList(ParameterizedSql.from("select * from players"))).contains(a, b);
+      assertThat(m.readList(ParameterizedSql.of("select * from players"))).contains(a, b);
       assertThat(m.readOne(OrderedParameterSql.parse("select * from players where id=?", 1)))
           .isEqualTo(a);
       assertThat(m.readOne("select * from players where id=?", 1)).isEqualTo(a);
@@ -531,7 +527,7 @@ class TypedOrmConnectionTest {
         Guest g = m.readOne(OrderedParameterSql.parse("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
-        g = m.readOne(ParameterizedSql.from("select * from guests"));
+        g = m.readOne(ParameterizedSql.of("select * from guests"));
         failBecauseExceptionWasNotThrown(SormException.class);
       });
     } catch (SormException e) {
@@ -586,7 +582,7 @@ class TypedOrmConnectionTest {
       m = m.untype().type(Guest.class);
       Guest g = m.readFirst("SELECT * FROM GUESTS");
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
-      g = m.readFirst(ParameterizedSql.from("SELECT * FROM GUESTS"));
+      g = m.readFirst(ParameterizedSql.of("SELECT * FROM GUESTS"));
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
       m.commit();
     });

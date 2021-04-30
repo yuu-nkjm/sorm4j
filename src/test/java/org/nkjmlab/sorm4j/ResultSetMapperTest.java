@@ -17,27 +17,16 @@ class ResultSetMapperTest {
     sorm.accept(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
   }
 
-  @Test
-  void testMapRowClassOfTResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
-        (rs, rowNum) -> conn.mapRow(Player.class, rs)));
-  }
-
-  @Test
-  void testMapRowResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
-        (rs, rowNum) -> conn.mapRowToMap(rs)));
-  }
 
   @Test
   void testMapRowsClassOfTResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
+    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
         rs -> conn.mapRowList(Player.class, rs)));
   }
 
   @Test
   void testMapRowsResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.from("select * from players"),
+    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
         rs -> conn.mapRowsToMapList(rs)));
   }
 
