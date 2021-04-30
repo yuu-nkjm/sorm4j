@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
@@ -41,5 +42,23 @@ public interface OrmConnection extends OrmReader, OrmUpdater, OrmMapReader, SqlE
    * @return
    */
   String getTableName(Class<?> objectClass);
+
+
+  /**
+   * Gets table metadata corresponding to the given object class.
+   *
+   * @param objectClass
+   * @return
+   */
+  TableMetaData getTableMetaData(Class<?> objectClass);
+
+
+  /**
+   * Gets table metadata to the given object class and the table name.
+   *
+   * @param objectClass
+   * @return
+   */
+  TableMetaData getTableMetaData(Class<?> objectClass, String tableName);
 
 }

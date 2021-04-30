@@ -92,11 +92,11 @@ class TableMappingTest {
   @Test
   void testCol() {
     sorm.accept(m -> {
-      assertThat(getTableMapping(m, Guest.class).getSql().getColumns())
+      assertThat(getTableMapping(m, Guest.class).getTableMetaData().getColumns())
           .containsAll(List.of("ID", "NAME", "ADDRESS"));
     });
     sorm.accept(m -> {
-      assertThat(getTableMapping(m, Guest.class).getSql().getPrimaryKeys())
+      assertThat(getTableMapping(m, Guest.class).getTableMetaData().getPrimaryKeys())
           .containsAll(List.of("ID"));
     });
     sorm.accept(m -> {

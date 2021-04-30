@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Field accessor mapping to the column.
+ * Field accessor mapping to the columnName.
  *
  * @author nkjm
  *
@@ -14,11 +14,11 @@ public final class Accessor {
 
   private final GetterAccessor getter;
   private final SetterAccessor setter;
-  private final Column column;
+  private final ColumnName columnName;
 
 
-  public Accessor(Column column, Field field, Method getter, Method setter) {
-    this.column = column;
+  public Accessor(ColumnName columnName, Field field, Method getter, Method setter) {
+    this.columnName = columnName;
     this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
     this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
   }
@@ -63,8 +63,8 @@ public final class Accessor {
 
   @Override
   public String toString() {
-    return "Accessor [getterAccessor=" + getter + ", setterAccessor=" + setter + ", column="
-        + column + "]";
+    return "Accessor [getterAccessor=" + getter + ", setterAccessor=" + setter + ", columnName="
+        + columnName + "]";
   }
 
 

@@ -24,7 +24,6 @@ import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
 import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
-import org.nkjmlab.sorm4j.internal.util.SqlTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
@@ -72,30 +71,30 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     return setters;
   }
 
-  private static Map<Column, Method> getAnnotatatedSettersMap(Class<?> objectClass) {
+  private static Map<ColumnName, Method> getAnnotatatedSettersMap(Class<?> objectClass) {
     Class<OrmSetter> ann = OrmSetter.class;
-    Map<Column, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
+    Map<ColumnName, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
         .filter(m -> Objects.nonNull(m.getAnnotation(ann)))
-        .collect(Collectors.toMap(m -> new Column(m.getAnnotation(ann).value()), m -> m));
+        .collect(Collectors.toMap(m -> new ColumnName(m.getAnnotation(ann).value()), m -> m));
     return annos;
   }
 
-  private static Map<Column, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
+  private static Map<ColumnName, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
     Class<OrmColumn> ann = OrmColumn.class;
     return Arrays.stream(objectClass.getDeclaredFields())
         .filter(f -> Objects.nonNull(f.getAnnotation(ann)))
-        .collect(Collectors.toMap(f -> new Column(f.getAnnotation(ann).value()), f -> {
+        .collect(Collectors.toMap(f -> new ColumnName(f.getAnnotation(ann).value()), f -> {
           f.setAccessible(true);
           return f;
         }));
   }
 
 
-  private static Map<Column, Method> getAnnotatedGettersMap(Class<?> objectClass) {
+  private static Map<ColumnName, Method> getAnnotatedGettersMap(Class<?> objectClass) {
     Class<OrmGetter> ann = OrmGetter.class;
-    Map<Column, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
+    Map<ColumnName, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
         .filter(m -> Objects.nonNull(m.getAnnotation(ann)))
-        .collect(Collectors.toMap(m -> new Column(m.getAnnotation(ann).value()), m -> m));
+        .collect(Collectors.toMap(m -> new ColumnName(m.getAnnotation(ann).value()), m -> m));
     return annos;
   }
 
@@ -137,34 +136,34 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     names.addAll(getAllGetters(objectClass).keySet());
     names.addAll(getAllSetters(objectClass).keySet());
 
-    List<Column> columns = new ArrayList<>(names).stream()
+    List<ColumnName> columnNames = new ArrayList<>(names).stream()
         .flatMap(fieldName -> guessColumnNameCandidates(fieldName).stream())
         .collect(Collectors.toList());
-    columns.addAll(getAnnotatedFieldsMap(objectClass).keySet());
-    columns.addAll(getAnnotatedGettersMap(objectClass).keySet());
-    columns.addAll(getAnnotatatedSettersMap(objectClass).keySet());
+    columnNames.addAll(getAnnotatedFieldsMap(objectClass).keySet());
+    columnNames.addAll(getAnnotatedGettersMap(objectClass).keySet());
+    columnNames.addAll(getAnnotatatedSettersMap(objectClass).keySet());
 
-    return createAccessors(objectClass, columns);
+    return createAccessors(objectClass, columnNames);
   }
 
   @Override
-  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<Column> columns) {
+  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<ColumnName> columnNames) {
     Map<FieldName, Field> fields = getAllFields(objectClass);
     Map<FieldName, Method> getters = getAllGetters(objectClass);
     Map<FieldName, Method> setters = getAllSetters(objectClass);
-    Map<Column, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
-    Map<Column, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
-    Map<Column, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
+    Map<ColumnName, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
+    Map<ColumnName, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
+    Map<ColumnName, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
 
     List<FieldName> fieldsList = new ArrayList<>(fields.keySet());
     Map<String, Accessor> ret = new HashMap<>();
-    for (Column column : columns) {
-      Field f = annotatedFields.get(column);
-      Method g = isValidGetter(annotatedGetters.get(column));
-      Method s = isValidSetter(annotatedSetters.get(column));
+    for (ColumnName columnName : columnNames) {
+      Field f = annotatedFields.get(columnName);
+      Method g = isValidGetter(annotatedGetters.get(columnName));
+      Method s = isValidSetter(annotatedSetters.get(columnName));
 
       Optional<FieldName> op =
-          fieldsList.stream().filter(fieldName -> isMatch(column, fieldName)).findFirst();
+          fieldsList.stream().filter(fieldName -> isMatch(columnName, fieldName)).findFirst();
       if (op.isPresent()) {
         FieldName fieldName = op.get();
         f = f != null ? f : fields.get(fieldName);
@@ -173,10 +172,10 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       }
       if (f == null && (g == null || s == null)) {
         LoggerFactory.debug(getClass(),
-            "Skip matching with Column [{}] to field because could not found corresponding field.",
-            column);
+            "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
+            columnName);
       } else {
-        ret.put(StringUtils.toCanonical(column.getName()), new Accessor(column, f, g, s));
+        ret.put(StringUtils.toCanonical(columnName.getName()), new Accessor(columnName, f, g, s));
       }
     }
     return ret;
@@ -188,28 +187,28 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
    * from a field contains the given column name, the field is mapped to the column. Capital case is
    * ignored for the mapping.
    *
-   * @param column
+   * @param columnName
    * @param fieldName
    * @return
    */
-  protected boolean isMatch(Column column, FieldName fieldName) {
+  protected boolean isMatch(ColumnName columnName, FieldName fieldName) {
     final List<String> candidates = guessColumnNameCandidates(fieldName).stream()
-        .map(Column::getName).collect(Collectors.toList());
-    return containsAsCanonical(candidates, column.getName());
+        .map(ColumnName::getName).collect(Collectors.toList());
+    return containsAsCanonical(candidates, columnName.getName());
   }
 
 
   @Override
-  public List<Column> getAutoGeneratedColumns(DatabaseMetaData metaData, String tableName)
+  public List<ColumnName> getAutoGeneratedColumns(DatabaseMetaData metaData, String tableName)
       throws SQLException {
     try (ResultSet resultSet =
         metaData.getColumns(null, getSchemaPattern(metaData), tableName, "%")) {
-      final List<Column> columnsList = new ArrayList<>();
+      final List<ColumnName> columnsList = new ArrayList<>();
       while (resultSet.next()) {
         String columnName = resultSet.getString(4);
         String isAutoIncrement = resultSet.getString(23);
         if (isAutoIncrement.equals("YES")) {
-          columnsList.add(new Column(columnName));
+          columnsList.add(new ColumnName(columnName));
         }
       }
       return columnsList;
@@ -217,31 +216,41 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
   @Override
-  public List<Column> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException {
+  public List<ColumnName> getColumns(DatabaseMetaData metaData, String tableName)
+      throws SQLException {
 
-    // Column name and data type for message.
-    final class ColumnOnTable extends Column {
+    // ColumnName name and data type for message.
+    final class ColumnNameWithMetaData extends ColumnName {
 
-      private int dataType;
+      private final String msg;
 
-      public ColumnOnTable(String name, int dataType) {
+      public ColumnNameWithMetaData(String name, int dataType, String typeName, int ordinalPosition,
+          String isNullable, String isAutoIncremented, String isGenerated) {
         super(name);
-        this.dataType = dataType;
+        this.msg = StringUtils.format("{}. {} [{}({})] [{},{},{}]", ordinalPosition, name, typeName,
+            dataType, isNullable, isAutoIncremented, isGenerated);
       }
 
       @Override
       public String toString() {
-        return getName() + "(" + SqlTypeUtils.sqlTypeToString(dataType) + ")";
+        return msg;
       }
     }
 
     try (ResultSet resultSet =
         metaData.getColumns(null, getSchemaPattern(metaData), tableName, "%")) {
-      final List<Column> columnsList = new ArrayList<>();
+      final List<ColumnName> columnsList = new ArrayList<>();
       while (resultSet.next()) {
         String columnName = resultSet.getString(4);
         int dataType = resultSet.getInt(5);
-        columnsList.add(new ColumnOnTable(columnName, dataType));
+        String typeName = resultSet.getString(6);
+        int ordinalPosition = resultSet.getInt(17);
+        String isNullable = resultSet.getString(18);
+        String isAutoIncremented = resultSet.getString(23);
+        String isGenerated = resultSet.getString(24);
+
+        columnsList.add(new ColumnNameWithMetaData(columnName, dataType, typeName, ordinalPosition,
+            isNullable, isAutoIncremented, isGenerated));
       }
       return columnsList;
     }
@@ -250,14 +259,14 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
 
   @Override
-  public List<Column> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
+  public List<ColumnName> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
       throws SQLException {
-    final List<Column> primaryKeysList = new ArrayList<>();
+    final List<ColumnName> primaryKeysList = new ArrayList<>();
     try (ResultSet resultSet =
         metaData.getPrimaryKeys(null, getSchemaPattern(metaData), tableName)) {
       while (resultSet.next()) {
         final String columnName = resultSet.getString(4);
-        primaryKeysList.add(new Column(columnName));
+        primaryKeysList.add(new ColumnName(columnName));
       }
       return primaryKeysList;
     }
@@ -282,9 +291,9 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
    * @return
    */
 
-  protected List<Column> guessColumnNameCandidates(FieldName fieldName) {
+  protected List<ColumnName> guessColumnNameCandidates(FieldName fieldName) {
     final String _fieldName = fieldName.getName();
-    return Stream.of(toCanonical(_fieldName)).map(Column::new).collect(Collectors.toList());
+    return Stream.of(toCanonical(_fieldName)).map(ColumnName::new).collect(Collectors.toList());
   }
 
 

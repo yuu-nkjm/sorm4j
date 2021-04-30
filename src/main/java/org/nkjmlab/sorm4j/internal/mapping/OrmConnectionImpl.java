@@ -26,6 +26,7 @@ import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
@@ -592,19 +593,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T readByPrimaryKeyOf(T object) {
-    if (object == null) {
-      return null;
-    }
-    @SuppressWarnings("unchecked")
-    Class<T> objectClass = (Class<T>) object.getClass();
-    final TableMapping<T> mapping = getTableMapping(objectClass);
-    return readByPrimaryKey(objectClass, mapping.getReadPrimaryKeyParameters(object));
-  }
-
-
-
-  @Override
   public <T> T readFirst(Class<T> objectClass, ParameterizedSql sql) {
     return readFirst(objectClass, sql.getSql(), sql.getParameters());
   }
@@ -849,6 +837,16 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
+  }
+
+  @Override
+  public TableMetaData getTableMetaData(Class<?> objectClass) {
+    return getTableMapping(objectClass).getTableMetaData();
+  }
+
+  @Override
+  public TableMetaData getTableMetaData(Class<?> objectClass, String tableName) {
+    return mappings.getTableMapping(connection, tableName, objectClass).getTableMetaData();
   }
 
 

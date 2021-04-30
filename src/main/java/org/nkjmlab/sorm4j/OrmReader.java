@@ -48,16 +48,6 @@ public interface OrmReader {
   <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
 
   /**
-   *
-   * @param <T>
-   * @param object
-   * @return
-   */
-  @Experimental
-  <T> T readByPrimaryKeyOf(T object);
-
-
-  /**
    * Reads an object from the database.
    *
    * @param <T>
@@ -147,36 +137,22 @@ public interface OrmReader {
 
 
   /**
-   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
+   * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
    *
    * @param <T1>
    * @param <T2>
+   * @param <T3>
    * @param t1
    * @param t2
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
-      Object... parameters);
-
-  /**
-   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
-   *
-   * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
-   * @param <T1>
-   * @param <T2>
-   * @param t1
-   * @param t2
+   * @param t3
    * @param sql
    * @return
    */
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      ParameterizedSql sql);
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
@@ -197,22 +173,36 @@ public interface OrmReader {
       String sql, Object... parameters);
 
   /**
-   * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
    *
    * @param <T1>
    * @param <T2>
-   * @param <T3>
    * @param t1
    * @param t2
-   * @param t3
    * @param sql
    * @return
    */
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      ParameterizedSql sql);
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
+
+  /**
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
+   *
+   * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
+   *
+   * @param <T1>
+   * @param <T2>
+   * @param t1
+   * @param t2
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters);
 
 
 }

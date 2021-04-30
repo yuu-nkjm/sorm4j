@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 @Experimental
-public abstract class TableSchema {
+public class TableSchema {
 
   private final String name;
   private final Map<String, String[]> columnDefinitions;
@@ -36,7 +36,7 @@ public abstract class TableSchema {
    * @param columnName
    * @param dataTypeAndOptions
    */
-  protected void addColumnDefinition(String columnName, String... dataTypeAndOptions) {
+  public void addColumnDefinition(String columnName, String... dataTypeAndOptions) {
     columnDefinitions.put(columnName, dataTypeAndOptions);
   }
 
@@ -52,7 +52,7 @@ public abstract class TableSchema {
    *
    * @param uniqueColumnPair
    */
-  protected void addUniqueConstraint(String... uniqueColumnPair) {
+  public void addUniqueConstraint(String... uniqueColumnPair) {
     uniqueColumnPairs.add(uniqueColumnPair);
   }
 
@@ -75,7 +75,7 @@ public abstract class TableSchema {
   }
 
   public String getIndexSchema(String... columns) {
-    final String indexName = "index_" + name + "_" + String.join("_", columns);
+    final String indexName = "index_" + name + "_" + join("_", columns);
     return createIndexOn(indexName, name, columns);
   }
 
@@ -91,7 +91,7 @@ public abstract class TableSchema {
    *
    * @param attributes
    */
-  protected void setPrimaryKey(String... attributes) {
+  public void setPrimaryKey(String... attributes) {
     this.primaryKeys = attributes;
   }
 
@@ -124,7 +124,7 @@ public abstract class TableSchema {
 
   private static String getTableSchema(String tableName, Map<String, String[]> columns,
       String[] primaryKeys, List<String[]> uniqueColumnPairs) {
-    String schema = tableName + "(" + String.join(", ", getColumuns(columns))
+    String schema = tableName + "(" + join(", ", getColumuns(columns))
         + createPrimaryKeyConstraint(primaryKeys) + createUniqueConstraint(uniqueColumnPairs) + ")";
     return schema;
   }
@@ -133,7 +133,7 @@ public abstract class TableSchema {
 
   private static List<String> getColumuns(Map<String, String[]> columnDefinisions) {
     return columnDefinisions.keySet().stream()
-        .map(columnName -> columnName + " " + String.join(" ", columnDefinisions.get(columnName)))
+        .map(columnName -> columnName + " " + join(" ", columnDefinisions.get(columnName)))
         .collect(Collectors.toList());
   }
 

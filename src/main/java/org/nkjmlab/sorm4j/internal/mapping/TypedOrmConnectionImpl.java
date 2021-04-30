@@ -284,11 +284,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public T readByPrimaryKeyOf(T object) {
-    return conn.readByPrimaryKey(objectClass, object);
-  }
-
-  @Override
   public T readFirst(ParameterizedSql sql) {
     return conn.readFirst(objectClass, sql);
   }
