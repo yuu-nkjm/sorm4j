@@ -30,6 +30,10 @@ public class TableSqlFactory {
     String selectByPrimaryKeySql =
         selectAllSql + " " + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
 
+    String existsSql = "select 1 from " + tableName
+        + createWhereClauseIdentifyByPrimaryKeys(primaryKeys) + " limit 1";
+
+
     String updateSql =
         "update " + tableName + createUpdateSetClause(tableMetaData.getNotPrimaryKeys())
             + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
@@ -37,7 +41,7 @@ public class TableSqlFactory {
         "delete from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
 
     return new TableSql(insertOrMergePlaceholders, selectByPrimaryKeySql, selectAllSql, insertSql,
-        updateSql, deleteSql, mergeSql, insertSqlPrefix, mergeSqlPrefix);
+        updateSql, deleteSql, mergeSql, existsSql, insertSqlPrefix, mergeSqlPrefix);
   }
 
   private static String toColumList(List<String> columns) {

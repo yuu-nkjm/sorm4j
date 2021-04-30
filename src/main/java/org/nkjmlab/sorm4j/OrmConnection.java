@@ -22,4 +22,5 @@ public interface OrmConnection extends OrmReader, OrmUpdater, MetaDataHandler, O
   <T> TypedOrmConnection<T> type(Class<T> objectClass);
 
 
+
 }

@@ -22,12 +22,13 @@ public final class TableSql {
   private final String updateSql;
   private final String deleteSql;
   private final String mergeSql;
+  private final String existsSql;
   private final String insertSqlPrefix;
   private final String mergeSqlPrefix;
 
   public TableSql(String insertOrMergePlaceholders, String selectByPrimaryKeySql,
       String selectAllSql, String insertSql, String updateSql, String deleteSql, String mergeSql,
-      String insertSqlPrefix, String mergeSqlPrefix) {
+      String existsSql, String insertSqlPrefix, String mergeSqlPrefix) {
     this.insertOrMergePlaceholders = insertOrMergePlaceholders;
     this.selectByPrimaryKeySql = selectByPrimaryKeySql;
     this.selectAllSql = selectAllSql;
@@ -35,6 +36,7 @@ public final class TableSql {
     this.updateSql = updateSql;
     this.deleteSql = deleteSql;
     this.mergeSql = mergeSql;
+    this.existsSql = existsSql;
     this.insertSqlPrefix = insertSqlPrefix;
     this.mergeSqlPrefix = mergeSqlPrefix;
   }
@@ -79,6 +81,10 @@ public final class TableSql {
 
   public String getUpdateSql() {
     return updateSql;
+  }
+
+  public String getExistsSql() {
+    return existsSql;
   }
 
 }

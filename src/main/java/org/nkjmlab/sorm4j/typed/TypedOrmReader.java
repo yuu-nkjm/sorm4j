@@ -126,4 +126,12 @@ public interface TypedOrmReader<T> {
    */
   List<T> mapRowList(ResultSet resultSet);
 
+  /**
+   * Returns the object which has same primary key exists or not.
+   *
+   * @param object
+   * @return
+   */
+  boolean exists(T object);
+
 }

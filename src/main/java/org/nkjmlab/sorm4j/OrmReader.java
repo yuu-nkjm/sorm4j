@@ -214,4 +214,13 @@ public interface OrmReader {
    * @return
    */
   <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet);
+
+  /**
+   * Returns the object which has same primary key exists or not.
+   *
+   * @param object
+   * @return
+   */
+  <T> boolean exists(T object);
+
 }

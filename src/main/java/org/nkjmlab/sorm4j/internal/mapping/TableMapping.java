@@ -65,7 +65,7 @@ public final class TableMapping<T> extends Mapping<T> {
     return sql;
   }
 
-  public Object[] getReadPrimaryKeyParameters(T object) {
+  public Object[] getPrimaryKeyParameters(T object) {
     return getParameters(object, tableMetaData.getPrimaryKeys());
   }
 

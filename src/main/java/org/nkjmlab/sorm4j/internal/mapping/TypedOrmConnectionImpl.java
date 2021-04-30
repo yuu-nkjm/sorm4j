@@ -31,12 +31,24 @@ import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
-  protected Class<T> objectClass;
   protected OrmConnectionImpl conn;
+  protected Class<T> objectClass;
 
   public TypedOrmConnectionImpl(Class<T> objectClass, OrmConnectionImpl ormMapper) {
     this.conn = ormMapper;
     this.objectClass = objectClass;
+  }
+
+  @Override
+  public void acceptPreparedStatementHandler(ParameterizedSql sql,
+      ConsumerHandler<PreparedStatement> handler) {
+    conn.acceptPreparedStatementHandler(sql, handler);
+  }
+
+  @Override
+  public <S> S applyPreparedStatementHandler(ParameterizedSql sql,
+      FunctionHandler<PreparedStatement, S> handler) {
+    return conn.applyPreparedStatementHandler(sql, handler);
   }
 
   @Override
@@ -49,10 +61,14 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     conn.begin(transactionIsolationLevel);
   }
 
+
+
   @Override
   public void close() {
     conn.close();
   }
+
+
 
   @Override
   public void commit() {
@@ -60,12 +76,28 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
 
+  @Override
+  public BasicCommand createCommand(String sql) {
+    return BasicCommand.from(conn, sql);
+  }
+
+
+  @Override
+  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
+    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+  }
+
+
+  @Override
+  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
+    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+  }
+
 
   @Override
   public int[] delete(List<T> objects) {
     return conn.delete(objects);
   }
-
 
 
   @Override
@@ -79,11 +111,11 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.delete(objects);
   }
 
-
   @Override
   public int deleteAll() {
     return conn.deleteAll(objectClass);
   }
+
 
 
   @Override
@@ -97,12 +129,10 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.deleteOn(tableName, objects);
   }
 
-
   @Override
   public int deleteOn(String tableName, T object) {
     return conn.deleteOn(tableName, object);
   }
-
 
   @Override
   public int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
@@ -113,8 +143,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   public <S> S executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, S> resultSetHandler) {
     return conn.executeQuery(sql, resultSetHandler);
   }
-
-
 
   @Override
   public <S> List<S> executeQuery(ParameterizedSql sql, RowMapper<S> rowMapper) {
@@ -127,20 +155,43 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.executeUpdate(sql);
   }
 
+
   @Override
   public int executeUpdate(String sql, Object... parameters) {
     return conn.executeUpdate(sql, parameters);
   }
+
+
+  @Override
+  public boolean exists(T object) {
+    return conn.exists(object);
+  }
+
+
 
   @Override
   public Connection getJdbcConnection() {
     return conn.getJdbcConnection();
   }
 
+
+  @Override
+  public TableMetaData getTableMetaData() {
+    return conn.getTableMetaData(objectClass);
+  }
+
+
+  @Override
+  public TableMetaData getTableMetaData(String tableName) {
+    return conn.getTableMetaData(objectClass, tableName);
+  }
+
+
   @Override
   public String getTableName() {
     return conn.getTableName(objectClass);
   }
+
 
   @Override
   public int[] insert(List<T> objects) {
@@ -165,31 +216,25 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.insertAndGet(objects);
   }
 
-
-
   @Override
   public InsertResult<T> insertAndGet(T object) {
     return conn.insertAndGet(object);
   }
-
 
   @Override
   public InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return conn.insertAndGet(objects);
   }
 
-
   @Override
   public InsertResult<T> insertAndGetOn(String tableName, List<T> objects) {
     return conn.insertAndGetOn(tableName, objects);
   }
 
-
   @Override
   public InsertResult<T> insertAndGetOn(String tableName, T object) {
     return conn.insertAndGetOn(tableName, object);
   }
-
 
   @Override
   public InsertResult<T> insertAndGetOn(String tableName,
@@ -197,18 +242,15 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.insertAndGetOn(tableName, objects);
   }
 
-
   @Override
   public int[] insertOn(String tableName, List<T> objects) {
     return conn.insertOn(tableName, objects);
   }
 
-
   @Override
   public int insertOn(String tableName, T object) {
     return conn.insertOn(tableName, object);
   }
-
 
   @Override
   public int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
@@ -385,6 +427,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.update(objects);
   }
 
+
   @Override
   public int[] updateOn(String tableName, List<T> objects) {
     return conn.updateOn(tableName, objects);
@@ -398,44 +441,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.updateOn(tableName, objects);
-  }
-
-  @Override
-  public <S> S applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, S> handler) {
-    return conn.applyPreparedStatementHandler(sql, handler);
-  }
-
-  @Override
-  public void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler) {
-    conn.acceptPreparedStatementHandler(sql, handler);
-  }
-
-  @Override
-  public BasicCommand createCommand(String sql) {
-    return BasicCommand.from(conn, sql);
-  }
-
-  @Override
-  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
-  }
-
-  @Override
-  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
-  }
-
-
-  @Override
-  public TableMetaData getTableMetaData() {
-    return conn.getTableMetaData(objectClass);
-  }
-
-  @Override
-  public TableMetaData getTableMetaData(String tableName) {
-    return conn.getTableMetaData(objectClass, tableName);
   }
 
 

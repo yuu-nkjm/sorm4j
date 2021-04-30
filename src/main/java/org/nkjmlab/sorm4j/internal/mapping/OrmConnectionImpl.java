@@ -859,4 +859,12 @@ public class OrmConnectionImpl implements OrmConnection {
     return mappings.getTableMapping(connection, tableName, objectClass).getTableMetaData();
   }
 
+  @Override
+  public <T> boolean exists(T object) {
+    final TableMapping<T> mapping = getCastedTableMapping(object.getClass());
+    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    final String sql = mapping.getSql().getExistsSql();
+    return readFirst(Integer.class, sql, mapping.getPrimaryKeyParameters(object)) != null;
+  }
+
 }
