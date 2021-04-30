@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
@@ -48,16 +47,22 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
   private static final String EMBEDDED_PLACEHOLDER = "{?}";
   private static final String LIST_PLACEHOLDER = "<?>";
 
+  public static ParameterizedSql of(String sql, Object... parameters) {
+    return new ParameterizedSqlImpl(sql, parameters);
+  }
+
   public static ParameterizedSql parse(String sql, Object... parameters) {
-    ParameterizedSql st = new ParameterizedSqlImpl(sql, parameters);
     if (parameters.length == 0) {
-      return st;
+      return new ParameterizedSqlImpl(sql, parameters);
     }
-    st = sql.contains(LIST_PLACEHOLDER) ? parseListPlaceholder(sql, parameters) : st;
-    st = sql.contains(EMBEDDED_PLACEHOLDER)
-        ? parseEmbeddedPlaceholder(st.getSql(), st.getParameters())
-        : st;
-    return st;
+
+    ParameterizedSql embeddedSql =
+        sql.contains(EMBEDDED_PLACEHOLDER) ? parseEmbeddedPlaceholder(sql, parameters)
+            : new ParameterizedSqlImpl(sql, parameters);
+
+    return sql.contains(LIST_PLACEHOLDER)
+        ? parseListPlaceholder(embeddedSql.getSql(), embeddedSql.getParameters())
+        : embeddedSql;
   }
 
 
@@ -116,7 +121,8 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     }
     String _sql =
         StringUtils.replacePlaceholder(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
-            index -> SqlUtils.literal(parameters[specialParameterIndexes.get(index)]));
+            index -> parameters[specialParameterIndexes.get(index)] == null ? "null"
+                : parameters[specialParameterIndexes.get(index)].toString());
 
     return new ParameterizedSqlImpl(_sql, removedEmbeddedParams.toArray());
   }

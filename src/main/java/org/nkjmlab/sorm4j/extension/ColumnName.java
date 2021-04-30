@@ -8,16 +8,16 @@ import java.util.Objects;
  * @author nkjm
  *
  */
-public class Column implements Comparable<Column> {
+public class ColumnName implements Comparable<ColumnName> {
 
   private final String name;
 
-  public Column(String name) {
+  public ColumnName(String name) {
     this.name = name;
   }
 
   @Override
-  public int compareTo(Column o) {
+  public int compareTo(ColumnName o) {
     return name.compareTo(o.name);
   }
 
@@ -25,9 +25,9 @@ public class Column implements Comparable<Column> {
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (!(obj instanceof Column))
+    if (!(obj instanceof ColumnName))
       return false;
-    Column other = (Column) obj;
+    ColumnName other = (ColumnName) obj;
     return Objects.equals(name, other.name);
   }
 

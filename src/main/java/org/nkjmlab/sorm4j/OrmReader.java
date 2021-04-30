@@ -1,15 +1,16 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.result.Tuple2;
+import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 /**
  * The interface of reading functions of object-relation mapping.
@@ -46,16 +47,6 @@ public interface OrmReader {
    * @return
    */
   <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
-
-  /**
-   *
-   * @param <T>
-   * @param object
-   * @return
-   */
-  @Experimental
-  <T> T readByPrimaryKeyOf(T object);
-
 
   /**
    * Reads an object from the database.
@@ -147,36 +138,22 @@ public interface OrmReader {
 
 
   /**
-   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
+   * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
    *
    * @param <T1>
    * @param <T2>
+   * @param <T3>
    * @param t1
    * @param t2
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
-      Object... parameters);
-
-  /**
-   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
-   *
-   * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
-   * @param <T1>
-   * @param <T2>
-   * @param t1
-   * @param t2
+   * @param t3
    * @param sql
    * @return
    */
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      ParameterizedSql sql);
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
@@ -197,22 +174,53 @@ public interface OrmReader {
       String sql, Object... parameters);
 
   /**
-   * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
    *
    * @param <T1>
    * @param <T2>
-   * @param <T3>
    * @param t1
    * @param t2
-   * @param t3
    * @param sql
    * @return
    */
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      ParameterizedSql sql);
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
 
+  /**
+   * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
+   *
+   * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
+   *
+   * @param <T1>
+   * @param <T2>
+   * @param t1
+   * @param t2
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters);
+
+  /**
+   * Maps the all rows in the given resultSet to an object list.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param resultSet
+   * @return
+   */
+  <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet);
+
+  /**
+   * Returns the object which has same primary key exists or not.
+   *
+   * @param object
+   * @return
+   */
+  <T> boolean exists(T object);
 
 }

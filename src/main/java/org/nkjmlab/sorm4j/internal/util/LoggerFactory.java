@@ -12,12 +12,10 @@ public final class LoggerFactory {
 
 
   private static boolean isEnableSlf4j() {
-    try {
+    return Try.getOrDefault(() -> {
       Class.forName("org.slf4j.Logger");
       return true;
-    } catch (ClassNotFoundException e1) {
-      return false;
-    }
+    }, false);
   }
 
   /**

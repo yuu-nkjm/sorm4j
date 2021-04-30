@@ -8,11 +8,11 @@ import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.RowMapper;
-import org.nkjmlab.sorm4j.sql.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.helper.Command;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple2;
-import org.nkjmlab.sorm4j.sql.tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.result.Tuple2;
+import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 public abstract class AbstractCommand implements Command {
 

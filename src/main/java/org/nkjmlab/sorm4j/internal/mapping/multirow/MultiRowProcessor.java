@@ -98,7 +98,7 @@ public abstract class MultiRowProcessor<T> {
     dp.ifPresent(lp -> lp.debug(getClass(),
         "{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
         lp.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
-        tableMapping.getObjectClass(), tableMapping.getTableName(),
+        tableMapping.getObjectClass(), tableMapping.getTableMetaData().getTableName(),
         Try.getOrNull(() -> con.getMetaData().getURL())));
     return result;
   }

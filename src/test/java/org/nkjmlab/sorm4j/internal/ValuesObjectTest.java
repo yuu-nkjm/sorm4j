@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.Column;
+import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
@@ -36,8 +36,8 @@ class ValuesObjectTest {
 
   @Test
   void testColumn() {
-    Column v1 = new Column("test");
-    Column v2 = new Column("test");
+    ColumnName v1 = new ColumnName("test");
+    ColumnName v2 = new ColumnName("test");
     verify(v1, v2);
 
   }

@@ -1,10 +1,11 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Map;
-import org.nkjmlab.sorm4j.internal.sql.AbstractCommand;
+import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
+import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.helper.OrderedParameterCommand;
 
 public class BasicCommandImpl extends AbstractCommand implements BasicCommand {
 
@@ -42,7 +43,7 @@ public class BasicCommandImpl extends AbstractCommand implements BasicCommand {
 
   @Override
   protected ParameterizedSql parse() {
-    return ParameterizedSql.from(sql);
+    return ParameterizedSql.of(sql);
   }
 
 

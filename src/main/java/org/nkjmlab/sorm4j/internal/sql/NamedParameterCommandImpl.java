@@ -2,9 +2,9 @@ package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.helper.NamedParameterCommand;
 
 public class NamedParameterCommandImpl extends AbstractCommand implements NamedParameterCommand {
 

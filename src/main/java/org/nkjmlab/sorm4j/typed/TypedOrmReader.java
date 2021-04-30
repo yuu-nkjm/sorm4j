@@ -1,12 +1,12 @@
 package org.nkjmlab.sorm4j.typed;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.sql.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 
 /**
  * The typed interface of reading functions of object-relation mapping.
@@ -39,13 +39,6 @@ public interface TypedOrmReader<T> {
    */
   T readByPrimaryKey(Object... primaryKeyValues);
 
-  /**
-   *
-   * @param object
-   * @return
-   */
-  @Experimental
-  T readByPrimaryKeyOf(T object);
 
   /**
    * Reads an object from the database.
@@ -124,5 +117,21 @@ public interface TypedOrmReader<T> {
    * @return
    */
   T readOne(String sql, Object... parameters);
+
+  /**
+   * Maps the all rows in the given resultSet to an object list.
+   *
+   * @param resultSet
+   * @return
+   */
+  List<T> mapRowList(ResultSet resultSet);
+
+  /**
+   * Returns the object which has same primary key exists or not.
+   *
+   * @param object
+   * @return
+   */
+  boolean exists(T object);
 
 }

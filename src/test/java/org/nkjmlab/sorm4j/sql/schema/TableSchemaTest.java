@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql.schema;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.sql.schema.TableSchema.TableSchemaKeyword.*;
+import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
 import org.junit.jupiter.api.Test;
 
 class TableSchemaTest {
@@ -20,6 +20,7 @@ class TableSchemaTest {
       addColumnDefinition(NAME, VARCHAR);
       addColumnDefinition(TEL, VARCHAR);
       addUniqueConstraint(TEL);
+      addIndexColumn(TEL);
       setPrimaryKey(ID);
     }
 
@@ -34,7 +35,7 @@ class TableSchemaTest {
 
   @Test
   void testGetName() {
-    assertThat(guestTable.getName()).isEqualToIgnoringCase("guests");
+    assertThat(guestTable.getTableName()).isEqualToIgnoringCase("guests");
   }
 
   @Test
@@ -45,7 +46,7 @@ class TableSchemaTest {
 
   @Test
   void testGetIndexSchema() {
-    assertThat(guestTable.getIndexSchema(GuestTable.TEL))
+    assertThat(guestTable.getCreateIndexStatements().get(0))
         .isEqualToIgnoringCase("CREATE INDEX IF NOT EXISTS index_guests_tel ON guests(tel)");
   }
 

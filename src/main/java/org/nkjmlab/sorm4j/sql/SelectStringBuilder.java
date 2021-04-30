@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql.helper;
+package org.nkjmlab.sorm4j.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

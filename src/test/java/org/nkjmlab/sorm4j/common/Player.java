@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 
 @OrmTable("PLAYERS")
-@OrmColumnAliasPrefix("P")
+@OrmColumnAliasPrefix("p")
 public class Player {
 
   private int id;

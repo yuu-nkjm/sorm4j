@@ -292,8 +292,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     final int colNum = metaData.getColumnCount();
     final List<String> columns = new ArrayList<>(colNum);
     for (int i = 1; i <= colNum; i++) {
-      final String colLabel = metaData.getColumnLabel(i);
-      columns.add(colLabel);
+      columns.add(metaData.getColumnLabel(i));
     }
     return columns;
   }

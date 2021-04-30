@@ -17,7 +17,7 @@ public final class ColumnToAccessorMap {
   private final String columnAliasPrefix;
 
   /**
-   * Column map to accessor. A key converted to a canonical name.
+   * ColumnName map to accessor. A key converted to a canonical name.
    *
    * @param columnToAccessorMap
    */
@@ -51,7 +51,7 @@ public final class ColumnToAccessorMap {
   }
 
   /**
-   * Gets the accessor of the given columnName. Column name is regarded as canonical name.
+   * Gets the accessor of the given columnName. ColumnName name is regarded as canonical name.
    *
    * @param columnName
    * @return

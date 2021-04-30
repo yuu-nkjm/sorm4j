@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.sql.helper.SelectStringBuilder;
+import org.nkjmlab.sorm4j.sql.SelectStringBuilder;
 
 /**
  * An builder of select SQL.
