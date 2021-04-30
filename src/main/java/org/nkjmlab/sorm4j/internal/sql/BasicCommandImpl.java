@@ -43,7 +43,7 @@ public class BasicCommandImpl extends AbstractCommand implements BasicCommand {
 
   @Override
   protected ParameterizedSql parse() {
-    return ParameterizedSql.from(sql);
+    return ParameterizedSql.of(sql);
   }
 
 
