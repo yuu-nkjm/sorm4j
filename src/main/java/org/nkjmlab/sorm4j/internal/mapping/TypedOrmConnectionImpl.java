@@ -8,6 +8,7 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
@@ -140,8 +141,8 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public <S> S executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, S> resultSetHandler) {
-    return conn.executeQuery(sql, resultSetHandler);
+  public <S> S executeQuery(ParameterizedSql sql, ResultSetTraverser<S> resultSetTraverser) {
+    return conn.executeQuery(sql, resultSetTraverser);
   }
 
   @Override
@@ -176,6 +177,18 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
 
   @Override
+  public ResultSetTraverser<List<T>> getResultSetTraverser() {
+    return conn.getResultSetTraverser(objectClass);
+  }
+
+
+  @Override
+  public RowMapper<T> getRowMapper() {
+    return conn.getRowMapper(objectClass);
+  }
+
+
+  @Override
   public TableMetaData getTableMetaData() {
     return conn.getTableMetaData(objectClass);
   }
@@ -204,12 +217,10 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.insert(object);
   }
 
-
   @Override
   public int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return conn.insert(objects);
   }
-
 
   @Override
   public InsertResult<T> insertAndGet(List<T> objects) {
@@ -258,13 +269,8 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public List<T> mapRowList(ResultSet resultSet) {
-    return conn.mapRowList(objectClass, resultSet);
-  }
-
-  @Override
-  public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return conn.mapRowsToMapList(resultSet);
+  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
+    return conn.mapRowToMap(resultSet);
   }
 
   @Override
@@ -403,6 +409,11 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
+  public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
+    return conn.traverseAndMapToMapList(resultSet);
+  }
+
+  @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
     return new TypedOrmConnectionImpl<>(objectClass, conn);
   }
@@ -417,6 +428,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.update(objects);
   }
 
+
   @Override
   public int update(T object) {
     return conn.update(object);
@@ -426,7 +438,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   public int[] update(@SuppressWarnings("unchecked") T... objects) {
     return conn.update(objects);
   }
-
 
   @Override
   public int[] updateOn(String tableName, List<T> objects) {
@@ -442,7 +453,5 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   public int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.updateOn(tableName, objects);
   }
-
-
 
 }

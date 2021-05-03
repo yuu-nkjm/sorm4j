@@ -13,6 +13,7 @@ import java.util.Spliterators;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
@@ -83,7 +84,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   public List<T> toList() {
     @SuppressWarnings("unchecked")
     List<T> ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS)
-        ? (List<T>) Try.getOrThrow(() -> ormMapper.mapRowsToMapList(resultSet), Try::rethrow)
+        ? (List<T>) Try.getOrThrow(() -> ormMapper.traverseAndMapToMapList(resultSet), Try::rethrow)
         : ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
@@ -91,7 +92,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrThrow(() -> RowMapper.convertToRowListMapper(rowMapper).apply(resultSet),
+    List<T> ret = Try.getOrThrow(() -> ResultSetTraverser.from(rowMapper).traverseAndMap(resultSet),
         Try::rethrow);
     close();
     return ret;
@@ -143,7 +144,7 @@ final class LazyResultSetImpl<T> implements LazyResultSet<T> {
         PreparedStatement stmt, ResultSet resultSet) {
       this.nextSupplier = objectClass.equals(MAP_CLASS)
           ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowToMap(resultSet), Try::rethrow)
-          : Try.createSupplierWithThrow(() -> ormMapper.mapRow(objectClass, resultSet),
+          : Try.createSupplierWithThrow(() -> ormMapper.mapRowToObject(objectClass, resultSet),
               Try::rethrow);
     }
 

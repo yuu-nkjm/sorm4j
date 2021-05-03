@@ -36,6 +36,4 @@ public interface OrmCommonFunction
    */
   NamedParameterCommand createCommand(String sql, Map<String, Object> parameters);
 
-
-
 }

@@ -130,7 +130,7 @@ class OrmConnectionTest {
 
 
     var ret = sorm.apply(conn -> conn.createCommand("select * from players where id=:id")
-        .bind("id", id.get()).executeQuery(rs -> conn.mapRowList(Player.class, rs)));
+        .bind("id", id.get()).executeQuery(rs -> conn.traverseAndMapToList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
   }

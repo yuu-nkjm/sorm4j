@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
@@ -55,7 +56,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   static <R> R executeQueryAndRead(SormOptions options, Connection connection,
       SqlParametersSetter sqlParametersSetter, String sql, Object[] parameters,
-      FunctionHandler<ResultSet, R> resultSetHandler) {
+      ResultSetTraverser<R> resultSetTraverser) {
     final Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.EXECUTE_QUERY);
     dp.ifPresent(lp -> {
       lp.debug(OrmConnectionImpl.class, "[{}] [{}] with {} parameters", lp.getTag(), sql,
@@ -66,7 +67,7 @@ public class OrmConnectionImpl implements OrmConnection {
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
       try (ResultSet resultSet = stmt.executeQuery()) {
-        R ret = resultSetHandler.apply(resultSet);
+        R ret = resultSetTraverser.traverseAndMap(resultSet);
         dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} Read [{}] objects from [{}]",
             lp.getTagAndElapsedTime(), ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
             Try.getOrNull(() -> connection.getMetaData().getURL())));
@@ -278,14 +279,14 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> T executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, T> resultSetHandler) {
+  public <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> resultSetTraverser) {
     return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter,
-        sql.getSql(), sql.getParameters(), resultSetHandler);
+        sql.getSql(), sql.getParameters(), resultSetTraverser);
   }
 
   @Override
   public <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper) {
-    return executeQuery(sql, RowMapper.convertToRowListMapper(rowMapper));
+    return executeQuery(sql, ResultSetTraverser.from(rowMapper));
   }
 
   @Override
@@ -423,7 +424,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     if (resultSet.next()) {
-      return mapRow(objectClass, resultSet);
+      return mapRowToObject(objectClass, resultSet);
     }
     return null;
   }
@@ -465,7 +466,7 @@ public class OrmConnectionImpl implements OrmConnection {
   <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     T ret = null;
     if (resultSet.next()) {
-      ret = mapRow(objectClass, resultSet);
+      ret = mapRowToObject(objectClass, resultSet);
     }
     if (resultSet.next()) {
       throw new SormException("Non-unique result returned");
@@ -506,7 +507,7 @@ public class OrmConnectionImpl implements OrmConnection {
         Try::rethrow);
   }
 
-  public <T> T mapRow(Class<T> objectClass, ResultSet resultSet) {
+  public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) {
     return Try
         .getOrThrow(() -> resultSetConverter.isStandardClass(mappings.getOptions(), objectClass)
             ? resultSetConverter.toSingleStandardObject(mappings.getOptions(), resultSet,
@@ -515,17 +516,26 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-
-  @Override
-  public <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet) {
+  public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     return Try
         .getOrThrow(() -> resultSetConverter.isStandardClass(mappings.getOptions(), objectClass)
             ? loadNativeObjectList(objectClass, resultSet)
             : loadPojoList(objectClass, resultSet), Try::rethrow);
   }
 
+
   @Override
-  public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
+  public <T> RowMapper<T> getRowMapper(Class<T> objectClass) {
+    return (resultSet, rowNum) -> mapRowToObject(objectClass, resultSet);
+  }
+
+  @Override
+  public <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> objectClass) {
+    return resultSet -> traverseAndMapToList(objectClass, resultSet);
+  }
+
+  @Override
+  public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       final List<Map<String, Object>> ret = new ArrayList<>();
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
@@ -538,6 +548,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
+  @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
@@ -645,7 +656,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
     return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
-        parameters, resultSet -> mapRowList(objectClass, resultSet));
+        parameters, resultSet -> traverseAndMapToList(objectClass, resultSet));
   }
 
   @Override
@@ -705,7 +716,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
     return executeQueryAndRead(mappings.getOptions(), getJdbcConnection(), sqlParametersSetter, sql,
-        parameters, resultSet -> mapRowsToMapList(resultSet));
+        parameters, resultSet -> traverseAndMapToMapList(resultSet));
   }
 
   @Override
@@ -741,7 +752,7 @@ public class OrmConnectionImpl implements OrmConnection {
         parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
-            ret = mapRow(objectClass, resultSet);
+            ret = mapRowToObject(objectClass, resultSet);
           }
           if (resultSet.next()) {
             throw new SormException("Non-unique result returned");

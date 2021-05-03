@@ -19,12 +19,20 @@ import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
  */
 public interface OrmMapReader {
   /**
-   * Maps the all rows in the given resultSet to a map list.
+   * Maps one row in the resultSet to an object. The method does not call {@link ResultSet#next()}.
    *
    * @param resultSet
    * @return
    */
-  List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet);
+  Map<String, Object> mapRowToMap(ResultSet resultSet);
+
+  /**
+   * Traverses and maps the all the rows in the given resultSet to an map list.
+   *
+   * @param resultSet
+   * @return
+   */
+  List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet);
 
   /**
    * See {@link OrmMapReader#readMapFirst(String, Object...)}

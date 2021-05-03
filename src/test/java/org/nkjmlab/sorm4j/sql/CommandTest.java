@@ -47,7 +47,7 @@ class CommandTest {
     sorm.accept(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       Player p = conn.createCommand("select * from players where id=?", 1)
-          .executeQuery(rs -> conn.mapRowList(Player.class, rs)).get(0);
+          .executeQuery(rs -> conn.traverseAndMapToList(Player.class, rs)).get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -194,7 +194,7 @@ class CommandTest {
 
     List<Player> ret =
         sorm.apply(conn -> conn.createCommand("select * from players where id=? and name=?")
-            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRowList(Player.class, rs)));
+            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.traverseAndMapToList(Player.class, rs)));
 
     assertThat(ret.size()).isEqualTo(1);
 

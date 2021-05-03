@@ -3,6 +3,8 @@ package org.nkjmlab.sorm4j.typed;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
+import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -119,12 +121,25 @@ public interface TypedOrmReader<T> {
   T readOne(String sql, Object... parameters);
 
   /**
-   * Maps the all rows in the given resultSet to an object list.
+   * Gets a function which maps one row in the resultSet to an object. The method does not call
+   * {@link ResultSet#next()}.
    *
-   * @param resultSet
+   * @param <T>
+   * @param objectClass
    * @return
    */
-  List<T> mapRowList(ResultSet resultSet);
+  RowMapper<T> getRowMapper();
+
+  /**
+   * Gets function which traverses and maps the all the rows in the given resultSet to an object
+   * list.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
+  ResultSetTraverser<List<T>> getResultSetTraverser();
+
 
   /**
    * Returns the object which has same primary key exists or not.

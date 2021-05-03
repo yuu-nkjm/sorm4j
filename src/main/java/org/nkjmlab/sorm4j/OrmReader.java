@@ -206,14 +206,26 @@ public interface OrmReader {
       Object... parameters);
 
   /**
-   * Maps the all rows in the given resultSet to an object list.
+   * Gets a function which maps one row in the resultSet to an object. The method does not call
+   * {@link ResultSet#next()}.
    *
    * @param <T>
    * @param objectClass
-   * @param resultSet
    * @return
    */
-  <T> List<T> mapRowList(Class<T> objectClass, ResultSet resultSet);
+  <T> RowMapper<T> getRowMapper(Class<T> objectClass);
+
+  /**
+   * Gets function which traverses and maps the all the rows in the given resultSet to an object
+   * list.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
+  <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> objectClass);
+
+
 
   /**
    * Returns the object which has same primary key exists or not.
