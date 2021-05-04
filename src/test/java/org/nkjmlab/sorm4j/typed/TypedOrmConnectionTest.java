@@ -72,12 +72,12 @@ class TypedOrmConnectionTest {
 
     assertThat(ret1.size()).isEqualTo(2);
     ret1 = sorm.apply(conn -> conn.type(Player.class).executeQuery(
-        ParameterizedSql.of("select * from players"), rs -> conn.traverseAndMapToList(Player.class, rs)));
+        ParameterizedSql.of("select * from players"), conn.getResultSetTraverser(Player.class)));
     assertThat(ret1.size()).isEqualTo(2);
 
     List<Map<String, Object>> ret2 =
         sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-            rs -> conn.traverseAndMapToMapList(rs)));
+            conn.getResultSetToMapTraverser()));
 
     assertThat(ret2.size()).isEqualTo(2);
 

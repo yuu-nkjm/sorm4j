@@ -535,6 +535,15 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public RowMapper<Map<String, Object>> getRowToMapMapper() {
+    return (resultSet, rowNum) -> mapRowToMap(resultSet);
+  }
+
+  @Override
+  public ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
+    return resultSet -> traverseAndMapToMapList(resultSet);
+  }
+
   public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       final List<Map<String, Object>> ret = new ArrayList<>();
@@ -548,7 +557,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  @Override
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);

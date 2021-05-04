@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
@@ -177,18 +176,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
 
   @Override
-  public ResultSetTraverser<List<T>> getResultSetTraverser() {
-    return conn.getResultSetTraverser(objectClass);
-  }
-
-
-  @Override
-  public RowMapper<T> getRowMapper() {
-    return conn.getRowMapper(objectClass);
-  }
-
-
-  @Override
   public TableMetaData getTableMetaData() {
     return conn.getTableMetaData(objectClass);
   }
@@ -266,11 +253,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.insertOn(tableName, objects);
-  }
-
-  @Override
-  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return conn.mapRowToMap(resultSet);
   }
 
   @Override
@@ -409,11 +391,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
-    return conn.traverseAndMapToMapList(resultSet);
-  }
-
-  @Override
   public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
     return new TypedOrmConnectionImpl<>(objectClass, conn);
   }
@@ -452,6 +429,26 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.updateOn(tableName, objects);
+  }
+
+  @Override
+  public RowMapper<Map<String, Object>> getRowToMapMapper() {
+    return conn.getRowToMapMapper();
+  }
+
+  @Override
+  public ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
+    return conn.getResultSetToMapTraverser();
+  }
+
+  @Override
+  public RowMapper<T> getRowMapper() {
+    return conn.getRowMapper(objectClass);
+  }
+
+  @Override
+  public ResultSetTraverser<List<T>> getResultSetTraverser() {
+    return conn.getResultSetTraverser(objectClass);
   }
 
 }
