@@ -2,11 +2,22 @@ package org.nkjmlab.sorm4j;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public interface OrmCommonFunction
     extends OrmMapReader, SqlExecutor, TransactionFunction, AutoCloseable {
+
+
+  /**
+   * Creates a {@link Command} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  Command createCommand(ParameterizedSql sql);
 
 
   /**

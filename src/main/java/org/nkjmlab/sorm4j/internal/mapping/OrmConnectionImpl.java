@@ -26,6 +26,7 @@ import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -159,6 +160,12 @@ public class OrmConnectionImpl implements OrmConnection {
   public BasicCommand createCommand(String sql) {
     return BasicCommand.from(this, sql);
   }
+
+  @Override
+  public Command createCommand(ParameterizedSql sql) {
+    return BasicCommand.from(this, sql.getSql()).addParameter(sql.getParameters());
+  }
+
 
   @Override
   public OrderedParameterCommand createCommand(String sql, Object... parameters) {

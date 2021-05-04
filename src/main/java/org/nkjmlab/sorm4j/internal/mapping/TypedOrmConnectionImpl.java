@@ -10,6 +10,7 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -61,14 +62,10 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     conn.begin(transactionIsolationLevel);
   }
 
-
-
   @Override
   public void close() {
     conn.close();
   }
-
-
 
   @Override
   public void commit() {
@@ -78,19 +75,24 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
   @Override
   public BasicCommand createCommand(String sql) {
-    return BasicCommand.from(conn, sql);
+    return conn.createCommand(sql);
+  }
+
+  @Override
+  public Command createCommand(ParameterizedSql sql) {
+    return conn.createCommand(sql);
   }
 
 
   @Override
   public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+    return conn.createCommand(sql, parameters);
   }
 
 
   @Override
   public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+    return conn.createCommand(sql, parameters);
   }
 
 
@@ -450,5 +452,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   public ResultSetTraverser<List<T>> getResultSetTraverser() {
     return conn.getResultSetTraverser(objectClass);
   }
+
 
 }
