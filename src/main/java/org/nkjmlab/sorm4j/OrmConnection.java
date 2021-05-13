@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
  * @author nkjm
  *
  */
-public interface OrmConnection extends OrmReader, OrmUpdater, TableMetaDataFunction, OrmCommonFunction {
+public interface OrmConnection extends OrmReader, OrmUpdater, TableMetaDataFunction, OrmConnectionCommon {
 
   /**
    * Creates a {@link TypedOrmConnection}

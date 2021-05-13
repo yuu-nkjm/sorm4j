@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 @Experimental
@@ -24,7 +25,7 @@ public class TableSchema {
     this.createTableStatement = "create table if not exists " + tableSchema;
     this.dropTableStatement = "drop table if exists " + tableName;
     this.columnNames = builder.getColumunNames();
-    this.createIndexStatements = builder.getCreateIndexStatements();
+    this.createIndexStatements = builder.getCreateIndexIfNotExistsStatements();
 
   }
 
@@ -36,15 +37,15 @@ public class TableSchema {
     return columnNames;
   }
 
-  public List<String> getCreateIndexStatements() {
+  public List<String> getCreateIndexIfNotExistsStatements() {
     return createIndexStatements;
   }
 
-  public String getCreateTableStatement() {
+  public String getCreateTableIfNotExistsStatement() {
     return createTableStatement;
   }
 
-  public String getDropTableStatement() {
+  public String getDropTableIfExistsStatement() {
     return dropTableStatement;
   }
 
@@ -149,7 +150,7 @@ public class TableSchema {
       return getTableSchema(tableName, columnDefinitions, primaryKeys, uniqueColumnPairs);
     }
 
-    private List<String> getCreateIndexStatements() {
+    private List<String> getCreateIndexIfNotExistsStatements() {
       return indexColumns.stream()
           .map(columns -> getCreateIndexOnStatement("index_" + tableName + "_" + join("_", columns),
               tableName, columns))
@@ -200,6 +201,19 @@ public class TableSchema {
       return schema;
     }
 
+  }
+
+  public void createTableIfNotExists(SqlExecutor sqlExecutor) {
+    sqlExecutor.executeUpdate(getCreateTableIfNotExistsStatement());
+  }
+
+  public void createIndexesIfNotExists(SqlExecutor sqlExecutor) {
+    getCreateIndexIfNotExistsStatements().forEach(s -> sqlExecutor.executeUpdate(s));
+
+  }
+
+  public void dropTableIfExists(SqlExecutor sqlExecutor) {
+    sqlExecutor.executeUpdate(getDropTableIfExistsStatement());
   }
 
 }

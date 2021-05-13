@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
@@ -27,11 +28,13 @@ public final class SormImpl implements Sorm {
   private final DataSource dataSource;
 
   private final ConfigStore configStore;
+  private final Orm orm;
 
 
   public SormImpl(DataSource connectionSource, ConfigStore configs) {
     this.configStore = configs;
     this.dataSource = connectionSource;
+    this.orm = new OrmImpl(this);
   }
 
   @Override
@@ -199,5 +202,9 @@ public final class SormImpl implements Sorm {
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
   }
 
+  @Override
+  public Orm getOrm() {
+    return orm;
+  }
 
 }

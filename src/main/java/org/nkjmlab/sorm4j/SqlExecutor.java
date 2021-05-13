@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -87,13 +86,5 @@ public interface SqlExecutor {
    * @return
    */
   int executeUpdate(ParameterizedSql sql);
-
-  /**
-   * Gets {@link Connection}.
-   *
-   * @return
-   */
-  Connection getJdbcConnection();
-
 
 }

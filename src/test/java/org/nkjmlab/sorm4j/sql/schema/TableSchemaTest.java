@@ -43,7 +43,7 @@ class TableSchemaTest {
 
   @Test
   void testGetIndexSchema() {
-    assertThat(guestTable.schema.getCreateIndexStatements().get(0))
+    assertThat(guestTable.schema.getCreateIndexIfNotExistsStatements().get(0))
         .isEqualToIgnoringCase("CREATE INDEX IF NOT EXISTS index_guests_tel ON guests(tel)");
   }
 

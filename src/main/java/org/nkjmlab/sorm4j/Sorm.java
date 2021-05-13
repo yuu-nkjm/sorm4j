@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j;
 import java.sql.Connection;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  * An interface of executing object-relation mapping.
@@ -144,5 +145,12 @@ public interface Sorm {
    */
   OrmTransaction openTransaction();
 
+  /**
+   * Gets a {@link Orm} object.
+   *
+   * @return
+   */
+  @Experimental
+  Orm getOrm();
 
 }

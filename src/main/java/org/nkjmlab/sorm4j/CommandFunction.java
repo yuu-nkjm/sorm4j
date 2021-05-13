@@ -7,9 +7,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-public interface OrmCommonFunction
-    extends OrmMapReader, SqlExecutor, TransactionFunction, AutoCloseable {
-
+public interface CommandFunction {
 
   /**
    * Creates a {@link Command} from SQL string.

@@ -134,7 +134,8 @@ final class Mappings {
           "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
           columns.stream().filter(e -> !keySetWithoutAlias.contains(StringUtils.toCanonical(e)))
               .sorted().collect(Collectors.toList()),
-          tableName, allColumns.stream().sorted().collect(Collectors.toList()),
+          tableName,
+          allColumns.stream().map(c -> c.toString()).sorted().collect(Collectors.toList()),
           objectClass.getName(),
           keySetWithoutAlias.stream().sorted().collect(Collectors.toList())));
     }

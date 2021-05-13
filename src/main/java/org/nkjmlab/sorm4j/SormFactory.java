@@ -65,7 +65,7 @@ public final class SormFactory {
 
 
   /**
-   * Create a {@link Sorm} object which uses {@link DriverManager} and the configurations
+   * Creates a {@link Sorm} object which uses {@link DriverManager} and the configurations
    * corresponding to the given configName.
    *
    * @param jdbcUrl
@@ -75,11 +75,19 @@ public final class SormFactory {
    * @return
    */
   public static Sorm create(String jdbcUrl, String username, String password, String configName) {
-    return create(createDriverManagerConnectionSource(jdbcUrl, username, password), configName);
+    return create(createDriverManagerDataSource(jdbcUrl, username, password), configName);
   }
 
 
-  private static DataSource createDriverManagerConnectionSource(String jdbcUrl, String username,
+  /**
+   * Creates a {@link DataSource} which simply wraps {@link DriverManager}
+   *
+   * @param jdbcUrl
+   * @param username
+   * @param password
+   * @return
+   */
+  public static DataSource createDriverManagerDataSource(String jdbcUrl, String username,
       String password) {
     return new DriverManagerDataSource(jdbcUrl, username, password);
   }

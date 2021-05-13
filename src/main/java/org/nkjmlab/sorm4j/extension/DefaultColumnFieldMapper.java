@@ -227,8 +227,9 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       public ColumnNameWithMetaData(String name, int dataType, String typeName, int ordinalPosition,
           String isNullable, String isAutoIncremented, String isGenerated) {
         super(name);
-        this.msg = StringUtils.format("{}. {} [{}({})] [{},{},{}]", ordinalPosition, name, typeName,
-            dataType, isNullable, isAutoIncremented, isGenerated);
+        this.msg =
+            StringUtils.format("{}. {} [{}({})] [{},{},{}]", String.format("%02d", ordinalPosition),
+                name, typeName, dataType, isNullable, isAutoIncremented, isGenerated);
       }
 
       @Override
