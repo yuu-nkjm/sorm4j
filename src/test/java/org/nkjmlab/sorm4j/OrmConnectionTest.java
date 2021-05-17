@@ -17,7 +17,6 @@ import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
-import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
@@ -59,7 +58,6 @@ class OrmConnectionTest {
 
   @Test
   void testJoin() {
-    SormLogger.on();
     sorm.accept(m -> {
       m.insert(GUEST_ALICE, GUEST_BOB);
       m.insert(PLAYER_ALICE, PLAYER_BOB);
@@ -467,13 +465,11 @@ class OrmConnectionTest {
 
 
       try {
-        SormLogger.on();
         m.readList(Integer.class, "select * from players");
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
         assertThat(e.getMessage()).contains("but 1 column was expected to load data into");
       }
-      SormLogger.off();
 
 
       assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);

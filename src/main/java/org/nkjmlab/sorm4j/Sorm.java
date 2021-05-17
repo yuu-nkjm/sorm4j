@@ -144,18 +144,11 @@ public interface Sorm {
   <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler);
 
   /**
-   * Get the config name of this object.
+   * Gets the config of this object.
    *
    * @return
    */
-  String getConfigName();
-
-  /**
-   * Get the string of the config of this object.
-   *
-   * @return
-   */
-  String getConfigString();
+  SormConfig getConfig();
 
   /**
    * Gets {@link DataSource}.

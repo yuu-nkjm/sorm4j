@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.typed;
 
-import org.nkjmlab.sorm4j.CommandFunction;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmMapReader;
 import org.nkjmlab.sorm4j.SqlExecutor;
-import org.nkjmlab.sorm4j.TableMetaDataFunction;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
@@ -15,8 +13,8 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  */
 @Experimental
-public interface TypedOrm<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader, CommandFunction,
-    TableMetaDataFunction, SqlExecutor {
+public interface TypedOrm<T> extends TypedOrmReader<T>, TypedOrmUpdater<T>, OrmMapReader,
+    TypedMetaDataFunction<T>, SqlExecutor {
 
   /**
    * Creates {@link TypedOrm}

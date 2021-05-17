@@ -39,6 +39,9 @@ class CommandTest {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       conn.createCommand("select * from guests where id=?", 1)
           .applyPreparedStatementHandler(pstmt -> pstmt.execute());
+
+      conn.createCommand("select * from guests where id=:id", Map.of("id", 1));
+
     });
   }
 
@@ -209,5 +212,21 @@ class CommandTest {
 
     assertThat(ret.size()).isEqualTo(1);
   }
+
+  @Test
+  void testCommand() {
+
+    sorm.apply(
+        conn -> conn.createCommand(ParameterizedSql.parse("select * from players where id=?", 1))
+            .readList(Player.class));
+
+    sorm.apply(conn -> conn
+        .createCommand(
+            ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
+        .readList(Player.class));
+    sorm.apply(conn -> conn.getRowToMapMapper());
+    sorm.apply(conn -> conn.getTableMetaData(Player.class, "players"));
+  }
+
 
 }

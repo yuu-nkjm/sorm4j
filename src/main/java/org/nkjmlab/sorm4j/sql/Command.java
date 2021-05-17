@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
+import org.nkjmlab.sorm4j.OrmMapLazyReader;
 import org.nkjmlab.sorm4j.OrmMapReader;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
@@ -118,7 +119,7 @@ public interface Command {
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link OrmMapReader#readMapLazy(String, Object...)}
+   * See {@link OrmMapLazyReader#readMapLazy(String, Object...)}
    *
    * @return
    */

@@ -22,7 +22,7 @@ public interface OrderedParameterCommand extends OrderedParameterSql, Command {
   /**
    * Creates a request from SQL string.
    *
-   * @param orm
+   * @param conn
    * @param sql
    * @return
    */

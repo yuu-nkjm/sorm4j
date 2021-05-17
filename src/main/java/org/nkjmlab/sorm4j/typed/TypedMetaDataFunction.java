@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.typed;
 
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 
-public interface TypedMetaDataHandler<T> {
+public interface TypedMetaDataFunction<T> {
   /**
    * Gets table name corresponding to the given object class.
    *

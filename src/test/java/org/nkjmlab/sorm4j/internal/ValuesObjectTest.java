@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.internal;
 
 import static org.assertj.core.api.Assertions.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.FieldName;
@@ -39,6 +41,14 @@ class ValuesObjectTest {
     ColumnName v1 = new ColumnName("test");
     ColumnName v2 = new ColumnName("test");
     verify(v1, v2);
+
+  }
+
+  @Test
+  void testColumnOrder() {
+    ColumnName v1 = new ColumnName("2test");
+    ColumnName v2 = new ColumnName("1test");
+    assertThat(List.of(v1, v2).stream().sorted().collect(Collectors.toList()).get(0)).isEqualTo(v2);
 
   }
 

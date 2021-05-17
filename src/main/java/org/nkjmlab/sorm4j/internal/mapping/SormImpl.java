@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
@@ -22,11 +21,8 @@ import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
  *
  */
 public final class SormImpl implements Sorm {
-  // private static final org.slf4j.Logger log =
-  // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
 
   private final DataSource dataSource;
-
   private final SormConfig sormConfig;
   private final Orm orm;
 
@@ -74,14 +70,10 @@ public final class SormImpl implements Sorm {
     }
   }
 
-  @Override
-  public String getConfigName() {
-    return sormConfig.getCacheName();
-  }
 
   @Override
-  public String getConfigString() {
-    return sormConfig.toString();
+  public SormConfig getConfig() {
+    return sormConfig;
   }
 
 
@@ -193,8 +185,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public Map<String, String> getTableMappingStatusMap() {
-    return sormConfig.getTableMappings().entrySet().stream()
-        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
+    return sormConfig.getTableMappingStatusMap();
   }
 
   @Override

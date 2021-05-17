@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
 
 /**
  * A builder for configuration of or mapper.
@@ -39,7 +40,6 @@ public class SormConfigBuilder {
       Connection.TRANSACTION_READ_COMMITTED;
   public static final String DEFAULT_CACHE_NAME = "DEFAULT_CACHE";
 
-  private String cacheName = DEFAULT_CACHE_NAME;
   private ColumnFieldMapper columnFieldMapper = DEFAULT_COLUMN_FIELD_MAPPER;
   private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
   private ResultSetConverter resultSetConverter = DEFAULT_RESULT_SET_CONVERTER;
@@ -50,12 +50,14 @@ public class SormConfigBuilder {
   private int batchSizeWithMultiRow = 5;
   private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
   private Map<String, Object> options = new HashMap<>();
+  private LoggerConfig loggerConfig = new LoggerConfig();
+
 
 
   public SormConfigBuilder() {}
 
   public SormConfig build() {
-    return new SormConfig(cacheName, options, columnFieldMapper, tableNameMapper,
+    return new SormConfig(loggerConfig, options, columnFieldMapper, tableNameMapper,
         resultSetConverter, sqlParametersSetter, multiRowProcessorType, batchSize, multiRowSize,
         batchSizeWithMultiRow, transactionIsolationLevel);
   }
@@ -121,10 +123,24 @@ public class SormConfigBuilder {
   }
 
 
-  public SormConfigBuilder setCacheName(String cacheName) {
-    this.cacheName = cacheName;
+  public SormConfigBuilder setLoggerOnAll() {
+    this.loggerConfig.onAll();
     return this;
   }
 
+  public SormConfigBuilder setLoggerOffAll() {
+    this.loggerConfig.offAll();
+    return this;
+  }
+
+  public SormConfigBuilder setLoggerOn(LoggerConfig.Category... categories) {
+    this.loggerConfig.on(categories);
+    return this;
+  }
+
+  public SormConfigBuilder setLoggerOff(LoggerConfig.Category... categories) {
+    this.loggerConfig.off(categories);
+    return this;
+  }
 
 }

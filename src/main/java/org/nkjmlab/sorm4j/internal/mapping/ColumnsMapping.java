@@ -38,8 +38,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final PojoCreator<T> pojoCreator;
 
   @SuppressWarnings("unchecked")
-  public ColumnsMapping(SormOptions options, Class<T> objectClass,
-      ResultSetConverter resultSetConverter, ColumnToAccessorMap columnToAccessorMap) {
+  public ColumnsMapping(SormOptions options, ResultSetConverter resultSetConverter,
+      Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
     super(options, resultSetConverter, objectClass, columnToAccessorMap);
 
     SetterPojoCreator<T> setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
@@ -259,7 +259,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   }
 
-  String getFormattedString() {
+  public String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
         + System.lineSeparator() + super.getColumnToAccessorString();
   }

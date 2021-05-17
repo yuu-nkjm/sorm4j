@@ -1,15 +1,32 @@
 package org.nkjmlab.sorm4j.extension;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
-import org.nkjmlab.sorm4j.internal.mapping.Mappings;
 import org.nkjmlab.sorm4j.internal.mapping.SormOptionsImpl;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.TableMetaDataImpl;
+import org.nkjmlab.sorm4j.internal.mapping.TableSql;
+import org.nkjmlab.sorm4j.internal.mapping.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.internal.util.LogPoint;
+import org.nkjmlab.sorm4j.internal.util.StringUtils;
+import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.sql.TableMetaData;
 
 /**
  * A configuration store of sorm4j.
@@ -20,161 +37,205 @@ import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 @Experimental
 public final class SormConfig {
 
-  private final String cacheName;
-  private final ColumnFieldMapper columnFieldMapper;
+  private static final TableSqlFactory tableSqlFactory = new TableSqlFactory();
   private final TableNameMapper tableNameMapper;
+  private final ColumnFieldMapper columnFieldMapper;
+  private final MultiRowProcessorFactory multiRowProcessorFactory;
   private final ResultSetConverter resultSetConverter;
   private final SqlParametersSetter sqlParametersSetter;
-  private final MultiRowProcessorFactory multiRowProcessorFactory;
-  private final MultiRowProcessorType multiRowProcessorType;
-  private final int batchSize;
-  private final int multiRowSize;
-  private final int batchSizeWithMultiRow;
+  private final SormOptions options;
+
+  private final ConcurrentMap<String, TableMapping<?>> tableMappings;
+  private final ConcurrentMap<Class<?>, ColumnsMapping<?>> columnsMappings;
+  private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
+  private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
+
   private final int transactionIsolationLevel;
-  private final Map<String, Object> options;
-  private final Mappings mappings;
+  private final LoggerConfig loggerConfig;
 
-
-  public SormConfig(String cacheName, Map<String, Object> options,
-      ColumnFieldMapper fieldNameMapper, TableNameMapper tableNameMapper,
+  SormConfig(LoggerConfig loggerConfig, Map<String, Object> options,
+      ColumnFieldMapper columnFieldMapper, TableNameMapper tableNameMapper,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
       int batchSizeWithMultiRow, int transactionIsolationLevel) {
-    this.cacheName = cacheName;
-    this.columnFieldMapper = fieldNameMapper;
+    this.loggerConfig = loggerConfig;
+    this.options = new SormOptionsImpl(options);
+    this.transactionIsolationLevel = transactionIsolationLevel;
     this.tableNameMapper = tableNameMapper;
+    this.columnFieldMapper = columnFieldMapper;
+    this.multiRowProcessorFactory = MultiRowProcessorFactory.createMultiRowProcessorFactory(
+        loggerConfig, this.options, sqlParametersSetter, multiRowProcessorType, batchSize,
+        multiRowSize, batchSizeWithMultiRow);
     this.resultSetConverter = resultSetConverter;
     this.sqlParametersSetter = sqlParametersSetter;
-    this.multiRowProcessorType = multiRowProcessorType;
-    this.batchSize = batchSize;
-    this.multiRowSize = multiRowSize;
-    this.batchSizeWithMultiRow = batchSizeWithMultiRow;
-    this.options = options;
-    SormOptions _options = new SormOptionsImpl(options);
-    this.multiRowProcessorFactory =
-        MultiRowProcessorFactory.createMultiRowProcessorFactory(_options, sqlParametersSetter,
-            multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
-    this.transactionIsolationLevel = transactionIsolationLevel;
-    this.mappings =
-        new Mappings(_options, tableNameMapper, fieldNameMapper, multiRowProcessorFactory,
-            resultSetConverter, sqlParametersSetter, getTableMappings(), getColumnsMappings(),
-            getClassNameToValidTableNameMap(), getTableNameToValidTableNameMaps());
+    this.tableMappings = new ConcurrentHashMap<>();
+    this.columnsMappings = new ConcurrentHashMap<>();
+    this.classNameToValidTableNameMap = new ConcurrentHashMap<>();
+    this.tableNameToValidTableNameMap = new ConcurrentHashMap<>();
   }
 
-  public String getCacheName() {
-    return cacheName;
+
+  public int getTransactionIsolationLevel() {
+    return transactionIsolationLevel;
   }
 
-  public ColumnFieldMapper getColumnFieldMapper() {
-    return columnFieldMapper;
+  public Map<String, String> getTableMappingStatusMap() {
+    return tableMappings.entrySet().stream()
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
+  }
+
+  public <T> TableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
+    TableName tableName = toTableName(connection, objectClass);
+    return getTableMapping(connection, tableName, objectClass);
+  }
+
+  /**
+   * Get table mapping by the table name and the object class. When there is no mapping, the method
+   * create a mapping and register it.
+   *
+   */
+  public <T> TableMapping<T> getTableMapping(Connection connection, String tableName,
+      Class<T> objectClass) {
+    return getTableMapping(connection, toTableName(connection, tableName), objectClass);
+  }
+
+  <T> TableMapping<T> getTableMapping(Connection connection, TableName tableName,
+      Class<T> objectClass) {
+    String key = tableName.getName() + "-" + objectClass.getName();
+    @SuppressWarnings("unchecked")
+    TableMapping<T> ret =
+        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
+          TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
+          createLogPoint(LoggerConfig.Category.MAPPING).ifPresent(lp -> lp.info(SormConfig.class,
+              "[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
+          return m;
+        }, Try::rethrow));
+    return ret;
+  }
+
+  public Optional<LogPoint> createLogPoint(Category category) {
+    return loggerConfig.createLogPoint(category);
+  }
+
+
+  public <T> ColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
+    ColumnToAccessorMap columnToAccessorMap =
+        new ColumnToAccessorMap(objectClass, columnFieldMapper.createAccessors(objectClass));
+
+    return new ColumnsMapping<>(options, resultSetConverter, objectClass, columnToAccessorMap);
+  }
+
+  public <T> TableMapping<T> createTableMapping(Class<T> objectClass, String tableName,
+      Connection connection) throws SQLException {
+
+    DatabaseMetaData metaData = connection.getMetaData();
+
+    List<ColumnName> allColumns = columnFieldMapper.getColumns(metaData, tableName);
+
+    List<String> primaryKeys = columnFieldMapper.getPrimaryKeys(metaData, tableName).stream()
+        .map(c -> c.getName()).collect(Collectors.toList());
+
+    List<String> autoGeneratedColumns =
+        columnFieldMapper.getAutoGeneratedColumns(metaData, tableName).stream()
+            .map(c -> c.getName()).collect(Collectors.toList());
+
+    List<String> columns = allColumns.stream().map(c -> c.getName()).collect(Collectors.toList());
+
+    String colmunAliasPrefix =
+        Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
+            .map(a -> a.value()).orElse("");
+
+    TableMetaData tableMetaData = new TableMetaDataImpl(tableName, colmunAliasPrefix, columns,
+        primaryKeys, autoGeneratedColumns);
+
+    TableSql sql = tableSqlFactory.create(tableMetaData);
+
+    Map<String, Accessor> accessors = columnFieldMapper.createAccessors(objectClass, allColumns);
+
+    Set<String> keySetWithoutAlias = accessors.keySet();
+    if (!StringUtils.equalsAsCanonical(columns, keySetWithoutAlias)) {
+      throw new SormException(StringUtils.format(
+          "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
+          columns.stream().filter(e -> !keySetWithoutAlias.contains(StringUtils.toCanonical(e)))
+              .sorted().collect(Collectors.toList()),
+          tableName,
+          allColumns.stream().map(c -> c.toString()).sorted().collect(Collectors.toList()),
+          objectClass.getName(),
+          keySetWithoutAlias.stream().sorted().collect(Collectors.toList())));
+    }
+
+    ColumnToAccessorMap columnToAccessorMap = new ColumnToAccessorMap(objectClass, accessors);
+
+    return new TableMapping<>(loggerConfig, options, resultSetConverter, sqlParametersSetter,
+        multiRowProcessorFactory, objectClass, columnToAccessorMap, tableMetaData, sql);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  public <T> TableMapping<T> getCastedTableMapping(Connection connection, Class<?> objectClass) {
+    return (TableMapping<T>) getTableMapping(connection, objectClass);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  public <T> TableMapping<T> getCastedTableMapping(Connection connection, String tableName,
+      Class<?> objectClass) {
+    return (TableMapping<T>) getTableMapping(connection, tableName, objectClass);
+  }
+
+  public <T> ColumnsMapping<T> getColumnsMapping(Class<T> objectClass) {
+    @SuppressWarnings("unchecked")
+    ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
+      ColumnsMapping<T> m = createColumnsMapping(objectClass);
+      createLogPoint(LoggerConfig.Category.MAPPING).ifPresent(
+          lp -> lp.info(SormConfig.class, System.lineSeparator() + m.getFormattedString()));
+
+      return m;
+    });
+    return ret;
+  }
+
+  private TableName toTableName(Connection connection, Class<?> objectClass) {
+    return classNameToValidTableNameMap.computeIfAbsent(objectClass, Try.createFunctionWithThrow(
+        k -> tableNameMapper.getTableName(objectClass, connection.getMetaData()), Try::rethrow));
+  }
+
+  public String getTableName(Connection connection, Class<?> objectClass) {
+    return toTableName(connection, objectClass).getName();
+  }
+
+  private TableName toTableName(Connection connection, String tableName) {
+    return tableNameToValidTableNameMap.computeIfAbsent(tableName, Try.createFunctionWithThrow(
+        k -> tableNameMapper.getTableName(tableName, connection.getMetaData()), Try::rethrow));
   }
 
   public ResultSetConverter getResultSetConverter() {
     return resultSetConverter;
   }
 
-  public TableNameMapper getTableNameMapper() {
-    return tableNameMapper;
-  }
-
-  public MultiRowProcessorFactory getMultiRowProcessorFactory() {
-    return multiRowProcessorFactory;
-  }
-
   public SqlParametersSetter getSqlParametersSetter() {
     return sqlParametersSetter;
   }
 
-  public ConcurrentMap<String, TableMapping<?>> getTableMappings() {
-    return OrmCache.getTableMappings(cacheName);
+  public SormOptions getOptions() {
+    return options;
   }
 
-  public ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings() {
-    return OrmCache.getColumnsMappings(cacheName);
-  }
-
-  public ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap() {
-    return OrmCache.getClassNameToValidTableNameMap(cacheName);
-  }
-
-  public ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps() {
-    return OrmCache.getTableNameToValidTableNameMaps(cacheName);
-  }
-
-  public int getTransactionIsolationLevel() {
-    return transactionIsolationLevel;
-  }
-
-  public MultiRowProcessorType getMultiRowProcessorType() {
-    return multiRowProcessorType;
-  }
-
-  public int getBatchSize() {
-    return batchSize;
-  }
-
-  public int getMultiRowSize() {
-    return multiRowSize;
-  }
-
-  public int getBatchSizeWithMultiRow() {
-    return batchSizeWithMultiRow;
-  }
-
-  public Mappings getMappings() {
-    return mappings;
+  public LoggerConfig getLoggerConfig() {
+    return loggerConfig;
   }
 
   @Override
   public String toString() {
-    return "SormConfig [cacheName=" + cacheName + ", columnFieldMapper=" + columnFieldMapper
-        + ", tableNameMapper=" + tableNameMapper + ", resultSetConverter=" + resultSetConverter
-        + ", sqlParametersSetter=" + sqlParametersSetter + ", multiRowProcessorType="
-        + multiRowProcessorType + ", batchSize=" + batchSize + ", multiRowSize=" + multiRowSize
-        + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow + ", transactionIsolationLevel="
-        + transactionIsolationLevel + "]";
+    return "SormConfig [tableNameMapper=" + tableNameMapper + ", columnFieldMapper="
+        + columnFieldMapper + ", multiRowProcessorFactory=" + multiRowProcessorFactory
+        + ", resultSetConverter=" + resultSetConverter + ", sqlParametersSetter="
+        + sqlParametersSetter + ", tableMappings=" + tableMappings + ", columnsMappings="
+        + columnsMappings + ", classNameToValidTableNameMap=" + classNameToValidTableNameMap
+        + ", tableNameToValidTableNameMap=" + tableNameToValidTableNameMap + ", options=" + options
+        + ", transactionIsolationLevel=" + transactionIsolationLevel + "]";
   }
 
-  public Map<String, Object> getOptions() {
-    return options;
-  }
 
-  private static class OrmCache {
-
-    private OrmCache() {}
-
-    private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
-        new ConcurrentHashMap<>(); // key => Config Name
-    private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
-        new ConcurrentHashMap<>();
-
-    private static final ConcurrentMap<String, ConcurrentMap<Class<?>, TableName>> classNameToValidTableNameMapCaches =
-        new ConcurrentHashMap<>();
-
-    private static final ConcurrentMap<String, ConcurrentMap<String, TableName>> tableNameToValidTableNameMapCaches =
-        new ConcurrentHashMap<>();
-
-    public static ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings(String cacheName) {
-      return columnsMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
-    }
-
-    public static ConcurrentMap<String, TableMapping<?>> getTableMappings(String cacheName) {
-      return tableMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
-    }
-
-    public static ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap(
-        String configName) {
-      return classNameToValidTableNameMapCaches.computeIfAbsent(configName,
-          n -> new ConcurrentHashMap<>());
-    }
-
-    public static ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps(
-        String configName) {
-      return tableNameToValidTableNameMapCaches.computeIfAbsent(configName,
-          n -> new ConcurrentHashMap<>());
-    }
-
-
-  }
 
 }

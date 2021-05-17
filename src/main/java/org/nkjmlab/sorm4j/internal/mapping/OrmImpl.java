@@ -11,14 +11,9 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.BasicCommand;
-import org.nkjmlab.sorm4j.sql.Command;
-import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
 import org.nkjmlab.sorm4j.typed.TypedOrm;
@@ -53,10 +48,6 @@ public class OrmImpl implements Orm {
     return applyAndClose(conn -> conn.readAll(objectClass));
   }
 
-  @Override
-  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
-    return applyAndClose(conn -> conn.readAllLazy(objectClass));
-  }
 
   @Override
   public <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
@@ -73,15 +64,6 @@ public class OrmImpl implements Orm {
     return applyAndClose(conn -> conn.readFirst(objectClass, sql, parameters));
   }
 
-  @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readLazy(objectClass, sql));
-  }
-
-  @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.readLazy(objectClass, sql, parameters));
-  }
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql) {
@@ -347,16 +329,6 @@ public class OrmImpl implements Orm {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readMapLazy(sql));
-  }
-
-  @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.readMapLazy(sql, parameters));
-  }
-
-  @Override
   public List<Map<String, Object>> readMapList(ParameterizedSql sql) {
     return applyAndClose(conn -> conn.readMapList(sql));
   }
@@ -406,26 +378,6 @@ public class OrmImpl implements Orm {
   @Override
   public int executeUpdate(ParameterizedSql sql) {
     return applyAndClose(conn -> conn.executeUpdate(sql));
-  }
-
-  @Override
-  public Command createCommand(ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public BasicCommand createCommand(String sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
-  }
-
-  @Override
-  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
   }
 
   @Override

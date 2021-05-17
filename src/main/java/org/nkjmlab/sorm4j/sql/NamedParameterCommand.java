@@ -29,7 +29,7 @@ public interface NamedParameterCommand extends NamedParameterSql, Command {
   /**
    * Creates a request from SQL string.
    *
-   * @param orm
+   * @param conn
    * @param sql
    * @return
    */

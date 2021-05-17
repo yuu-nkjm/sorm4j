@@ -10,7 +10,7 @@ Here is an example with lambda expressions:
 
 ```java
 // Creates an entry point as javax.sql.DataSource.
-Sorm sorm = SormFactory.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","username","password");
+Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","username","password");
 
 // insert
 sorm.apply(conn -> conn.insert(new Customer(1, "Alice", "Tokyo")));

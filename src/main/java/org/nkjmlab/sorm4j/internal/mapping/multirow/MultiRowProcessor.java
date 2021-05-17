@@ -5,12 +5,11 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.extension.SormLogger;
+import org.nkjmlab.sorm4j.extension.LoggerConfig;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.util.LogPoint;
-import org.nkjmlab.sorm4j.internal.util.LogPointFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessor<T> {
@@ -20,9 +19,11 @@ public abstract class MultiRowProcessor<T> {
 
   final TableMapping<T> tableMapping;
   final SormOptions options;
+  final LoggerConfig loggerConfig;
 
-  MultiRowProcessor(SormOptions options, SqlParametersSetter sqlParametersSetter,
-      TableMapping<T> tableMapping, int batchSize) {
+  MultiRowProcessor(LoggerConfig loggerConfig, SormOptions options,
+      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize) {
+    this.loggerConfig = loggerConfig;
     this.options = options;
     this.sqlParametersSetter = sqlParametersSetter;
     this.tableMapping = tableMapping;
@@ -91,7 +92,7 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> dp = LogPointFactory.createLogPoint(SormLogger.Category.MULTI_ROW);
+    Optional<LogPoint> dp = loggerConfig.createLogPoint(LoggerConfig.Category.MULTI_ROW);
 
     final int[] result = exec.apply(objects);
 

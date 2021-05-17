@@ -11,8 +11,8 @@ import org.nkjmlab.sorm4j.typed.TypedOrm;
  *
  */
 @Experimental
-public interface Orm extends OrmReader, OrmUpdater, OrmMapReader, CommandFunction,
-    TableMetaDataFunction, SqlExecutor {
+public interface Orm
+    extends OrmReader, OrmUpdater, OrmMapReader, TableMetaDataFunction, SqlExecutor {
   /**
    * Creates {@link TypedOrm}
    *
