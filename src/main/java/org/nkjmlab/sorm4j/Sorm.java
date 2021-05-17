@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
@@ -17,7 +16,7 @@ import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
  * @author nkjm
  *
  */
-public interface Sorm {
+public interface Sorm extends Orm {
 
   static final SormConfig DEFAULT_CONFIG = new SormConfigBuilder().build();
 
@@ -164,13 +163,6 @@ public interface Sorm {
    */
   Connection getJdbcConnection();
 
-  /**
-   * Gets a {@link Orm} object.
-   *
-   * @return
-   */
-  @Experimental
-  Orm getOrm();
 
   /**
    * Gets map of the table mapping status. The keys are table names in lower case.

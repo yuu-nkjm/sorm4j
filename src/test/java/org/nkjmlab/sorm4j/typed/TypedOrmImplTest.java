@@ -19,7 +19,7 @@ class TypedOrmImplTest {
   @BeforeAll
   static void setUp() {
     sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    orm = sorm.getOrm().type(Player.class);
+    orm = sorm.type(Player.class);
   }
 
   @BeforeEach
@@ -374,12 +374,6 @@ class TypedOrmImplTest {
   @Test
   void testExecuteUpdateParameterizedSql() {
     orm.executeUpdate(ParameterizedSql.parse("insert into players values(?,?,?)", 9, "A", "B"));
-  }
-
-
-  @Test
-  void testUnType() {
-    orm.untype();
   }
 
 }

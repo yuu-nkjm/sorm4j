@@ -55,9 +55,9 @@ class TableSchemaTest {
 
   @Test
   void testCreate() {
-    tempGuestTable.schema.createTableIfNotExists(sorm.getOrm());
-    tempGuestTable.schema.createIndexesIfNotExists(sorm.getOrm());
-    tempGuestTable.schema.dropTableIfExists(sorm.getOrm());
+    tempGuestTable.schema.createTableIfNotExists(sorm);
+    tempGuestTable.schema.createIndexesIfNotExists(sorm);
+    tempGuestTable.schema.dropTableIfExists(sorm);
   }
 
 
