@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.Sorm;
 
 public class DbEngineTestUtils {
 
@@ -48,7 +48,7 @@ public class DbEngineTestUtils {
       String user = properties.getProperty("username");
       String password = properties.getProperty("password");
       System.out.println(properties);
-      return SormFactory.create(url, user, password).getDataSource();
+      return Sorm.create(url, user, password).getDataSource();
     } catch (Exception e) {
       return JdbcConnectionPool.create(defaultJdbcUrl, "sorm", "sorm");
     }

@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.Configurator;
+import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
@@ -22,6 +22,8 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  *
  */
 public class NamedParameterSqlImpl implements NamedParameterSql {
+  private static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
+      new DefaultColumnFieldMapper();
   private static final char DEFAULT_PREFIX = ':';
   private static final char DEFAULT_SUFFIX = 0;
 
@@ -43,7 +45,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
 
 
   public NamedParameterSqlImpl(String sql) {
-    this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, Configurator.DEFAULT_COLUMN_FIELD_MAPPER);
+    this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_COLUMN_FIELD_MAPPER);
   }
 
   @Override

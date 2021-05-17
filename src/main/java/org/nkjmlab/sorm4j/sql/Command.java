@@ -1,12 +1,13 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
+import org.nkjmlab.sorm4j.OrmMapLazyReader;
 import org.nkjmlab.sorm4j.OrmMapReader;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
@@ -46,10 +47,10 @@ public interface Command {
    * Executes a query and apply the given handler to the returned result set.
    *
    * @param <T>
-   * @param resultSetHandler
+   * @param resultSetTraverser
    * @return
    */
-  <T> T executeQuery(FunctionHandler<ResultSet, T> resultSetHandler);
+  <T> T executeQuery(ResultSetTraverser<T> resultSetTraverser);
 
 
   /**
@@ -118,7 +119,7 @@ public interface Command {
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link OrmMapReader#readMapLazy(String, Object...)}
+   * See {@link OrmMapLazyReader#readMapLazy(String, Object...)}
    *
    * @return
    */

@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.typed;
 
-import org.nkjmlab.sorm4j.OrmCommonFunction;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.OrmConnectionCommon;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
@@ -11,8 +11,8 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  */
 @Experimental
-public interface TypedOrmConnection<T>
-    extends TypedOrmReader<T>, TypedOrmUpdater<T>, TypedMetaDataHandler<T>, OrmCommonFunction {
+public interface TypedOrmConnection<T> extends TypedOrmReader<T>, TypedOrmLazyReader<T>,
+    TypedOrmUpdater<T>, TypedMetaDataFunction<T>, OrmConnectionCommon {
 
   /**
    * Creates {@link TypedOrmConnection}

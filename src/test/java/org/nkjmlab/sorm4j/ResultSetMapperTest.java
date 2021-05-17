@@ -21,13 +21,13 @@ class ResultSetMapperTest {
   @Test
   void testMapRowsClassOfTResultSet() {
     sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-        rs -> conn.mapRowList(Player.class, rs)));
+        conn.getResultSetTraverser(Player.class)));
   }
 
   @Test
   void testMapRowsResultSet() {
     sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-        rs -> conn.mapRowsToMapList(rs)));
+        conn.getResultSetToMapTraverser()));
   }
 
 }

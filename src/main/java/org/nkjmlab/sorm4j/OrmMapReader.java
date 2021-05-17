@@ -8,7 +8,6 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 
 
 /**
@@ -18,13 +17,24 @@ import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
  *
  */
 public interface OrmMapReader {
+
   /**
-   * Maps the all rows in the given resultSet to a map list.
+   * Gets a function which maps one row in the resultSet to an object. The method does not call
+   * {@link ResultSet#next()}.
    *
-   * @param resultSet
    * @return
    */
-  List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet);
+  RowMapper<Map<String, Object>> getRowToMapMapper();
+
+  /**
+   * Gets function which traverses and maps the all the rows in the given resultSet to an object
+   * list.
+   *
+   * @return
+   */
+  ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser();
+
+
 
   /**
    * See {@link OrmMapReader#readMapFirst(String, Object...)}
@@ -51,30 +61,6 @@ public interface OrmMapReader {
    */
   Map<String, Object> readMapFirst(String sql, Object... parameters);
 
-  /**
-   * See {@link OrmMapReader#readMapLazy(String, Object...)}
-   *
-   * @param sql
-   * @return
-   */
-  LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql);
-
-  /**
-   * Returns an {@link LazyResultSet} instance containing data from the execution of the provided
-   * parametrized SQL and convert it to Stream, List, and so on.
-   * <p>
-   * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
-   *
-   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
-   * @param parameters are ordered parameter.
-   */
-  LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
 
   /**
    * See {@link OrmMapReader#readMapList(String, Object...)}

@@ -18,6 +18,7 @@ public interface TableSchemaKeyword {
   public static final String TINYINT = "TINYINT";
   public static final String SMALLINT = "SMALLINT";
   public static final String IDENTITY = "IDENTITY";
+  public static final String ARRAY = "ARRAY";
 
   /** Constraint and misc **/
   public static final String UNIQUE = "UNIQUE";

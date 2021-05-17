@@ -1,32 +1,29 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.typed;
 
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 
-public interface MetaDataHandler {
+public interface TypedMetaDataFunction<T> {
   /**
    * Gets table name corresponding to the given object class.
    *
-   * @param objectClass
    * @return
    */
-  String getTableName(Class<?> objectClass);
+  String getTableName();
 
 
   /**
    * Gets table metadata corresponding to the given object class.
    *
-   * @param objectClass
    * @return
    */
-  TableMetaData getTableMetaData(Class<?> objectClass);
+  TableMetaData getTableMetaData();
 
 
   /**
    * Gets table metadata to the given object class and the table name.
    *
-   * @param objectClass
    * @return
    */
-  TableMetaData getTableMetaData(Class<?> objectClass, String tableName);
+  TableMetaData getTableMetaData(String tableName);
 
 }

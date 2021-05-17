@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
@@ -25,7 +23,8 @@ public interface SqlExecutor {
    * @param handler
    */
   @Experimental
-  void acceptPreparedStatementHandler(ParameterizedSql sql, ConsumerHandler<PreparedStatement> handler);
+  void acceptPreparedStatementHandler(ParameterizedSql sql,
+      ConsumerHandler<PreparedStatement> handler);
 
 
   /**
@@ -41,7 +40,7 @@ public interface SqlExecutor {
       FunctionHandler<PreparedStatement, T> handler);
 
   /**
-   * Executes a query and apply the given handler to the returned result set.
+   * Executes a query and apply the given {@link ResultSetTraverser} to the returned result set.
    * <p>
    * This method wraps {@link PreparedStatement#executeQuery(String)}
    * <p>
@@ -50,21 +49,21 @@ public interface SqlExecutor {
    *
    * @param <T>
    * @param sql SQL code to be executed.
-   * @param resultSetHandler
+   * @param traverser
    * @return
    */
-  <T> T executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, T> resultSetHandler);
+  <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> traverser);
 
 
   /**
-   * Executes a query and apply the given mapper to the each row in returned result set.
+   * Executes a query and apply the given {@link RowMapper} to the each row in returned result set.
    *
    * @param <T>
    * @param sql
-   * @param rowMapper
+   * @param mapper
    * @return
    */
-  <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper);
+  <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> mapper);
 
   /**
    * Executes an update and returns the number of rows modified.
@@ -87,13 +86,5 @@ public interface SqlExecutor {
    * @return
    */
   int executeUpdate(ParameterizedSql sql);
-
-  /**
-   * Gets {@link Connection}.
-   *
-   * @return
-   */
-  Connection getJdbcConnection();
-
 
 }

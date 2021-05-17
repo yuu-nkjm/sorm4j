@@ -1,12 +1,12 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -35,8 +35,8 @@ public abstract class AbstractCommand implements Command {
   }
 
   @Override
-  public <T> T executeQuery(FunctionHandler<ResultSet, T> resultSetHandler) {
-    return conn.executeQuery(parse(), resultSetHandler);
+  public <T> T executeQuery(ResultSetTraverser<T> resultSetTraverser) {
+    return conn.executeQuery(parse(), resultSetTraverser);
   }
 
   @Override

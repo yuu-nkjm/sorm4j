@@ -27,12 +27,14 @@ import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
@@ -42,6 +44,7 @@ import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
   private static DataSource dataSource;
+  private static SormConfig sormConfig;
 
   @BeforeAll
   static void beforAll() {
@@ -85,8 +88,8 @@ public class TestPostgreSQLSqlMapper {
         return null;
       }
     });
-    SormFactory
-        .updateDefaultConfig(conf -> conf.setSqlParametersSetter(ps).setResultSetConverter(rsc));
+    sormConfig =
+        new SormConfigBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build();
   }
 
 
@@ -107,7 +110,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = SormFactory.toOrmConnection(conn);
+      OrmConnection c = Sorm.toOrmConnection(conn, sormConfig);
       doTest(c, "c_boolean", true);
       doTest(c, "c_integer", 1);
       doTest(c, "c_integer", new BigDecimal("1"));
@@ -189,7 +192,7 @@ public class TestPostgreSQLSqlMapper {
       }
     } catch (Exception e) {
       System.err.println(messagePrefix + "fail => " + e.getMessage());
-      //e.printStackTrace();
+      // e.printStackTrace();
     }
 
   }

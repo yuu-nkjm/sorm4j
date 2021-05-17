@@ -8,7 +8,9 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -16,6 +18,7 @@ import repackage.net.sf.persist.tests.engine.framework.FieldMap;
 
 public class TestSqlserver {
   private static DataSource dataSource;
+  private static SormConfig conf;
 
   public static void main(String[] args) {
     beforAll();
@@ -23,11 +26,10 @@ public class TestSqlserver {
 
   @BeforeAll
   static void beforAll() {
-    dataSource =
-        DbEngineTestUtils.getDataSource(TestSqlserver.class, "jdbc:h2:mem:sqlserver;MODE=MSSQLServer");
+    dataSource = DbEngineTestUtils.getDataSource(TestSqlserver.class,
+        "jdbc:h2:mem:sqlserver;MODE=MSSQLServer");
     DbEngineTestUtils.executeSql(dataSource, TestSqlserver.class, "schema.sql");
-    SormFactory
-        .updateDefaultConfig(configurator -> configurator.setOption("dbEngine", "MSSQLServer"));
+    conf = new SormConfigBuilder().setOption("dbEngine", "MSSQLServer").build();
 
   }
 
@@ -35,7 +37,7 @@ public class TestSqlserver {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn, conf);
       ormConn.setAutoCommit(false);
       Class<?>[] characterTypes = new Class<?>[] {String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};
@@ -66,7 +68,7 @@ public class TestSqlserver {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn, conf);
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -108,7 +110,7 @@ public class TestSqlserver {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn, conf);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("datetimeCol").setTypes(java.sql.Timestamp.class));
@@ -132,7 +134,7 @@ public class TestSqlserver {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn, conf);
       ormConn.setAutoCommit(false);
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class};

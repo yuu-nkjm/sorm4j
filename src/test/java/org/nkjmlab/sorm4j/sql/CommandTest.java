@@ -39,6 +39,9 @@ class CommandTest {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       conn.createCommand("select * from guests where id=?", 1)
           .applyPreparedStatementHandler(pstmt -> pstmt.execute());
+
+      conn.createCommand("select * from guests where id=:id", Map.of("id", 1));
+
     });
   }
 
@@ -47,7 +50,7 @@ class CommandTest {
     sorm.accept(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       Player p = conn.createCommand("select * from players where id=?", 1)
-          .executeQuery(rs -> conn.mapRowList(Player.class, rs)).get(0);
+          .executeQuery(conn.getResultSetTraverser(Player.class)).get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -192,9 +195,9 @@ class CommandTest {
         .addParameter(id.incrementAndGet(), "Frank", "Tokyo").executeUpdate());
     assertThat(row).isEqualTo(1);
 
-    List<Player> ret =
-        sorm.apply(conn -> conn.createCommand("select * from players where id=? and name=?")
-            .addParameter(id.get(), "Frank").executeQuery(rs -> conn.mapRowList(Player.class, rs)));
+    List<Player> ret = sorm.apply(conn -> conn
+        .createCommand("select * from players where id=? and name=?")
+        .addParameter(id.get(), "Frank").executeQuery(conn.getResultSetTraverser(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
 
@@ -205,9 +208,25 @@ class CommandTest {
 
 
     ret = sorm.apply(conn -> conn.createCommand("select * from players where id=?")
-        .addParameter(id.get()).executeQuery((rs, rowNum) -> new Player()));
+        .addParameter(id.get()).executeQuery(conn.getRowMapper(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
   }
+
+  @Test
+  void testCommand() {
+
+    sorm.apply(
+        conn -> conn.createCommand(ParameterizedSql.parse("select * from players where id=?", 1))
+            .readList(Player.class));
+
+    sorm.apply(conn -> conn
+        .createCommand(
+            ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
+        .readList(Player.class));
+    sorm.apply(conn -> conn.getRowToMapMapper());
+    sorm.apply(conn -> conn.getTableMetaData(Player.class, "players"));
+  }
+
 
 }

@@ -2,14 +2,15 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -61,14 +62,10 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     conn.begin(transactionIsolationLevel);
   }
 
-
-
   @Override
   public void close() {
     conn.close();
   }
-
-
 
   @Override
   public void commit() {
@@ -78,19 +75,24 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
 
   @Override
   public BasicCommand createCommand(String sql) {
-    return BasicCommand.from(conn, sql);
+    return conn.createCommand(sql);
+  }
+
+  @Override
+  public Command createCommand(ParameterizedSql sql) {
+    return conn.createCommand(sql);
   }
 
 
   @Override
   public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+    return conn.createCommand(sql, parameters);
   }
 
 
   @Override
   public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+    return conn.createCommand(sql, parameters);
   }
 
 
@@ -140,8 +142,8 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   }
 
   @Override
-  public <S> S executeQuery(ParameterizedSql sql, FunctionHandler<ResultSet, S> resultSetHandler) {
-    return conn.executeQuery(sql, resultSetHandler);
+  public <S> S executeQuery(ParameterizedSql sql, ResultSetTraverser<S> resultSetTraverser) {
+    return conn.executeQuery(sql, resultSetTraverser);
   }
 
   @Override
@@ -204,12 +206,10 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.insert(object);
   }
 
-
   @Override
   public int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return conn.insert(objects);
   }
-
 
   @Override
   public InsertResult<T> insertAndGet(List<T> objects) {
@@ -255,16 +255,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   @Override
   public int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return conn.insertOn(tableName, objects);
-  }
-
-  @Override
-  public List<T> mapRowList(ResultSet resultSet) {
-    return conn.mapRowList(objectClass, resultSet);
-  }
-
-  @Override
-  public List<Map<String, Object>> mapRowsToMapList(ResultSet resultSet) {
-    return conn.mapRowsToMapList(resultSet);
   }
 
   @Override
@@ -417,6 +407,7 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.update(objects);
   }
 
+
   @Override
   public int update(T object) {
     return conn.update(object);
@@ -426,7 +417,6 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
   public int[] update(@SuppressWarnings("unchecked") T... objects) {
     return conn.update(objects);
   }
-
 
   @Override
   public int[] updateOn(String tableName, List<T> objects) {
@@ -443,6 +433,25 @@ public class TypedOrmConnectionImpl<T> implements TypedOrmConnection<T> {
     return conn.updateOn(tableName, objects);
   }
 
+  @Override
+  public RowMapper<Map<String, Object>> getRowToMapMapper() {
+    return conn.getRowToMapMapper();
+  }
+
+  @Override
+  public ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
+    return conn.getResultSetToMapTraverser();
+  }
+
+  @Override
+  public RowMapper<T> getRowMapper() {
+    return conn.getRowMapper(objectClass);
+  }
+
+  @Override
+  public ResultSetTraverser<List<T>> getResultSetTraverser() {
+    return conn.getResultSetTraverser(objectClass);
+  }
 
 
 }
