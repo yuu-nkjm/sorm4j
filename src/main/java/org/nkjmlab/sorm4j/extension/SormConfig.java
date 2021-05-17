@@ -1,19 +1,15 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.extension;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.Configurator.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.TableName;
-import org.nkjmlab.sorm4j.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.internal.mapping.Mappings;
+import org.nkjmlab.sorm4j.internal.mapping.SormOptionsImpl;
+import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
  * A configuration store of sorm4j.
@@ -21,14 +17,10 @@ import org.nkjmlab.sorm4j.internal.util.StringUtils;
  * @author nkjm
  *
  */
-public final class ConfigStore {
-  public static ConfigStore INITIAL_DEFAULT_CONFIG_STORE =
-      new ConfiguratorImpl(SormFactory.DEFAULT_CONFIG_NAME).build();
+@Experimental
+public final class SormConfig {
 
-  // private static final org.slf4j.Logger log =
-  // org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
-
-  private final String configName;
+  private final String cacheName;
   private final ColumnFieldMapper columnFieldMapper;
   private final TableNameMapper tableNameMapper;
   private final ResultSetConverter resultSetConverter;
@@ -40,16 +32,15 @@ public final class ConfigStore {
   private final int batchSizeWithMultiRow;
   private final int transactionIsolationLevel;
   private final Map<String, Object> options;
-
   private final Mappings mappings;
 
 
-  public ConfigStore(String cacheName, Map<String, Object> options,
+  public SormConfig(String cacheName, Map<String, Object> options,
       ColumnFieldMapper fieldNameMapper, TableNameMapper tableNameMapper,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
       int batchSizeWithMultiRow, int transactionIsolationLevel) {
-    this.configName = cacheName;
+    this.cacheName = cacheName;
     this.columnFieldMapper = fieldNameMapper;
     this.tableNameMapper = tableNameMapper;
     this.resultSetConverter = resultSetConverter;
@@ -70,8 +61,8 @@ public final class ConfigStore {
             getClassNameToValidTableNameMap(), getTableNameToValidTableNameMaps());
   }
 
-  public String getConfigName() {
-    return configName;
+  public String getCacheName() {
+    return cacheName;
   }
 
   public ColumnFieldMapper getColumnFieldMapper() {
@@ -95,52 +86,23 @@ public final class ConfigStore {
   }
 
   public ConcurrentMap<String, TableMapping<?>> getTableMappings() {
-    return OrmCache.getTableMappings(configName);
+    return OrmCache.getTableMappings(cacheName);
   }
 
   public ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings() {
-    return OrmCache.getColumnsMappings(configName);
+    return OrmCache.getColumnsMappings(cacheName);
   }
 
   public ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap() {
-    return OrmCache.getClassNameToValidTableNameMap(configName);
+    return OrmCache.getClassNameToValidTableNameMap(cacheName);
   }
 
   public ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps() {
-    return OrmCache.getTableNameToValidTableNameMaps(configName);
+    return OrmCache.getTableNameToValidTableNameMaps(cacheName);
   }
 
   public int getTransactionIsolationLevel() {
     return transactionIsolationLevel;
-  }
-
-  private static final ConcurrentMap<String, ConfigStore> configStores = new ConcurrentHashMap<>();
-  static {
-    configStores.put(SormFactory.DEFAULT_CONFIG_NAME, INITIAL_DEFAULT_CONFIG_STORE);
-  }
-
-  public static ConfigStore refreshAndRegister(ConfigStore configStore) {
-    refresh(configStore.getConfigName());
-    configStores.put(configStore.getConfigName(), configStore);
-    return configStore;
-  }
-
-  public static ConfigStore get(String configName) {
-    ConfigStore ret = configStores.get(configName);
-    if (ret != null) {
-      return ret;
-    }
-    throw new SormException(
-        StringUtils.format("Config name [{}] is not registered yet. Registered config names = {}",
-            configName, configStores.keySet()));
-  }
-
-  public static ConfigStore getDefaultConfigStore() {
-    return get(SormFactory.DEFAULT_CONFIG_NAME);
-  }
-
-  public static void refresh(String configName) {
-    OrmCache.refresh(configName);
   }
 
   public MultiRowProcessorType getMultiRowProcessorType() {
@@ -165,7 +127,7 @@ public final class ConfigStore {
 
   @Override
   public String toString() {
-    return "ConfigStore [configName=" + configName + ", columnFieldMapper=" + columnFieldMapper
+    return "SormConfig [cacheName=" + cacheName + ", columnFieldMapper=" + columnFieldMapper
         + ", tableNameMapper=" + tableNameMapper + ", resultSetConverter=" + resultSetConverter
         + ", sqlParametersSetter=" + sqlParametersSetter + ", multiRowProcessorType="
         + multiRowProcessorType + ", batchSize=" + batchSize + ", multiRowSize=" + multiRowSize
@@ -175,6 +137,44 @@ public final class ConfigStore {
 
   public Map<String, Object> getOptions() {
     return options;
+  }
+
+  private static class OrmCache {
+
+    private OrmCache() {}
+
+    private static final ConcurrentMap<String, ConcurrentMap<String, TableMapping<?>>> tableMappingsCaches =
+        new ConcurrentHashMap<>(); // key => Config Name
+    private static final ConcurrentMap<String, ConcurrentMap<Class<?>, ColumnsMapping<?>>> columnsMappingsCaches =
+        new ConcurrentHashMap<>();
+
+    private static final ConcurrentMap<String, ConcurrentMap<Class<?>, TableName>> classNameToValidTableNameMapCaches =
+        new ConcurrentHashMap<>();
+
+    private static final ConcurrentMap<String, ConcurrentMap<String, TableName>> tableNameToValidTableNameMapCaches =
+        new ConcurrentHashMap<>();
+
+    public static ConcurrentMap<Class<?>, ColumnsMapping<?>> getColumnsMappings(String cacheName) {
+      return columnsMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+    }
+
+    public static ConcurrentMap<String, TableMapping<?>> getTableMappings(String cacheName) {
+      return tableMappingsCaches.computeIfAbsent(cacheName, n -> new ConcurrentHashMap<>());
+    }
+
+    public static ConcurrentMap<Class<?>, TableName> getClassNameToValidTableNameMap(
+        String configName) {
+      return classNameToValidTableNameMapCaches.computeIfAbsent(configName,
+          n -> new ConcurrentHashMap<>());
+    }
+
+    public static ConcurrentMap<String, TableName> getTableNameToValidTableNameMaps(
+        String configName) {
+      return tableNameToValidTableNameMapCaches.computeIfAbsent(configName,
+          n -> new ConcurrentHashMap<>());
+    }
+
+
   }
 
 }

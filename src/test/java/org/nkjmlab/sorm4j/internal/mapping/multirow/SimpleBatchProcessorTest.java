@@ -8,11 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormFactory;
-import org.nkjmlab.sorm4j.common.Guest;
-import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.Configurator;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 
 class SimpleBatchProcessorTest {
 
@@ -20,9 +18,8 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    SormFactory.registerConfig("SIMPLE_BATCH", builder -> builder
-        .setMultiRowProcessorType(Configurator.MultiRowProcessorType.SIMPLE_BATCH));
-    sorm = SormFactory.create(jdbcUrl, user, password, "SIMPLE_BATCH");
+    sorm = Sorm.create(jdbcUrl, user, password, new SormConfigBuilder()
+        .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build());
   }
 
 
@@ -31,11 +28,6 @@ class SimpleBatchProcessorTest {
     SormTestUtils.dropAndCreateTableAll(sorm);
   }
 
-  @Test
-  void testSetUp() {
-    assertThat(sorm.getConfigString())
-        .contains(Configurator.MultiRowProcessorType.SIMPLE_BATCH.name());
-  }
 
   @Test
   void testMultiRowInsert() {

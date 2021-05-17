@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -34,7 +34,7 @@ public class TestOracle {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Byte[].class};
       Class<?>[] blobTypes = new Class<?>[] {byte[].class, Byte[].class, InputStream.class};
@@ -69,7 +69,7 @@ public class TestOracle {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           // .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class)) // oracle is picky
@@ -98,7 +98,7 @@ public class TestOracle {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] longTypes = new Class<?>[] {Long.class, long.class};
       Class<?>[] doubleTypes = new Class<?>[] {Double.class, double.class, BigDecimal.class};
@@ -127,7 +127,7 @@ public class TestOracle {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = SormFactory.toOrmConnection(conn);
+      OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};

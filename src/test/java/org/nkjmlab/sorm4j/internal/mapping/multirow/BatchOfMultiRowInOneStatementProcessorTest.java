@@ -8,10 +8,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.Configurator;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
+import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
@@ -28,16 +29,14 @@ class BatchOfMultiRowInOneStatementProcessorTest {
     SormLogger.on();
     SormLogger.off();
     SormLogger.on();
-    SormFactory.registerConfig("BATCH_CONF", builder -> builder
-        .setMultiRowProcessorType(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH));
-
-    sorm = SormTestUtils.createSorm("BATCH_CONF");
+    SormConfig conf = new SormConfigBuilder()
+        .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).build();
+    sorm = SormTestUtils.createWith(conf);
     SormTestUtils.dropAndCreateTableAll(sorm);
     String s = sorm.getConfigString();
 
-    assertThat(s.toString())
-        .contains(Configurator.MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
-    sorm = SormFactory.create(jdbcUrl, user, password, "BATCH_CONF");
+    assertThat(s.toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
+    sorm = Sorm.create(jdbcUrl, user, password, conf);
   }
 
   @BeforeEach

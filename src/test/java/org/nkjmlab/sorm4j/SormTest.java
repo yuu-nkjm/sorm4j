@@ -35,7 +35,7 @@ class SormTest {
   void testException() throws SQLException {
     DataSource mock = Mockito.spy(DataSource.class);
     Mockito.doThrow(new SQLException("Mock exception")).when(mock).getConnection();
-    Sorm sormImpl = SormFactory.create(mock);
+    Sorm sormImpl = Sorm.create(mock);
     try {
       sormImpl.getJdbcConnection();
       failBecauseExceptionWasNotThrown(Exception.class);
@@ -51,7 +51,7 @@ class SormTest {
     DataSource mock = Mockito.spy(DataSource.class);
 
     Mockito.when(mock.getConnection()).thenReturn(conMock);
-    Sorm sormImpl = SormFactory.create(mock);
+    Sorm sormImpl = Sorm.create(mock);
 
     try {
       sormImpl.acceptJdbcConnectionHandler(con -> {
@@ -130,7 +130,7 @@ class SormTest {
   void testToString() {
     assertThat(sorm.toString()).contains("Sorm");
 
-    SormFactory.create(SormTestUtils.createDataSourceH2()).getDataSource();
+    Sorm.create(SormTestUtils.createDataSourceH2()).getDataSource();
 
   }
 
@@ -164,7 +164,7 @@ class SormTest {
       tr.commit();
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
     });
 
   }
@@ -176,14 +176,14 @@ class SormTest {
       // auto-rollback
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
     });
     try (OrmConnection tr = sorm.openTransaction()) {
       tr.insert(a);
       tr.commit();
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(SormFactory.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(1);
+      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(1);
     });
   }
 

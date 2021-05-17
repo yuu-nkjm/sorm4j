@@ -19,6 +19,7 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
@@ -119,14 +120,14 @@ public class OrmConnectionImpl implements OrmConnection {
    * Creates a instance that will use the default cache for table-object and column-object mappings.
    *
    * @param connection {@link java.sql.Connection} object to be used
-   * @param configStore
+   * @param sormConfig
    */
-  public OrmConnectionImpl(Connection connection, ConfigStore configStore) {
+  public OrmConnectionImpl(Connection connection, SormConfig sormConfig) {
     this.connection = connection;
-    this.mappings = configStore.getMappings();
+    this.mappings = sormConfig.getMappings();
     this.resultSetConverter = mappings.getResultSetConverter();
     this.sqlParametersSetter = mappings.getSqlParametersSetter();
-    this.transactionIsolationLevel = configStore.getTransactionIsolationLevel();
+    this.transactionIsolationLevel = sormConfig.getTransactionIsolationLevel();
   }
 
   @Override

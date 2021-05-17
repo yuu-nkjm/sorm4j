@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.extension.Configurator.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;

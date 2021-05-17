@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.common;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.extension.SormConfig;
 
 public class SormTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
@@ -40,15 +40,15 @@ public class SormTestUtils {
   }
 
   public static Sorm createSorm() {
-    Sorm ret = SormFactory.create(jdbcUrl, user, password);
+    Sorm ret = Sorm.create(jdbcUrl, user, password);
     return ret;
   }
 
-  public static Sorm createSorm(String confName) {
-    Sorm ret = SormFactory.create(jdbcUrl, user, password, confName);
+  public static Sorm createWith(SormConfig conf) {
+    Sorm ret = Sorm.create(jdbcUrl, user, password, conf);
     return ret;
-
   }
+
 
   public static void dropAndCreateTableAll(Sorm sorm) {
     dropAndCreateGuestTable(sorm);

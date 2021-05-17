@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormFactory;
+import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
@@ -27,19 +27,19 @@ public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
 
-  private final ConfigStore configStore;
+  private final SormConfig sormConfig;
   private final Orm orm;
 
 
-  public SormImpl(DataSource connectionSource, ConfigStore configs) {
-    this.configStore = configs;
+  public SormImpl(DataSource connectionSource, SormConfig configs) {
+    this.sormConfig = configs;
     this.dataSource = connectionSource;
     this.orm = new OrmImpl(this);
   }
 
   @Override
   public OrmTransaction openTransaction() {
-    return new OrmTransactionImpl(getJdbcConnection(), configStore);
+    return new OrmTransactionImpl(getJdbcConnection(), sormConfig);
   }
 
 
@@ -76,18 +76,18 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String getConfigName() {
-    return configStore.getConfigName();
+    return sormConfig.getCacheName();
   }
 
   @Override
   public String getConfigString() {
-    return configStore.toString();
+    return sormConfig.toString();
   }
 
 
   @Override
   public OrmConnection openConnection() {
-    return new OrmConnectionImpl(getJdbcConnection(), configStore);
+    return new OrmConnectionImpl(getJdbcConnection(), sormConfig);
   }
 
 
@@ -141,13 +141,13 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String toString() {
-    return "Sorm [dataSource=" + dataSource + ", configStore=" + configStore + "]";
+    return "Sorm [dataSource=" + dataSource + ", sormConfig=" + sormConfig + "]";
   }
 
 
   public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-    public OrmTransactionImpl(Connection connection, ConfigStore options) {
+    public OrmTransactionImpl(Connection connection, SormConfig options) {
       super(connection, options);
       begin(options.getTransactionIsolationLevel());
     }
@@ -192,13 +192,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public Sorm createWith(String configName) {
-    return SormFactory.create(dataSource, configName);
-  }
-
-  @Override
   public Map<String, String> getTableMappingStatusMap() {
-    return configStore.getTableMappings().entrySet().stream()
+    return sormConfig.getTableMappings().entrySet().stream()
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
   }
 

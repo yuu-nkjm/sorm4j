@@ -15,7 +15,8 @@ import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.Configurator;
+import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.extension.SormLogger;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
@@ -122,7 +123,7 @@ class OrmConnectionTest {
     row = sorm.apply(conn -> {
       NamedParameterSql sql =
           NamedParameterSql.parse("insert into players values(`id`, `name`, `address`)", '`', '`',
-              Configurator.DEFAULT_COLUMN_FIELD_MAPPER);
+              new DefaultColumnFieldMapper());
       sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
       return conn.executeUpdate(sql.parse());
     });
@@ -603,17 +604,12 @@ class OrmConnectionTest {
   @Test
   void testTransactionLevel() {
 
-    SormFactory.registerModifiedConfig(sorm.getConfigName(), "isolev",
-        b -> b.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE));
 
-    try {
-      sorm.createWith("isole").acceptTransactionHandler(m -> {
-      });
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-      assertThat(e.getMessage()).contains("is not registered");
-    }
-    sorm.createWith("isolev").acceptTransactionHandler(m -> {
+
+    Sorm orm = Sorm.create(sorm.getDataSource(), new SormConfigBuilder()
+        .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build());
+
+    orm.acceptTransactionHandler(m -> {
       assertThat(m.getJdbcConnection().getTransactionIsolation())
           .isEqualTo(Connection.TRANSACTION_SERIALIZABLE);
     });

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.SormFactory;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
@@ -179,7 +178,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testClose() {
-    SormFactory.create(SormTestUtils.createDataSourceH2()).getDataSource();
+    Sorm.create(SormTestUtils.createDataSourceH2()).getDataSource();
 
     sorm.accept(m -> {
       m.close();
@@ -538,7 +537,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testSormExeption() {
-    DataSource ds = SormFactory
+    DataSource ds = Sorm
         .create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password).getDataSource();
     try {
       ds.unwrap(null);
@@ -627,7 +626,7 @@ class TypedOrmConnectionTest {
     assertThat(num).isEqualTo(1);
 
     try (Connection conn = sorm.getJdbcConnection()) {
-      SormFactory.toOrmConnection(conn);
+      Sorm.toOrmConnection(conn);
     } catch (SQLException e) {
       fail();
     }

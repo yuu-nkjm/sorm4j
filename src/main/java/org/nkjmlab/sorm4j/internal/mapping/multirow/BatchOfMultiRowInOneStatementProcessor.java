@@ -3,9 +3,9 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.mapping.ConfigStore;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
 
 /**
  * A sql statement processor for multirow update and batch. This object could be set ormapper via
- * {@link ConfigStore}
+ * {@link SormConfig}
  *
  * @author nkjm
  *

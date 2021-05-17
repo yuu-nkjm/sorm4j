@@ -26,7 +26,7 @@ import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 
-final class Mappings {
+public final class Mappings {
 
   private static final TableSqlFactory tableSqlFactory = new TableSqlFactory();
   private final TableNameMapper tableNameMapper;
