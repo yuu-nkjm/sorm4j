@@ -14,7 +14,6 @@ import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SormOptionsImpl;
@@ -53,7 +52,7 @@ public final class SormConfig {
   private final int transactionIsolationLevel;
   private final LoggerConfig loggerConfig;
 
-  SormConfig(LoggerConfig loggerConfig, Map<String, Object> options,
+  public SormConfig(LoggerConfig loggerConfig, Map<String, Object> options,
       ColumnFieldMapper columnFieldMapper, TableNameMapper tableNameMapper,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,

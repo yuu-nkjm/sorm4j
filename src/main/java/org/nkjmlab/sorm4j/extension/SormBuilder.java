@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.extension;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
 
 @Experimental
 public class SormBuilder {
@@ -12,7 +12,7 @@ public class SormBuilder {
   private SormConfigBuilder configBuilder = new SormConfigBuilder();
 
   public Sorm build() {
-    return Sorm.create(dataSource, configBuilder.build());
+    return new SormImpl(dataSource, configBuilder.build());
   }
 
   public SormBuilder setDataSource(DataSource dataSource) {

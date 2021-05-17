@@ -385,5 +385,4 @@ public class OrmImpl implements Orm {
     return new TypedOrmImpl<>(objectClass, this);
   }
 
-
 }
