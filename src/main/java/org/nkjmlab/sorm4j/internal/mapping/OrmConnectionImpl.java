@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,11 +18,11 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.LoggerConfig;
+import org.nkjmlab.sorm4j.extension.LoggerConfig.LogPoint;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.sql.Command;
@@ -72,15 +71,12 @@ public class OrmConnectionImpl implements OrmConnection {
       ConsumerHandler<PreparedStatement> handler) {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
       getSqlParametersSetter().setParameters(sormConfig.getOptions(), stmt, sql.getParameters());
-      final Optional<LogPoint> dp =
-          getLoggerConfig().createLogPoint(LoggerConfig.Category.HANDLE_PREPAREDSTATEMENT);
       handler.accept(stmt);
-      dp.ifPresent(lp -> {
-        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(),
-            sql.getParameters());
-        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(),
-            sql.getSql(), Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
-      });
+
+      getLoggerConfig()
+          .createLogPoint(LoggerConfig.Category.HANDLE_PREPAREDSTATEMENT, OrmConnectionImpl.class)
+          .ifPresent(_lp -> _lp.createBeforeSqlMessage(connection, sql));
+
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -96,15 +92,12 @@ public class OrmConnectionImpl implements OrmConnection {
       FunctionHandler<PreparedStatement, T> handler) {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
       getSqlParametersSetter().setParameters(sormConfig.getOptions(), stmt, sql.getParameters());
-      final Optional<LogPoint> dp =
-          getLoggerConfig().createLogPoint(LoggerConfig.Category.HANDLE_PREPAREDSTATEMENT);
+
+      getLoggerConfig()
+          .createLogPoint(LoggerConfig.Category.HANDLE_PREPAREDSTATEMENT, OrmConnectionImpl.class)
+          .ifPresent(_lp -> _lp.createBeforeSqlMessage(connection, sql));
       T ret = handler.apply(stmt);
-      dp.ifPresent(lp -> {
-        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(),
-            sql.getParameters());
-        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(),
-            sql.getSql(), Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
-      });
+
       return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
@@ -601,12 +594,12 @@ public class OrmConnectionImpl implements OrmConnection {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(sormConfig.getOptions(), stmt, parameters);
-      final Optional<LogPoint> dp =
-          getLoggerConfig().createLogPoint(LoggerConfig.Category.EXECUTE_QUERY);
+
+      getLoggerConfig().createLogPoint(LoggerConfig.Category.EXECUTE_QUERY, OrmConnectionImpl.class)
+          .ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+
       final ResultSet resultSet = stmt.executeQuery();
       LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
-      dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} readLazy from [{}]",
-          lp.getTagAndElapsedTime(), Try.getOrNull(() -> connection.getMetaData().getURL())));
       lazyResultSets.add(ret);
       return ret;
     } catch (SQLException e) {
@@ -656,13 +649,10 @@ public class OrmConnectionImpl implements OrmConnection {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(sormConfig.getOptions(), stmt, parameters);
 
-      final Optional<LogPoint> dp =
-          getLoggerConfig().createLogPoint(LoggerConfig.Category.EXECUTE_QUERY);
+      getLoggerConfig().createLogPoint(LoggerConfig.Category.EXECUTE_QUERY, OrmConnectionImpl.class)
+          .ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
 
       final ResultSet resultSet = stmt.executeQuery();
-
-      dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} readMapLazy from [{}]",
-          lp.getTagAndElapsedTime(), Try.getOrNull(() -> connection.getMetaData().getURL())));
 
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
       LazyResultSet<Map<String, Object>> ret =
@@ -854,20 +844,16 @@ public class OrmConnectionImpl implements OrmConnection {
   static <R> R executeQueryAndRead(LoggerConfig loggerConfig, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
       Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
-    final Optional<LogPoint> dp = loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_QUERY);
-    dp.ifPresent(lp -> {
-      lp.debug(OrmConnectionImpl.class, "[{}] [{}] with {} parameters", lp.getTag(), sql,
-          parameters == null ? 0 : parameters.length);
-      lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {}", lp.getTag(), parameters);
-    });
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
+      final Optional<LogPoint> lp =
+          loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_QUERY, OrmConnectionImpl.class);
+      lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+
       try (ResultSet resultSet = stmt.executeQuery()) {
         R ret = resultSetTraverser.traverseAndMap(resultSet);
-        dp.ifPresent(lp -> lp.debug(OrmConnectionImpl.class, "{} Read [{}] objects from [{}]",
-            lp.getTagAndElapsedTime(), ret instanceof Collection ? ((Collection<?>) ret).size() : 1,
-            Try.getOrNull(() -> connection.getMetaData().getURL())));
+        lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterQueryMessage(ret)));
         return ret;
       }
     } catch (Exception e) {
@@ -878,16 +864,15 @@ public class OrmConnectionImpl implements OrmConnection {
   static final int executeUpdateAndClose(LoggerConfig loggerConfig, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
       Object[] parameters) {
-    final Optional<LogPoint> dp = loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE);
+
+    final Optional<LogPoint> lp =
+        loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE, OrmConnectionImpl.class);
+    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
       int ret = stmt.executeUpdate();
-      dp.ifPresent(lp -> {
-        lp.trace(OrmConnectionImpl.class, "[{}] Parameters = {} ", lp.getTag(), parameters);
-        lp.debug(OrmConnectionImpl.class, "{} Call [{}] [{}]", lp.getTagAndElapsedTime(), sql,
-            Try.getOrNull(() -> connection.getMetaData().getURL()), sql);
-      });
+      lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterUpdateMessage(ret)));
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);

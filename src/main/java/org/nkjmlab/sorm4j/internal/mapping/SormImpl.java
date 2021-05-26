@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
@@ -33,7 +34,6 @@ public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
   private final SormConfig sormConfig;
-
 
   public SormImpl(DataSource connectionSource, SormConfig configs) {
     this.sormConfig = configs;
@@ -549,9 +549,28 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.executeUpdate(sql));
   }
 
+  private final Map<Class<?>, TypedOrm<?>> typedOrms = new ConcurrentHashMap<>();
+
+  @SuppressWarnings("unchecked")
   @Override
   public <S> TypedOrm<S> type(Class<S> objectClass) {
-    return new TypedOrmImpl<>(objectClass, this);
+    return (TypedOrm<S>) typedOrms.computeIfAbsent(objectClass,
+        oc -> new TypedOrmImpl<>(objectClass, this));
+  }
+
+  @Override
+  public void acceptWithLogging(ConsumerHandler<OrmConnection> handler) {
+    sormConfig.getLoggerConfig().forceLogging = true;
+    accept(handler);
+    sormConfig.getLoggerConfig().forceLogging = false;
+  }
+
+  @Override
+  public <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler) {
+    sormConfig.getLoggerConfig().forceLogging = true;
+    R ret = apply(handler);
+    sormConfig.getLoggerConfig().forceLogging = false;
+    return ret;
   }
 
 }

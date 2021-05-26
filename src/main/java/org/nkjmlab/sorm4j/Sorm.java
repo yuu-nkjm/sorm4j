@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.SormBuilder;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
@@ -88,6 +90,11 @@ public interface Sorm extends Orm {
    */
   void accept(ConsumerHandler<OrmConnection> handler);
 
+  @Experimental
+  void acceptWithLogging(ConsumerHandler<OrmConnection> handler);
+
+  @Experimental
+  <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler);
 
 
   /**
@@ -191,5 +198,15 @@ public interface Sorm extends Orm {
    * @return
    */
   OrmTransaction openTransaction();
+
+  static SormBuilder newBuilder() {
+    return new SormBuilder();
+  }
+
+  static SormBuilder newBuilder(DataSource dataSource) {
+    return new SormBuilder(dataSource);
+  }
+
+
 
 }

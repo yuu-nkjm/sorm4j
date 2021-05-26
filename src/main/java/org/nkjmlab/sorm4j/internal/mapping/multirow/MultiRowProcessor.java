@@ -4,12 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.extension.LoggerConfig;
+import org.nkjmlab.sorm4j.extension.LoggerConfig.LogPoint;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
-import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessor<T> {
@@ -92,15 +91,15 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> dp = loggerConfig.createLogPoint(LoggerConfig.Category.MULTI_ROW);
+    Optional<LogPoint> lp = loggerConfig.createLogPoint(LoggerConfig.Category.MULTI_ROW,
+        MultiRowInOneStatementProcessor.class);
+    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeMultiRowMessage(con, objects[0].getClass(),
+        objects.length, tableMapping.getTableMetaData().getTableName())));
+
 
     final int[] result = exec.apply(objects);
 
-    dp.ifPresent(lp -> lp.debug(getClass(),
-        "{} [{}] objects (req=[{}]) of [{}] are wrote into [{}]  at [{}]",
-        lp.getTagAndElapsedTime(), IntStream.of(result).sum(), objects.length,
-        tableMapping.getObjectClass(), tableMapping.getTableMetaData().getTableName(),
-        Try.getOrNull(() -> con.getMetaData().getURL())));
+    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterMultiRowMessage(result)));
     return result;
   }
 

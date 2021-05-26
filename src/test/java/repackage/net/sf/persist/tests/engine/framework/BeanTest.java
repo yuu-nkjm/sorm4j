@@ -7,18 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.slf4j.Logger;
 
 
 public class BeanTest {
 
-  private static final org.slf4j.Logger log =
-      org.nkjmlab.sorm4j.internal.util.LoggerFactory.getLogger();
+  private static final Logger log = org.slf4j.LoggerFactory.getLogger(BeanTest.class);
 
 
   public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
     ormConn.deleteAllOn(dbName(beanMap.getClassName()));
-    Object obj = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
+    Object obj =
+        DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
     tester.accept(obj);
   }
 
@@ -26,7 +27,8 @@ public class BeanTest {
   public static void testNull(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
     ormConn.deleteAllOn(dbName(beanMap.getClassName()));
-    Object objNull = DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
+    Object objNull =
+        DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
     tester.accept(objNull);
   }
 

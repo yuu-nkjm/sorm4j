@@ -8,8 +8,15 @@ import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
 @Experimental
 public class SormBuilder {
 
+
   private DataSource dataSource;
   private SormConfigBuilder configBuilder = new SormConfigBuilder();
+
+  public SormBuilder() {}
+
+  public SormBuilder(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
 
   public Sorm build() {
     return new SormImpl(dataSource, configBuilder.build());
