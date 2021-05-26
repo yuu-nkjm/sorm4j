@@ -54,6 +54,14 @@ public class TableSchema {
     return tableSchema;
   }
 
+  public static TableSchema.Builder newBuilder() {
+    return new TableSchema.Builder();
+  }
+
+  public static TableSchema.Builder newBuilder(String tableName) {
+    return new TableSchema.Builder(tableName);
+  }
+
 
   public static class Builder {
     private String tableName;
@@ -66,6 +74,11 @@ public class TableSchema {
       this.columnDefinitions = new LinkedHashMap<>();
       this.uniqueColumnPairs = new ArrayList<>();
       this.indexColumns = new ArrayList<>();
+    }
+
+    public Builder(String tableName) {
+      this();
+      this.tableName = tableName;
     }
 
     public TableSchema build() {
@@ -203,6 +216,12 @@ public class TableSchema {
 
   }
 
+  public void createTableAndIndexesIfNotExists(SqlExecutor sqlExecutor) {
+    createTableIfNotExists(sqlExecutor);
+    createIndexesIfNotExists(sqlExecutor);
+
+  }
+
   public void createTableIfNotExists(SqlExecutor sqlExecutor) {
     sqlExecutor.executeUpdate(getCreateTableIfNotExistsStatement());
   }
@@ -215,5 +234,7 @@ public class TableSchema {
   public void dropTableIfExists(SqlExecutor sqlExecutor) {
     sqlExecutor.executeUpdate(getDropTableIfExistsStatement());
   }
+
+
 
 }

@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.sql;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
+ * Sql keywords wrapped with space.
  *
  * @author nkjm
  * @see <a href="https://en.wikipedia.org/wiki/SQL_reserved_words">SQL reserved words -
@@ -70,6 +71,9 @@ public interface SqlKeyword {
   public static final String WHEN = wrapSpace("WHEN").toLowerCase();
   public static final String WHERE = wrapSpace("WHERE").toLowerCase();
   public static final String WITH = wrapSpace("WITH").toLowerCase();
+
+
+  public static final String SELECT_STAR = wrapSpace("select *");
 
   static String wrapSpace(String str) {
     return " " + str + " ";
