@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.SormBuilder;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
@@ -17,9 +18,9 @@ import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
  * @author nkjm
  *
  */
-public interface Sorm {
+public interface Sorm extends Orm {
 
-  static final SormConfig INITIAL_DEFAULT_CONFIG_STORE = new SormConfigBuilder().build();
+  static final SormConfig DEFAULT_CONFIG = new SormConfigBuilder().build();
 
 
   /**
@@ -29,7 +30,7 @@ public interface Sorm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return Sorm.create(dataSource, INITIAL_DEFAULT_CONFIG_STORE);
+    return Sorm.create(dataSource, DEFAULT_CONFIG);
   }
 
   static Sorm create(DataSource dataSource, SormConfig config) {
@@ -45,7 +46,7 @@ public interface Sorm {
    * @return
    */
   static Sorm create(String jdbcUrl, String user, String password) {
-    return Sorm.create(jdbcUrl, user, password, INITIAL_DEFAULT_CONFIG_STORE);
+    return create(jdbcUrl, user, password, DEFAULT_CONFIG);
   }
 
 
@@ -74,7 +75,7 @@ public interface Sorm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, INITIAL_DEFAULT_CONFIG_STORE);
+    return Sorm.toOrmConnection(connection, DEFAULT_CONFIG);
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormConfig sormConfig) {
@@ -89,6 +90,11 @@ public interface Sorm {
    */
   void accept(ConsumerHandler<OrmConnection> handler);
 
+  @Experimental
+  void acceptWithLogging(ConsumerHandler<OrmConnection> handler);
+
+  @Experimental
+  <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler);
 
 
   /**
@@ -164,13 +170,6 @@ public interface Sorm {
    */
   Connection getJdbcConnection();
 
-  /**
-   * Gets a {@link Orm} object.
-   *
-   * @return
-   */
-  @Experimental
-  Orm getOrm();
 
   /**
    * Gets map of the table mapping status. The keys are table names in lower case.
@@ -199,5 +198,15 @@ public interface Sorm {
    * @return
    */
   OrmTransaction openTransaction();
+
+  static SormBuilder newBuilder() {
+    return new SormBuilder();
+  }
+
+  static SormBuilder newBuilder(DataSource dataSource) {
+    return new SormBuilder(dataSource);
+  }
+
+
 
 }

@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SormOptionsImpl;
@@ -23,7 +21,6 @@ import org.nkjmlab.sorm4j.internal.mapping.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.internal.util.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
@@ -53,7 +50,7 @@ public final class SormConfig {
   private final int transactionIsolationLevel;
   private final LoggerConfig loggerConfig;
 
-  SormConfig(LoggerConfig loggerConfig, Map<String, Object> options,
+  public SormConfig(LoggerConfig loggerConfig, Map<String, Object> options,
       ColumnFieldMapper columnFieldMapper, TableNameMapper tableNameMapper,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
@@ -106,17 +103,13 @@ public final class SormConfig {
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
-          createLogPoint(LoggerConfig.Category.MAPPING).ifPresent(lp -> lp.info(SormConfig.class,
-              "[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
+          loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING, SormConfig.class)
+              .ifPresent(lp -> lp.logger.info("[{}]" + System.lineSeparator() + "{}", lp.getTag(),
+                  m.getFormattedString()));
           return m;
         }, Try::rethrow));
     return ret;
   }
-
-  public Optional<LogPoint> createLogPoint(Category category) {
-    return loggerConfig.createLogPoint(category);
-  }
-
 
   public <T> ColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
     ColumnToAccessorMap columnToAccessorMap =
@@ -187,8 +180,8 @@ public final class SormConfig {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
-      createLogPoint(LoggerConfig.Category.MAPPING).ifPresent(
-          lp -> lp.info(SormConfig.class, System.lineSeparator() + m.getFormattedString()));
+      loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING, SormConfig.class)
+          .ifPresent(lp -> lp.logger.info(System.lineSeparator() + m.getFormattedString()));
 
       return m;
     });

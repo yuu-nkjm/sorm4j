@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
 
 /**
  * A builder for configuration of or mapper.
@@ -14,13 +13,6 @@ import org.nkjmlab.sorm4j.extension.LoggerConfig.Category;
  */
 @Experimental
 public class SormConfigBuilder {
-
-  /**
-   * Type of how to execute multi-row update SQL statements.
-   */
-  public enum MultiRowProcessorType {
-    SIMPLE_BATCH, MULTI_ROW, MULTI_ROW_AND_BATCH
-  }
 
   public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR =
       MultiRowProcessorType.MULTI_ROW;

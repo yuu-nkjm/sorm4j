@@ -7,12 +7,12 @@ import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder.MultiRowProcessorType;
 
 class OrmConfigStoreTest {
 

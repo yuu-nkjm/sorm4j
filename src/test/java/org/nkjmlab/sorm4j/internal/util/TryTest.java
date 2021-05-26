@@ -61,21 +61,6 @@ class TryTest {
     }
   }
 
-  @Test
-  void testCreateBiConsumer() {
-    try {
-      Try.createBiConsumer((con1, con2) -> {
-        throw new RuntimeException("try");
-      }, e -> {
-      }).accept("a", "b");
-    } catch (Exception e) {
-      assertThat(e.getMessage()).contains("try");
-    }
-    Try.createBiConsumer((con1, con2) -> {
-    }, e -> {
-    }).accept("a", "b");
-  }
-
 
 
   @Test
@@ -91,16 +76,6 @@ class TryTest {
     }, Try::rethrow).accept("a");
   }
 
-  @Test
-  void testCreateBiConsumerWithThrow() {
-    try {
-      Try.createBiConsumerWithThrow((c1, c2) -> {
-        throw new RuntimeException("try");
-      }, Try::rethrow).accept("a", "b");
-    } catch (Exception e) {
-      assertThat(e.getMessage()).contains("try");
-    }
-  }
 
   @Test
   void testCreateFunction() {

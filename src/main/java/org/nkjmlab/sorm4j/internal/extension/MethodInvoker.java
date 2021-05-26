@@ -1,9 +1,9 @@
-package org.nkjmlab.sorm4j.internal.util;
+package org.nkjmlab.sorm4j.internal.extension;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-class MethodInvoker {
+public class MethodInvoker {
   private MethodInvoker() {}
 
   private static final DateTimeFormatter dateTimeFormatter =

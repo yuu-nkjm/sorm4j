@@ -23,7 +23,7 @@ import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
+import org.nkjmlab.sorm4j.internal.extension.LoggerFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
@@ -103,14 +103,12 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (getter.getParameterCount() != 0) {
-      LoggerFactory.warn(DefaultResultSetConverter.class,
-          "Getter [{}] should not have parameter but has {} params.", getter,
-          getter.getParameterCount());
+      LoggerFactory.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
+          getter, getter.getParameterCount());
       return null;
     }
     if (getter.getReturnType() == void.class) {
-      LoggerFactory.warn(DefaultResultSetConverter.class,
-          "Getter [{}] must have return a parameter.", getter);
+      LoggerFactory.getLogger().warn("Getter [{}] must have return a parameter.", getter);
     }
 
     return getter;
@@ -121,7 +119,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (setter.getParameterCount() != 1) {
-      LoggerFactory.warn(DefaultResultSetConverter.class,
+      LoggerFactory.getLogger().warn(
           "Setter [{}] should have a single parameter but has {} params.", setter,
           setter.getParameterCount());
       return null;
@@ -171,7 +169,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
         s = s != null ? g : isValidSetter(setters.get(fieldName));
       }
       if (f == null && (g == null || s == null)) {
-        LoggerFactory.debug(getClass(),
+        LoggerFactory.getLogger().debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             columnName);
       } else {

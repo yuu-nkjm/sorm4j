@@ -16,10 +16,10 @@ import org.nkjmlab.sorm4j.typed.TypedOrm;
 
 public class TypedOrmImpl<T> implements TypedOrm<T> {
 
-  private OrmImpl orm;
+  private Orm orm;
   private Class<T> objectClass;
 
-  public TypedOrmImpl(Class<T> objectClass, OrmImpl orm) {
+  public TypedOrmImpl(Class<T> objectClass, Orm orm) {
     this.orm = orm;
     this.objectClass = objectClass;
   }
@@ -329,16 +329,6 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   @Override
   public int executeUpdate(ParameterizedSql sql) {
     return orm.executeUpdate(sql);
-  }
-
-  @Override
-  public <S> TypedOrm<S> type(Class<S> objectClass) {
-    return new TypedOrmImpl<>(objectClass, orm);
-  }
-
-  @Override
-  public Orm untype() {
-    return orm;
   }
 
 }

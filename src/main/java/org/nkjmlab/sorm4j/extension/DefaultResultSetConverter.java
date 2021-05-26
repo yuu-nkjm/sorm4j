@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension;
 
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -99,8 +100,18 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
           final String str = resultSet.getString(column);
           return (str == null) ? null : str.toCharArray();
         }
-        default:
-          return resultSet.getObject(column);
+        default: {
+          java.sql.Array arry = resultSet.getArray(column);
+          Object srcArry = arry.getArray();
+          final int length = Array.getLength(srcArry);
+          Object destArray =
+              Array.newInstance(Try.getOrThrow(() -> Class.forName(name), Try::rethrow), length);
+          for (int i = 0; i < length; i++) {
+            Object v = Array.get(srcArry, i);
+            Array.set(destArray, i, v);
+          }
+          return destArray;
+        }
       }
     } else {
       final String name = toType.getName();

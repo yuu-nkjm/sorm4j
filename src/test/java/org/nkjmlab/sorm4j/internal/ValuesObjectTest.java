@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.TableName;
-import org.nkjmlab.sorm4j.internal.util.LoggerFactory;
+import org.nkjmlab.sorm4j.internal.extension.LoggerFactory;
 
 class ValuesObjectTest {
 

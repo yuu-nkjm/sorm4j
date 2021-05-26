@@ -10,7 +10,6 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.typed.TypedOrm;
 
 class TypedOrmImplTest {
 
@@ -20,7 +19,7 @@ class TypedOrmImplTest {
   @BeforeAll
   static void setUp() {
     sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
-    orm = sorm.getOrm().type(Player.class);
+    orm = sorm.type(Player.class);
   }
 
   @BeforeEach
@@ -375,12 +374,6 @@ class TypedOrmImplTest {
   @Test
   void testExecuteUpdateParameterizedSql() {
     orm.executeUpdate(ParameterizedSql.parse("insert into players values(?,?,?)", 9, "A", "B"));
-  }
-
-
-  @Test
-  void testUnType() {
-    orm.untype();
   }
 
 }

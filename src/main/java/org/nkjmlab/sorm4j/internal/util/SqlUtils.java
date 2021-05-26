@@ -30,16 +30,27 @@ public final class SqlUtils {
    * @param element
    * @return
    */
+  /**
+   * Converts the given arguments to SQL literal.
+   *
+   * @param element
+   * @return
+   */
   public static String literal(Object element) {
     if (element == null) {
       return "null";
-    } else if (element instanceof Number || element instanceof Boolean) {
-      return element.toString();
+    } else if (element.getClass().isArray()) {
+      return "[" + String.join(", ",
+          ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new)) + "]";
     } else if (element instanceof List) {
       return String.join(", ",
           ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
     }
+
     final String str = element.toString();
+    if (element instanceof Number || element instanceof Boolean) {
+      return str;
+    }
     switch (str) {
       case "?":
         return str;
