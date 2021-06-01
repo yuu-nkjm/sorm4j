@@ -103,7 +103,7 @@ public final class SormConfig {
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
-          loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING, SormConfig.class)
+          loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING)
               .ifPresent(lp -> lp.logger.info("[{}]" + System.lineSeparator() + "{}", lp.getTag(),
                   m.getFormattedString()));
           return m;
@@ -180,7 +180,7 @@ public final class SormConfig {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
-      loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING, SormConfig.class)
+      loggerConfig.createLogPoint(LoggerConfig.Category.MAPPING)
           .ifPresent(lp -> lp.logger.info(System.lineSeparator() + m.getFormattedString()));
 
       return m;

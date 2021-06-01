@@ -79,9 +79,8 @@ public final class LoggerConfig {
   public volatile boolean forceLogging = false;
 
   @Experimental
-  public Optional<LogPoint> createLogPoint(LoggerConfig.Category category, Class<?> clazz) {
-    return isLogging(category) ? Optional.of(new LogPoint(category.name(), clazz))
-        : Optional.empty();
+  public Optional<LogPoint> createLogPoint(LoggerConfig.Category category) {
+    return isLogging(category) ? Optional.of(new LogPoint(category.name())) : Optional.empty();
   }
 
   private boolean isLogging(Category category) {
@@ -95,9 +94,9 @@ public final class LoggerConfig {
     private long startTime;
     public final SormLogger logger;
 
-    private LogPoint(String name, Class<?> clazz) {
+    private LogPoint(String name) {
       this.name = name;
-      this.logger = LoggerFactory.getLogger(clazz);
+      this.logger = LoggerFactory.getLogger();
     }
 
     public String getTagAndElapsedTime() {
@@ -120,7 +119,7 @@ public final class LoggerConfig {
     }
 
     public String createBeforeSqlMessage(Connection connection, ParameterizedSql psql) {
-      String ret = StringUtils.format("[{}] Execute SQL [{}] to [{}]", getTag(),
+      String ret = StringUtils.format("[{}] At {}, Execute SQL [{}] to [{}]", getTag(), getCaller(),
           psql.getBindedSql(), getDbUrl(connection));
       this.startTime = System.nanoTime();
       return ret;
@@ -129,8 +128,8 @@ public final class LoggerConfig {
     public String createBeforeMultiRowMessage(Connection connection, Class<?> clazz, int length,
         String tableName) {
       String ret = StringUtils.format(
-          "[{}] Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]", getTag(),
-          length, clazz, tableName, getDbUrl(connection));
+          "[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]",
+          getTag(), getCaller(), length, clazz, tableName, getDbUrl(connection));
       this.startTime = System.nanoTime();
       return ret;
     }
@@ -148,6 +147,18 @@ public final class LoggerConfig {
     public String createAfterMultiRowMessage(int[] result) {
       return StringUtils.format("{} Affect [{}] objects", getTagAndElapsedTime(),
           IntStream.of(result).sum());
+    }
+
+    private String getCaller() {
+      StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+
+      String caller = Arrays.stream(stackTrace)
+          .filter(s -> !s.getClassName().startsWith("org.nkjmlab.sorm4j")
+              && !s.getClassName().startsWith("java."))
+          .findFirst().map(se -> se.getClassName() + "." + se.getMethodName() + "("
+              + se.getFileName() + ":" + se.getLineNumber() + ")")
+          .orElseGet(() -> "");
+      return caller;
     }
 
   }

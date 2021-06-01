@@ -5,14 +5,14 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 @Experimental
 public interface SormLogger {
 
-  void trace(String format, Object... arguments);
+  void trace(String format, Object... params);
 
-  void debug(String format, Object... arguments);
+  void debug(String format, Object... params);
 
-  void info(String format, Object... arguments);
+  void info(String format, Object... params);
 
-  void warn(String format, Object... arguments);
+  void warn(String format, Object... params);
 
-  void error(String format, Object... arguments);
+  void error(String format, Object... params);
 
 }

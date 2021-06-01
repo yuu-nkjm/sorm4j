@@ -137,7 +137,7 @@ public final class TableMapping<T> extends Mapping<T> {
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
 
     final Optional<LogPoint> lp =
-        loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE, TableMapping.class);
+        loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE);
     lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
 
     int ret = OrmConnectionImpl.executeUpdateAndClose(loggerConfig, options, connection,
@@ -232,7 +232,7 @@ public final class TableMapping<T> extends Mapping<T> {
       sqlParametersSetter.setParameters(options, stmt, parameters);
 
       final Optional<LogPoint> lp =
-          loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE, TableMapping.class);
+          loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE);
 
       lp.ifPresent(
           _lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, insertSql, parameters)));

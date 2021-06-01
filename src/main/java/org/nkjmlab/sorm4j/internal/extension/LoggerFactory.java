@@ -12,15 +12,15 @@ public final class LoggerFactory {
   public static SormLogger getLogger() {
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
     String className = stackTrace[1].getClassName();
-    return loggers.computeIfAbsent(className,
-        k -> Slf4jSormLogger.enableLogger ? Slf4jSormLogger.getLogger(k)
-            : SysoutSormLogger.getLogger(k));
+    return loggers.computeIfAbsent(className, k -> Log4jSormLogger.enableLogger
+        ? Log4jSormLogger.getLogger()
+        : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger.getLogger() : JulSormLogger.getLogger()));
   }
 
   public static SormLogger getLogger(Class<?> clazz) {
-    return loggers.computeIfAbsent(clazz.getName(),
-        k -> Slf4jSormLogger.enableLogger ? Slf4jSormLogger.getLogger(k)
-            : SysoutSormLogger.getLogger(k));
+    return loggers.computeIfAbsent(clazz.getName(), k -> Log4jSormLogger.enableLogger
+        ? Log4jSormLogger.getLogger()
+        : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger.getLogger() : JulSormLogger.getLogger()));
   }
 
 
