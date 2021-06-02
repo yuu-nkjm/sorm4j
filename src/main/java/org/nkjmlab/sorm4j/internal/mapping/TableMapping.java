@@ -15,11 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.LoggerConfig;
-import org.nkjmlab.sorm4j.extension.LoggerConfig.LogPoint;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
@@ -40,14 +40,14 @@ public final class TableMapping<T> extends Mapping<T> {
 
   private final TableMetaData tableMetaData;
   private final TableSql sql;
-  private final LoggerConfig loggerConfig;
+  private final LoggerContext loggerContext;
 
-  public TableMapping(LoggerConfig loggerConfig, SormOptions options,
+  public TableMapping(LoggerContext loggerContext, SormOptions options,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorFactory multiRowProcessorFactory, Class<T> objectClass,
       ColumnToAccessorMap columnToAccessorMap, TableMetaData tableMetaData, TableSql sql) {
     super(options, resultSetConverter, objectClass, columnToAccessorMap);
-    this.loggerConfig = loggerConfig;
+    this.loggerContext = loggerContext;
     this.tableMetaData = tableMetaData;
     this.sql = sql;
     this.sqlParametersSetter = sqlParametersSetter;
@@ -137,10 +137,10 @@ public final class TableMapping<T> extends Mapping<T> {
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
 
     final Optional<LogPoint> lp =
-        loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE);
+        loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
     lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
 
-    int ret = OrmConnectionImpl.executeUpdateAndClose(loggerConfig, options, connection,
+    int ret = OrmConnectionImpl.executeUpdateAndClose(loggerContext, options, connection,
         sqlParametersSetter, sql, parameters);
 
     lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterUpdateMessage(ret)));
@@ -232,7 +232,7 @@ public final class TableMapping<T> extends Mapping<T> {
       sqlParametersSetter.setParameters(options, stmt, parameters);
 
       final Optional<LogPoint> lp =
-          loggerConfig.createLogPoint(LoggerConfig.Category.EXECUTE_UPDATE);
+          loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
 
       lp.ifPresent(
           _lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, insertSql, parameters)));

@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
@@ -33,16 +33,16 @@ import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
-  private final SormConfig sormConfig;
+  private final SormContext sormContext;
 
-  public SormImpl(DataSource connectionSource, SormConfig configs) {
-    this.sormConfig = configs;
+  public SormImpl(DataSource connectionSource, SormContext context) {
+    this.sormContext = context;
     this.dataSource = connectionSource;
   }
 
   @Override
   public OrmTransaction openTransaction() {
-    return new OrmTransactionImpl(getJdbcConnection(), sormConfig);
+    return new OrmTransactionImpl(getJdbcConnection(), sormContext);
   }
 
 
@@ -79,14 +79,14 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public SormConfig getConfig() {
-    return sormConfig;
+  public SormContext getContext() {
+    return sormContext;
   }
 
 
   @Override
   public OrmConnection openConnection() {
-    return new OrmConnectionImpl(getJdbcConnection(), sormConfig);
+    return new OrmConnectionImpl(getJdbcConnection(), sormContext);
   }
 
 
@@ -140,15 +140,15 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String toString() {
-    return "Sorm [dataSource=" + dataSource + ", sormConfig=" + sormConfig + "]";
+    return "Sorm [dataSource=" + dataSource + ", sormConfig=" + sormContext + "]";
   }
 
 
   public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-    public OrmTransactionImpl(Connection connection, SormConfig options) {
-      super(connection, options);
-      begin(options.getTransactionIsolationLevel());
+    public OrmTransactionImpl(Connection connection, SormContext context) {
+      super(connection, context);
+      begin(context.getTransactionIsolationLevel());
     }
 
     @Override
@@ -192,7 +192,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public Map<String, String> getTableMappingStatusMap() {
-    return sormConfig.getTableMappingStatusMap();
+    return sormContext.getTableMappingStatusMap();
   }
 
   private <R> R applyAndClose(FunctionHandler<OrmConnection, R> handler) {
@@ -560,16 +560,16 @@ public final class SormImpl implements Sorm {
 
   @Override
   public void acceptWithLogging(ConsumerHandler<OrmConnection> handler) {
-    sormConfig.getLoggerConfig().forceLogging = true;
+    sormContext.getLoggerContext().forceLogging = true;
     accept(handler);
-    sormConfig.getLoggerConfig().forceLogging = false;
+    sormContext.getLoggerContext().forceLogging = false;
   }
 
   @Override
   public <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler) {
-    sormConfig.getLoggerConfig().forceLogging = true;
+    sormContext.getLoggerContext().forceLogging = true;
     R ret = apply(handler);
-    sormConfig.getLoggerConfig().forceLogging = false;
+    sormContext.getLoggerContext().forceLogging = false;
     return ret;
   }
 

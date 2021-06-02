@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.SormBuilder;
+import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 
@@ -24,11 +24,11 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = new SormBuilder().setDataSource(jdbcUrl, user, password)
+    sorm = Sorm.newBuilder().setDataSource(jdbcUrl, user, password)
         .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).setLoggerOffAll()
-        .setLoggerOnAll().build();
+        .setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build();
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.getConfig().toString();
+    String s = sorm.getContext().toString();
 
     assertThat(s.toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }

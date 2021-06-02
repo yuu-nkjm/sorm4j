@@ -34,7 +34,7 @@ import org.nkjmlab.sorm4j.extension.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
@@ -44,7 +44,7 @@ import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
   private static DataSource dataSource;
-  private static SormConfig sormConfig;
+  private static SormContext sormContext;
 
   @BeforeAll
   static void beforAll() {
@@ -88,8 +88,8 @@ public class TestPostgreSQLSqlMapper {
         return null;
       }
     });
-    sormConfig =
-        new SormConfigBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build();
+    sormContext = new SormContext(
+        SormConfig.newBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build());
   }
 
 
@@ -110,7 +110,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn, sormConfig);
+      OrmConnection c = Sorm.toOrmConnection(conn, sormContext);
       doTest(c, "c_boolean", true);
       doTest(c, "c_integer", 1);
       doTest(c, "c_integer", new BigDecimal("1"));

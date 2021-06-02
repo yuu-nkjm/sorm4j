@@ -24,6 +24,7 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 public class NamedParameterSqlImpl implements NamedParameterSql {
   private static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnFieldMapper();
+
   private static final char DEFAULT_PREFIX = ':';
   private static final char DEFAULT_SUFFIX = 0;
 

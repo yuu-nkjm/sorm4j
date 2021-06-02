@@ -16,7 +16,6 @@ import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.SormBuilder;
 import org.nkjmlab.sorm4j.internal.mapping.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
@@ -602,7 +601,7 @@ class OrmConnectionTest {
 
 
 
-    Sorm orm = new SormBuilder().setDataSource(sorm.getDataSource())
+    Sorm orm = Sorm.newBuilder().setDataSource(sorm.getDataSource())
         .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build();
 
     orm.acceptTransactionHandler(m -> {

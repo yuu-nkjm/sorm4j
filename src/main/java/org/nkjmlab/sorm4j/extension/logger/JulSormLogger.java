@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.extension;
+package org.nkjmlab.sorm4j.extension.logger;
 
 import java.util.logging.Level;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
