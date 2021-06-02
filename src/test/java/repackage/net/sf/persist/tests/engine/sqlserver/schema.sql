@@ -1,3 +1,5 @@
+-- CREATE DATABASE sorm;
+
 drop table if exists numeric_types, datetime_types, string_types, binary_types;
 
 create table numeric_types (
