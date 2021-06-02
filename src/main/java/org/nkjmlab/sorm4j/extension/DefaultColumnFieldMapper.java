@@ -23,7 +23,6 @@ import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.internal.extension.LoggerFactory;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 /**
@@ -34,6 +33,16 @@ import org.nkjmlab.sorm4j.internal.util.StringUtils;
  */
 
 public class DefaultColumnFieldMapper implements ColumnFieldMapper {
+
+  private final LoggerConfig loggerConfig;
+
+  public DefaultColumnFieldMapper() {
+    this(new LoggerConfig.Builder().build());
+  }
+
+  public DefaultColumnFieldMapper(LoggerConfig loggerConfig) {
+    this.loggerConfig = loggerConfig;
+  }
 
   private static Map<FieldName, Method> extractedMethodStartWith(Class<?> objectClass,
       String prefix) {
@@ -98,30 +107,29 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     return annos;
   }
 
-  private static Method isValidGetter(Method getter) {
+  private Method isValidGetter(Method getter) {
     if (getter == null) {
       return null;
     }
     if (getter.getParameterCount() != 0) {
-      LoggerFactory.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
+      loggerConfig.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
           getter, getter.getParameterCount());
       return null;
     }
     if (getter.getReturnType() == void.class) {
-      LoggerFactory.getLogger().warn("Getter [{}] must have return a parameter.", getter);
+      loggerConfig.getLogger().warn("Getter [{}] must have return a parameter.", getter);
     }
 
     return getter;
   }
 
-  private static Method isValidSetter(Method setter) {
+  private Method isValidSetter(Method setter) {
     if (setter == null) {
       return null;
     }
     if (setter.getParameterCount() != 1) {
-      LoggerFactory.getLogger().warn(
-          "Setter [{}] should have a single parameter but has {} params.", setter,
-          setter.getParameterCount());
+      loggerConfig.getLogger().warn("Setter [{}] should have a single parameter but has {} params.",
+          setter, setter.getParameterCount());
       return null;
     }
     return setter;
@@ -169,7 +177,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
         s = s != null ? g : isValidSetter(setters.get(fieldName));
       }
       if (f == null && (g == null || s == null)) {
-        LoggerFactory.getLogger().debug(
+        loggerConfig.getLogger().debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             columnName);
       } else {

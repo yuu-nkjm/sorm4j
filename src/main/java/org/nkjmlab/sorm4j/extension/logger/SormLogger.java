@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.extension;
+package org.nkjmlab.sorm4j.extension.logger;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 

@@ -1,8 +1,10 @@
 package org.nkjmlab.sorm4j.extension;
 
+import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
 
 @Experimental
@@ -112,5 +114,11 @@ public class SormBuilder {
     configBuilder.setLoggerOff(categories);
     return this;
   }
+
+  public SormBuilder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
+    configBuilder.setLoggerSupplier(loggerSupplier);
+    return this;
+  }
+
 
 }

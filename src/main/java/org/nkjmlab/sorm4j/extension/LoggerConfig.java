@@ -3,15 +3,18 @@ package org.nkjmlab.sorm4j.extension;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.internal.extension.LoggerFactory;
-import org.nkjmlab.sorm4j.internal.extension.SormLogger;
+import org.nkjmlab.sorm4j.extension.logger.JulSormLogger;
+import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.extension.logger.Slf4jSormLogger;
+import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -32,55 +35,31 @@ public final class LoggerConfig {
     MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE, HANDLE_PREPAREDSTATEMENT;
   }
 
-  private final Set<LoggerConfig.Category> onCategories = ConcurrentHashMap.newKeySet();
 
-  @Experimental
-  private static List<Category> defaultLoggingCategories =
-      new CopyOnWriteArrayList<>(List.of(Category.MAPPING));
+  private final Set<LoggerConfig.Category> onCategories;
 
-  public LoggerConfig() {
-    defaultLoggingCategories.forEach(c -> on(c));
-  }
-
-
-  /**
-   * Enables logging for the given parameter of {@link Category}.
-   *
-   * @param categories are in {@link Category}
-   */
-  public void on(LoggerConfig.Category... categories) {
-    Arrays.stream(categories).forEach(name -> onCategories.add(name));
-  }
-
-  /**
-   * Disables logging for the given categories.
-   *
-   * @param categories
-   */
-  public void off(LoggerConfig.Category... categories) {
-    Arrays.stream(categories).forEach(name -> onCategories.remove(name));
-  }
-
-  /**
-   * Enables logging all categories. See {@link Category}.
-   */
-  public void onAll() {
-    on(LoggerConfig.Category.values());
-  }
-
-  /**
-   * Disables logging all categories. See {@link Category}.
-   */
-  public void offAll() {
-    off(LoggerConfig.Category.values());
-  }
-
+  private final Supplier<SormLogger> loggerSupplier;
   @Experimental
   public volatile boolean forceLogging = false;
 
+  private final Map<String, SormLogger> loggers = new ConcurrentHashMap<>();
+
+  public SormLogger getLogger() {
+    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+    String className = stackTrace[1].getClassName();
+    return loggers.computeIfAbsent(className, k -> loggerSupplier.get());
+  }
+
+  public LoggerConfig(Supplier<SormLogger> loggerSupplier,
+      Set<LoggerConfig.Category> onCategories) {
+    this.loggerSupplier = loggerSupplier;
+    this.onCategories = onCategories;
+  }
+
   @Experimental
   public Optional<LogPoint> createLogPoint(LoggerConfig.Category category) {
-    return isLogging(category) ? Optional.of(new LogPoint(category.name())) : Optional.empty();
+    return isLogging(category) ? Optional.of(new LogPoint(category.name(), getLogger()))
+        : Optional.empty();
   }
 
   private boolean isLogging(Category category) {
@@ -94,9 +73,9 @@ public final class LoggerConfig {
     private long startTime;
     public final SormLogger logger;
 
-    private LogPoint(String name) {
+    private LogPoint(String name, SormLogger logger) {
       this.name = name;
-      this.logger = LoggerFactory.getLogger();
+      this.logger = logger;
     }
 
     public String getTagAndElapsedTime() {
@@ -160,6 +139,66 @@ public final class LoggerConfig {
           .orElseGet(() -> "");
       return caller;
     }
+
+  }
+
+  public static class Builder {
+    private static Set<Category> defaultLoggingCategories = Set.of(Category.MAPPING);
+
+    private Supplier<SormLogger> loggerSupplier;
+    private final Set<LoggerConfig.Category> onCategories;
+
+    public Builder() {
+      this.onCategories = new HashSet<>(defaultLoggingCategories);
+    }
+
+    public void setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
+      this.loggerSupplier = loggerSupplier;
+    }
+
+    private static Supplier<SormLogger> getDefaultLoggerSupplier() {
+      return Log4jSormLogger.enableLogger ? () -> Log4jSormLogger.getLogger()
+          : (Slf4jSormLogger.enableLogger ? () -> Slf4jSormLogger.getLogger()
+              : () -> JulSormLogger.getLogger());
+    }
+
+    public LoggerConfig build() {
+      this.loggerSupplier = loggerSupplier != null ? loggerSupplier : getDefaultLoggerSupplier();
+      return new LoggerConfig(loggerSupplier, onCategories);
+    }
+
+    /**
+     * Enables logging for the given parameter of {@link Category}.
+     *
+     * @param categories are in {@link Category}
+     */
+    public void on(LoggerConfig.Category... categories) {
+      Arrays.stream(categories).forEach(name -> onCategories.add(name));
+    }
+
+    /**
+     * Disables logging for the given categories.
+     *
+     * @param categories
+     */
+    public void off(LoggerConfig.Category... categories) {
+      Arrays.stream(categories).forEach(name -> onCategories.remove(name));
+    }
+
+    /**
+     * Enables logging all categories. See {@link Category}.
+     */
+    public void onAll() {
+      on(LoggerConfig.Category.values());
+    }
+
+    /**
+     * Disables logging all categories. See {@link Category}.
+     */
+    public void offAll() {
+      off(LoggerConfig.Category.values());
+    }
+
 
   }
 
