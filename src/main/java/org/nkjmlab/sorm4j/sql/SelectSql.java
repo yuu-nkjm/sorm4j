@@ -198,26 +198,26 @@ public class SelectSql {
       }
       sql.append(columns);
       sql.append(prettyPrint ? System.lineSeparator() : "");
-      sql.append(" from " + table);
+      sql.append(FROM + table);
       if (where != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
-        sql.append(" where " + where);
+        sql.append(WHERE + where);
       }
       if (groupBy != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
-        sql.append(" group by " + groupBy);
+        sql.append(GROUP_BY + groupBy);
       }
       if (having != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
-        sql.append(" having " + having);
+        sql.append(HAVING + having);
       }
       if (orderBy != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
-        sql.append(" order by " + orderBy);
+        sql.append(ORDER_BY + orderBy);
       }
       if (limit != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
-        sql.append(" limit " + limit);
+        sql.append(LIMIT + limit);
       }
 
       return sql.toString();
@@ -286,7 +286,7 @@ public class SelectSql {
      * @param op
      * @param right
      */
-    private Condition(String left, String op, String right) {
+    private Condition(Object left, String op, Object right) {
       this.condition = left + op + right;
     }
 
@@ -345,16 +345,16 @@ public class SelectSql {
    * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
    * </pre>
    */
-  public static String as(Object col, String alias) {
-    return col + " as " + alias;
+  public static String as(Object src, String alias) {
+    return src + AS + alias;
   }
 
   public static String between(String colName, Object beginExp, Object endExp) {
-    return wrapSpace(colName + BETWEEN + literal(beginExp) + "AND" + literal(endExp));
+    return wrapSpace(colName + BETWEEN + literal(beginExp) + AND + literal(endExp));
   }
 
-  public static String castAs(String colName, String toType) {
-    return wrapSpace(CAST + wrapParentheses(colName + AS + toType));
+  public static String castAs(String src, String toType) {
+    return wrapSpace(CAST + wrapParentheses(src + AS + toType));
   }
 
 
@@ -387,11 +387,11 @@ public class SelectSql {
    * @param right
    */
 
-  public static Condition condition(String left, String op, String right) {
+  public static Condition condition(Object left, String op, Object right) {
     return new Condition(left, op, right);
   }
 
-  public static String cond(String left, String op, String right) {
+  public static String cond(Object left, String op, Object right) {
     return left + op + right;
   }
 
@@ -407,10 +407,6 @@ public class SelectSql {
 
   public static String groupBy(String... groups) {
     return wrapSpace(GROUP_BY + joinCommaAndSpace(groups));
-  }
-
-  private static String joinCommaAndSpace(String... elements) {
-    return String.join(", ", elements);
   }
 
   public static String limit(int limit) {
@@ -448,13 +444,14 @@ public class SelectSql {
   }
 
 
-  public static String max(String column) {
-    return wrapSpace(MAX + wrapParentheses(column));
+  public static String func(String functionName, String column) {
+    return wrapSpace(functionName + wrapParentheses(column));
   }
 
-  public static String min(String column) {
-    return wrapSpace(MIN + wrapParentheses(column));
+  public static String func(String functionName, String... columns) {
+    return wrapSpace(functionName + wrapParentheses(joinCommaAndSpace(columns)));
   }
+
 
   /**
    * Creates {@link Builder} object.
@@ -539,6 +536,10 @@ public class SelectSql {
 
   public static String where(String whereClause) {
     return wrapSpace(WHERE + whereClause);
+  }
+
+  private static String joinCommaAndSpace(String... elements) {
+    return String.join(", ", elements);
   }
 
   private static String wrapParentheses(String str) {
