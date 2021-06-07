@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,11 +18,15 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
+import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.sql.result.LazyResultSetImpl;
+import org.nkjmlab.sorm4j.internal.typed.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.sql.Command;
@@ -427,14 +431,14 @@ public class OrmConnectionImpl implements OrmConnection {
         mapping -> mapping.insert(getJdbcConnection(), objects), () -> new int[0]);
   }
 
-  <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+  public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     if (resultSet.next()) {
       return mapRowToObject(objectClass, resultSet);
     }
     return null;
   }
 
-  Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
+  public Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
       ret = mapRowToMap(resultSet);
@@ -454,7 +458,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   }
 
-  <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+  public <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     T ret = null;
     if (resultSet.next()) {
       ret = mapRowToObject(objectClass, resultSet);
@@ -466,7 +470,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
+  public Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
     Map<String, Object> ret = null;
     if (resultSet.next()) {
       ret = mapRowToMap(resultSet);
@@ -859,7 +863,7 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  static final int executeUpdateAndClose(LoggerContext loggerContext, SormOptions options,
+  public static final int executeUpdateAndClose(LoggerContext loggerContext, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
       Object[] parameters) {
 
@@ -878,4 +882,35 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
+  private static class ColumnsAndTypes {
+
+    private final List<String> columns;
+    private final List<Integer> columnTypes;
+
+    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+      this.columns = columns;
+      this.columnTypes = columnTypes;
+    }
+
+    public List<String> getColumns() {
+      return columns;
+    }
+
+    public List<Integer> getColumnTypes() {
+      return columnTypes;
+    }
+
+    static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
+      ResultSetMetaData metaData = resultSet.getMetaData();
+      int colNum = metaData.getColumnCount();
+      List<String> columns = new ArrayList<>(colNum);
+      List<Integer> columnTypes = new ArrayList<>(colNum);
+      for (int i = 1; i <= colNum; i++) {
+        columns.add(metaData.getColumnName(i));
+        columnTypes.add(metaData.getColumnType(i));
+      }
+      return new ColumnsAndTypes(columns, columnTypes);
+    }
+
+  }
 }

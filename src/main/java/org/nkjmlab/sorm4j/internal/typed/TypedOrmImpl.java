@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal.typed;
 
 import java.sql.PreparedStatement;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

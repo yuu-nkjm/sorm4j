@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import org.nkjmlab.sorm4j.extension.SormContext;
-
 /**
  * Functions of handling transaction.
  *
@@ -12,7 +10,7 @@ public interface TransactionFunction {
 
   /**
    * Begin transaction. The isolation level is corresponding to
-   * {@link SormContext#getTransactionIsolationLevel()}.
+   * {@link Sorm.Builder#setTransactionIsolationLevel()}.
    */
   void begin();
 

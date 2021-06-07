@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,9 @@ import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.SormContext;
+import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.internal.typed.TypedOrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.typed.TypedOrmImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
@@ -34,6 +36,13 @@ public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
   private final SormContext sormContext;
+
+  @Experimental
+  public static Sorm create(DataSource dataSource, SormContext context) {
+    return new SormImpl(dataSource, context);
+  }
+
+
 
   public SormImpl(DataSource connectionSource, SormContext context) {
     this.sormContext = context;

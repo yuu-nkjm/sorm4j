@@ -264,15 +264,15 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         + System.lineSeparator() + super.getColumnToAccessorString();
   }
 
-  List<T> loadPojoList(ResultSet resultSet) throws SQLException {
+  public List<T> loadPojoList(ResultSet resultSet) throws SQLException {
     return pojoCreator.loadPojoList(resultSet, createColumns(resultSet));
   }
 
-  T loadPojo(ResultSet resultSet) throws SQLException {
+  public T loadPojo(ResultSet resultSet) throws SQLException {
     return loadPojo(createColumns(resultSet), resultSet);
   }
 
-  T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
+  public T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
     return pojoCreator.loadPojo(resultSet, columns);
   }
 

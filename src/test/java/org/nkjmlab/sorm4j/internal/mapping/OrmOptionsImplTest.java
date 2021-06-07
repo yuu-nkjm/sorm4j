@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.internal.SormOptionsImpl;
 
 class OrmOptionsImplTest {
 

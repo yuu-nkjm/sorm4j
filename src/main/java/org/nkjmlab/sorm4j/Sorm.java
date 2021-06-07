@@ -10,14 +10,14 @@ import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
-import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.SormLogger;
-import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.internal.mapping.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.SormContext;
+import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 
 /**
  * An interface of executing object-relation mapping.
@@ -36,12 +36,9 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return Sorm.create(dataSource, DEFAULT_CONTEXT);
+    return SormImpl.create(dataSource, DEFAULT_CONTEXT);
   }
 
-  static Sorm create(DataSource dataSource, SormContext context) {
-    return new SormImpl(dataSource, context);
-  }
 
   /**
    * Create a {@link Sorm} object which uses {@link DriverManager}.
@@ -55,10 +52,6 @@ public interface Sorm extends Orm {
     return create(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
-
-  static Sorm create(String jdbcUrl, String user, String password, SormContext context) {
-    return create(createDriverManagerDataSource(jdbcUrl, user, password), context);
-  }
 
   /**
    * Creates a {@link DataSource} which simply wraps {@link DriverManager}

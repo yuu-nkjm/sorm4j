@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.SormLogger;
-import org.nkjmlab.sorm4j.internal.mapping.SormOptionsImpl;
+import org.nkjmlab.sorm4j.internal.SormOptionsImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 
 /**

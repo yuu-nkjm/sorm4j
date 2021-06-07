@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.internal;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -13,6 +13,13 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.extension.ColumnName;
+import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext.Category;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;

@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal.sql.result;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 
@@ -23,7 +24,7 @@ import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
  *
  * @param <T> element type in result
  */
-final class LazyResultSetImpl<T> implements LazyResultSet<T> {
+public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   @SuppressWarnings("rawtypes")
   private static final Class<? extends Map> MAP_CLASS = LinkedHashMap.class;
 
