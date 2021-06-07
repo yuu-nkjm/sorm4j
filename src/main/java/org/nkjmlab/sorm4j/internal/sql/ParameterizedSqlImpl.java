@@ -8,6 +8,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.SelectSql;
 
 /**
  * This class represents a sql statement with ordered parameters.
@@ -153,7 +154,7 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
   public String getBindedSql() {
     String sql = this.sql;
     for (int i = 0; i < parameters.length; i++) {
-      sql = sql.replaceFirst("\\?", ParameterizedSql.literal(parameters[i]));
+      sql = sql.replaceFirst("\\?", SelectSql.literal(parameters[i]));
     }
     return sql;
   }

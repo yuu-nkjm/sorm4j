@@ -1,20 +1,20 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.nkjmlab.sorm4j.sql.SelectSql.*;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 
 class ParameterizedSqlTest {
 
   @Test
   void testLietral() {
-    assertThat(SqlUtils.literal(List.of("a", "b"))).isEqualTo("'a', 'b'");
-    assertThat(SqlUtils.literal(null)).isEqualTo("null");
-    assertThat(SqlUtils.literal("?")).isEqualTo("?");
-    assertThat(SqlUtils.literal("test")).isEqualTo("'test'");
-    assertThat(ParameterizedSql.literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
+    assertThat(literal(List.of("a", "b"))).isEqualTo("'a', 'b'");
+    assertThat(literal(null)).isEqualTo("null");
+    assertThat(literal("?")).isEqualTo("?");
+    assertThat(literal("test")).isEqualTo("'test'");
+    assertThat(literal("hi, my name's tim.")).isEqualTo("'hi, my name''s tim.'");
   }
 
   @Test
