@@ -1,7 +1,7 @@
 
 package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -129,8 +129,9 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (setter.getParameterCount() != 1) {
-      loggerContext.getLogger().warn("Setter [{}] should have a single parameter but has {} params.",
-          setter, setter.getParameterCount());
+      loggerContext.getLogger().warn(
+          "Setter [{}] should have a single parameter but has {} params.", setter,
+          setter.getParameterCount());
       return null;
     }
     return setter;
@@ -182,7 +183,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             columnName);
       } else {
-        ret.put(StringUtils.toCanonical(columnName.getName()), new Accessor(columnName, f, g, s));
+        ret.put(toCanonical(columnName.getName()), new Accessor(columnName, f, g, s));
       }
     }
     return ret;

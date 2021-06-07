@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,7 +56,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
     }
 
     String className = objectClass.getSimpleName();
-    return StringUtils.addPluralSuffix(List.of(toCanonical(className)));
+    return addPluralSuffix(List.of(toCanonical(className)));
   }
 
   /**

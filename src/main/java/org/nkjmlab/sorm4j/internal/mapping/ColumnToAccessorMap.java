@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

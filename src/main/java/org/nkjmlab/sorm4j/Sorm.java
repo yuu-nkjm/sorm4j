@@ -171,9 +171,10 @@ public interface Sorm extends Orm {
 
 
   /**
-   * Gets map of the table mapping status. The keys are table names in lower case.
+   * Gets map of the table mapping status.
    *
-   * @return
+   * @return Map of status. Keys in the table are the names of the table returned in lower case.
+   *
    */
   Map<String, String> getTableMappingStatusMap();
 

@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.internal;
 
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -59,8 +60,8 @@ public final class SormContext {
 
 
   public Map<String, String> getTableMappingStatusMap() {
-    return tableMappings.entrySet().stream()
-        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getFormattedString()));
+    return tableMappings.entrySet().stream().collect(
+        Collectors.toMap(e -> toLowerCase(e.getKey()), e -> e.getValue().getFormattedString()));
   }
 
   public <T> TableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
@@ -129,11 +130,11 @@ public final class SormContext {
         sormConfig.getColumnFieldMapper().createAccessors(objectClass, allColumns);
 
     Set<String> keySetWithoutAlias = accessors.keySet();
-    if (!StringUtils.equalsAsCanonical(columns, keySetWithoutAlias)) {
+    if (!equalsAsCanonical(columns, keySetWithoutAlias)) {
       throw new SormException(StringUtils.format(
           "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
-          columns.stream().filter(e -> !keySetWithoutAlias.contains(StringUtils.toCanonical(e)))
-              .sorted().collect(Collectors.toList()),
+          columns.stream().filter(e -> !keySetWithoutAlias.contains(toCanonical(e))).sorted()
+              .collect(Collectors.toList()),
           tableName,
           allColumns.stream().map(c -> c.toString()).sorted().collect(Collectors.toList()),
           objectClass.getName(),
@@ -223,6 +224,5 @@ public final class SormContext {
         + ", tableNameToValidTableNameMap=" + tableNameToValidTableNameMap + ", sormConfig="
         + sormConfig + "]";
   }
-
 
 }

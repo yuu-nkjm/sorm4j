@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension;
 
 
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -10,9 +11,12 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -22,7 +26,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  *
  */
 
-public class DefaultResultSetConverter extends AbstractResultSetConverter {
+public class DefaultResultSetConverter implements ResultSetConverter {
 
   private static final Set<Class<?>> standardObjectClasses = Set.of(boolean.class, Boolean.class,
       byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
@@ -67,6 +71,55 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
   public DefaultResultSetConverter(ColumnValueConverter... converters) {
     this(Arrays.asList(converters));
   }
+
+  public static final String LOWER_CASE = "LOWER_CASE";
+  public static final String UPPER_CASE = "UPPER_CASE";
+  public static final String NO_CONVERSION = "NO_CONVERSION";
+
+  /**
+   * Defines the letter case of the keys in the result of {@link #toSingleMap}.
+   */
+  @Experimental
+  public static String LETTER_CASE_OF_KEY_IN_MAP_RESULT = LOWER_CASE;
+
+  @Experimental
+  public String convertKey(String key) {
+    switch (LETTER_CASE_OF_KEY_IN_MAP_RESULT) {
+      case LOWER_CASE:
+        return toLowerCase(key);
+      case UPPER_CASE:
+        return toUpperCase(key);
+      case NO_CONVERSION:
+      default:
+        return key;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * Keys in the results are the names of the columns returned in lower case.
+   *
+   */
+  @Override
+  public Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet,
+      List<String> columns, List<Integer> columnTypes) throws SQLException {
+    final int cSize = columns.size();
+    final Map<String, Object> ret = new LinkedHashMap<>(cSize);
+    for (int i = 1; i <= cSize; i++) {
+      ret.put(convertKey(columns.get(i - 1)),
+          getColumnValueBySqlType(resultSet, i, columnTypes.get(i - 1)));
+    }
+    return ret;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int sqlType,
+      Class<T> objectClass) throws SQLException {
+    return (T) convertColumnValueTo(options, resultSet, 1, sqlType, objectClass);
+  }
+
 
 
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
@@ -236,7 +289,6 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
    * @return
    * @throws SQLException
    */
-  @Override
   protected Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
@@ -308,5 +360,6 @@ public class DefaultResultSetConverter extends AbstractResultSetConverter {
         return resultSet.getObject(column);
     }
   }
+
 
 }

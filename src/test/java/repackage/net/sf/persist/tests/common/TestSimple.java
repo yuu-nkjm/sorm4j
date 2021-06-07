@@ -3,6 +3,7 @@ package repackage.net.sf.persist.tests.common;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
@@ -306,7 +306,7 @@ public class TestSimple {
       long id = simpleOrMapper.readFirst(long.class, "select id from simple limit 1");
 
       Map<String, Object> simpleMap1 =
-          simpleOrMapper.readMapFirst("select * from simple where id=?", id);
+          simpleOrMapper.readMapFirst("select id, long_col, string_col from simple where id=?", id);
       assertEquals(id, simpleMap1.get("id"));
       assertEquals(simple.getLongCol(), simpleMap1.get("long_col"));
       assertEquals(simple.getStringCol(), simpleMap1.get("string_col"));
@@ -515,29 +515,29 @@ public class TestSimple {
 
   @Test
   public void TestUpperSnakeCase() {
-    Set<String> guessed = Set.of(StringUtils.toUpperSnakeCase("name"));
+    Set<String> guessed = Set.of(toUpperSnakeCase("name"));
     Set<String> expected = Set.of("NAME");
     assertEquals(expected, guessed);
 
-    guessed = Set.of(StringUtils.toUpperSnakeCase("nameC"));
+    guessed = Set.of(toUpperSnakeCase("nameC"));
     expected = Set.of("NAME_C");
 
     assertEquals(expected, guessed);
 
-    guessed = Set.of(StringUtils.toUpperSnakeCase("nameCo"));
+    guessed = Set.of(toUpperSnakeCase("nameCo"));
     expected = Set.of("NAME_CO");
     assertEquals(expected, guessed);
 
-    guessed = Set.of(StringUtils.toUpperSnakeCase("n"));
+    guessed = Set.of(toUpperSnakeCase("n"));
     expected = Set.of("N");
 
     assertEquals(expected, guessed);
 
-    guessed = Set.of(StringUtils.toUpperSnakeCase("nC"));
+    guessed = Set.of(toUpperSnakeCase("nC"));
     expected = Set.of("N_C");
     assertEquals(expected, guessed);
 
-    guessed = Set.of(StringUtils.toUpperSnakeCase("nCMP"));
+    guessed = Set.of(toUpperSnakeCase("nCMP"));
     expected = Set.of("N_C_M_P");
     assertEquals(expected, guessed);
 

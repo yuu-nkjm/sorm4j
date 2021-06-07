@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;

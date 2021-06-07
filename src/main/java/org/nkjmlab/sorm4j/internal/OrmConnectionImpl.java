@@ -887,7 +887,7 @@ public class OrmConnectionImpl implements OrmConnection {
     private final List<String> columns;
     private final List<Integer> columnTypes;
 
-    public ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+    private ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
       this.columns = columns;
       this.columnTypes = columnTypes;
     }
@@ -906,7 +906,7 @@ public class OrmConnectionImpl implements OrmConnection {
       List<String> columns = new ArrayList<>(colNum);
       List<Integer> columnTypes = new ArrayList<>(colNum);
       for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnName(i));
+        columns.add(metaData.getColumnLabel(i));
         columnTypes.add(metaData.getColumnType(i));
       }
       return new ColumnsAndTypes(columns, columnTypes);
