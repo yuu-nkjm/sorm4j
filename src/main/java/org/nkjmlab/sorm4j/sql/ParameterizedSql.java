@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
-import org.nkjmlab.sorm4j.internal.util.SqlUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 
@@ -134,27 +133,5 @@ public interface ParameterizedSql {
   }
 
 
-
-  /**
-   * Convert the given arguments to SQL literal.
-   *
-   * @param element
-   * @return
-   */
-  @Experimental
-  static String literal(Object element) {
-    return SqlUtils.literal(element);
-  }
-
-  /**
-   * Returns single quoted expression. If it includes single quotations, they will be escaped.
-   *
-   * @param expr
-   * @return
-   */
-  @Experimental
-  static String quote(String expr) {
-    return SqlUtils.quote(expr);
-  }
 
 }

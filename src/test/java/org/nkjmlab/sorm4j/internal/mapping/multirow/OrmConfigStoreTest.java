@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 
@@ -30,8 +30,8 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      SormConfig conf = new SormConfigBuilder().setMultiRowProcessorType(null).setBatchSize(10)
-          .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build();
+      SormContext conf = new SormContext(SormConfig.newBuilder().setMultiRowProcessorType(null)
+          .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
@@ -43,11 +43,12 @@ class OrmConfigStoreTest {
 
     ResultSetConverter rsc = DEFAULT_RESULT_SET_CONVERTER;
 
-    SormConfig confs = new SormConfigBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
-        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
-        .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
-        .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10).setMultiRowSize(20)
-        .setBatchSizeWithMultiRow(30).build();
+    SormContext confs =
+        new SormContext(SormConfig.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+            .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
+            .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
+            .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10)
+            .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
   }
 
 

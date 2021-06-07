@@ -73,9 +73,22 @@ public interface SqlKeyword {
   public static final String WITH = wrapSpace("WITH").toLowerCase();
 
 
-  public static final String SELECT_STAR = wrapSpace("select *");
+  public static final String STAR = wrapSpace("*").toLowerCase();
+  public static final String SELECT_STAR = wrapSpace("SELECT *").toLowerCase();
+  public static final String ASC = wrapSpace("ASC").toLowerCase();
+  public static final String BETWEEN = wrapSpace("BETWEEN").toLowerCase();
+  public static final String CAST = wrapSpace("CAST").toLowerCase();
+  public static final String COUNT = wrapSpace("COUNT").toLowerCase();
+  public static final String DESC = wrapSpace("DESC").toLowerCase();
+  public static final String GROUP_BY = wrapSpace("GROUP BY").toLowerCase();
+  public static final String LIMIT = wrapSpace("LIMIT").toLowerCase();
+  public static final String MAX = wrapSpace("MAX").toLowerCase();
+  public static final String MIN = wrapSpace("MIN").toLowerCase();
+  public static final String ORDER_BY = wrapSpace("ORDER BY").toLowerCase();
+  public static final String SUM = wrapSpace("SUM").toLowerCase();
 
-  static String wrapSpace(String str) {
+
+  private static String wrapSpace(String str) {
     return " " + str + " ";
   }
 

@@ -7,13 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.TableName;
-import org.nkjmlab.sorm4j.internal.extension.LoggerFactory;
 
 class ValuesObjectTest {
 
   @Test
   void testTableName() {
-    System.out.println(LoggerFactory.class.getName());
     TableName v1 = new TableName("test");
     TableName v2 = new TableName("test");
     verify(v1, v2);

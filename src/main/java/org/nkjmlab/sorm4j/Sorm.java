@@ -3,11 +3,18 @@ package org.nkjmlab.sorm4j;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.SormBuilder;
+import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
-import org.nkjmlab.sorm4j.extension.SormConfigBuilder;
+import org.nkjmlab.sorm4j.extension.SormContext;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
+import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.mapping.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.internal.mapping.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
@@ -20,8 +27,7 @@ import org.nkjmlab.sorm4j.internal.mapping.SormImpl;
  */
 public interface Sorm extends Orm {
 
-  static final SormConfig DEFAULT_CONFIG = new SormConfigBuilder().build();
-
+  static final SormContext DEFAULT_CONTEXT = new SormContext(SormConfig.newBuilder().build());
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
@@ -30,11 +36,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return Sorm.create(dataSource, DEFAULT_CONFIG);
+    return Sorm.create(dataSource, DEFAULT_CONTEXT);
   }
 
-  static Sorm create(DataSource dataSource, SormConfig config) {
-    return new SormImpl(dataSource, config);
+  static Sorm create(DataSource dataSource, SormContext context) {
+    return new SormImpl(dataSource, context);
   }
 
   /**
@@ -46,12 +52,12 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(String jdbcUrl, String user, String password) {
-    return create(jdbcUrl, user, password, DEFAULT_CONFIG);
+    return create(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
 
-  static Sorm create(String jdbcUrl, String user, String password, SormConfig config) {
-    return create(Sorm.createDriverManagerDataSource(jdbcUrl, user, password), config);
+  static Sorm create(String jdbcUrl, String user, String password, SormContext context) {
+    return create(createDriverManagerDataSource(jdbcUrl, user, password), context);
   }
 
   /**
@@ -75,11 +81,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, DEFAULT_CONFIG);
+    return Sorm.toOrmConnection(connection, DEFAULT_CONTEXT);
   }
 
-  static OrmConnection toOrmConnection(Connection connection, SormConfig sormConfig) {
-    return new OrmConnectionImpl(connection, sormConfig);
+  static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
+    return new OrmConnectionImpl(connection, sormContext);
   }
 
   /**
@@ -154,7 +160,7 @@ public interface Sorm extends Orm {
    *
    * @return
    */
-  SormConfig getConfig();
+  SormContext getContext();
 
   /**
    * Gets {@link DataSource}.
@@ -199,14 +205,132 @@ public interface Sorm extends Orm {
    */
   OrmTransaction openTransaction();
 
-  static SormBuilder newBuilder() {
-    return new SormBuilder();
+  static Builder newBuilder() {
+    return new Builder();
   }
 
-  static SormBuilder newBuilder(DataSource dataSource) {
-    return new SormBuilder(dataSource);
+  static Builder newBuilder(DataSource dataSource) {
+    return new Builder(dataSource);
   }
 
+  static Builder newBuilder(String jdbcUrl, String user, String password) {
+    return new Builder(createDriverManagerDataSource(jdbcUrl, user, password));
+  }
+
+  @Experimental
+  public static class Builder {
+
+    private DataSource dataSource;
+    private SormConfig.Builder configBuilder = SormConfig.newBuilder();
+
+    public Builder() {}
+
+    public Builder(DataSource dataSource) {
+      this.dataSource = dataSource;
+    }
+
+    public Sorm build() {
+      return new SormImpl(dataSource, new SormContext(configBuilder.build()));
+    }
+
+    public Builder setDataSource(DataSource dataSource) {
+      this.dataSource = dataSource;
+      return this;
+    }
+
+
+    public Builder setDataSource(String jdbcUrl, String username, String password) {
+      this.dataSource = Sorm.createDriverManagerDataSource(jdbcUrl, username, password);
+      return this;
+    }
+
+    public Builder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
+      configBuilder.setColumnFieldMapper(fieldNameMapper);
+      return this;
+    }
+
+
+    public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
+      configBuilder.setTableNameMapper(tableNameMapper);
+      return this;
+    }
+
+
+    public Builder setResultSetConverter(ResultSetConverter resultSetConverter) {
+      configBuilder.setResultSetConverter(resultSetConverter);
+      return this;
+    }
+
+
+    public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
+      configBuilder.setSqlParametersSetter(sqlParametersSetter);
+      return this;
+    }
+
+
+    public Builder setMultiRowProcessorType(MultiRowProcessorType multiRowProcessorType) {
+      configBuilder.setMultiRowProcessorType(multiRowProcessorType);
+      return this;
+    }
+
+
+    public Builder setBatchSize(int size) {
+      configBuilder.setBatchSize(size);
+      return this;
+    }
+
+
+    public Builder setMultiRowSize(int size) {
+      configBuilder.setMultiRowSize(size);
+      return this;
+    }
+
+
+    public Builder setBatchSizeWithMultiRow(int size) {
+      configBuilder.setBatchSizeWithMultiRow(size);
+      return this;
+    }
+
+
+    public Builder setTransactionIsolationLevel(int level) {
+      configBuilder.setTransactionIsolationLevel(level);
+      return this;
+    }
+
+
+    public Builder setOption(String name, Object value) {
+      configBuilder.setOption(name, value);
+      return this;
+    }
+
+
+    public Builder setLoggerOnAll() {
+      configBuilder.setLoggerOnAll();
+      return this;
+    }
+
+    public Builder setLoggerOffAll() {
+      configBuilder.setLoggerOffAll();
+      return this;
+    }
+
+    public Builder setLoggerOn(LoggerContext.Category... categories) {
+      configBuilder.setLoggerOn(categories);
+      return this;
+    }
+
+    public Builder setLoggerOff(LoggerContext.Category... categories) {
+      configBuilder.setLoggerOff(categories);
+      return this;
+    }
+
+    public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
+      configBuilder.setLoggerSupplier(loggerSupplier);
+      return this;
+    }
+
+
+  }
 
 
 }

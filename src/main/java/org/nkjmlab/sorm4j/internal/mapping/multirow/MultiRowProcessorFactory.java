@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.extension.LoggerConfig;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 
 public final class MultiRowProcessorFactory {
@@ -23,22 +23,22 @@ public final class MultiRowProcessorFactory {
     return multiRowProcessorFactory.apply(tableMapping);
   }
 
-  public static MultiRowProcessorFactory createMultiRowProcessorFactory(LoggerConfig loggerConfig,
+  public static MultiRowProcessorFactory createMultiRowProcessorFactory(LoggerContext loggerContext,
       SormOptions options, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
       int batchSizeWithMultiRow) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
         return new MultiRowProcessorFactory(multiRowProcessorType,
-            t -> new SimpleBatchProcessor<>(loggerConfig, options, sqlParametersSetter, t,
+            t -> new SimpleBatchProcessor<>(loggerContext, options, sqlParametersSetter, t,
                 batchSize));
       case MULTI_ROW:
         return new MultiRowProcessorFactory(multiRowProcessorType,
-            t -> new MultiRowInOneStatementProcessor<>(loggerConfig, options, sqlParametersSetter,
+            t -> new MultiRowInOneStatementProcessor<>(loggerContext, options, sqlParametersSetter,
                 t, batchSize, multiRowSize));
       case MULTI_ROW_AND_BATCH:
         return new MultiRowProcessorFactory(multiRowProcessorType,
-            t -> new BatchOfMultiRowInOneStatementProcessor<>(loggerConfig,
+            t -> new BatchOfMultiRowInOneStatementProcessor<>(loggerContext,
                 options,
                 sqlParametersSetter, t, batchSize, multiRowSize, batchSizeWithMultiRow));
       default:

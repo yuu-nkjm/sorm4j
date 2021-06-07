@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.extension.LoggerConfig;
-import org.nkjmlab.sorm4j.extension.LoggerConfig.LogPoint;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
+import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -18,11 +18,11 @@ public abstract class MultiRowProcessor<T> {
 
   final TableMapping<T> tableMapping;
   final SormOptions options;
-  final LoggerConfig loggerConfig;
+  final LoggerContext loggerContext;
 
-  MultiRowProcessor(LoggerConfig loggerConfig, SormOptions options,
+  MultiRowProcessor(LoggerContext loggerContext, SormOptions options,
       SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize) {
-    this.loggerConfig = loggerConfig;
+    this.loggerContext = loggerContext;
     this.options = options;
     this.sqlParametersSetter = sqlParametersSetter;
     this.tableMapping = tableMapping;
@@ -91,15 +91,14 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> lp = loggerConfig.createLogPoint(LoggerConfig.Category.MULTI_ROW,
-        MultiRowInOneStatementProcessor.class);
-    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeMultiRowMessage(con, objects[0].getClass(),
-        objects.length, tableMapping.getTableMetaData().getTableName())));
+    Optional<LogPoint> lp = loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW);
+    lp.ifPresent(_lp -> _lp.logBeforeMultiRow(con, objects[0].getClass(), objects.length,
+        tableMapping.getTableMetaData().getTableName()));
 
 
     final int[] result = exec.apply(objects);
 
-    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterMultiRowMessage(result)));
+    lp.ifPresent(_lp -> _lp.logAfterMultiRow(result));
     return result;
   }
 

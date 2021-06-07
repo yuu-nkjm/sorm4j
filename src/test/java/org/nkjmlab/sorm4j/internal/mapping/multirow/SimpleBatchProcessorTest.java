@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.SormBuilder;
 
 class SimpleBatchProcessorTest {
 
@@ -20,7 +19,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = new SormBuilder().setDataSource(jdbcUrl, user, password)
+    sorm = Sorm.newBuilder().setDataSource(jdbcUrl, user, password)
         .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build();
   }
 
