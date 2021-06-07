@@ -502,7 +502,7 @@ public class SelectSql {
   /**
    * Returns single quoted expression. If it includes single quotations, they will be escaped.
    *
-   * @param expr
+   * @param str
    * @return
    */
   public static String quote(String str) {
