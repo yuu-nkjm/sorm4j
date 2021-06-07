@@ -73,9 +73,8 @@ public class OrmConnectionImpl implements OrmConnection {
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, sql.getParameters());
       handler.accept(stmt);
 
-      getLoggerConfig()
-          .createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
-          .ifPresent(_lp -> _lp.createBeforeSqlMessage(connection, sql));
+      getLoggerConfig().createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
+          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql));
 
     } catch (Exception e) {
       throw Try.rethrow(e);
@@ -93,9 +92,8 @@ public class OrmConnectionImpl implements OrmConnection {
     try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, sql.getParameters());
 
-      getLoggerConfig()
-          .createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
-          .ifPresent(_lp -> _lp.createBeforeSqlMessage(connection, sql));
+      getLoggerConfig().createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
+          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql));
       T ret = handler.apply(stmt);
 
       return ret;
@@ -596,7 +594,7 @@ public class OrmConnectionImpl implements OrmConnection {
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, parameters);
 
       getLoggerConfig().createLogPoint(LoggerContext.Category.EXECUTE_QUERY)
-          .ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
 
       final ResultSet resultSet = stmt.executeQuery();
       LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
@@ -650,7 +648,7 @@ public class OrmConnectionImpl implements OrmConnection {
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, parameters);
 
       getLoggerConfig().createLogPoint(LoggerContext.Category.EXECUTE_QUERY)
-          .ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
 
       final ResultSet resultSet = stmt.executeQuery();
 
@@ -849,11 +847,11 @@ public class OrmConnectionImpl implements OrmConnection {
       sqlParametersSetter.setParameters(options, stmt, parameters);
       final Optional<LogPoint> lp =
           loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_QUERY);
-      lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+      lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
 
       try (ResultSet resultSet = stmt.executeQuery()) {
         R ret = resultSetTraverser.traverseAndMap(resultSet);
-        lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterQueryMessage(ret)));
+        lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
         return ret;
       }
     } catch (Exception e) {
@@ -867,12 +865,12 @@ public class OrmConnectionImpl implements OrmConnection {
 
     final Optional<LogPoint> lp =
         loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
-    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeSqlMessage(connection, sql, parameters)));
+    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
       int ret = stmt.executeUpdate();
-      lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterUpdateMessage(ret)));
+      lp.ifPresent(_lp -> _lp.logAfterUpdate(ret));
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);

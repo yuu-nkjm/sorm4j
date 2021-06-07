@@ -1,19 +1,32 @@
 package org.nkjmlab.sorm4j.extension.logger;
 
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
-public class JulSormLogger implements SormLogger {
+public class JulSormLogger extends AbstractSormLogger implements SormLogger {
 
   private final java.util.logging.Logger logger;
+  private static java.util.logging.Logger defaultLogger = getDefaultLogger();
+
 
 
   public JulSormLogger(java.util.logging.Logger logger) {
     this.logger = logger;
   }
 
+  private static Logger getDefaultLogger() {
+    Logger logger = java.util.logging.Logger.getLogger(JulSormLogger.class.getName());
+    logger.setLevel(Level.FINE);
+    ConsoleHandler consoleHandler = new ConsoleHandler();
+    consoleHandler.setLevel(Level.FINE);
+    logger.addHandler(consoleHandler);
+    return logger;
+  }
+
   public static SormLogger getLogger() {
-    return new JulSormLogger(java.util.logging.Logger.getLogger(JulSormLogger.class.getName()));
+    return new JulSormLogger(defaultLogger);
   }
 
   @Override
@@ -51,4 +64,6 @@ public class JulSormLogger implements SormLogger {
       this.logger.severe(StringUtils.format(format, params));
     }
   }
+
+
 }

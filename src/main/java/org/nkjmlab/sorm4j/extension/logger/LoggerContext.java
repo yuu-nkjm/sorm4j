@@ -2,17 +2,13 @@ package org.nkjmlab.sorm4j.extension.logger;
 
 import java.sql.Connection;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
@@ -66,75 +62,64 @@ public final class LoggerContext {
   public static final class LogPoint {
 
     private final String name;
+    private final SormLogger logger;
     private long startTime;
-    public final SormLogger logger;
 
     private LogPoint(String name, SormLogger logger) {
       this.name = name;
       this.logger = logger;
     }
 
-    public String getTagAndElapsedTime() {
-      return "[" + getTag() + "]" + " ["
-          + String.format("%.3f", (double) (System.nanoTime() - startTime) / 1000 / 1000)
-          + " msec] :";
-    }
 
     public String getTag() {
       return name + ":" + (hashCode() / 10000);
     }
 
-    private String getDbUrl(Connection connection) {
-      return Try.getOrDefault(() -> connection.getMetaData().getURL(), "");
-    }
-
-    public String createBeforeSqlMessage(Connection connection, String sql, Object[] parameters) {
-      String ret = createBeforeSqlMessage(connection, ParameterizedSql.parse(sql, parameters));
-      return ret;
-    }
-
-    public String createBeforeSqlMessage(Connection connection, ParameterizedSql psql) {
-      String ret = StringUtils.format("[{}] At {}, Execute SQL [{}] to [{}]", getTag(), getCaller(),
-          psql.getBindedSql(), getDbUrl(connection));
+    public void logBeforeSql(Connection connection, String sql, Object... parameters) {
+      logger.logBeforeSql(getTag(), connection, sql, parameters);
       this.startTime = System.nanoTime();
-      return ret;
     }
 
-    public String createBeforeMultiRowMessage(Connection connection, Class<?> clazz, int length,
+    public void logBeforeSql(Connection connection, ParameterizedSql sql) {
+      logger.logBeforeSql(getTag(), connection, sql);
+      this.startTime = System.nanoTime();
+    }
+
+    public void logBeforeMultiRow(Connection con, Class<?> objectClass, int length,
         String tableName) {
-      String ret = StringUtils.format(
-          "[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]",
-          getTag(), getCaller(), length, clazz, tableName, getDbUrl(connection));
+      logger.logBeforeMultiRow(getTag(), con, objectClass, length, tableName);
       this.startTime = System.nanoTime();
-      return ret;
     }
 
 
-    public String createAfterUpdateMessage(int ret) {
-      return StringUtils.format("{} Affect [{}] rows", getTagAndElapsedTime(), ret);
+    public void logAfterQuery(Object ret) {
+      logger.logAfterQuery(getTag(), getElapsedTime(), ret);
     }
 
-    public String createAfterQueryMessage(Object ret) {
-      return StringUtils.format("{} Read [{}] objects", getTagAndElapsedTime(),
-          ret instanceof Collection ? ((Collection<?>) ret).size() : 1);
+
+    public void logAfterMultiRow(int[] result) {
+      logger.logAfterMultiRow(name, getElapsedTime(), result);
     }
 
-    public String createAfterMultiRowMessage(int[] result) {
-      return StringUtils.format("{} Affect [{}] objects", getTagAndElapsedTime(),
-          IntStream.of(result).sum());
+    private long getElapsedTime() {
+      return System.nanoTime() - startTime;
     }
 
-    private String getCaller() {
-      StackTraceElement[] stackTrace = new Throwable().getStackTrace();
 
-      String caller = Arrays.stream(stackTrace)
-          .filter(s -> !s.getClassName().startsWith("org.nkjmlab.sorm4j")
-              && !s.getClassName().startsWith("java."))
-          .findFirst().map(se -> se.getClassName() + "." + se.getMethodName() + "("
-              + se.getFileName() + ":" + se.getLineNumber() + ")")
-          .orElseGet(() -> "");
-      return caller;
+    public void logAfterUpdate(int ret) {
+      logger.logAfterUpdate(name, getElapsedTime(), ret);
     }
+
+
+    public SormLogger getLogger() {
+      return logger;
+    }
+
+
+    public void logMapping(String mappingInfo) {
+      logger.logMapping(getTag(), mappingInfo);
+    }
+
 
   }
 
@@ -154,9 +139,8 @@ public final class LoggerContext {
     }
 
     private static Supplier<SormLogger> getDefaultLoggerSupplier() {
-      return Log4jSormLogger.enableLogger ? () -> Log4jSormLogger.getLogger()
-          : (Slf4jSormLogger.enableLogger ? () -> Slf4jSormLogger.getLogger()
-              : () -> JulSormLogger.getLogger());
+      return Log4jSormLogger.enableLogger ? Log4jSormLogger::getLogger
+          : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger::getLogger : JulSormLogger::getLogger);
     }
 
     public LoggerContext build() {

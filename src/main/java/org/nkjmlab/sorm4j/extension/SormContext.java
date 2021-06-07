@@ -78,8 +78,8 @@ public final class SormContext {
     TableMapping<T> ret =
         (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
           TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
-          sormConfig.getLoggerContext().createLogPoint(Category.MAPPING).ifPresent(lp -> lp.logger
-              .info("[{}]" + System.lineSeparator() + "{}", lp.getTag(), m.getFormattedString()));
+          sormConfig.getLoggerContext().createLogPoint(Category.MAPPING)
+              .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
           return m;
         }, Try::rethrow));
     return ret;
@@ -159,7 +159,7 @@ public final class SormContext {
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
       sormConfig.getLoggerContext().createLogPoint(Category.MAPPING)
-          .ifPresent(lp -> lp.logger.info(System.lineSeparator() + m.getFormattedString()));
+          .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
 
       return m;
     });

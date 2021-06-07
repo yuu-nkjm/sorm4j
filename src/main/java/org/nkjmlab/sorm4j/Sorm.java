@@ -213,6 +213,10 @@ public interface Sorm extends Orm {
     return new Builder(dataSource);
   }
 
+  static Builder newBuilder(String jdbcUrl, String user, String password) {
+    return new Builder(createDriverManagerDataSource(jdbcUrl, user, password));
+  }
+
   @Experimental
   public static class Builder {
 

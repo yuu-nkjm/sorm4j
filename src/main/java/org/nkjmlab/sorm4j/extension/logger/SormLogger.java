@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.extension.logger;
 
+import java.sql.Connection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 @Experimental
 public interface SormLogger {
@@ -14,5 +16,20 @@ public interface SormLogger {
   void warn(String format, Object... params);
 
   void error(String format, Object... params);
+
+  void logBeforeSql(String tag, Connection connection, String sql, Object... parameters);
+
+  void logBeforeSql(String tag, Connection connection, ParameterizedSql psql);
+
+  void logBeforeMultiRow(String tag, Connection connection, Class<?> objectClass, int length,
+      String tableName);
+
+  void logAfterQuery(String tag, long elapsedTime, Object ret);
+
+  void logAfterUpdate(String tag, long elapsedTime, int ret);
+
+  void logAfterMultiRow(String tag, long elapsedTime, int[] result);
+
+  void logMapping(String tag, String mappingInfo);
 
 }

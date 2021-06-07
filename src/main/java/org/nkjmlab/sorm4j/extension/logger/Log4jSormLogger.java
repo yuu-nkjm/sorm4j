@@ -2,26 +2,24 @@ package org.nkjmlab.sorm4j.extension.logger;
 
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-public class Log4jSormLogger implements SormLogger {
+public class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
 
   public static final boolean enableLogger = isEnable();
 
   private static boolean isEnable() {
-    boolean ret = Try.getOrDefault(() -> {
+    return Try.getOrDefault(() -> {
       Class.forName("org.apache.logging.log4j.Logger");
       return true;
     }, false);
-    // if (!ret) {
-    // System.err.println("sorm4j: [org.apache.logging.log4j.Logger] is not found at the classpath.
-    // "
-    // + "If you want to use Log4j2, you should add Log4j2 logger at the classpath.");
-    // }
-    return ret;
   }
 
   private final org.apache.logging.log4j.Logger logger;
 
   public static SormLogger getLogger() {
+    if (!enableLogger) {
+      System.err.println("sorm4j: [org.apache.logging.log4j.Logger] is not found at the classpath."
+          + "If you want to use Log4j2, you should add Log4j2 logger at the classpath.");
+    }
     return new Log4jSormLogger(org.apache.logging.log4j.LogManager.getLogger());
   }
 

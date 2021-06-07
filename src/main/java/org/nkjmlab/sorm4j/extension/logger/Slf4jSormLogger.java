@@ -2,20 +2,15 @@ package org.nkjmlab.sorm4j.extension.logger;
 
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-public class Slf4jSormLogger implements SormLogger {
+public class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
 
   public static final boolean enableLogger = isEnable();
 
   private static boolean isEnable() {
-    boolean ret = Try.getOrDefault(() -> {
+    return Try.getOrDefault(() -> {
       Class.forName("org.slf4j.Logger");
       return true;
     }, false);
-    // if (!ret) {
-    // System.err.println("sorm4j: [org.slf4j.Logger] is not found at the classpath. "
-    // + "If you want to use SLF4J, you should add SLF4J logger at the classpath.");
-    // }
-    return ret;
   }
 
   private final org.slf4j.Logger logger;
@@ -25,6 +20,10 @@ public class Slf4jSormLogger implements SormLogger {
   }
 
   public static SormLogger getLogger() {
+    if (!enableLogger) {
+      System.err.println("sorm4j: [org.slf4j.Logger] is not found at the classpath. "
+          + "If you want to use SLF4J, you should add SLF4J logger at the classpath.");
+    }
     return new Slf4jSormLogger(org.slf4j.LoggerFactory.getLogger(Slf4jSormLogger.class));
   }
 

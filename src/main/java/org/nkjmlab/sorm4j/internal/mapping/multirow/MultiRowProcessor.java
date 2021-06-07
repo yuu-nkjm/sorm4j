@@ -92,13 +92,13 @@ public abstract class MultiRowProcessor<T> {
       return new int[0];
     }
     Optional<LogPoint> lp = loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW);
-    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createBeforeMultiRowMessage(con, objects[0].getClass(),
-        objects.length, tableMapping.getTableMetaData().getTableName())));
+    lp.ifPresent(_lp -> _lp.logBeforeMultiRow(con, objects[0].getClass(), objects.length,
+        tableMapping.getTableMetaData().getTableName()));
 
 
     final int[] result = exec.apply(objects);
 
-    lp.ifPresent(_lp -> _lp.logger.debug(_lp.createAfterMultiRowMessage(result)));
+    lp.ifPresent(_lp -> _lp.logAfterMultiRow(result));
     return result;
   }
 
