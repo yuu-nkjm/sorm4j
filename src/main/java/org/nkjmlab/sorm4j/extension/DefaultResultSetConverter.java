@@ -74,6 +74,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
 
   public static final String LOWER_CASE = "LOWER_CASE";
   public static final String UPPER_CASE = "UPPER_CASE";
+  public static final String CANONICAL = "CANONICAL";
   public static final String NO_CONVERSION = "NO_CONVERSION";
 
   /**
@@ -89,6 +90,8 @@ public class DefaultResultSetConverter implements ResultSetConverter {
         return toLowerCase(key);
       case UPPER_CASE:
         return toUpperCase(key);
+      case CANONICAL:
+        return toCanonicalCase(key);
       case NO_CONVERSION:
       default:
         return key;

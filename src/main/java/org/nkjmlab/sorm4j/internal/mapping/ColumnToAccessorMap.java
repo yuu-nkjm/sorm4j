@@ -24,7 +24,7 @@ public final class ColumnToAccessorMap {
   public ColumnToAccessorMap(Class<?> objectClass, Map<String, Accessor> columnToAccessorMap) {
 
     this.columnToAccessorMap = columnToAccessorMap.entrySet().stream()
-        .collect(Collectors.toMap(e -> toCanonical(e.getKey()), e -> e.getValue()));
+        .collect(Collectors.toMap(e -> toCanonicalCase(e.getKey()), e -> e.getValue()));
 
     this.columnAliasPrefix =
         Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
@@ -37,7 +37,7 @@ public final class ColumnToAccessorMap {
     Map<String, Accessor> tmp = new HashMap<>();
 
     for (String key : columnToAccessorMap.keySet()) {
-      String aKey = toCanonical(columnAliasPrefix + key);
+      String aKey = toCanonicalCase(columnAliasPrefix + key);
       if (this.columnToAccessorMap.containsKey(aKey)) {
         throw new SormException(StringUtils.format(
             "Modify table alias because table alias [{}] and column [{}] is concatenated and it becomes duplicated column",
@@ -57,7 +57,7 @@ public final class ColumnToAccessorMap {
    * @return
    */
   public Accessor get(String columnName) {
-    String cn = toCanonical(columnName);
+    String cn = toCanonicalCase(columnName);
     Accessor ret = columnToAccessorMap.get(cn);
     return ret != null ? ret : aliasColumnToAccessorMap.get(columnName);
   }

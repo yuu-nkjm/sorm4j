@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.extension;
 
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
 /**
  * A mapper from a class or candidates of table name to a valid table name exists on database.
@@ -18,7 +17,7 @@ public interface TableNameMapper {
    * @param metaData
    * @return table name exists in database.
    */
-  TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData) throws SQLException;
+  TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData);
 
   /**
    * Get table name corresponding with the table name.
@@ -27,6 +26,6 @@ public interface TableNameMapper {
    * @param metaData
    * @return table name exists in database.
    */
-  TableName getTableName(String tableName, DatabaseMetaData metaData) throws SQLException;
+  TableName getTableName(String tableName, DatabaseMetaData metaData);
 
 }

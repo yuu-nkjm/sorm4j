@@ -183,7 +183,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             columnName);
       } else {
-        ret.put(toCanonical(columnName.getName()), new Accessor(columnName, f, g, s));
+        ret.put(toCanonicalCase(columnName.getName()), new Accessor(columnName, f, g, s));
       }
     }
     return ret;
@@ -302,7 +302,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   protected List<ColumnName> guessColumnNameCandidates(FieldName fieldName) {
     final String _fieldName = fieldName.getName();
-    return Stream.of(toCanonical(_fieldName)).map(ColumnName::new).collect(Collectors.toList());
+    return Stream.of(toCanonicalCase(_fieldName)).map(ColumnName::new).collect(Collectors.toList());
   }
 
 

@@ -133,7 +133,7 @@ public final class SormContext {
     if (!equalsAsCanonical(columns, keySetWithoutAlias)) {
       throw new SormException(StringUtils.format(
           "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
-          columns.stream().filter(e -> !keySetWithoutAlias.contains(toCanonical(e))).sorted()
+          columns.stream().filter(e -> !keySetWithoutAlias.contains(toCanonicalCase(e))).sorted()
               .collect(Collectors.toList()),
           tableName,
           allColumns.stream().map(c -> c.toString()).sorted().collect(Collectors.toList()),

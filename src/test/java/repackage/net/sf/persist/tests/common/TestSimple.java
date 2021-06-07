@@ -3,14 +3,12 @@ package repackage.net.sf.persist.tests.common;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.AfterAll;
@@ -511,36 +509,6 @@ public class TestSimple {
         assertThat(e.getMessage()).contains("does not match any field");
       }
     }
-  }
-
-  @Test
-  public void TestUpperSnakeCase() {
-    Set<String> guessed = Set.of(toUpperSnakeCase("name"));
-    Set<String> expected = Set.of("NAME");
-    assertEquals(expected, guessed);
-
-    guessed = Set.of(toUpperSnakeCase("nameC"));
-    expected = Set.of("NAME_C");
-
-    assertEquals(expected, guessed);
-
-    guessed = Set.of(toUpperSnakeCase("nameCo"));
-    expected = Set.of("NAME_CO");
-    assertEquals(expected, guessed);
-
-    guessed = Set.of(toUpperSnakeCase("n"));
-    expected = Set.of("N");
-
-    assertEquals(expected, guessed);
-
-    guessed = Set.of(toUpperSnakeCase("nC"));
-    expected = Set.of("N_C");
-    assertEquals(expected, guessed);
-
-    guessed = Set.of(toUpperSnakeCase("nCMP"));
-    expected = Set.of("N_C_M_P");
-    assertEquals(expected, guessed);
-
   }
 
 

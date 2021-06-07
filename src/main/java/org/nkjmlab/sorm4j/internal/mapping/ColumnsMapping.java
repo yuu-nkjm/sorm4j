@@ -186,12 +186,12 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
       for (int i = 0; i < parametersLength; i++) {
         Parameter parameter = parameters[i];
-        String name = toCanonical(parameterNames[i]);
+        String name = toCanonicalCase(parameterNames[i]);
         parameterOrders.put(name, i);
         parameterTypes.put(name, parameter.getType());
         if (colmunAliasPrefix != null) {
-          parameterOrders.put(toCanonical(colmunAliasPrefix + name), i);
-          parameterTypes.put(toCanonical(colmunAliasPrefix + name), parameter.getType());
+          parameterOrders.put(toCanonicalCase(colmunAliasPrefix + name), i);
+          parameterTypes.put(toCanonicalCase(colmunAliasPrefix + name), parameter.getType());
 
         }
       }
@@ -224,13 +224,13 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     private Class<?>[] getParameterTypes(List<String> columns) {
       return parameterTypesOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
-          .map(columnName -> parameterTypes.get(toCanonical(columnName))).toArray(Class<?>[]::new));
+          .map(columnName -> parameterTypes.get(toCanonicalCase(columnName))).toArray(Class<?>[]::new));
     }
 
     private int[] getParameterOrders(List<String> columns) {
       return parameterOrderedByColumnMap.computeIfAbsent(columns,
           key -> columns.stream().mapToInt(columnName -> {
-            Integer o = parameterOrders.get(toCanonical(columnName));
+            Integer o = parameterOrders.get(toCanonicalCase(columnName));
             return o != null ? o.intValue() : -1;
           }).toArray());
     }
