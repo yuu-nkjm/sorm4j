@@ -50,7 +50,7 @@ public class Customer {
 Create an entry point:
 
 ```java
-Sorm sorm = SormFactory.create("jdbc:h2:mem:sormtest", "sa","");
+Sorm sorm = Sorm.create("jdbc:h2:mem:sormtest", "sa","");
 ```
 
 Reads matching rows from table:
