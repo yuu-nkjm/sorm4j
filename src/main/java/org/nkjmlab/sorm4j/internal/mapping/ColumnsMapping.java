@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -22,7 +23,6 @@ import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -42,11 +42,6 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
     super(options, resultSetConverter, objectClass, columnToAccessorMap);
 
-    SetterPojoCreator<T> setterPojoCreator = new SetterPojoCreator<>(Try.getOrThrow(
-        () -> objectClass.getDeclaredConstructor(),
-        e -> new SormException(StringUtils.format(
-            "The given container class [{}] should have the public default constructor (with no arguments) or {} annotated constructor.",
-            objectClass, OrmConstructor.class.getName()), e)));
 
     List<Constructor<?>> annotataedConstructors = Arrays
         .stream(objectClass.getDeclaredConstructors())
@@ -54,12 +49,16 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     if (annotataedConstructors.size() > 1) {
       throw new SormException(
-          StringUtils.format("Constructor with parameters annotated by {} should be one or less. ",
+          format("Constructor with parameters annotated by {} should be one or less. ",
               OrmConstructor.class.getName()));
     }
 
-    this.pojoCreator = annotataedConstructors.isEmpty() ? setterPojoCreator
-        : new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0));
+    this.pojoCreator = !annotataedConstructors.isEmpty()
+        ? new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0))
+        : new SetterPojoCreator<>(Try.getOrThrow(() -> objectClass.getDeclaredConstructor(),
+            e -> new SormException(format(
+                "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
+                objectClass, OrmConstructor.class.getName()), e)));
 
   }
 
@@ -223,8 +222,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
     private Class<?>[] getParameterTypes(List<String> columns) {
-      return parameterTypesOrderedByColumnMap.computeIfAbsent(columns, key -> columns.stream()
-          .map(columnName -> parameterTypes.get(toCanonicalCase(columnName))).toArray(Class<?>[]::new));
+      return parameterTypesOrderedByColumnMap.computeIfAbsent(columns,
+          key -> columns.stream().map(columnName -> parameterTypes.get(toCanonicalCase(columnName)))
+              .toArray(Class<?>[]::new));
     }
 
     private int[] getParameterOrders(List<String> columns) {
