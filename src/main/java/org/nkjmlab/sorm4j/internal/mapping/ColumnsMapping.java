@@ -265,26 +265,15 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
   public List<T> loadPojoList(ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojoList(resultSet, createColumns(resultSet));
+    return pojoCreator.loadPojoList(resultSet, createColumnLabels(resultSet));
   }
 
   public T loadPojo(ResultSet resultSet) throws SQLException {
-    return loadPojo(createColumns(resultSet), resultSet);
+    return loadPojo(createColumnLabels(resultSet), resultSet);
   }
 
   public T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
     return pojoCreator.loadPojo(resultSet, columns);
-  }
-
-
-  private List<String> createColumns(ResultSet resultSet) throws SQLException {
-    final ResultSetMetaData metaData = resultSet.getMetaData();
-    final int colNum = metaData.getColumnCount();
-    final List<String> columns = new ArrayList<>(colNum);
-    for (int i = 1; i <= colNum; i++) {
-      columns.add(metaData.getColumnName(i));
-    }
-    return columns;
   }
 
   public List<String> createColumnLabels(ResultSet resultSet) throws SQLException {
