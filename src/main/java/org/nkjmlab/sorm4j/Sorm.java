@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Map;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -149,11 +148,12 @@ public interface Sorm extends Orm {
   <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler);
 
   /**
-   * Gets the config of this object.
+   * Gets the context string of this object.
    *
    * @return
    */
-  SormContext getContext();
+  @Experimental
+  String getContextString();
 
   /**
    * Gets {@link DataSource}.
@@ -170,13 +170,6 @@ public interface Sorm extends Orm {
   Connection getJdbcConnection();
 
 
-  /**
-   * Gets map of the table mapping status.
-   *
-   * @return Map of status. Keys in the table are the names of the table returned in lower case.
-   *
-   */
-  Map<String, String> getTableMappingStatusMap();
 
   /**
    * Open {@link OrmConnection}. You should always use try-with-resources to ensure the database

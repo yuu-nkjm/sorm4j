@@ -58,12 +58,6 @@ public final class SormContext {
     this.tableNameToValidTableNameMap = new ConcurrentHashMap<>();
   }
 
-
-  public Map<String, String> getTableMappingStatusMap() {
-    return tableMappings.entrySet().stream().collect(
-        Collectors.toMap(e -> toLowerCase(e.getKey()), e -> e.getValue().getFormattedString()));
-  }
-
   public <T> TableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
     TableName tableName = toTableName(connection, objectClass);
     return getTableMapping(connection, tableName, objectClass);

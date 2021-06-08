@@ -179,8 +179,11 @@ public final class LoggerContext {
     public void offAll() {
       off(LoggerContext.Category.values());
     }
+  }
 
-
+  @Override
+  public String toString() {
+    return "LoggerContext [onCategories=" + onCategories + ", logger=" + getLogger() + "]";
   }
 
 }

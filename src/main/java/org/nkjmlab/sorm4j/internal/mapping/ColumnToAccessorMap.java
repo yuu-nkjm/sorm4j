@@ -72,8 +72,12 @@ public final class ColumnToAccessorMap {
         columnToAccessorMap.keySet().stream()
             .map(e -> "  COLUMN " + e + " => " + columnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()))
-        + System.lineSeparator() + "  " + columnToAccessorMap.values() + System.lineSeparator()
-        + "  OrmColumnAliasPrefix=[" + columnAliasPrefix + "]";
+        + System.lineSeparator() + "  DETAIL =>" + columnToAccessorMap.values()
+        + System.lineSeparator() + "  OrmColumnAliasPrefix is [" + columnAliasPrefix + "]"
+        + System.lineSeparator()
+        + String.join(System.lineSeparator(), aliasColumnToAccessorMap.keySet().stream().map(
+            e -> "  COLUMN " + e + " => " + aliasColumnToAccessorMap.get(e).getFormattedString())
+            .collect(Collectors.toList()));
 
   }
 

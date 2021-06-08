@@ -293,7 +293,7 @@ public final class TableMapping<T> extends Mapping<T> {
     return "[" + TableMapping.class.getSimpleName() + "] TABLE [" + tableMetaData.getTableName()
         + "] is mapped to [" + getObjectClass().getSimpleName() + "] class. " + "PRIMARY KEY is "
         + tableMetaData.getPrimaryKeys() + System.lineSeparator()
-        + super.getColumnToAccessorString() + System.lineSeparator() + "["
+        + super.getColumnToAccessorString() + System.lineSeparator() + "  ["
         + multiRowProcessor.getClass().getSimpleName() + "] is used for processing multirow.";
   }
 

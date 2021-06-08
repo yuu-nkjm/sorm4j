@@ -28,7 +28,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
         .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).setLoggerOffAll()
         .setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build();
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.getContext().toString();
+    String s = sorm.getContextString();
 
     assertThat(s.toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }

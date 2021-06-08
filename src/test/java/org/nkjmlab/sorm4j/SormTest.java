@@ -21,14 +21,14 @@ class SormTest {
   }
 
   @Test
-  void testGetFormattedStringn() throws SQLException {
+  void testAutoRollback() throws SQLException {
     Guest a = SormTestUtils.GUEST_ALICE;
     try (OrmConnection tr = sorm.openTransaction()) {
       tr.insert(a);
       // auto-rollback
     }
+    assertThat(sorm.readAll(Guest.class).size() == 0);
 
-    System.out.println(sorm.getTableMappingStatusMap());
   }
 
   @Test

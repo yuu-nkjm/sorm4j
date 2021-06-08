@@ -88,8 +88,8 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public SormContext getContext() {
-    return sormContext;
+  public String getContextString() {
+    return sormContext.toString();
   }
 
 
@@ -197,11 +197,6 @@ public final class SormImpl implements Sorm {
       return (OrmTransactionImpl) conn;
     }
 
-  }
-
-  @Override
-  public Map<String, String> getTableMappingStatusMap() {
-    return sormContext.getTableMappingStatusMap();
   }
 
   private <R> R applyAndClose(FunctionHandler<OrmConnection, R> handler) {
