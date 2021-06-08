@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 
 @Experimental
 public interface TableMetaData {
@@ -25,6 +26,18 @@ public interface TableMetaData {
   List<String> getColumnsForUpdate();
 
   List<String> getNotPrimaryKeys();
+
+
+  /**
+   * <p>
+   * Creates a string of column aliases.
+   * <p>
+   * For example, if the "customer" table has "id" and "name" columns, and
+   * {@link OrmColumnAliasPrefix} is "c" returns
+   * <code>"customer.id as cid, customer.name as cname"</code>.
+   *
+   * @return column aliases (e.g. <code>"customer.id as cid, customer.name as cname"</code>)
+   */
 
   String getColumnAliases();
 

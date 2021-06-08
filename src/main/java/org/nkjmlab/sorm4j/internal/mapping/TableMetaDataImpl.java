@@ -43,7 +43,7 @@ public class TableMetaDataImpl implements TableMetaData {
         Stream.concat(notPrimaryKeys.stream(), primaryKeys.stream()).collect(Collectors.toList());
 
     this.columnsWithAliasPrefix = String.join(", ",
-        columns.stream().map(col -> tableName + "." + col + " " + tableNameAliasPrefix + col)
+        columns.stream().map(col -> tableName + "." + col + " as " + tableNameAliasPrefix + col)
             .toArray(String[]::new));
 
   }
