@@ -14,10 +14,10 @@ public final class Accessor {
 
   private final GetterAccessor getter;
   private final SetterAccessor setter;
-  private final ColumnName columnName;
+  private final String columnName;
 
 
-  public Accessor(ColumnName columnName, Field field, Method getter, Method setter) {
+  public Accessor(String columnName, Field field, Method getter, Method setter) {
     this.columnName = columnName;
     this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
     this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
@@ -94,7 +94,8 @@ public final class Accessor {
 
     @Override
     public String toString() {
-      return getter.getReturnType().getSimpleName() + " " + getter.getName() + "()";
+      return getter == null ? "null"
+          : getter.getReturnType().getSimpleName() + " " + getter.getName() + "()";
     }
   }
 
@@ -114,7 +115,8 @@ public final class Accessor {
 
     @Override
     public String toString() {
-      return "field " + field.getType().getSimpleName() + " " + field.getName();
+      return field == null ? "null"
+          : "field " + field.getType().getSimpleName() + " " + field.getName();
     }
 
   }
@@ -149,7 +151,8 @@ public final class Accessor {
 
     @Override
     public String toString() {
-      return setter.getName() + "(" + setter.getParameterTypes()[0].getSimpleName() + ")";
+      return setter == null ? "null"
+          : setter.getName() + "(" + setter.getParameterTypes()[0].getSimpleName() + ")";
     }
 
   }
@@ -177,7 +180,8 @@ public final class Accessor {
 
     @Override
     public String toString() {
-      return "field " + field.getType().getSimpleName() + " " + field.getName();
+      return field == null ? "null"
+          : "field " + field.getType().getSimpleName() + " " + field.getName();
     }
 
   }

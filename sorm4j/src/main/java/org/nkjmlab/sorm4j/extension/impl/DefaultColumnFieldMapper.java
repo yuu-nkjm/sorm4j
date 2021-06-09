@@ -1,6 +1,7 @@
 
 package org.nkjmlab.sorm4j.extension.impl;
 
+import static java.util.Objects.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
@@ -49,71 +53,71 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     this.loggerContext = loggerContext;
   }
 
-  private static Map<FieldName, Method> extractedMethodStartWith(Class<?> objectClass,
-      String prefix) {
+  private Map<String, Method> extractedMethodStartWith(Class<?> objectClass, String prefix) {
     Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
-    return Arrays.stream(objectClass.getDeclaredMethods())
+    return Arrays.stream(objectClass.getMethods())
         .filter(m -> Objects.isNull(m.getAnnotation(ignoreAnn))
             && !Modifier.isStatic(m.getModifiers()) && m.getName().length() > prefix.length()
             && m.getName().substring(0, prefix.length()).equals(prefix))
-        .collect(Collectors.toMap(m -> new FieldName(
-            m.getName().substring(prefix.length(), prefix.length() + 1).toLowerCase()
-                + m.getName().substring(prefix.length() + 1)),
-            m -> m));
+        .collect(
+            Collectors.toMap(m -> toCanonicalCase(m.getName().substring(prefix.length())), m -> m));
   }
 
 
-  private static Map<FieldName, Field> getAllFields(final Class<?> objectClass) {
+  private static Map<String, Field> getAllFields(final Class<?> objectClass) {
     Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
-    return Arrays.stream(objectClass.getDeclaredFields())
+    return Arrays.stream(objectClass.getFields())
         .filter(
             f -> Objects.isNull(f.getAnnotation(ignoreAnn)) && !Modifier.isStatic(f.getModifiers()))
-        .collect(Collectors.toMap(f -> new FieldName(f), f -> {
-          f.setAccessible(true);
+        .collect(Collectors.toMap(f -> toCanonicalCase(f.getName()), f -> {
+          // f.setAccessible(true);
           return f;
         }));
   }
 
 
-  private static Map<FieldName, Method> getAllGetters(Class<?> objectClass) {
-    Map<FieldName, Method> getters = extractedMethodStartWith(objectClass, "get");
-    return getters;
+  private Map<String, Method> getAllGetters(Class<?> objectClass) {
+    return extractedMethodStartWith(objectClass, "get").entrySet().stream()
+        .filter(e -> nonNull(isValidGetter(e.getValue())))
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
-  private static Map<FieldName, Method> getAllSetters(Class<?> objectClass) {
-    Map<FieldName, Method> setters = extractedMethodStartWith(objectClass, "set");
-    return setters;
+  private Map<String, Method> getAllSetters(Class<?> objectClass) {
+    return extractedMethodStartWith(objectClass, "set").entrySet().stream()
+        .filter(e -> nonNull(isValidSetter(e.getValue())))
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
-  private static Map<ColumnName, Method> getAnnotatatedSettersMap(Class<?> objectClass) {
+  private Map<String, Method> getAnnotatatedSettersMap(Class<?> objectClass) {
     Class<OrmSetter> ann = OrmSetter.class;
-    Map<ColumnName, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
-        .filter(m -> Objects.nonNull(m.getAnnotation(ann)))
-        .collect(Collectors.toMap(m -> new ColumnName(m.getAnnotation(ann).value()), m -> m));
-    return annos;
+    return Arrays.stream(objectClass.getMethods())
+        .filter(m -> nonNull(m.getAnnotation(ann)) && nonNull(isValidSetter(m)))
+        .collect(Collectors.toMap(m -> toCanonicalCase(m.getAnnotation(ann).value()), m -> m));
   }
 
-  private static Map<ColumnName, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
+  private Map<String, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
     Class<OrmColumn> ann = OrmColumn.class;
-    return Arrays.stream(objectClass.getDeclaredFields())
-        .filter(f -> Objects.nonNull(f.getAnnotation(ann)))
-        .collect(Collectors.toMap(f -> new ColumnName(f.getAnnotation(ann).value()), f -> {
-          f.setAccessible(true);
+    return Arrays.stream(objectClass.getFields()).filter(f -> Objects.nonNull(f.getAnnotation(ann)))
+        .collect(Collectors.toMap(f -> toCanonicalCase(f.getAnnotation(ann).value()), f -> {
+          // f.setAccessible(true);
           return f;
         }));
   }
 
 
-  private static Map<ColumnName, Method> getAnnotatedGettersMap(Class<?> objectClass) {
+  private Map<String, Method> getAnnotatedGettersMap(Class<?> objectClass) {
     Class<OrmGetter> ann = OrmGetter.class;
-    Map<ColumnName, Method> annos = Arrays.stream(objectClass.getDeclaredMethods())
-        .filter(m -> Objects.nonNull(m.getAnnotation(ann)))
-        .collect(Collectors.toMap(m -> new ColumnName(m.getAnnotation(ann).value()), m -> m));
-    return annos;
+    return Arrays.stream(objectClass.getMethods())
+        .filter(m -> Objects.nonNull(m.getAnnotation(ann)) && nonNull(isValidGetter(m)))
+        .collect(Collectors.toMap(m -> toCanonicalCase(m.getAnnotation(ann).value()), m -> m));
   }
 
   private Method isValidGetter(Method getter) {
     if (getter == null) {
+      return null;
+    }
+
+    if (getter.getName().equals("getClass")) {
       return null;
     }
     if (getter.getParameterCount() != 0) {
@@ -143,70 +147,48 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   @Override
   public Map<String, Accessor> createAccessors(Class<?> objectClass) {
-    Set<FieldName> names = new HashSet<>();
+    Set<String> names = new HashSet<>();
     names.addAll(getAllFields(objectClass).keySet());
     names.addAll(getAllGetters(objectClass).keySet());
     names.addAll(getAllSetters(objectClass).keySet());
+    names.addAll(getAnnotatedFieldsMap(objectClass).keySet());
+    names.addAll(getAnnotatedGettersMap(objectClass).keySet());
+    names.addAll(getAnnotatatedSettersMap(objectClass).keySet());
 
-    List<ColumnName> columnNames = new ArrayList<>(names).stream()
-        .flatMap(fieldName -> guessColumnNameCandidates(fieldName).stream())
-        .collect(Collectors.toList());
-    columnNames.addAll(getAnnotatedFieldsMap(objectClass).keySet());
-    columnNames.addAll(getAnnotatedGettersMap(objectClass).keySet());
-    columnNames.addAll(getAnnotatatedSettersMap(objectClass).keySet());
-
-    return createAccessors(objectClass, columnNames);
+    return createAccessors(objectClass, new ArrayList<>(names));
   }
 
   @Override
-  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<ColumnName> columnNames) {
-    Map<FieldName, Field> fields = getAllFields(objectClass);
-    Map<FieldName, Method> getters = getAllGetters(objectClass);
-    Map<FieldName, Method> setters = getAllSetters(objectClass);
-    Map<ColumnName, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
-    Map<ColumnName, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
-    Map<ColumnName, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
+  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<String> columnNames) {
+    Map<String, Field> fields = getAllFields(objectClass);
+    Map<String, Method> getters = getAllGetters(objectClass);
+    Map<String, Method> setters = getAllSetters(objectClass);
+    Map<String, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
+    Map<String, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
+    Map<String, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
 
-    List<FieldName> fieldsList = new ArrayList<>(fields.keySet());
     Map<String, Accessor> ret = new HashMap<>();
-    for (ColumnName columnName : columnNames) {
-      Field f = annotatedFields.get(columnName);
-      Method g = isValidGetter(annotatedGetters.get(columnName));
-      Method s = isValidSetter(annotatedSetters.get(columnName));
+    for (String canonicalColName : columnNames.stream().map(col -> toCanonicalCase(col))
+        .toArray(String[]::new)) {
+      Field f =
+          nonNull(annotatedFields.get(canonicalColName)) ? annotatedFields.get(canonicalColName)
+              : fields.get(canonicalColName);
+      Method g =
+          nonNull(annotatedGetters.get(canonicalColName)) ? annotatedGetters.get(canonicalColName)
+              : getters.get(canonicalColName);
+      Method s =
+          nonNull(annotatedSetters.get(canonicalColName)) ? annotatedSetters.get(canonicalColName)
+              : setters.get(canonicalColName);
 
-      Optional<FieldName> op =
-          fieldsList.stream().filter(fieldName -> isMatch(columnName, fieldName)).findFirst();
-      if (op.isPresent()) {
-        FieldName fieldName = op.get();
-        f = f != null ? f : fields.get(fieldName);
-        g = g != null ? g : isValidGetter(getters.get(fieldName));
-        s = s != null ? g : isValidSetter(setters.get(fieldName));
-      }
-      if (f == null && (g == null || s == null)) {
+      if (f == null && (g == null && s == null)) {
         loggerContext.getLogger().debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
-            columnName);
+            canonicalColName);
       } else {
-        ret.put(toCanonicalCase(columnName.getName()), new Accessor(columnName, f, g, s));
+        ret.put(canonicalColName, new Accessor(canonicalColName, f, g, s));
       }
     }
     return ret;
-  }
-
-
-  /**
-   * Gets field name corresponding to the column name. If the set of column name candidates guessed
-   * from a field contains the given column name, the field is mapped to the column. Capital case is
-   * ignored for the mapping.
-   *
-   * @param columnName
-   * @param fieldName
-   * @return
-   */
-  protected boolean isMatch(ColumnName columnName, FieldName fieldName) {
-    final List<String> candidates = guessColumnNameCandidates(fieldName).stream()
-        .map(ColumnName::getName).collect(Collectors.toList());
-    return containsAsCanonical(candidates, columnName.getName());
   }
 
 
@@ -307,6 +289,33 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   protected List<ColumnName> guessColumnNameCandidates(FieldName fieldName) {
     final String _fieldName = fieldName.getName();
     return Stream.of(toCanonicalCase(_fieldName)).map(ColumnName::new).collect(Collectors.toList());
+  }
+
+  @Override
+  public String getColumnAliasPrefix(Class<?> objectClass) {
+    return Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
+        .map(a -> a.value()).orElse("");
+  }
+
+  @Override
+  public Map<String, Accessor> createAliasAccessors(String prefix,
+      Map<String, Accessor> accessors) {
+    if (prefix.length() == 0) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, Accessor> ret = new HashMap<>();
+
+    for (String key : accessors.keySet()) {
+      String aKey = toCanonicalCase(prefix + key);
+      if (accessors.containsKey(aKey)) {
+        throw new SormException(StringUtils.format(
+            "Modify table alias because table alias [{}] and column [{}] is concatenated and it becomes duplicated column",
+            prefix, key));
+      }
+      ret.put(aKey, accessors.get(key));
+    }
+    return ret;
   }
 
 

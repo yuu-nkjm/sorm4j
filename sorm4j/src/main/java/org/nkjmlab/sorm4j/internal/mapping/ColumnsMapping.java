@@ -43,8 +43,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     super(options, resultSetConverter, objectClass, columnToAccessorMap);
 
 
-    List<Constructor<?>> annotataedConstructors = Arrays
-        .stream(objectClass.getDeclaredConstructors())
+    List<Constructor<?>> annotataedConstructors = Arrays.stream(objectClass.getConstructors())
         .filter(c -> c.getAnnotation(OrmConstructor.class) != null).collect(Collectors.toList());
 
     if (annotataedConstructors.size() > 1) {
@@ -55,7 +54,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     this.pojoCreator = !annotataedConstructors.isEmpty()
         ? new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0))
-        : new SetterPojoCreator<>(Try.getOrThrow(() -> objectClass.getDeclaredConstructor(),
+        : new SetterPojoCreator<>(Try.getOrThrow(() -> objectClass.getConstructor(),
             e -> new SormException(format(
                 "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
                 objectClass, OrmConstructor.class.getName()), e)));
@@ -68,7 +67,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     public PojoCreator(Constructor<S> constructor) {
       this.constructor = constructor;
-      constructor.setAccessible(true);
+      // constructor.setAccessible(true);
     }
 
     abstract List<S> loadPojoList(ResultSet resultSet, List<String> columns) throws SQLException;
@@ -261,7 +260,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   public String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
-        + System.lineSeparator() + super.getColumnToAccessorString();
+        + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator() + "  "
+        + pojoCreator;
   }
 
   public List<T> loadPojoList(ResultSet resultSet) throws SQLException {
@@ -281,6 +281,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
     return columns;
   }
+
 
 
 }

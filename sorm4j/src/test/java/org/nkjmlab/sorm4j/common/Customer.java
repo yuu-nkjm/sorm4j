@@ -14,9 +14,9 @@ public class Customer {
   public static final String CREATE_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS customer (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
-  private int id;
+  public int id;
   private String name;
-  private String address;
+  public String address;
 
   // Require public no arg constructor (default constructor)
   public Customer() {}
@@ -39,6 +39,10 @@ public class Customer {
   @Override
   public String toString() {
     return "Customer [id=" + id + ", address=" + address + ", name=" + name + "]";
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 

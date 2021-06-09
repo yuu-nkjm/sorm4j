@@ -33,6 +33,14 @@ public class Location {
     return "Location [id=" + id + ", name=" + name + "]";
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public void setName(Place name) {
+    this.name = name;
+  }
+
 
 
 }
