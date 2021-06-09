@@ -4,9 +4,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.nkjmlab.sorm4j.OrmReader;
 
 /**
- * Defines a table name alias for join.
+ * Defines a prefix for field alias. When "name" field mapped to "name" column and the value of
+ * {@link OrmColumnAliasPrefix}} is "customer", "customername" column also mapped to "name" field.
+ * It is mainly designed for {@link OrmReader#readTupleList} method.
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -14,7 +18,7 @@ import java.lang.annotation.Target;
 public @interface OrmColumnAliasPrefix {
 
   /**
-   * Name of the table mapped to the class.
+   * Prefix for field alias.
    */
   String value();
 

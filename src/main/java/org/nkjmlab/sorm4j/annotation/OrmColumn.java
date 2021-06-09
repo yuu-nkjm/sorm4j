@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines column mapping to a field.
+ * Defines a column mapping to a field.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})

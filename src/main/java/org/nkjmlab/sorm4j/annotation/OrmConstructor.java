@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines constructor for mapping.
+ * Defines a constructor for mapping.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR})
