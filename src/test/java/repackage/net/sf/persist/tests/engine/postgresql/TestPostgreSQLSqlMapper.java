@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -28,13 +27,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -67,25 +63,7 @@ public class TestPostgreSQLSqlMapper {
         stmt.setObject(parameterIndex, pg);
       }
     });
-
-    ResultSetConverter rsc = new DefaultResultSetConverter(new ColumnValueConverter() {
-
-      @Override
-      public boolean isApplicable(SormOptions options, ResultSet resultSet, int column,
-          int columnType, Class<?> toType) {
-        // TODO Auto-generated method stub
-        return false;
-      }
-
-      @Override
-      public Object convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
-          Class<?> toType) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-    });
-    sormContext =
-        SormContext.newBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build();
+    sormContext = SormContext.newBuilder().setSqlParametersSetter(ps).build();
   }
 
 

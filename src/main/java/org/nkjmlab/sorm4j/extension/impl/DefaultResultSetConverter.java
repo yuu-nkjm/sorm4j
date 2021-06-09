@@ -34,12 +34,12 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   private static final Set<Class<?>> standardObjectClasses = Set.of(boolean.class, Boolean.class,
       byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
       Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
-      byte[].class, Byte[].class, char[].class, Character[].class, String.class, BigDecimal.class,
-      java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class,
-      java.sql.Timestamp.class, java.time.LocalDate.class, java.time.LocalTime.class,
-      java.time.LocalDateTime.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
-      java.util.Date.class, java.util.UUID.class, java.io.InputStream.class, java.io.Reader.class,
-      java.net.URL.class, java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class);
+      String.class, BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
+      java.sql.Time.class, java.sql.Timestamp.class, java.time.LocalDate.class,
+      java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
+      java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
+      java.io.InputStream.class, java.io.Reader.class, java.net.URL.class,
+      java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class);
 
   /**
    * Returns the given type is enable to convert element object.
@@ -127,6 +127,29 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   }
 
 
+  private static Class<?> componentType(String name) {
+    switch (name) {
+      case "boolean":
+        return boolean.class;
+      case "char":
+        return char.class;
+      case "byte":
+        return byte.class;
+      case "short":
+        return short.class;
+      case "int":
+        return int.class;
+      case "long":
+        return long.class;
+      case "float":
+        return float.class;
+      case "double":
+        return double.class;
+      default:
+        return Try.getOrThrow(() -> Class.forName(name), Try::rethrow);
+    }
+  }
+
 
   // 2021-03-26 An approach to create converter at once and apply the converter to get result is
   // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
@@ -163,8 +186,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
           java.sql.Array arry = resultSet.getArray(column);
           Object srcArry = arry.getArray();
           final int length = Array.getLength(srcArry);
-          Object destArray =
-              Array.newInstance(Try.getOrThrow(() -> Class.forName(name), Try::rethrow), length);
+          Object destArray = Array.newInstance(componentType(name), length);
           for (int i = 0; i < length; i++) {
             Object v = Array.get(srcArry, i);
             Array.set(destArray, i, v);
