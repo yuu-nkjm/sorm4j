@@ -42,7 +42,7 @@
     <repository>
       <id>nkjmlab-public</id>
       <name>nkjmlab Public Repository</name>
-      <url>https://maven.nkjmlab.org/nexus/content/groups/public</url>
+      <url>https://maven.nkjmlab.org/repository/maven-public/</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
