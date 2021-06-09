@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
@@ -13,7 +13,6 @@ import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.extension.impl.DefaultTableSqlFactory;
-import org.nkjmlab.sorm4j.internal.SormContext;
 
 class OrmConfigStoreTest {
 
@@ -31,8 +30,8 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      SormContext conf = new SormContext(SormConfig.newBuilder().setMultiRowProcessorType(null)
-          .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
+      SormContext conf = SormContext.newBuilder().setMultiRowProcessorType(null).setBatchSize(10)
+          .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build();
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
@@ -44,13 +43,12 @@ class OrmConfigStoreTest {
 
     ResultSetConverter rsc = DEFAULT_RESULT_SET_CONVERTER;
 
-    SormContext confs =
-        new SormContext(SormConfig.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
-            .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
-            .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
-            .setTableSqlFactory(new DefaultTableSqlFactory())
-            .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10)
-            .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
+    SormContext confs = SormContext.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
+        .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
+        .setTableSqlFactory(new DefaultTableSqlFactory())
+        .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10).setMultiRowSize(20)
+        .setBatchSizeWithMultiRow(30).build();
   }
 
 

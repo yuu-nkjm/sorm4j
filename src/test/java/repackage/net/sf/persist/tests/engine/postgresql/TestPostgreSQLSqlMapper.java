@@ -31,12 +31,11 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.SormContext;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
@@ -85,8 +84,8 @@ public class TestPostgreSQLSqlMapper {
         return null;
       }
     });
-    sormContext = new SormContext(
-        SormConfig.newBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build());
+    sormContext =
+        SormContext.newBuilder().setSqlParametersSetter(ps).setResultSetConverter(rsc).build();
   }
 
 

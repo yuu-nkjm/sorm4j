@@ -15,6 +15,7 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.typed.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.typed.TypedOrmImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;

@@ -18,6 +18,7 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;

@@ -8,13 +8,12 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormConfig;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 
@@ -26,7 +25,6 @@ import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
  */
 public interface Sorm extends Orm {
 
-  static final SormContext DEFAULT_CONTEXT = new SormContext(SormConfig.newBuilder().build());
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
@@ -35,7 +33,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return SormImpl.create(dataSource, DEFAULT_CONTEXT);
+    return SormImpl.create(dataSource, SormContext.DEFAULT_CONTEXT);
   }
 
 
@@ -73,7 +71,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, DEFAULT_CONTEXT);
+    return Sorm.toOrmConnection(connection, SormContext.DEFAULT_CONTEXT);
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
@@ -208,7 +206,7 @@ public interface Sorm extends Orm {
   public static class Builder {
 
     private DataSource dataSource;
-    private SormConfig.Builder configBuilder = SormConfig.newBuilder();
+    private SormContext.Builder contextBuilder = SormContext.newBuilder();
 
     public Builder() {}
 
@@ -217,7 +215,7 @@ public interface Sorm extends Orm {
     }
 
     public Sorm build() {
-      return new SormImpl(dataSource, new SormContext(configBuilder.build()));
+      return new SormImpl(dataSource, contextBuilder.build());
     }
 
     public Builder setDataSource(DataSource dataSource) {
@@ -232,87 +230,87 @@ public interface Sorm extends Orm {
     }
 
     public Builder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
-      configBuilder.setColumnFieldMapper(fieldNameMapper);
+      contextBuilder.setColumnFieldMapper(fieldNameMapper);
       return this;
     }
 
 
     public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
-      configBuilder.setTableNameMapper(tableNameMapper);
+      contextBuilder.setTableNameMapper(tableNameMapper);
       return this;
     }
 
 
     public Builder setResultSetConverter(ResultSetConverter resultSetConverter) {
-      configBuilder.setResultSetConverter(resultSetConverter);
+      contextBuilder.setResultSetConverter(resultSetConverter);
       return this;
     }
 
 
     public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
-      configBuilder.setSqlParametersSetter(sqlParametersSetter);
+      contextBuilder.setSqlParametersSetter(sqlParametersSetter);
       return this;
     }
 
 
     public Builder setMultiRowProcessorType(MultiRowProcessorType multiRowProcessorType) {
-      configBuilder.setMultiRowProcessorType(multiRowProcessorType);
+      contextBuilder.setMultiRowProcessorType(multiRowProcessorType);
       return this;
     }
 
 
     public Builder setBatchSize(int size) {
-      configBuilder.setBatchSize(size);
+      contextBuilder.setBatchSize(size);
       return this;
     }
 
 
     public Builder setMultiRowSize(int size) {
-      configBuilder.setMultiRowSize(size);
+      contextBuilder.setMultiRowSize(size);
       return this;
     }
 
 
     public Builder setBatchSizeWithMultiRow(int size) {
-      configBuilder.setBatchSizeWithMultiRow(size);
+      contextBuilder.setBatchSizeWithMultiRow(size);
       return this;
     }
 
 
     public Builder setTransactionIsolationLevel(int level) {
-      configBuilder.setTransactionIsolationLevel(level);
+      contextBuilder.setTransactionIsolationLevel(level);
       return this;
     }
 
 
     public Builder setOption(String name, Object value) {
-      configBuilder.setOption(name, value);
+      contextBuilder.setOption(name, value);
       return this;
     }
 
 
     public Builder setLoggerOnAll() {
-      configBuilder.setLoggerOnAll();
+      contextBuilder.setLoggerOnAll();
       return this;
     }
 
     public Builder setLoggerOffAll() {
-      configBuilder.setLoggerOffAll();
+      contextBuilder.setLoggerOffAll();
       return this;
     }
 
     public Builder setLoggerOn(LoggerContext.Category... categories) {
-      configBuilder.setLoggerOn(categories);
+      contextBuilder.setLoggerOn(categories);
       return this;
     }
 
     public Builder setLoggerOff(LoggerContext.Category... categories) {
-      configBuilder.setLoggerOff(categories);
+      contextBuilder.setLoggerOff(categories);
       return this;
     }
 
     public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
-      configBuilder.setLoggerSupplier(loggerSupplier);
+      contextBuilder.setLoggerSupplier(loggerSupplier);
       return this;
     }
 

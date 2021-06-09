@@ -9,8 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.SormConfig;
-import org.nkjmlab.sorm4j.internal.SormContext;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -29,7 +28,7 @@ public class TestSqlserver {
     dataSource = DbEngineTestUtils.getDataSource(TestSqlserver.class,
         "jdbc:h2:mem:sqlserver;MODE=MSSQLServer");
     DbEngineTestUtils.executeSql(dataSource, TestSqlserver.class, "schema.sql");
-    conf = new SormContext(SormConfig.newBuilder().setOption("dbEngine", "MSSQLServer").build());
+    conf = SormContext.newBuilder().setOption("dbEngine", "MSSQLServer").build();
 
   }
 
