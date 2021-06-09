@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.extension.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.extension.ParameterSetter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**

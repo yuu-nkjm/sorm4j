@@ -496,13 +496,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  private <T> T loadSinglePojoByColumnLabels(Class<T> objectClass, ResultSet resultSet) {
-    final ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
-    return Try.getOrThrow(() -> mapping.loadPojo(mapping.createColumnLabels(resultSet), resultSet),
-        Try::rethrow);
-  }
-
-
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     return Try.getOrThrow(() -> {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
@@ -733,9 +726,8 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
-                loadSinglePojoByColumnLabels(t2, resultSet),
-                loadSinglePojoByColumnLabels(t3, resultSet)));
+            ret1.add(Tuples.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet),
+                loadSinglePojo(t3, resultSet)));
           }
           return ret1;
         });
@@ -755,8 +747,7 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuples.of(loadSinglePojoByColumnLabels(t1, resultSet),
-                loadSinglePojoByColumnLabels(t2, resultSet)));
+            ret1.add(Tuples.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet)));
           }
           return ret1;
         });

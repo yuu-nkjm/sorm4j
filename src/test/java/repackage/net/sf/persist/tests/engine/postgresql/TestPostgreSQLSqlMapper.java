@@ -29,13 +29,13 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
-import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.SormContext;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -53,7 +53,6 @@ public class TestPostgreSQLSqlMapper {
     DbEngineTestUtils.executeSql(dataSource, TestPostgreSQLSqlMapper.class, "sql-mapper-test.sql");
 
     SqlParametersSetter ps = new DefaultSqlParametersSetter(new ParameterSetter() {
-
       @Override
       public boolean isApplicable(SormOptions options, PreparedStatement stmt, int parameterIndex,
           Class<?> parameterClass, Object parameter) {
@@ -67,9 +66,7 @@ public class TestPostgreSQLSqlMapper {
         pg.setType("inet");
         pg.setValue(((InetAddress) parameter).getHostAddress());
         stmt.setObject(parameterIndex, pg);
-
       }
-
     });
 
     ResultSetConverter rsc = new DefaultResultSetConverter(new ColumnValueConverter() {

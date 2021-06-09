@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.extension.impl;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Field;
@@ -23,6 +23,10 @@ import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
+import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.ColumnName;
+import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 

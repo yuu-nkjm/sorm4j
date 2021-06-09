@@ -42,8 +42,6 @@ public final class SormImpl implements Sorm {
     return new SormImpl(dataSource, context);
   }
 
-
-
   public SormImpl(DataSource connectionSource, SormContext context) {
     this.sormContext = context;
     this.dataSource = connectionSource;

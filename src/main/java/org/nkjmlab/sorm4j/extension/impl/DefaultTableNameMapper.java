@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.extension.impl;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
+import org.nkjmlab.sorm4j.extension.TableName;
+import org.nkjmlab.sorm4j.extension.TableNameMapper;
 
 /**
  * Default implementation of {@link TableNameMapper}

@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultTableSqlFactory;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.SormOptionsImpl;
@@ -27,12 +32,13 @@ public final class SormConfig {
   private final SormOptions options;
   private final int transactionIsolationLevel;
   private final LoggerContext loggerContext;
+  private final TableSqlFactory tableSqlFactory;
 
   public SormConfig(LoggerContext loggerContext, Map<String, Object> options,
       ColumnFieldMapper columnFieldMapper, TableNameMapper tableNameMapper,
       ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
-      MultiRowProcessorType multiRowProcessorType, int batchSize, int multiRowSize,
-      int batchSizeWithMultiRow, int transactionIsolationLevel) {
+      TableSqlFactory tableSqlFactory, MultiRowProcessorType multiRowProcessorType, int batchSize,
+      int multiRowSize, int batchSizeWithMultiRow, int transactionIsolationLevel) {
     this.loggerContext = loggerContext;
     this.options = new SormOptionsImpl(options);
     this.transactionIsolationLevel = transactionIsolationLevel;
@@ -43,6 +49,7 @@ public final class SormConfig {
         multiRowSize, batchSizeWithMultiRow);
     this.resultSetConverter = resultSetConverter;
     this.sqlParametersSetter = sqlParametersSetter;
+    this.tableSqlFactory = tableSqlFactory;
   }
 
 
@@ -87,6 +94,10 @@ public final class SormConfig {
     return tableNameMapper;
   }
 
+  public TableSqlFactory getTableSqlFactory() {
+    return tableSqlFactory;
+  }
+
 
   public MultiRowProcessorFactory getMultiRowProcessorFactory() {
     return multiRowProcessorFactory;
@@ -100,26 +111,28 @@ public final class SormConfig {
   @Experimental
   public static class Builder {
 
-    public static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR =
+    private static final MultiRowProcessorType DEFAULT_MULTI_ROW_PROCESSOR =
         MultiRowProcessorType.MULTI_ROW;
 
-    public static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
+    private static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
         new DefaultSqlParametersSetter();
 
-    public static final ResultSetConverter DEFAULT_RESULT_SET_CONVERTER =
+    private static final ResultSetConverter DEFAULT_RESULT_SET_CONVERTER =
         new DefaultResultSetConverter();
 
-    public static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
+    private static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
 
+    private static final TableSqlFactory DEFAULT_TABLE_SQL_FACTORY = new DefaultTableSqlFactory();
 
-    public static final int DEFAULT_TRANSACTION_ISOLATION_LEVEL =
+    private static final int DEFAULT_TRANSACTION_ISOLATION_LEVEL =
         Connection.TRANSACTION_READ_COMMITTED;
-    public static final String DEFAULT_CACHE_NAME = "DEFAULT_CACHE";
 
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ResultSetConverter resultSetConverter = DEFAULT_RESULT_SET_CONVERTER;
     private SqlParametersSetter sqlParametersSetter = DEFAULT_SQL_PARAMETER_SETTER;
     private MultiRowProcessorType multiRowProcessorType = DEFAULT_MULTI_ROW_PROCESSOR;
+    private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
+
     private ColumnFieldMapper columnFieldMapper;
     private int batchSize = 32;
     private int multiRowSize = 32;
@@ -137,8 +150,8 @@ public final class SormConfig {
       columnFieldMapper = columnFieldMapper != null ? columnFieldMapper
           : new DefaultColumnFieldMapper(loggerContext);
       return new SormConfig(loggerContext, options, columnFieldMapper, tableNameMapper,
-          resultSetConverter, sqlParametersSetter, multiRowProcessorType, batchSize, multiRowSize,
-          batchSizeWithMultiRow, transactionIsolationLevel);
+          resultSetConverter, sqlParametersSetter, tableSqlFactory, multiRowProcessorType,
+          batchSize, multiRowSize, batchSizeWithMultiRow, transactionIsolationLevel);
     }
 
 
@@ -162,6 +175,11 @@ public final class SormConfig {
 
     public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
       this.sqlParametersSetter = sqlParametersSetter;
+      return this;
+    }
+
+    public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
+      this.tableSqlFactory = tableSqlFactory;
       return this;
     }
 

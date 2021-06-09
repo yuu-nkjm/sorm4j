@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.extension.impl;
 
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
+import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**

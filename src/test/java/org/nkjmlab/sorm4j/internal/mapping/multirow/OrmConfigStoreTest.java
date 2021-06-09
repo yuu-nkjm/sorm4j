@@ -3,15 +3,16 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
-import org.nkjmlab.sorm4j.extension.DefaultSqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormConfig;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultTableSqlFactory;
 import org.nkjmlab.sorm4j.internal.SormContext;
 
 class OrmConfigStoreTest {
@@ -47,6 +48,7 @@ class OrmConfigStoreTest {
         new SormContext(SormConfig.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
             .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
             .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
+            .setTableSqlFactory(new DefaultTableSqlFactory())
             .setMultiRowProcessorType(DEFAULT_MULTI_ROW_PROCESSOR).setBatchSize(10)
             .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
   }

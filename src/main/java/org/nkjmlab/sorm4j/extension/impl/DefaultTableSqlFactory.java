@@ -1,13 +1,17 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.extension.impl;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.extension.TableSql;
+import org.nkjmlab.sorm4j.extension.TableSqlFactory;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 
-public class TableSqlFactory {
+public class DefaultTableSqlFactory implements TableSqlFactory {
 
-  public TableSql create(TableMetaData tableMetaData) {
+  @Override
+  public TableSql create(TableMetaData tableMetaData, Class<?> objectClass, Connection connection) {
     String tableName = tableMetaData.getTableName();
     List<String> columns = tableMetaData.getColumns();
     List<String> primaryKeys = tableMetaData.getPrimaryKeys();
@@ -61,6 +65,7 @@ public class TableSqlFactory {
   private static String generatePlaceholders(int num) {
     return String.join(",", Stream.generate(() -> "?").limit(num).collect(Collectors.toList()));
   }
+
 
 
 }

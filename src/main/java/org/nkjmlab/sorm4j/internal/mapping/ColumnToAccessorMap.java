@@ -59,7 +59,7 @@ public final class ColumnToAccessorMap {
   public Accessor get(String columnName) {
     String cn = toCanonicalCase(columnName);
     Accessor ret = columnToAccessorMap.get(cn);
-    return ret != null ? ret : aliasColumnToAccessorMap.get(columnName);
+    return ret != null ? ret : aliasColumnToAccessorMap.get(cn);
   }
 
 

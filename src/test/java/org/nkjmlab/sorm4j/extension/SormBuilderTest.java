@@ -3,6 +3,10 @@ package org.nkjmlab.sorm4j.extension;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext.Category;
 
 class SormBuilderTest {

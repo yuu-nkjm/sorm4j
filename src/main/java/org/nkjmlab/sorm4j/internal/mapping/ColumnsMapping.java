@@ -20,9 +20,9 @@ import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -269,11 +269,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   }
 
   public T loadPojo(ResultSet resultSet) throws SQLException {
-    return loadPojo(createColumnLabels(resultSet), resultSet);
-  }
-
-  public T loadPojo(List<String> columns, ResultSet resultSet) throws SQLException {
-    return pojoCreator.loadPojo(resultSet, columns);
+    return pojoCreator.loadPojo(resultSet, createColumnLabels(resultSet));
   }
 
   public List<String> createColumnLabels(ResultSet resultSet) throws SQLException {
