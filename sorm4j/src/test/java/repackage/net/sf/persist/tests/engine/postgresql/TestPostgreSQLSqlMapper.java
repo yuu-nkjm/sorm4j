@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
-import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
@@ -39,7 +38,6 @@ import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
   private static DataSource dataSource;
-  private static SormContext sormContext;
 
   @BeforeAll
   static void beforAll() {
@@ -63,7 +61,7 @@ public class TestPostgreSQLSqlMapper {
         stmt.setObject(parameterIndex, pg);
       }
     });
-    sormContext = SormContext.newBuilder().setSqlParametersSetter(ps).build();
+    Sorm.setDefaultContext(builder -> builder.setSqlParametersSetter(ps).build());
   }
 
 
@@ -84,7 +82,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn, sormContext);
+      OrmConnection c = Sorm.toOrmConnection(conn);
       doTest(c, "c_boolean", true);
       doTest(c, "c_integer", 1);
       doTest(c, "c_integer", new BigDecimal("1"));

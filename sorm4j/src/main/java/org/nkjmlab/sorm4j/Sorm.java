@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -25,6 +26,10 @@ import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
  */
 public interface Sorm extends Orm {
 
+  static class DefaultContext {
+    static volatile SormContext CONTEXT = SormContext.newBuilder().build();
+  }
+
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
@@ -33,7 +38,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return SormImpl.create(dataSource, SormContext.DEFAULT_CONTEXT);
+    return SormImpl.create(dataSource, DefaultContext.CONTEXT);
   }
 
 
@@ -49,6 +54,9 @@ public interface Sorm extends Orm {
     return create(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
+  static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
+    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.newBuilder());
+  }
 
   /**
    * Creates a {@link DataSource} which simply wraps {@link DriverManager}
@@ -71,7 +79,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, SormContext.DEFAULT_CONTEXT);
+    return Sorm.toOrmConnection(connection, DefaultContext.CONTEXT);
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
