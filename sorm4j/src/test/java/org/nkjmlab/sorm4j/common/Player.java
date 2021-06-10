@@ -8,9 +8,9 @@ import org.nkjmlab.sorm4j.annotation.OrmTable;
 @OrmColumnAliasPrefix("p")
 public class Player {
 
-  private int id;
+  public int id;
   private String name;
-  private String address;
+  public String address;
 
   public Player() {}
 

@@ -36,7 +36,7 @@ public interface ColumnFieldMapper {
    * @return
    * @throws SQLException
    */
-  List<ColumnName> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException;
+  List<ColumnNameWithMetaData> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException;
 
   /**
    *
@@ -59,7 +59,7 @@ public interface ColumnFieldMapper {
    *
    * @return
    */
-  Map<String, Accessor> createAccessors(Class<?> objectClass, List<ColumnName> columnNames);
+  Map<String, Accessor> createAccessors(Class<?> objectClass, List<String> columnNames);
 
   /**
    * Creates accessors by guessing column names from the object class for {@link ColumnsMapping}
@@ -69,6 +69,10 @@ public interface ColumnFieldMapper {
    */
 
   Map<String, Accessor> createAccessors(Class<?> objectClass);
+
+  String getColumnAliasPrefix(Class<?> objectClass);
+
+  Map<String, Accessor> createAliasAccessors(String prefix, Map<String, Accessor> accessors);
 
 
 }

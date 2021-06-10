@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.extension;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.nkjmlab.sorm4j.SormException;
 
 /**
  * Field accessor mapping to the columnName.
@@ -12,15 +13,19 @@ import java.lang.reflect.Method;
  */
 public final class Accessor {
 
+  private static final EmptyGetter EMPTY_GETTER = new EmptyGetter();
+  private static final EmptySetter EMPTY_SETTER = new EmptySetter();
   private final GetterAccessor getter;
   private final SetterAccessor setter;
-  private final ColumnName columnName;
+  private final String columnName;
 
 
-  public Accessor(ColumnName columnName, Field field, Method getter, Method setter) {
+  public Accessor(String columnName, Field field, Method getter, Method setter) {
     this.columnName = columnName;
-    this.getter = getter != null ? new GetterMethod(getter) : new FieldGetter(field);
-    this.setter = setter != null ? new SetterMethod(setter) : new FieldSetter(field);
+    this.getter = getter != null ? new GetterMethod(getter)
+        : field != null ? new FieldGetter(field) : EMPTY_GETTER;
+    this.setter = setter != null ? new SetterMethod(setter)
+        : field != null ? new FieldSetter(field) : EMPTY_SETTER;
   }
 
 
@@ -98,6 +103,14 @@ public final class Accessor {
     }
   }
 
+  private static final class EmptyGetter implements GetterAccessor {
+
+    @Override
+    public Object get(Object object)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      throw new SormException("No valid getter for " + object);
+    }
+  }
 
   private static final class FieldGetter implements GetterAccessor {
 
@@ -125,6 +138,20 @@ public final class Accessor {
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 
     Class<?> getParameterType();
+  }
+
+  private static final class EmptySetter implements SetterAccessor {
+
+    @Override
+    public void set(Object object, Object value)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      throw new SormException("No valid setter for " + object);
+    }
+
+    @Override
+    public Class<?> getParameterType() {
+      throw new SormException("No valid setter");
+    }
   }
 
   private static final class SetterMethod implements SetterAccessor {

@@ -7,14 +7,13 @@ import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 
 @OrmTable("simple")
-@SuppressWarnings("unused")
 public class Simple01 {
 
-  private long id;
-  private String stringCol;
+  public long id;
+  public String stringCol;
   // field name annotation
   @OrmColumn("LONG_COL")
-  private long intCol;
+  public long intCol;
 
 
 

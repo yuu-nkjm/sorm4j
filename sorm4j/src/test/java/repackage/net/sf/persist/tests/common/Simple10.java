@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.annotation.OrmTable;
 public class Simple10 {
 
   private long id;
-  private String stringCol;
+  public String stringCol;
   private long longCol;
 
   public long getId() {

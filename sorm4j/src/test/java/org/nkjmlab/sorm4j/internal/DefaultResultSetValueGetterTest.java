@@ -63,11 +63,11 @@ class DefaultResultSetValueGetterTest {
   void testSqlTypeToString() {}
 
   public static class LocalDateTimeSample {
-    LocalTime time;
-    LocalDate date;
-    LocalDateTime dateTime;
-    Object[] arry;
-    Float fl;
+    public LocalTime time;
+    public LocalDate date;
+    public LocalDateTime dateTime;
+    public Object[] arry;
+    public Float fl;
 
     @OrmIgnore
     int ignoreCol;

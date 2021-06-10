@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.sql;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
 
 @Experimental
 public interface TableMetaData {
@@ -40,5 +41,7 @@ public interface TableMetaData {
    */
 
   String getColumnAliases();
+
+  List<ColumnNameWithMetaData> getColumnsWithMetaData();
 
 }

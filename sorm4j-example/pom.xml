@@ -6,23 +6,7 @@
   <artifactId>sorm4j-example</artifactId>
   <version>1.3.17</version>
   <description>Example of Sorm4j</description>
-  <url>https://github.com/yuu-nkjm/sorm4j</url>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Yuu Nakajima</name>
-      <email>yuu.nkjm.pub@gmail.com</email>
-      <organization>nkjmlab.org</organization>
-      <organizationUrl>https://github.com/nkjmlab</organizationUrl>
-    </developer>
-  </developers>
   <properties>
-    <sorm4j-version>${project.version}</sorm4j-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <additionalparam>-Xdoclint:none</additionalparam>
     <downloadSources>true</downloadSources>
@@ -33,7 +17,7 @@
     <dependency>
       <groupId>org.nkjmlab</groupId>
       <artifactId>sorm4j</artifactId>
-      <version>${sorm4j-version}</version>
+      <version>[1.0.0,)</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
     <dependency>

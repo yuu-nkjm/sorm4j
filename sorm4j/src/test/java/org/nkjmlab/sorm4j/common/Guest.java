@@ -62,5 +62,9 @@ public class Guest {
         && Objects.equals(name, other.name);
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
 
 }
