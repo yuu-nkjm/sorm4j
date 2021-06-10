@@ -157,15 +157,43 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   }
 
+  private static class ConstructorParameter {
+    private final String name;
+    /**
+     * Order in the constructor parameter
+     */
+    private final int order;
+    private final Class<?> type;
+
+    public ConstructorParameter(String name, int order, Class<?> type) {
+      this.name = name;
+      this.order = order;
+      this.type = type;
+    }
+
+    public int getOrder() {
+      return order;
+    }
+
+    public Class<?> getType() {
+      return type;
+    }
+
+    @Override
+    public String toString() {
+      return "ConstructorParameter [name=" + name + ", order=" + order + ", type=" + type + "]";
+    }
+
+  }
 
   private final class ConstructorPojoCreator<S> extends PojoCreator<S> {
 
-    private final Map<String, Class<?>> parameterTypes = new HashMap<>();
-    private final Map<String, Integer> parameterOrders = new HashMap<>();
-    private final int parametersLength;
 
-    private final Map<List<String>, Class<?>[]> parameterTypesCache = new ConcurrentHashMap<>();
-    private final Map<List<String>, int[]> parameterOrderCache = new ConcurrentHashMap<>();
+    private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
+    private final int constructorParametersLength;
+
+    private final Map<List<String>, ConstructorParameter[]> columnAndConstructorParameterMapping =
+        new ConcurrentHashMap<>();
 
 
     public ConstructorPojoCreator(Constructor<S> constructor, String columnAliasPrefix) {
@@ -174,33 +202,54 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
       String[] parameterNames = constructor.getAnnotation(OrmConstructor.class).value();
       Parameter[] parameters = constructor.getParameters();
-      this.parametersLength = parameters.length;
+      this.constructorParametersLength = parameters.length;
 
-      for (int i = 0; i < parametersLength; i++) {
+      for (int i = 0; i < constructorParametersLength; i++) {
         Parameter parameter = parameters[i];
-        String name = toCanonicalCase(parameterNames[i]);
-        parameterOrders.put(name, i);
-        parameterTypes.put(name, parameter.getType());
+        String canonicalName = toCanonicalCase(parameterNames[i]);
+        ConstructorParameter cp = new ConstructorParameter(canonicalName, i, parameter.getType());
+        constructorParametersMap.put(canonicalName, cp);
         if (columnAliasPrefix != null && columnAliasPrefix.length() != 0) {
-          parameterOrders.put(toCanonicalCase(columnAliasPrefix + name), i);
-          parameterTypes.put(toCanonicalCase(columnAliasPrefix + name), parameter.getType());
+          constructorParametersMap.put(toCanonicalCase(columnAliasPrefix + canonicalName), cp);
 
         }
       }
     }
 
 
-    private S createPojo(ResultSet resultSet, int[] sqlTypes, Class<?>[] parameterTypes,
-        int[] orders) {
+    /**
+     * <pre>
+     * <code>
+     * Pojo(int a, String b, int c);
+     * select c, d, b, a from pojo;
+     * =>
+     * constructorParameters =
+     *     {c,3,int}     <= c: SQL(1st), CONST(3rd),
+     *     null          <= d: SQL(2nd), CONST(NON),
+     *     {b,2,String}  <= b: SQL(3rd), CONST(2nd),
+     *     {a,1,int}     <= a: SQL(4th), CONST(1st),
+     *
+     * </code>
+     * </pre>
+     *
+     * @param resultSet
+     * @param sqlTypes
+     * @param constructorParameters ordered by column. if the column is not mapped to constructor
+     *        parameter, the value is null.
+     * @return
+     */
+    private S createPojo(ResultSet resultSet, int[] sqlTypes,
+        ConstructorParameter[] constructorParameters) {
       try {
-        final Object[] params = new Object[parametersLength];
-        for (int i = 1; i <= orders.length; i++) {
-          final int order = orders[i - 1];
-          if (order == -1) {
+        final Object[] params = new Object[constructorParametersLength];
+
+        for (int i = 0; i < constructorParameters.length; i++) {
+          ConstructorParameter cp = constructorParameters[i];
+          if (cp == null) {
             continue;
           }
-          params[order] = resultSetConverter.convertColumnValueTo(options, resultSet, i,
-              sqlTypes[i - 1], parameterTypes[i - 1]);
+          params[cp.getOrder()] = resultSetConverter.convertColumnValueTo(options, resultSet, i + 1,
+              sqlTypes[i], constructorParameters[i].getType());
         }
         return constructor.newInstance(params);
       } catch (SQLException e) {
@@ -214,29 +263,19 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
 
 
-    private Class<?>[] getParameterTypes(List<String> columns) {
-      return parameterTypesCache.computeIfAbsent(columns,
-          key -> columns.stream().map(columnName -> parameterTypes.get(toCanonicalCase(columnName)))
-              .toArray(Class<?>[]::new));
+    private ConstructorParameter[] getCorrespondingParameter(List<String> columns) {
+      return columnAndConstructorParameterMapping.computeIfAbsent(columns,
+          key -> columns.stream().map(col -> constructorParametersMap.get(toCanonicalCase(col)))
+              .toArray(ConstructorParameter[]::new));
     }
-
-    private int[] getParameterOrders(List<String> columns) {
-      return parameterOrderCache.computeIfAbsent(columns,
-          key -> columns.stream().mapToInt(columnName -> {
-            Integer o = parameterOrders.get(toCanonicalCase(columnName));
-            return o != null ? o.intValue() : -1;
-          }).toArray());
-    }
-
 
     @Override
     List<S> loadPojoList(ResultSet resultSet, List<String> columns) throws SQLException {
       final int[] columnTypes = getColumnTypes(resultSet, columns);
-      final Class<?>[] parameterTypes = getParameterTypes(columns);
-      final int[] orders = getParameterOrders(columns);
+      final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
       final List<S> ret = new ArrayList<>();
       while (resultSet.next()) {
-        ret.add(createPojo(resultSet, columnTypes, parameterTypes, orders));
+        ret.add(createPojo(resultSet, columnTypes, constructorParameters));
       }
       return ret;
     }
@@ -245,9 +284,14 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     @Override
     S loadPojo(ResultSet resultSet, List<String> columns) throws SQLException {
       final int[] columnTypes = getColumnTypes(resultSet, columns);
-      final Class<?>[] parameterTypes = getParameterTypes(columns);
-      final int[] orders = getParameterOrders(columns);
-      return createPojo(resultSet, columnTypes, parameterTypes, orders);
+      final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
+      return createPojo(resultSet, columnTypes, constructorParameters);
+    }
+
+
+    @Override
+    public String toString() {
+      return "ConstructorPojoCreator [constructorParametersMap=" + constructorParametersMap + "]";
     }
 
   }
