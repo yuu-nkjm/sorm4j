@@ -4,8 +4,8 @@ import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
 import java.lang.reflect.InvocationTargetException;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 
 abstract class Mapping<T> {
@@ -78,7 +78,7 @@ abstract class Mapping<T> {
 
 
   protected String getColumnToAccessorString() {
-    return "[" + objectClass.getName() + "] is map to " + columnToAccessorMap.toString();
+    return "[" + objectClass.getName() + "] is mapped to " + columnToAccessorMap.toString();
   }
 
 

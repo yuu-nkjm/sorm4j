@@ -30,6 +30,7 @@ import org.nkjmlab.sorm4j.annotation.OrmSetter;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.ColumnName;
+import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
 import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
@@ -210,31 +211,11 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
   @Override
-  public List<ColumnName> getColumns(DatabaseMetaData metaData, String tableName)
+  public List<ColumnNameWithMetaData> getColumns(DatabaseMetaData metaData, String tableName)
       throws SQLException {
-
-    // ColumnName name and data type for message.
-    final class ColumnNameWithMetaData extends ColumnName {
-
-      private final String msg;
-
-      public ColumnNameWithMetaData(String name, int dataType, String typeName, int ordinalPosition,
-          String isNullable, String isAutoIncremented, String isGenerated) {
-        super(name);
-        this.msg =
-            StringUtils.format("{}. {} [{}({})] [{},{},{}]", String.format("%02d", ordinalPosition),
-                name, typeName, dataType, isNullable, isAutoIncremented, isGenerated);
-      }
-
-      @Override
-      public String toString() {
-        return msg;
-      }
-    }
-
     try (ResultSet resultSet =
         metaData.getColumns(null, getSchemaPattern(metaData), tableName, "%")) {
-      final List<ColumnName> columnsList = new ArrayList<>();
+      final List<ColumnNameWithMetaData> columnsList = new ArrayList<>();
       while (resultSet.next()) {
         String columnName = resultSet.getString(4);
         int dataType = resultSet.getInt(5);

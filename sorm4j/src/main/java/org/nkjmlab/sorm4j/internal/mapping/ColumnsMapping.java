@@ -260,8 +260,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   public String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
-        + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator() + "  "
-        + pojoCreator;
+        + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator()
+        + "  with [" + pojoCreator + "]";
   }
 
   public List<T> loadPojoList(ResultSet resultSet) throws SQLException {

@@ -50,15 +50,14 @@ public final class ColumnToAccessorMap {
   public String toString() {
     String keySetString =
         columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList()).toString();
-    return "COLUMNS " + keySetString + System.lineSeparator() + String.join(System.lineSeparator(),
-        columnToAccessorMap.keySet().stream()
-            .map(e -> "  COLUMN " + e + " => " + columnToAccessorMap.get(e).getFormattedString())
+    return "columns " + keySetString + System.lineSeparator()
+        + String.join(System.lineSeparator(), columnToAccessorMap.keySet().stream()
+            .map(e -> "  Column " + e + " => " + columnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()))
-        + System.lineSeparator() + "  DETAIL =>" + columnToAccessorMap.values()
         + System.lineSeparator() + "  OrmColumnAliasPrefix is [" + columnAliasPrefix + "]"
         + (columnAliasPrefix.length() == 0 ? "" : System.lineSeparator())
         + String.join(System.lineSeparator(), aliasColumnToAccessorMap.keySet().stream().map(
-            e -> "  COLUMN " + e + " => " + aliasColumnToAccessorMap.get(e).getFormattedString())
+            e -> "  Column " + e + " => " + aliasColumnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()));
 
   }

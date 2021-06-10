@@ -36,7 +36,7 @@ public interface ColumnFieldMapper {
    * @return
    * @throws SQLException
    */
-  List<ColumnName> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException;
+  List<ColumnNameWithMetaData> getColumns(DatabaseMetaData metaData, String tableName) throws SQLException;
 
   /**
    *

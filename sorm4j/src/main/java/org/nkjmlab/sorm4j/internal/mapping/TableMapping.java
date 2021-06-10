@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
+import static java.lang.System.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -291,11 +292,11 @@ public final class TableMapping<T> extends Mapping<T> {
   }
 
   public String getFormattedString() {
-    return "[" + TableMapping.class.getSimpleName() + "] TABLE [" + tableMetaData.getTableName()
-        + "] is mapped to [" + getObjectClass().getSimpleName() + "] class. " + "PRIMARY KEY is "
-        + tableMetaData.getPrimaryKeys() + System.lineSeparator()
-        + super.getColumnToAccessorString() + System.lineSeparator() + "  ["
-        + multiRowProcessor.getClass().getSimpleName() + "] is used for processing multirow.";
+    return "[" + TableMapping.class.getSimpleName() + "] Table [" + tableMetaData.getTableName()
+        + "] is mapped to [" + getObjectClass().getName() + "] class. " + lineSeparator() + "PK="
+        + tableMetaData.getPrimaryKeys() + ",  " + tableMetaData.getColumnsWithMetaData()
+        + lineSeparator() + super.getColumnToAccessorString() + lineSeparator() + "  with ["
+        + multiRowProcessor.getClass().getSimpleName() + "]";
   }
 
   public TableMetaData getTableMetaData() {
