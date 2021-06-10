@@ -13,11 +13,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
@@ -51,9 +49,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           format("Constructor with parameters annotated by {} should be one or less. ",
               OrmConstructor.class.getName()));
     }
-
     this.pojoCreator = !annotataedConstructors.isEmpty()
-        ? new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0))
+        ? new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0),
+            columnToAccessorMap.getColumnAliasPrefix())
         : new SetterPojoCreator<>(Try.getOrThrow(() -> objectClass.getConstructor(),
             e -> new SormException(format(
                 "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
@@ -166,17 +164,13 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     private final Map<String, Integer> parameterOrders = new HashMap<>();
     private final int parametersLength;
 
-    private final Map<List<String>, Class<?>[]> parameterTypesOrderedByColumnMap =
-        new ConcurrentHashMap<>();
-    private final Map<List<String>, int[]> parameterOrderedByColumnMap = new ConcurrentHashMap<>();
+    private final Map<List<String>, Class<?>[]> parameterTypesCache = new ConcurrentHashMap<>();
+    private final Map<List<String>, int[]> parameterOrderCache = new ConcurrentHashMap<>();
 
 
-    public ConstructorPojoCreator(Constructor<S> constructor) {
+    public ConstructorPojoCreator(Constructor<S> constructor, String columnAliasPrefix) {
       super(constructor);
 
-      String colmunAliasPrefix =
-          Optional.ofNullable(getObjectClass().getAnnotation(OrmColumnAliasPrefix.class))
-              .map(a -> a.value()).orElse("");
 
       String[] parameterNames = constructor.getAnnotation(OrmConstructor.class).value();
       Parameter[] parameters = constructor.getParameters();
@@ -187,9 +181,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         String name = toCanonicalCase(parameterNames[i]);
         parameterOrders.put(name, i);
         parameterTypes.put(name, parameter.getType());
-        if (colmunAliasPrefix != null) {
-          parameterOrders.put(toCanonicalCase(colmunAliasPrefix + name), i);
-          parameterTypes.put(toCanonicalCase(colmunAliasPrefix + name), parameter.getType());
+        if (columnAliasPrefix != null && columnAliasPrefix.length() != 0) {
+          parameterOrders.put(toCanonicalCase(columnAliasPrefix + name), i);
+          parameterTypes.put(toCanonicalCase(columnAliasPrefix + name), parameter.getType());
 
         }
       }
@@ -221,13 +215,13 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
     private Class<?>[] getParameterTypes(List<String> columns) {
-      return parameterTypesOrderedByColumnMap.computeIfAbsent(columns,
+      return parameterTypesCache.computeIfAbsent(columns,
           key -> columns.stream().map(columnName -> parameterTypes.get(toCanonicalCase(columnName)))
               .toArray(Class<?>[]::new));
     }
 
     private int[] getParameterOrders(List<String> columns) {
-      return parameterOrderedByColumnMap.computeIfAbsent(columns,
+      return parameterOrderCache.computeIfAbsent(columns,
           key -> columns.stream().mapToInt(columnName -> {
             Integer o = parameterOrders.get(toCanonicalCase(columnName));
             return o != null ? o.intValue() : -1;

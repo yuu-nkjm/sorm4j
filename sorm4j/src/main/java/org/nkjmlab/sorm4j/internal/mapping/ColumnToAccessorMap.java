@@ -62,4 +62,8 @@ public final class ColumnToAccessorMap {
 
   }
 
+  public String getColumnAliasPrefix() {
+    return columnAliasPrefix;
+  }
+
 }
