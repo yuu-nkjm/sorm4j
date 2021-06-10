@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.nkjmlab.sorm4j.sql.SqlKeyword.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -424,8 +426,12 @@ public class SelectSql {
     if (element == null) {
       return "null";
     } else if (element.getClass().isArray()) {
-      return "[" + String.join(", ",
-          ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new)) + "]";
+      final int length = Array.getLength(element);
+      List<String> ret = new ArrayList<>(length);
+      for (int i = 0; i < length; i++) {
+        ret.add(literal(Array.get(element, i)));
+      }
+      return "[" + String.join(",", ret) + "]";
     } else if (element instanceof List) {
       return String.join(", ",
           ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
