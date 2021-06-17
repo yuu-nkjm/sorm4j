@@ -30,8 +30,8 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      SormContext conf = SormContext.newBuilder().setMultiRowProcessorType(null).setBatchSize(10)
-          .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build();
+      SormContext.newBuilder().setMultiRowProcessorType(null).setBatchSize(10).setMultiRowSize(20)
+          .setBatchSizeWithMultiRow(30).build();
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
@@ -43,7 +43,7 @@ class OrmConfigStoreTest {
 
     ResultSetConverter rsc = DEFAULT_RESULT_SET_CONVERTER;
 
-    SormContext confs = SormContext.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+    SormContext.newBuilder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
         .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setResultSetConverter(rsc)
         .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
         .setTableSqlFactory(new DefaultTableSqlFactory())

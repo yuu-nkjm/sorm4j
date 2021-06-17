@@ -16,7 +16,7 @@ class StringUtilsTest {
   @Test
   void testFormat() {
     assertThat(StringUtils.format("{}")).isEqualTo("{}");
-    assertThat(StringUtils.format("{}", null)).isEqualTo("{}");
+    assertThat(StringUtils.format("{}", (Object[]) null)).isEqualTo("{}");
   }
 
 }

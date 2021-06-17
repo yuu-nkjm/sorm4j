@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ class LazyResultSetTest {
     sorm.accept(m -> {
       try (Stream<Player> st = m.readAllLazy(Player.class).stream()) {
         st.onClose(() -> System.out.println("close1"));
-        Optional<Player> ret = st.findAny();
+        st.findAny();
 
       }
     });
@@ -32,7 +31,7 @@ class LazyResultSetTest {
     sorm.accept(m -> {
       Stream<Player> st = m.readAllLazy(Player.class).stream();
       st.onClose(() -> System.out.println("close2"));
-      Optional<Player> ret = st.findAny();
+      st.findAny();
     });
 
     // sorm.accept(m -> {
