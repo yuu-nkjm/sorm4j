@@ -580,8 +580,7 @@ class TypedOrmConnectionTest {
 
   @Test
   void testSormExeption() {
-    DataSource ds = Sorm.create(SormTestUtils.jdbcUrl, SormTestUtils.user, SormTestUtils.password)
-        .getDataSource();
+    DataSource ds = Sorm.create(SormTestUtils.jdbcUrl).getDataSource();
     try {
       ds.unwrap(null);
       failBecauseExceptionWasNotThrown(UnsupportedOperationException.class);

@@ -34,6 +34,15 @@ public interface Sorm extends Orm {
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
    *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   * Sorm.create(dataSource);
+   *</pre></code>
+   *
    * @param dataSource
    * @return
    */
@@ -45,6 +54,14 @@ public interface Sorm extends Orm {
   /**
    * Create a {@link Sorm} object which uses {@link DriverManager}.
    *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   *</pre></code>
+   *
    * @param jdbcUrl
    * @param user
    * @param password
@@ -52,6 +69,24 @@ public interface Sorm extends Orm {
    */
   static Sorm create(String jdbcUrl, String user, String password) {
     return create(createDriverManagerDataSource(jdbcUrl, user, password));
+  }
+
+  /**
+   * Create a {@link Sorm} object which uses {@link DriverManager}.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+   *</pre></code>
+   *
+   * @param jdbcUrl
+   * @return
+   */
+  static Sorm create(String jdbcUrl) {
+    return create(createDriverManagerDataSource(jdbcUrl, null, null));
   }
 
   static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
