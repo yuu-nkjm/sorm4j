@@ -48,6 +48,8 @@ public interface OrmMapReader {
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}.
    * <p>
+   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
    * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
@@ -72,10 +74,14 @@ public interface OrmMapReader {
 
   /**
    * Reads a list of objects from the database by mapping the SQL execution results to instances of
-   * {@link java.util.Map} containing data from the execution of the provided parameterized SQL and
+   * {@link java.util.Map} containing data from the execution of the provided parameterized SQL.
+   *
    * <p>
-   * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
+   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   *
+   * <p>
+   * Types of value returned from the database will be converted to Java types in the map according
+   * with the correspondence defined in
    * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
@@ -99,6 +105,15 @@ public interface OrmMapReader {
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
    * is thrown.
+   * <p>
+   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   * <p>
+   * Types of value returned from the database will be converted to Java types in the map according
+   * with the correspondence defined in
+   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * <p>
+   * Parameters will be set according with the correspondence defined in
+   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
