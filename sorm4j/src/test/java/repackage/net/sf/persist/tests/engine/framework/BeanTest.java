@@ -173,7 +173,6 @@ public class BeanTest {
           }
 
           // TODO: maybe test compatibility of return type with field type?
-
           // compare values using a method that takes into consideration "compatible" types
           // (eg char[]-String, double-BigDecimal, etc)
           Object retConverted = DynamicBean.convertToType(fieldValue.getClass(), ret);

@@ -601,7 +601,7 @@ class OrmConnectionTest {
 
 
 
-    Sorm orm = Sorm.newBuilder().setDataSource(sorm.getDataSource())
+    Sorm orm = Sorm.builder().setDataSource(sorm.getDataSource())
         .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build();
 
     orm.acceptTransactionHandler(m -> {

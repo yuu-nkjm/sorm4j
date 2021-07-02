@@ -225,7 +225,7 @@ public final class SormContext {
         + sormConfig + "]";
   }
 
-  public static Builder newBuilder() {
+  public static Builder builder() {
     return new Builder();
   }
 
@@ -260,7 +260,7 @@ public final class SormContext {
     private int batchSizeWithMultiRow = 5;
     private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
     private Map<String, Object> options = new HashMap<>();
-    private LoggerContext.Builder loggerConfigBuilder = LoggerContext.newBuilder();
+    private LoggerContext.Builder loggerConfigBuilder = LoggerContext.builder();
 
 
 

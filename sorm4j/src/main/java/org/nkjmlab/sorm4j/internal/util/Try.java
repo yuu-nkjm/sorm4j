@@ -165,4 +165,10 @@ public final class Try {
     createRunnable(onTry, onCatch).run();
   }
 
+  public static <T, X extends RuntimeException> T getWithCatch(ThrowableSupplier<T> onTry,
+      Function<Exception, T> onCatch) {
+    return createSupplier(onTry, e -> onCatch.apply(e)).get();
+  }
+
+
 }

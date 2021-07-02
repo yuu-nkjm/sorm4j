@@ -27,7 +27,7 @@ import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 public interface Sorm extends Orm {
 
   static class DefaultContext {
-    static volatile SormContext CONTEXT = SormContext.newBuilder().build();
+    static volatile SormContext CONTEXT = SormContext.builder().build();
   }
 
 
@@ -90,7 +90,7 @@ public interface Sorm extends Orm {
   }
 
   static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
-    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.newBuilder());
+    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.builder());
   }
 
   /**
@@ -233,15 +233,15 @@ public interface Sorm extends Orm {
    */
   OrmTransaction openTransaction();
 
-  static Builder newBuilder() {
+  static Builder builder() {
     return new Builder();
   }
 
-  static Builder newBuilder(DataSource dataSource) {
+  static Builder builder(DataSource dataSource) {
     return new Builder(dataSource);
   }
 
-  static Builder newBuilder(String jdbcUrl, String user, String password) {
+  static Builder builder(String jdbcUrl, String user, String password) {
     return new Builder(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
@@ -249,7 +249,7 @@ public interface Sorm extends Orm {
   public static class Builder {
 
     private DataSource dataSource;
-    private SormContext.Builder contextBuilder = SormContext.newBuilder();
+    private SormContext.Builder contextBuilder = SormContext.builder();
 
     public Builder() {}
 

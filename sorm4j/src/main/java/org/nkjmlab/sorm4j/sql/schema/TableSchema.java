@@ -54,11 +54,11 @@ public class TableSchema {
     return tableSchema;
   }
 
-  public static TableSchema.Builder newBuilder() {
+  public static TableSchema.Builder builder() {
     return new TableSchema.Builder();
   }
 
-  public static TableSchema.Builder newBuilder(String tableName) {
+  public static TableSchema.Builder builder(String tableName) {
     return new TableSchema.Builder(tableName);
   }
 

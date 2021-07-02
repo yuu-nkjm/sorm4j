@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
 public class LoggingExample {
 
   public static void main(String[] args) {
-    Sorm sorm = Sorm.newBuilder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
+    Sorm sorm = Sorm.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
         .setLoggerSupplier(JulSormLogger::getLogger).setLoggerOnAll().build();
 
     sorm.accept(conn -> {
@@ -17,7 +17,7 @@ public class LoggingExample {
       conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
     });
 
-    sorm = Sorm.newBuilder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
+    sorm = Sorm.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
         .setLoggerSupplier(Log4jSormLogger::getLogger).setLoggerOnAll().build();
     List<Customer> customers =
         sorm.apply(conn -> conn.createCommand("select * from customer where name=? and address=?")

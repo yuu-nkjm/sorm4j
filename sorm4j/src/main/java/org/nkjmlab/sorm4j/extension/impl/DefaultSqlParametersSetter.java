@@ -65,7 +65,7 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
   /**
    * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.
    *
-   * @param options TODO
+   * @param options
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameter parameters values
    *

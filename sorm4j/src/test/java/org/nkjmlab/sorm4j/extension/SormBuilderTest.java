@@ -14,7 +14,7 @@ class SormBuilderTest {
   @Test
   void testBuild() {
 
-    Sorm.newBuilder(SormTestUtils.createDataSourceH2())
+    Sorm.builder(SormTestUtils.createDataSourceH2())
         .setColumnFieldMapper(new DefaultColumnFieldMapper())
         .setTableNameMapper(new DefaultTableNameMapper())
         .setResultSetConverter(new DefaultResultSetConverter())
