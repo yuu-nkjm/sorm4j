@@ -20,7 +20,7 @@ class TableSchemaTest {
 
     public TempGuestTable() {
       this.schema =
-          new TableSchema.Builder().setTableName("temp_guests").addColumnDefinition(ID, INT)
+          TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID, INT)
               .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
               .addUniqueConstraint(TEL).addIndexColumn(TEL).setPrimaryKey(ID).build();
     }

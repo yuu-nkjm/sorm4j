@@ -47,7 +47,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   private final LoggerContext loggerContext;
 
   public DefaultColumnFieldMapper() {
-    this(LoggerContext.newBuilder().build());
+    this(LoggerContext.builder().build());
   }
 
   public DefaultColumnFieldMapper(LoggerContext loggerContext) {

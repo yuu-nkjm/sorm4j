@@ -40,7 +40,7 @@ public class SormTestUtils {
   }
 
   public static Sorm createSorm() {
-    Sorm ret = Sorm.newBuilder(jdbcUrl, user, password).setLoggerOn(Category.MAPPING).build();
+    Sorm ret = Sorm.builder(jdbcUrl, user, password).setLoggerOn(Category.MAPPING).build();
     return ret;
   }
 

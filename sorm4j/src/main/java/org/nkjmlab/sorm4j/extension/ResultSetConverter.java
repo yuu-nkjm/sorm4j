@@ -55,6 +55,10 @@ public interface ResultSetConverter {
    * Converts the result from database to a map objects. The data of the column is extracted by
    * corresponding column types.
    *
+   * <p>
+   * Keys in the results returned in lower case by default. The setting is changed by
+   * {@link #setLetterCaseOfKeyInMap}.
+   *
    * @param options
    * @param resultSet
    * @param columns
@@ -65,6 +69,13 @@ public interface ResultSetConverter {
    */
   Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) throws SQLException;
+
+  /**
+   * Defines the letter case of the keys in the result of {@link #toSingleMap}.
+   *
+   * @param letterCase
+   */
+  void setLetterCaseOfKeyInMap(String letterCase);
 
 
   /**

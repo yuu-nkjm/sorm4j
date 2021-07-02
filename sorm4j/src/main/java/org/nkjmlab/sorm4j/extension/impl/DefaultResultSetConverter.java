@@ -77,23 +77,34 @@ public class DefaultResultSetConverter implements ResultSetConverter {
 
   public static final String LOWER_CASE = "LOWER_CASE";
   public static final String UPPER_CASE = "UPPER_CASE";
-  public static final String CANONICAL = "CANONICAL";
+  public static final String CANONICAL_CASE = "CANONICAL_CASE";
   public static final String NO_CONVERSION = "NO_CONVERSION";
 
+  @Experimental
+  public static volatile String LETTER_CASE_OF_KEY_IN_MAP = LOWER_CASE;
+
+
+
   /**
-   * Defines the letter case of the keys in the result of {@link #toSingleMap}.
+   * {@inheritDoc}
+   *
+   * @param letterCase {@link #LOWER_CASE}, {@link #UPPSER_CASE}, {@link #UPPSER_CASE},
+   *        {@link #CANONICAL_CASE} and {@link #NO_CONVERSION} can be used.
    */
   @Experimental
-  public static String LETTER_CASE_OF_KEY_IN_MAP_RESULT = LOWER_CASE;
+  @Override
+  public void setLetterCaseOfKeyInMap(String letterCase) {
+    LETTER_CASE_OF_KEY_IN_MAP = letterCase;
+  }
 
-  @Experimental
-  public String convertKey(String key) {
-    switch (LETTER_CASE_OF_KEY_IN_MAP_RESULT) {
+
+  private String convertKey(String key) {
+    switch (LETTER_CASE_OF_KEY_IN_MAP) {
       case LOWER_CASE:
         return toLowerCase(key);
       case UPPER_CASE:
         return toUpperCase(key);
-      case CANONICAL:
+      case CANONICAL_CASE:
         return toCanonicalCase(key);
       case NO_CONVERSION:
       default:
@@ -101,12 +112,6 @@ public class DefaultResultSetConverter implements ResultSetConverter {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * Keys in the results are the names of the columns returned in lower case.
-   *
-   */
   @Override
   public Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet,
       List<String> columns, List<Integer> columnTypes) throws SQLException {

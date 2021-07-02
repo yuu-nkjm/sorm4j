@@ -91,7 +91,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] delete(T... objects) {
+  public int[] delete(@SuppressWarnings("unchecked") T... objects) {
     return orm.delete(objects);
   }
 
@@ -106,7 +106,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] deleteOn(String tableName, T... objects) {
+  public int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return orm.deleteOn(tableName, objects);
   }
 
@@ -132,7 +132,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] insert(T... objects) {
+  public int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return orm.insert(objects);
   }
 
@@ -147,7 +147,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] insertOn(String tableName, T... objects) {
+  public int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return orm.insertOn(tableName, objects);
   }
 
@@ -163,7 +163,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public InsertResult<T> insertAndGet(T... objects) {
+  public InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return orm.insertAndGet(objects);
   }
 
@@ -178,7 +178,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public InsertResult<T> insertAndGetOn(String tableName, T... objects) {
+  public InsertResult<T> insertAndGetOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return orm.insertAndGetOn(tableName, objects);
   }
 
@@ -193,7 +193,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] merge(T... objects) {
+  public int[] merge(@SuppressWarnings("unchecked") T... objects) {
     return orm.merge(objects);
   }
 
@@ -208,7 +208,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] mergeOn(String tableName, T... objects) {
+  public int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return orm.mergeOn(tableName, objects);
   }
 
@@ -223,7 +223,7 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] update(T... objects) {
+  public int[] update(@SuppressWarnings("unchecked") T... objects) {
     return orm.update(objects);
   }
 
@@ -238,7 +238,8 @@ public class TypedOrmImpl<T> implements TypedOrm<T> {
   }
 
   @Override
-  public int[] updateOn(String tableName, T... objects) {
+  public int[] updateOn(String tableName,
+      @SuppressWarnings("unchecked") T... objects) {
     return orm.updateOn(tableName, objects);
   }
 

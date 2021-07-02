@@ -28,7 +28,7 @@ public class TestSqlserver {
     dataSource = DbEngineTestUtils.getDataSource(TestSqlserver.class,
         "jdbc:h2:mem:sqlserver;MODE=MSSQLServer");
     DbEngineTestUtils.executeSql(dataSource, TestSqlserver.class, "schema.sql");
-    conf = SormContext.newBuilder().setOption("dbEngine", "MSSQLServer").build();
+    conf = SormContext.builder().setOption("dbEngine", "MSSQLServer").build();
 
   }
 

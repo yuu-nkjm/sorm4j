@@ -54,11 +54,11 @@ public class TableSchema {
     return tableSchema;
   }
 
-  public static TableSchema.Builder newBuilder() {
+  public static TableSchema.Builder builder() {
     return new TableSchema.Builder();
   }
 
-  public static TableSchema.Builder newBuilder(String tableName) {
+  public static TableSchema.Builder builder(String tableName) {
     return new TableSchema.Builder(tableName);
   }
 
@@ -70,7 +70,7 @@ public class TableSchema {
     private final List<String[]> uniqueColumnPairs;
     private final List<String[]> indexColumns;
 
-    public Builder() {
+    private Builder() {
       this.columnDefinitions = new LinkedHashMap<>();
       this.uniqueColumnPairs = new ArrayList<>();
       this.indexColumns = new ArrayList<>();

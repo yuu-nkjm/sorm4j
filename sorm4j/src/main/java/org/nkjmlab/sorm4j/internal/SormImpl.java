@@ -307,7 +307,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] delete(T... objects) {
+  public <T> int[] delete(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.delete(objects));
   }
 
@@ -323,7 +323,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] deleteOn(String tableName, T... objects) {
+  public <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.deleteOn(tableName, objects));
   }
 
@@ -348,7 +348,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] insert(T... objects) {
+  public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insert(objects));
   }
 
@@ -364,7 +364,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGet(T... objects) {
+  public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertAndGet(objects));
   }
 
@@ -381,7 +381,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetOn(String tableName, T... objects) {
+  public <T> InsertResult<T> insertAndGetOn(String tableName,
+      @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertAndGetOn(tableName, objects));
   }
 
@@ -398,7 +399,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] insertOn(String tableName, T... objects) {
+  public <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertOn(tableName, objects));
   }
 
@@ -413,7 +414,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] merge(T... objects) {
+  public <T> int[] merge(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.merge(objects));
   }
 
@@ -429,7 +430,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] mergeOn(String tableName, T... objects) {
+  public <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.mergeOn(tableName, objects));
   }
 
@@ -444,7 +445,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] update(T... objects) {
+  public <T> int[] update(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.update(objects));
   }
 
@@ -460,7 +461,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] updateOn(String tableName, T... objects) {
+  public <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.updateOn(tableName, objects));
   }
 

@@ -24,7 +24,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.newBuilder().setDataSource(jdbcUrl, user, password)
+    sorm = Sorm.builder().setDataSource(jdbcUrl, user, password)
         .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).setLoggerOffAll()
         .setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build();
     SormTestUtils.dropAndCreateTableAll(sorm);

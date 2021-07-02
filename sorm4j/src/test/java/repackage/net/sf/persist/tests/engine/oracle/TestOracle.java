@@ -1,7 +1,6 @@
 package repackage.net.sf.persist.tests.engine.oracle;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -101,9 +100,9 @@ public class TestOracle {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] longTypes = new Class<?>[] {Long.class, long.class};
-      Class<?>[] doubleTypes = new Class<?>[] {Double.class, double.class, BigDecimal.class};
-      Class<?>[] floatTypes =
-          new Class<?>[] {Float.class, float.class, Double.class, double.class, BigDecimal.class};
+      // Class<?>[] doubleTypes = new Class<?>[] {Double.class, double.class, BigDecimal.class};
+      // Class<?>[] floatTypes =
+      // new Class<?>[] {Float.class, float.class, Double.class, double.class, BigDecimal.class};
 
       BeanMap beanMap =
           new BeanMap("NumericTypes").addField(new FieldMap("numberCol").setTypes(longTypes));

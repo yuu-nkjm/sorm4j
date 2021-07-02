@@ -10,6 +10,7 @@ public class Simple06 {
 
   private long id;
   private String stringCol;
+  @SuppressWarnings("unused")
   private long longCol;
 
   public long getId() {

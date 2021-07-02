@@ -19,7 +19,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.newBuilder().setDataSource(jdbcUrl, user, password)
+    sorm = Sorm.builder().setDataSource(jdbcUrl, user, password)
         .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build();
   }
 

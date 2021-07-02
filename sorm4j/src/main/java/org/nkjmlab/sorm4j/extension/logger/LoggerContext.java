@@ -123,7 +123,7 @@ public final class LoggerContext {
 
   }
 
-  public static Builder newBuilder() {
+  public static Builder builder() {
     return new Builder();
   }
 
@@ -132,7 +132,7 @@ public final class LoggerContext {
     private Supplier<SormLogger> loggerSupplier;
     private final Set<LoggerContext.Category> onCategories = new HashSet<>();
 
-    public Builder() {}
+    private Builder() {}
 
     public void setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
       this.loggerSupplier = loggerSupplier;

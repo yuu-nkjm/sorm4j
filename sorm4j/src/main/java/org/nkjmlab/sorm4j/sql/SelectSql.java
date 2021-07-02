@@ -36,6 +36,7 @@ public class SelectSql {
 
     private String where;
 
+    private Builder() {}
 
     /**
      * Creates a select SQL statement from the objects.
@@ -464,7 +465,7 @@ public class SelectSql {
    *
    * @return
    */
-  public static Builder newBuilder() {
+  public static Builder builder() {
     return new Builder();
   }
 

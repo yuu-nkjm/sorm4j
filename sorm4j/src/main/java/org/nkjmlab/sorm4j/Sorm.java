@@ -27,12 +27,21 @@ import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 public interface Sorm extends Orm {
 
   static class DefaultContext {
-    static volatile SormContext CONTEXT = SormContext.newBuilder().build();
+    static volatile SormContext CONTEXT = SormContext.builder().build();
   }
 
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   * Sorm.create(dataSource);
+   *</pre></code>
    *
    * @param dataSource
    * @return
@@ -45,6 +54,14 @@ public interface Sorm extends Orm {
   /**
    * Create a {@link Sorm} object which uses {@link DriverManager}.
    *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   *</pre></code>
+   *
    * @param jdbcUrl
    * @param user
    * @param password
@@ -54,8 +71,26 @@ public interface Sorm extends Orm {
     return create(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
+  /**
+   * Create a {@link Sorm} object which uses {@link DriverManager}.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * <code>
+   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+   *</pre></code>
+   *
+   * @param jdbcUrl
+   * @return
+   */
+  static Sorm create(String jdbcUrl) {
+    return create(createDriverManagerDataSource(jdbcUrl, null, null));
+  }
+
   static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
-    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.newBuilder());
+    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.builder());
   }
 
   /**
@@ -198,15 +233,15 @@ public interface Sorm extends Orm {
    */
   OrmTransaction openTransaction();
 
-  static Builder newBuilder() {
+  static Builder builder() {
     return new Builder();
   }
 
-  static Builder newBuilder(DataSource dataSource) {
+  static Builder builder(DataSource dataSource) {
     return new Builder(dataSource);
   }
 
-  static Builder newBuilder(String jdbcUrl, String user, String password) {
+  static Builder builder(String jdbcUrl, String user, String password) {
     return new Builder(createDriverManagerDataSource(jdbcUrl, user, password));
   }
 
@@ -214,9 +249,9 @@ public interface Sorm extends Orm {
   public static class Builder {
 
     private DataSource dataSource;
-    private SormContext.Builder contextBuilder = SormContext.newBuilder();
+    private SormContext.Builder contextBuilder = SormContext.builder();
 
-    public Builder() {}
+    private Builder() {}
 
     public Builder(DataSource dataSource) {
       this.dataSource = dataSource;

@@ -29,7 +29,9 @@ public class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection() throws SQLException {
-    return Try.getOrThrow(() -> DriverManager.getConnection(jdbcUrl, username, password),
+    return Try.getOrThrow(
+        () -> username != null ? DriverManager.getConnection(jdbcUrl, username, password)
+            : DriverManager.getConnection(jdbcUrl),
         Try::rethrow);
   }
 

@@ -63,6 +63,7 @@ class OrmConnectionTest {
       m.insert(SormTestUtils.LOCATION_TOKYO);
       m.insert(SormTestUtils.LOCATION_KYOTO);
 
+      @SuppressWarnings("unused")
       List<Location> gs = m.readList(Location.class, "select * from players");
 
       List<Tuple2<Guest, Player>> result = m.readTupleList(Guest.class, Player.class,
@@ -93,12 +94,11 @@ class OrmConnectionTest {
 
   @Test
   void testNamedRequest1() {
-    AtomicInteger id = new AtomicInteger(10);
     int row =
         sorm.apply(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
             .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
     assertThat(row).isEqualTo(1);
-    Player p = sorm.apply(conn -> conn.readAll(Player.class)).get(0);
+    sorm.apply(conn -> conn.readAll(Player.class)).get(0);
   }
 
   @Test
@@ -601,7 +601,7 @@ class OrmConnectionTest {
 
 
 
-    Sorm orm = Sorm.newBuilder().setDataSource(sorm.getDataSource())
+    Sorm orm = Sorm.builder().setDataSource(sorm.getDataSource())
         .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build();
 
     orm.acceptTransactionHandler(m -> {
