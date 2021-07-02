@@ -264,7 +264,7 @@ public final class SormContext {
 
 
 
-    public Builder() {}
+    private Builder() {}
 
     public SormContext build() {
       LoggerContext loggerContext = loggerConfigBuilder.build();

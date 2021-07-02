@@ -251,7 +251,7 @@ public interface Sorm extends Orm {
     private DataSource dataSource;
     private SormContext.Builder contextBuilder = SormContext.builder();
 
-    public Builder() {}
+    private Builder() {}
 
     public Builder(DataSource dataSource) {
       this.dataSource = dataSource;

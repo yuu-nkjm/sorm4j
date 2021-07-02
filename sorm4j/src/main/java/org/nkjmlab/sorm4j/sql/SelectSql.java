@@ -36,6 +36,7 @@ public class SelectSql {
 
     private String where;
 
+    private Builder() {}
 
     /**
      * Creates a select SQL statement from the objects.

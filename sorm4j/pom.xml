@@ -35,9 +35,9 @@
 
   <properties>
     <slf4j-version>1.7.30</slf4j-version>
-    <log4j-version>2.14.0</log4j-version>
-    <junit-jupiter-version>5.7.1</junit-jupiter-version>
-    <assertj-version>3.19.0</assertj-version>
+    <log4j-version>2.14.1</log4j-version>
+    <junit-jupiter-version>5.7.2</junit-jupiter-version>
+    <assertj-version>3.20.2</assertj-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <additionalparam>-Xdoclint:none</additionalparam>

@@ -70,7 +70,7 @@ public class TableSchema {
     private final List<String[]> uniqueColumnPairs;
     private final List<String[]> indexColumns;
 
-    public Builder() {
+    private Builder() {
       this.columnDefinitions = new LinkedHashMap<>();
       this.uniqueColumnPairs = new ArrayList<>();
       this.indexColumns = new ArrayList<>();

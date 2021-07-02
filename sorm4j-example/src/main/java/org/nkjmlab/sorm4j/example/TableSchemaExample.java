@@ -37,7 +37,7 @@ public class TableSchemaExample {
 
     public QuizTable(DataSource dataSorce) {
       this.sorm = Sorm.create(dataSorce);
-      this.schema = new TableSchema.Builder().setTableName(TABLE_NAME)
+      this.schema = TableSchema.builder().setTableName(TABLE_NAME)
           .addColumnDefinition(ID, TableSchemaKeyword.INT, TableSchemaKeyword.AUTO_INCREMENT,
               TableSchemaKeyword.PRIMARY_KEY)
           .addColumnDefinition(BOOK_NAME, VARCHAR).addColumnDefinition(BOOK_NAME, VARCHAR)
