@@ -17,7 +17,7 @@
     <dependency>
       <groupId>org.nkjmlab</groupId>
       <artifactId>sorm4j</artifactId>
-      <version>[1.0.0,)</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
     <dependency>
