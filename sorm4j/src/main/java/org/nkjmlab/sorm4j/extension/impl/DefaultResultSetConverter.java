@@ -88,7 +88,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   /**
    * {@inheritDoc}
    *
-   * @param letterCase {@link #LOWER_CASE}, {@link #UPPSER_CASE}, {@link #UPPSER_CASE},
+   * @param letterCase {@link #LOWER_CASE}, {@link #LOWER_CASE}, {@link #UPPER_CASE},
    *        {@link #CANONICAL_CASE} and {@link #NO_CONVERSION} can be used.
    */
   @Experimental

@@ -10,7 +10,7 @@ public interface TransactionFunction {
 
   /**
    * Begin transaction. The isolation level is corresponding to
-   * {@link Sorm.Builder#setTransactionIsolationLevel()}.
+   * {@link Sorm.Builder#setTransactionIsolationLevel(int)}.
    */
   void begin();
 
