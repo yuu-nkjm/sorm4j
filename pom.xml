@@ -4,19 +4,34 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-parent</artifactId>
+  <name>sorm4j-parent</name>
+  <description>Simple micro Object-Relation Mapper for Java</description>
   <version>1.3.19</version>
   <packaging>pom</packaging>
   <url>https://github.com/nkjmlab</url>
-
-  <properties>
-    <sorm4j-version>${project.version}</sorm4j-version>
-  </properties>
-
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Yuu Nakajima</name>
+      <email>yuu.nkjm.pub@gmail.com</email>
+      <organization>nkjmlab.org</organization>
+      <organizationUrl>https://github.com/nkjmlab</organizationUrl>
+    </developer>
+  </developers>
   <scm>
     <connection>scm:git:git@github.com:yuu-nkjmb/sorm4j.git</connection>
     <url>https://github.com/yuu-nkjm/sorm4j</url>
     <tag>HEAD</tag>
   </scm>
+
+  <properties>
+    <sorm4j-version>${project.version}</sorm4j-version>
+  </properties>
 
   <distributionManagement>
     <snapshotRepository>
@@ -29,9 +44,92 @@
     </repository>
   </distributionManagement>
 
+
   <modules>
     <module>sorm4j</module>
   </modules>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <compilerVersion>11</compilerVersion>
+          <source>11</source>
+          <target>11</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <!-- from https://central.sonatype.org/pages/apache-maven.html#distribution-management-and-authentication -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.8</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+      <!-- from https://central.sonatype.org/pages/apache-maven.html#javadoc-and-sources-attachments -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <excludePackageNames>org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
+          <quiet>true</quiet>
+          <doclint>none</doclint>
+          <additionalOptions>--frames</additionalOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- from https://central.sonatype.org/pages/apache-maven.html#gpg-signed-components -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 
