@@ -13,7 +13,7 @@ public class TableSchemaExample {
     String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
     String user = "username";
     String password = "password";
-    DataSource dataSorce = Sorm.createDriverManagerDataSource(jdbcUrl, user, password);
+    DataSource dataSorce = Sorm.createDataSource(jdbcUrl, user, password);
 
     QuizTable quizTable = new QuizTable(dataSorce);
 
