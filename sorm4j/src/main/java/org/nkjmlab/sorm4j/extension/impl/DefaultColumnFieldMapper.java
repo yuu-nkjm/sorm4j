@@ -60,8 +60,8 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
         .filter(m -> Objects.isNull(m.getAnnotation(ignoreAnn))
             && !Modifier.isStatic(m.getModifiers()) && m.getName().length() > prefix.length()
             && m.getName().substring(0, prefix.length()).equals(prefix))
-        .collect(
-            Collectors.toMap(m -> toCanonicalCase(m.getName().substring(prefix.length())), m -> m));
+        .collect(Collectors.toMap(m -> toCanonicalCase(m.getName().substring(prefix.length())),
+            m -> m, (v1, v2) -> v2));
   }
 
 
@@ -80,6 +80,12 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   private Map<String, Method> getAllGetters(Class<?> objectClass) {
     return extractedMethodStartWith(objectClass, "get").entrySet().stream()
         .filter(e -> nonNull(isValidGetter(e.getValue())))
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+  }
+
+  private Map<String, Method> getAllMethods(Class<?> objectClass) {
+    return extractedMethodStartWith(objectClass, "").entrySet().stream()
+        .filter(e -> nonNull(isValidGetter(e.getValue(), false)))
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
@@ -114,6 +120,10 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   }
 
   private Method isValidGetter(Method getter) {
+    return isValidGetter(getter, true);
+  }
+
+  private Method isValidGetter(Method getter, boolean logging) {
     if (getter == null) {
       return null;
     }
@@ -122,14 +132,17 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (getter.getParameterCount() != 0) {
-      loggerContext.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
-          getter, getter.getParameterCount());
+      if (logging) {
+        loggerContext.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
+            getter, getter.getParameterCount());
+      }
       return null;
     }
     if (getter.getReturnType() == void.class) {
-      loggerContext.getLogger().warn("Getter [{}] must have return a parameter.", getter);
+      if (logging) {
+        loggerContext.getLogger().warn("Getter [{}] must have return a parameter.", getter);
+      }
     }
-
     return getter;
   }
 
@@ -163,6 +176,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
   public Map<String, Accessor> createAccessors(Class<?> objectClass, List<String> columnNames) {
     Map<String, Field> fields = getAllFields(objectClass);
     Map<String, Method> getters = getAllGetters(objectClass);
+    Map<String, Method> allMethods = getAllMethods(objectClass);
     Map<String, Method> setters = getAllSetters(objectClass);
     Map<String, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
     Map<String, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
@@ -176,7 +190,8 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
               : fields.get(canonicalColName);
       Method g =
           nonNull(annotatedGetters.get(canonicalColName)) ? annotatedGetters.get(canonicalColName)
-              : getters.get(canonicalColName);
+              : nonNull(getters.get(canonicalColName)) ? getters.get(canonicalColName)
+                  : allMethods.get(canonicalColName);
       Method s =
           nonNull(annotatedSetters.get(canonicalColName)) ? annotatedSetters.get(canonicalColName)
               : setters.get(canonicalColName);

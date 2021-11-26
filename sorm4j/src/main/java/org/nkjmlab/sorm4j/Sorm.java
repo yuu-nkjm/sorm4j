@@ -68,7 +68,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(String jdbcUrl, String user, String password) {
-    return create(createDriverManagerDataSource(jdbcUrl, user, password));
+    return create(createDataSource(jdbcUrl, user, password));
   }
 
   /**
@@ -86,7 +86,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(String jdbcUrl) {
-    return create(createDriverManagerDataSource(jdbcUrl, null, null));
+    return create(createDataSource(jdbcUrl, null, null));
   }
 
   static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
@@ -101,8 +101,7 @@ public interface Sorm extends Orm {
    * @param password
    * @return
    */
-  static DataSource createDriverManagerDataSource(String jdbcUrl, String username,
-      String password) {
+  static DataSource createDataSource(String jdbcUrl, String username, String password) {
     return new DriverManagerDataSource(jdbcUrl, username, password);
   }
 
@@ -242,7 +241,7 @@ public interface Sorm extends Orm {
   }
 
   static Builder builder(String jdbcUrl, String user, String password) {
-    return new Builder(createDriverManagerDataSource(jdbcUrl, user, password));
+    return new Builder(createDataSource(jdbcUrl, user, password));
   }
 
   @Experimental
@@ -268,7 +267,7 @@ public interface Sorm extends Orm {
 
 
     public Builder setDataSource(String jdbcUrl, String username, String password) {
-      this.dataSource = Sorm.createDriverManagerDataSource(jdbcUrl, username, password);
+      this.dataSource = Sorm.createDataSource(jdbcUrl, username, password);
       return this;
     }
 

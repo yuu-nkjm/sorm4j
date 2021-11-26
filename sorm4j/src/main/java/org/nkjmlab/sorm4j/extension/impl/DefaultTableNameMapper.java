@@ -55,7 +55,12 @@ public class DefaultTableNameMapper implements TableNameMapper {
     }
     String className = objectClass.getSimpleName();
     String cannonicalClassName = toCanonicalCase(className);
-    return List.of(cannonicalClassName, cannonicalClassName + "S");
+    if (cannonicalClassName.endsWith("Y")) {
+      return List.of(cannonicalClassName, cannonicalClassName + "S",
+          cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES");
+    } else {
+      return List.of(cannonicalClassName, cannonicalClassName + "S");
+    }
   }
 
 
