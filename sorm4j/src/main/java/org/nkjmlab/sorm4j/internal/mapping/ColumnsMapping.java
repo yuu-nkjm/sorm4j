@@ -35,7 +35,6 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   private final PojoCreator<T> pojoCreator;
 
-  @SuppressWarnings("unchecked")
   public ColumnsMapping(SormOptions options, ResultSetConverter resultSetConverter,
       Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
     super(options, resultSetConverter, objectClass, columnToAccessorMap);
@@ -49,15 +48,47 @@ public final class ColumnsMapping<T> extends Mapping<T> {
           format("Constructor with parameters annotated by {} should be one or less. ",
               OrmConstructor.class.getName()));
     }
-    this.pojoCreator = !annotataedConstructors.isEmpty()
-        ? new ConstructorPojoCreator<>((Constructor<T>) annotataedConstructors.get(0),
-            columnToAccessorMap.getColumnAliasPrefix())
-        : new SetterPojoCreator<>(Try.getOrThrow(() -> objectClass.getConstructor(),
-            e -> new SormException(format(
-                "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
-                objectClass, OrmConstructor.class.getName()), e)));
+
+    this.pojoCreator = objectClass.isRecord() ? createCanonicalPojoCreator(objectClass)
+        : (!annotataedConstructors.isEmpty()
+            ? createAnnotatedPojoCreator(objectClass, annotataedConstructors)
+            : new SetterPojoCreator<>(getDefaultConstructor(objectClass)));
 
   }
+
+  private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
+    return Try.getOrThrow(() -> objectClass.getConstructor(), e -> new SormException(format(
+        "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
+        objectClass, OrmConstructor.class.getName()), e));
+  }
+
+
+
+  private PojoCreator<T> createAnnotatedPojoCreator(Class<T> objectClass,
+      List<Constructor<?>> annotataedConstructors) {
+    @SuppressWarnings("unchecked")
+    Constructor<T> constructor = (Constructor<T>) annotataedConstructors.get(0);
+    return new ConstructorPojoCreator<>(constructor,
+        constructor.getAnnotation(OrmConstructor.class).value(),
+        columnToAccessorMap.getColumnAliasPrefix());
+  }
+
+
+
+  private PojoCreator<T> createCanonicalPojoCreator(Class<T> objectClass) {
+    Constructor<T> constructor = Try.getOrThrow(
+        () -> objectClass.getConstructor(Arrays.stream(objectClass.getDeclaredFields())
+            .map(f -> f.getType()).toArray(Class[]::new)),
+        e -> new SormException(
+            format("The given container class [{}] should have the canonical constructor.",
+                objectClass),
+            e));
+    String[] parameterNames =
+        Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
+    return new ConstructorPojoCreator<>(constructor, parameterNames,
+        columnToAccessorMap.getColumnAliasPrefix());
+  }
+
 
 
   private static abstract class PojoCreator<S> {
@@ -188,19 +219,16 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   private final class ConstructorPojoCreator<S> extends PojoCreator<S> {
 
-
     private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
     private final int constructorParametersLength;
 
     private final Map<List<String>, ConstructorParameter[]> columnAndConstructorParameterMapping =
         new ConcurrentHashMap<>();
 
-
-    public ConstructorPojoCreator(Constructor<S> constructor, String columnAliasPrefix) {
+    public ConstructorPojoCreator(Constructor<S> constructor, String[] parameterNames,
+        String columnAliasPrefix) {
       super(constructor);
 
-
-      String[] parameterNames = constructor.getAnnotation(OrmConstructor.class).value();
       Parameter[] parameters = constructor.getParameters();
       this.constructorParametersLength = parameters.length;
 
@@ -211,7 +239,6 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         constructorParametersMap.put(canonicalName, cp);
         if (columnAliasPrefix != null && columnAliasPrefix.length() != 0) {
           constructorParametersMap.put(toCanonicalCase(columnAliasPrefix + canonicalName), cp);
-
         }
       }
     }
