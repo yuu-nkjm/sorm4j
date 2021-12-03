@@ -31,7 +31,7 @@ create table if not exists datetime_types (
 drop table binary_types if exists;
 
 create table if not exists binary_types (
-	binary_col binary,
+	--binary_col binary,
 	blob_col blob,
 	other_col other
 	--uuid_col uuid
@@ -42,7 +42,7 @@ drop table string_types if exists;
 create table if not exists string_types (
 	varchar_col varchar,
 	varchar_ignorecase_col varchar_ignorecase,
-	char_col char,
+--	char_col char,
 	clob_col clob
 );
 

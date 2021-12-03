@@ -97,12 +97,12 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "c_date", Date.valueOf(localDate));
       doTest(c, "c_time", localTime);
       doTest(c, "c_time", Time.valueOf(localTime));
-      doTest(c, "c_timetz", offsetTime);
+      // doTest(c, "c_timetz", offsetTime);
       doTest(c, "c_timestamp", localDateTime);
       doTest(c, "c_timestamp", Timestamp.valueOf(localDateTime));
-      doTest(c, "c_timestamptz", offsetDateTime);
-      doTest(c, "c_inet_ipv4", InetAddress.getByName("192.168.1.1"));
-      doTest(c, "c_inet_ipv6", InetAddress.getByName("::1"));
+      // doTest(c, "c_timestamptz", offsetDateTime);
+      // doTest(c, "c_inet_ipv4", InetAddress.getByName("192.168.1.1"));
+      // doTest(c, "c_inet_ipv6", InetAddress.getByName("::1"));
       doTest(c, "c_url", new URL("https://example.com"));
       doTest(c, "c_integer_array", new Integer[] {1, 2, 3});
       doTest(c, "c_integer_array", new int[] {1, 2, 3});

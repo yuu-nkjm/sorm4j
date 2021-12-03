@@ -144,7 +144,7 @@ public class TestPostgreSQL {
       // with it
       BeanMap beanMap = new BeanMap("StringTypes")
           .addField(new FieldMap("char1Col").setTypes(characterTypes).setSize(1))
-          .addField(new FieldMap("charCol").setTypes(stringTypes).setSize(255))
+          // .addField(new FieldMap("charCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("varcharCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("textCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(8192)
