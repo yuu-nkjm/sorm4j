@@ -9,16 +9,15 @@
   <parent>
     <groupId>org.nkjmlab</groupId>
     <artifactId>sorm4j-parent</artifactId>
-    <version>1.4.0-rc1</version>
+    <version>1.4.0-rc2</version>
   </parent>
   <properties>
     <slf4j-version>1.7.30</slf4j-version>
-    <log4j-version>2.14.1</log4j-version>
-    <junit-jupiter-version>5.7.2</junit-jupiter-version>
-    <assertj-version>3.20.2</assertj-version>
+    <log4j-version>[2.14.1,)</log4j-version>
+    <junit-jupiter-version>[5.7.2,)</junit-jupiter-version>
+    <assertj-version>[3.20.2,)</assertj-version>
+    <h2-version>[1.4.200,)</h2-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
-    <additionalparam>-Xdoclint:none</additionalparam>
     <downloadSources>true</downloadSources>
     <downloadJavadocs>true</downloadJavadocs>
   </properties>
@@ -37,13 +36,7 @@
       <version>${slf4j-version}</version>
       <optional>true</optional>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit-jupiter-version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
@@ -68,7 +61,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.8.0</version>
+      <version>[3.8.0,)</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
@@ -82,7 +75,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.200</version>
+      <version>${h2-version}</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
