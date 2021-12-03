@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 class SormTest {
 
@@ -156,18 +155,6 @@ class SormTest {
 
   Guest a = SormTestUtils.GUEST_ALICE;
 
-  @Test
-  void testRunTransactionClassOfTConsumerOfTypedOrmTransactionOfT() {
-    try (TypedOrmTransaction<Guest> tr = sorm.openTransaction().type(Guest.class)) {
-      tr.insert(a);
-      tr.rollback();
-      tr.commit();
-    }
-    sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
-    });
-
-  }
 
   @Test
   void testBeginTransaction() {
@@ -176,14 +163,14 @@ class SormTest {
       // auto-rollback
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(0);
+      assertThat(Sorm.toOrmConnection(con).readAll(Guest.class).size()).isEqualTo(0);
     });
     try (OrmConnection tr = sorm.openTransaction()) {
       tr.insert(a);
       tr.commit();
     }
     sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(Sorm.toOrmConnection(con).type(Guest.class).readAll().size()).isEqualTo(1);
+      assertThat(Sorm.toOrmConnection(con).readAll(Guest.class).size()).isEqualTo(1);
     });
   }
 

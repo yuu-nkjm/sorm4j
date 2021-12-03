@@ -27,7 +27,6 @@ import org.nkjmlab.sorm4j.internal.mapping.ColumnsMapping;
 import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.LazyResultSetImpl;
-import org.nkjmlab.sorm4j.internal.typed.TypedOrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.BasicCommand;
 import org.nkjmlab.sorm4j.sql.Command;
@@ -40,7 +39,6 @@ import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.result.Tuples;
-import org.nkjmlab.sorm4j.typed.TypedOrmConnection;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -789,12 +787,6 @@ public class OrmConnectionImpl implements OrmConnection {
       }
       return ret;
     }, Try::rethrow);
-  }
-
-
-  @Override
-  public <S> TypedOrmConnection<S> type(Class<S> objectClass) {
-    return new TypedOrmConnectionImpl<>(objectClass, this);
   }
 
   @Override

@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-jmh</artifactId>
-  <version>1.4.0-rc2</version>
+  <version>1.4.0-rc3</version>
   <packaging>jar</packaging>
   <name>Sorm4j benchmark</name>
 
