@@ -10,8 +10,6 @@ public class JulSormLogger extends AbstractSormLogger implements SormLogger {
   private final java.util.logging.Logger logger;
   private static java.util.logging.Logger defaultLogger = getDefaultLogger();
 
-
-
   public JulSormLogger(java.util.logging.Logger logger) {
     this.logger = logger;
   }
@@ -31,38 +29,53 @@ public class JulSormLogger extends AbstractSormLogger implements SormLogger {
 
   @Override
   public void trace(String format, Object... params) {
-    if (logger.isLoggable(Level.FINER)) {
-      this.logger.finer(StringUtils.format(format, params));
-    }
+    this.logger.finer(StringUtils.format(format, params));
   }
 
 
   @Override
   public void debug(String format, Object... params) {
-    if (logger.isLoggable(Level.FINE)) {
-      this.logger.fine(StringUtils.format(format, params));
-    }
+    this.logger.fine(StringUtils.format(format, params));
   }
 
   @Override
   public void info(String format, Object... params) {
-    if (logger.isLoggable(Level.INFO)) {
-      this.logger.info(StringUtils.format(format, params));
-    }
+    this.logger.info(StringUtils.format(format, params));
   }
 
   @Override
   public void warn(String format, Object... params) {
-    if (logger.isLoggable(Level.WARNING)) {
-      this.logger.warning(StringUtils.format(format, params));
-    }
+    this.logger.warning(StringUtils.format(format, params));
   }
 
   @Override
   public void error(String format, Object... params) {
-    if (logger.isLoggable(Level.SEVERE)) {
-      this.logger.severe(StringUtils.format(format, params));
-    }
+    this.logger.severe(StringUtils.format(format, params));
+  }
+
+  @Override
+  public void trace(int depth, String format, Object... params) {
+    trace(format, params);
+  }
+
+  @Override
+  public void debug(int depth, String format, Object... params) {
+    debug(format, params);
+  }
+
+  @Override
+  public void info(int depth, String format, Object... params) {
+    info(format, params);
+  }
+
+  @Override
+  public void warn(int depth, String format, Object... params) {
+    warn(format, params);
+  }
+
+  @Override
+  public void error(int depth, String format, Object... params) {
+    error(format, params);
   }
 
 

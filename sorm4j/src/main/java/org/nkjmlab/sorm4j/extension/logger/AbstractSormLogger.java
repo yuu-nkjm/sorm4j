@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.extension.logger;
 
 import java.sql.Connection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.IntStream;
+import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.StringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -17,8 +17,8 @@ public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logBeforeSql(String tag, Connection connection, ParameterizedSql psql) {
-    debug(StringUtils.format("[{}] At {}, Execute SQL [{}] to [{}]", tag, getCaller(),
-        psql.getBindedSql(), getDbUrl(connection)));
+    debug(StringUtils.format("[{}] At {}, Execute SQL [{}] to [{}]", tag,
+        getOutsideInvokerOfLibrary(), psql.getBindedSql(), getDbUrl(connection)));
   }
 
 
@@ -27,7 +27,7 @@ public abstract class AbstractSormLogger implements SormLogger {
       String tableName) {
     debug(StringUtils.format(
         "[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]", tag,
-        getCaller(), length, clazz, tableName, getDbUrl(connection)));
+        getOutsideInvokerOfLibrary(), length, clazz, tableName, getDbUrl(connection)));
   }
 
 
@@ -51,7 +51,7 @@ public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logMapping(String tag, String mappingInfo) {
-    debug("[{}]" + System.lineSeparator() + "{}", tag, mappingInfo);
+    debug(4, "[{}]" + System.lineSeparator() + "{}", tag, mappingInfo);
   }
 
   private String getTagAndElapsedTime(String tag, long elapsedTime) {
@@ -64,14 +64,9 @@ public abstract class AbstractSormLogger implements SormLogger {
   }
 
 
-  private String getCaller() {
-    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    String caller = Arrays.stream(stackTrace)
-        .filter(s -> !s.getClassName().startsWith("org.nkjmlab.sorm4j")
-            && !s.getClassName().startsWith("java."))
-        .findFirst().map(se -> se.getClassName() + "." + se.getMethodName() + "(" + se.getFileName()
-            + ":" + se.getLineNumber() + ")")
-        .orElseGet(() -> "");
-    return caller;
+  private static String getOutsideInvokerOfLibrary() {
+    return MethodInvokerInfoUtils.getOutsideInvoker("org.nkjmlab.sorm4j");
+
   }
+
 }

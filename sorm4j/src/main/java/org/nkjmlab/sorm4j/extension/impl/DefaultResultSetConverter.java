@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -30,6 +29,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 
 public class DefaultResultSetConverter implements ResultSetConverter {
+
 
   private static final Set<Class<?>> standardObjectClasses = Set.of(boolean.class, Boolean.class,
       byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
@@ -64,42 +64,35 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   private final List<ColumnValueConverter> converters;
 
   public DefaultResultSetConverter() {
-    this.converters = Collections.emptyList();
+    this(LetterCaseOfKeyInMap.LOWER_CASE, Collections.emptyList());
   }
 
-  public DefaultResultSetConverter(List<ColumnValueConverter> converters) {
-    this.converters = new ArrayList<>(converters);
+  public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap) {
+    this(letterCaseOfKeyInMap, Collections.emptyList());
   }
 
-  public DefaultResultSetConverter(ColumnValueConverter... converters) {
-    this(Arrays.asList(converters));
+  public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap,
+      List<ColumnValueConverter> converters) {
+    this(letterCaseOfKeyInMap, converters.toArray(ColumnValueConverter[]::new));
   }
 
-  public static final String LOWER_CASE = "LOWER_CASE";
-  public static final String UPPER_CASE = "UPPER_CASE";
-  public static final String CANONICAL_CASE = "CANONICAL_CASE";
-  public static final String NO_CONVERSION = "NO_CONVERSION";
+  public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap,
+      ColumnValueConverter... converters) {
+    this.converters = converters.length == 0 ? Collections.emptyList() : Arrays.asList(converters);
+    this.letterCaseOfKeyInMap = letterCaseOfKeyInMap;
+  }
 
   @Experimental
-  public static volatile String LETTER_CASE_OF_KEY_IN_MAP = LOWER_CASE;
+  private final LetterCaseOfKeyInMap letterCaseOfKeyInMap;
 
 
+  public enum LetterCaseOfKeyInMap {
+    LOWER_CASE, UPPER_CASE, CANONICAL_CASE, NO_CONVERSION;
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param letterCase {@link #LOWER_CASE}, {@link #LOWER_CASE}, {@link #UPPER_CASE},
-   *        {@link #CANONICAL_CASE} and {@link #NO_CONVERSION} can be used.
-   */
-  @Experimental
-  @Override
-  public void setLetterCaseOfKeyInMap(String letterCase) {
-    LETTER_CASE_OF_KEY_IN_MAP = letterCase;
   }
-
 
   private String convertKey(String key) {
-    switch (LETTER_CASE_OF_KEY_IN_MAP) {
+    switch (letterCaseOfKeyInMap) {
       case LOWER_CASE:
         return toLowerCase(key);
       case UPPER_CASE:

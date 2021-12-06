@@ -34,6 +34,9 @@ import org.postgresql.util.PGobject;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
+  private static final org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
+
   private static DataSource dataSource;
 
   @BeforeAll
@@ -59,6 +62,8 @@ public class TestPostgreSQLSqlMapper {
       }
     });
     Sorm.setDefaultContext(builder -> builder.setSqlParametersSetter(ps).build());
+
+
   }
 
 
@@ -109,7 +114,7 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "c_varchar_array", List.of("A", "B", "C"));
 
 
-      System.out.println("--------");
+      log.debug("--------");
       doTestIn(c, "c_integer", List.of(1, 2, 3));
       doTestIn(c, "c_integer", new Integer[] {1, 2, 3});
       doTestIn(c, "c_integer", new int[] {1, 2, 3});
@@ -128,12 +133,12 @@ public class TestPostgreSQLSqlMapper {
     try {
       Object ret = c.readFirst(param.getClass(), "SELECT " + column + " FROM sql_mapper_test");
       if (equals(ret, param)) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug(messagePrefix + "success => " + ret);
       } else {
-        System.err.println(messagePrefix + "fail => " + ret);
+        log.error(messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error(messagePrefix + "fail => " + e.getMessage());
     }
   }
 
@@ -155,12 +160,12 @@ public class TestPostgreSQLSqlMapper {
       Map<String, Object> ret = c
           .readMapFirst("SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
       if (ret != null) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug(messagePrefix + "success => " + ret);
       } else {
-        System.err.println(messagePrefix + "fail => " + ret);
+        log.error(messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error(messagePrefix + "fail => " + e.getMessage());
       // e.printStackTrace();
     }
 
@@ -178,12 +183,12 @@ public class TestPostgreSQLSqlMapper {
           .addParameter(param).parse();
       Map<String, Object> ret = c.readMapFirst(statement);
       if (ret != null) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug(messagePrefix + "success => " + ret);
       } else {
-        System.out.println(messagePrefix + "fail => " + ret);
+        log.error(messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error(messagePrefix + "fail => " + e.getMessage());
     }
   }
 

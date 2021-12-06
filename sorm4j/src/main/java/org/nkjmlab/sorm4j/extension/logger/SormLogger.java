@@ -17,6 +17,17 @@ public interface SormLogger {
 
   void error(String format, Object... params);
 
+  void trace(int depth, String format, Object... params);
+
+  void debug(int depth, String format, Object... params);
+
+  void info(int depth, String format, Object... params);
+
+  void warn(int depth, String format, Object... params);
+
+  void error(int depth, String format, Object... params);
+
+
   void logBeforeSql(String tag, Connection connection, String sql, Object... parameters);
 
   void logBeforeSql(String tag, Connection connection, ParameterizedSql psql);

@@ -70,13 +70,6 @@ public interface ResultSetConverter {
   Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet, List<String> columns,
       List<Integer> columnTypes) throws SQLException;
 
-  /**
-   * Defines the letter case of the keys in the result of {@link #toSingleMap}.
-   *
-   * @param letterCase
-   */
-  void setLetterCaseOfKeyInMap(String letterCase);
-
 
   /**
    * Converts to a single native object of the given object class.
