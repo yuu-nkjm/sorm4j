@@ -119,7 +119,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void close() {
-    Try.runOrThrow(() -> {
+    Try.runOrElseThrow(() -> {
       lazyResultSets.forEach(rs -> rs.close());
       lazyResultSets.clear();
       getJdbcConnection().close();
@@ -129,7 +129,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void commit() {
-    Try.runOrThrow(() -> getJdbcConnection().commit(), Try::rethrow);
+    Try.runOrElseThrow(() -> getJdbcConnection().commit(), Try::rethrow);
   }
 
   @Override
@@ -272,7 +272,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   private int getOneSqlType(Class<?> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(() -> {
+    return Try.getOrElseThrow(() -> {
       ResultSetMetaData metaData = resultSet.getMetaData();
       if (metaData.getColumnCount() != 1) {
         throw new SormException("ResultSet returned [" + metaData.getColumnCount()
@@ -496,7 +496,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return Try.getOrThrow(() -> {
+    return Try.getOrElseThrow(() -> {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       return getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
           ct.getColumns(), ct.getColumnTypes());
@@ -505,7 +505,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(
+    return Try.getOrElseThrow(
         () -> getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
             ? getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
                 getOneSqlType(objectClass, resultSet), objectClass)
@@ -757,20 +757,20 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void rollback() {
-    Try.runOrThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
+    Try.runOrElseThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
   }
 
   @Override
   public void setAutoCommit(final boolean autoCommit) {
-    Try.runOrThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
+    Try.runOrElseThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
   }
 
   private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
+    Try.runOrElseThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
   }
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrThrow(
+    return Try.getOrElseThrow(
         () -> getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
             ? loadNativeObjectList(objectClass, resultSet)
             : loadPojoList(objectClass, resultSet),
@@ -778,7 +778,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
-    return Try.getOrThrow(() -> {
+    return Try.getOrElseThrow(() -> {
       final List<Map<String, Object>> ret = new ArrayList<>();
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       while (resultSet.next()) {

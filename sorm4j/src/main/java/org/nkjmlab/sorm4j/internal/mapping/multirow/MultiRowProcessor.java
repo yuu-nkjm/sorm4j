@@ -34,19 +34,19 @@ public abstract class MultiRowProcessor<T> {
   public abstract int[] multiRowMerge(Connection con, @SuppressWarnings("unchecked") T... objects);
 
   final void setAutoCommit(Connection connection, boolean autoCommit) {
-    Try.runOrThrow(() -> connection.setAutoCommit(autoCommit), Try::rethrow);
+    Try.runOrElseThrow(() -> connection.setAutoCommit(autoCommit), Try::rethrow);
   }
 
   final void commitIfRequired(Connection connection, boolean origAutoCommit) {
     if (origAutoCommit) {
-      Try.runOrThrow(() -> connection.commit(), Try::rethrow);
+      Try.runOrElseThrow(() -> connection.commit(), Try::rethrow);
     }
   }
 
 
   final void rollbackIfRequired(Connection connection, boolean origAutoCommit) {
     if (!origAutoCommit) {
-      Try.runOrThrow(() -> connection.rollback(), Try::rethrow);
+      Try.runOrElseThrow(() -> connection.rollback(), Try::rethrow);
     }
   }
 

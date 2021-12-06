@@ -29,7 +29,7 @@ public class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection() throws SQLException {
-    return Try.getOrThrow(
+    return Try.getOrElseThrow(
         () -> username != null ? DriverManager.getConnection(jdbcUrl, username, password)
             : DriverManager.getConnection(jdbcUrl),
         Try::rethrow);
@@ -52,7 +52,7 @@ public class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection(String username, String password) throws SQLException {
-    return Try.getOrThrow(() -> DriverManager.getConnection(jdbcUrl, username, password),
+    return Try.getOrElseThrow(() -> DriverManager.getConnection(jdbcUrl, username, password),
         Try::rethrow);
   }
 

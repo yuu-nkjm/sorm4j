@@ -60,7 +60,7 @@ public abstract class AbstractSormLogger implements SormLogger {
   }
 
   private String getDbUrl(Connection connection) {
-    return Try.getOrDefault(() -> connection.getMetaData().getURL(), "");
+    return Try.getOrElse(() -> connection.getMetaData().getURL(), "");
   }
 
 

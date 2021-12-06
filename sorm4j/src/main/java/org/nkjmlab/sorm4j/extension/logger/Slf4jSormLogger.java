@@ -7,7 +7,7 @@ public class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
   public static final boolean enableLogger = isEnable();
 
   private static boolean isEnable() {
-    return Try.getOrDefault(() -> {
+    return Try.getOrElse(() -> {
       Class.forName("org.slf4j.Logger");
       return true;
     }, false);

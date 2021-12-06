@@ -73,7 +73,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
-    return Try.getOrThrow(() -> objectClass.getConstructor(), e -> new SormException(format(
+    return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(format(
         "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
         objectClass, OrmConstructor.class.getName()), e));
   }
@@ -81,7 +81,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass) {
-    Constructor<T> constructor = Try.getOrThrow(
+    Constructor<T> constructor = Try.getOrElseThrow(
         () -> objectClass.getConstructor(Arrays.stream(objectClass.getRecordComponents())
             .map(cn -> cn.getType()).toArray(Class[]::new)),
         e -> new SormException(format(
@@ -112,7 +112,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final Map<List<String>, int[]> columnTypesMap = new ConcurrentHashMap<>();
 
   private int[] getColumnTypes(ResultSet resultSet, List<String> columns) {
-    return columnTypesMap.computeIfAbsent(columns, k -> Try.getOrThrow(() -> {
+    return columnTypesMap.computeIfAbsent(columns, k -> Try.getOrElseThrow(() -> {
       ResultSetMetaData metaData = resultSet.getMetaData();
       int n = metaData.getColumnCount();
       int[] ret = new int[n];
