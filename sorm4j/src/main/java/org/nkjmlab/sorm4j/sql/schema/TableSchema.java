@@ -91,12 +91,6 @@ public class TableSchema {
       return this;
     }
 
-    public Builder setTableName(Enum<?> tableName) {
-      setTableName(tableName.name());
-      return this;
-    }
-
-
     /**
      * Adds an unique constraint.
      *
@@ -209,18 +203,14 @@ public class TableSchema {
     }
 
     private static String createPrimaryKeyConstraint(String[] primaryKeys) {
-      if (primaryKeys == null || primaryKeys.length == 0) {
-        return "";
-      }
-      return ", primary key" + "(" + join(", ", primaryKeys) + ")";
+      return (primaryKeys == null || primaryKeys.length == 0) ? ""
+          : ", primary key" + "(" + join(", ", primaryKeys) + ")";
     }
 
     private static String createUniqueConstraint(List<String[]> uniqueColumnPairs) {
-      if (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0) {
-        return "";
-      }
-      return ", " + String.join(", ", uniqueColumnPairs.stream()
-          .map(u -> "unique" + "(" + join(", ", u) + ")").toArray(String[]::new));
+      return (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0) ? ""
+          : ", " + String.join(", ", uniqueColumnPairs.stream()
+              .map(u -> "unique" + "(" + join(", ", u) + ")").toArray(String[]::new));
     }
 
     private static List<String> getColumunNames(Map<String, String[]> columnDefinitions) {
