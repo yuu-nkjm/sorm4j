@@ -2,6 +2,8 @@ package org.nkjmlab.sorm4j.sql.schema;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
+import static org.nkjmlab.sorm4j.sql.schema.TableSchemaTest.TempGuestTable.Column.*;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
@@ -11,27 +13,52 @@ class TableSchemaTest {
   private static TempGuestTable tempGuestTable = new TempGuestTable();
   private static Sorm sorm = SormTestUtils.createSorm();
 
-  private static class TempGuestTable {
+  static class TempGuestTable {
 
-    private static String ID = "id";
-    private static String NAME = "name";
-    private static String TEL = "tel";
+    public static enum Column {
+      ID, NAME, TEL
+    }
+
     private final TableSchema schema;
 
     public TempGuestTable() {
-      this.schema =
-          TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID, INT)
-              .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
-              .addUniqueConstraint(TEL).addIndexColumn(TEL).setPrimaryKey(ID).build();
+      this.schema = TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID, INT)
+          .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
+          .addUniqueConstraint(TEL).addIndexColumn(TEL).setPrimaryKey(ID).build();
     }
+
+  }
+
+  @Test
+  void testSchemeBuilder() {
+    TableSchema schema1 = TableSchema.builder().setTableName("temp_guests")
+        .addColumnDefinition(ID.name(), INT).addColumnDefinition(NAME.name(), VARCHAR)
+        .addColumnDefinition(TEL.name(), VARCHAR).addUniqueConstraint(TEL.name())
+        .addIndexColumn(TEL.name()).setPrimaryKey(ID.name()).build();
+
+    TableSchema schema2 = TableSchema.builder("temp_guests").addColumnDefinition(ID, INT)
+        .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
+        .addUniqueConstraint(TEL).addIndexColumn(TEL).setPrimaryKey(ID).build();
+
+    assertThat(schema1.getTableSchema()).isEqualTo(schema2.getTableSchema());
+
+  }
+
+  @Test
+  void testSchemeBuilder2() {
+    TableSchema schema1 =
+        TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID.name(), INT)
+            .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
+
+
 
   }
 
 
   @Test
   void testGetColumnNames() {
-    assertThat(tempGuestTable.schema.getColumnNames()).contains(TempGuestTable.ID,
-        TempGuestTable.NAME, TempGuestTable.TEL);
+    assertThat(tempGuestTable.schema.getColumnNames()).containsExactlyInAnyOrder(
+        Stream.of(ID, NAME, TEL).map(e -> e.name()).toArray(String[]::new));
   }
 
   @Test

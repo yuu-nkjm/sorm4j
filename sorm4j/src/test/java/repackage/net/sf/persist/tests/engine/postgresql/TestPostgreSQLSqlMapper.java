@@ -15,9 +15,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,13 +67,13 @@ public class TestPostgreSQLSqlMapper {
    *
    * @throws SQLException
    */
-  private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
+  // private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
   private static final LocalDate localDate = LocalDate.of(2019, 9, 27);
   private static final LocalTime localTime = LocalTime.of(13, 23);
   private static final LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-  private static final OffsetTime offsetTime = OffsetTime.of(localTime, JST_OFFSET);
-  private static final OffsetDateTime offsetDateTime =
-      OffsetDateTime.of(localDate, localTime, JST_OFFSET);
+  // private static final OffsetTime offsetTime = OffsetTime.of(localTime, JST_OFFSET);
+  // private static final OffsetDateTime offsetDateTime =
+  // OffsetDateTime.of(localDate, localTime, JST_OFFSET);
 
 
   @Test
