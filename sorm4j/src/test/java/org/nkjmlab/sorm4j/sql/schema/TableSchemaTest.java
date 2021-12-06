@@ -50,8 +50,6 @@ class TableSchemaTest {
         TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID.name(), INT)
             .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
 
-
-
   }
 
 

@@ -20,6 +20,12 @@ class SormTest {
   }
 
   @Test
+  void testCreate() {
+    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
+    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+  }
+
+  @Test
   void testAutoRollback() throws SQLException {
     Guest a = SormTestUtils.GUEST_ALICE;
     try (OrmConnection tr = sorm.openTransaction()) {

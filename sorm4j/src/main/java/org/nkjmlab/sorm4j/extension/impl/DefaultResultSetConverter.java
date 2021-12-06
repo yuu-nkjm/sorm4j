@@ -151,7 +151,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
       case "double":
         return double.class;
       default:
-        return Try.getOrThrow(() -> Class.forName(name), Try::rethrow);
+        return Try.getOrElseThrow(() -> Class.forName(name), Try::rethrow);
     }
   }
 
@@ -291,13 +291,13 @@ public class DefaultResultSetConverter implements ResultSetConverter {
               .orElse(null);
         case "java.net.URL":
           return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrNull(() -> new java.net.URL(s))).orElse(null);
+              .map(s -> Try.getOrElseNull(() -> new java.net.URL(s))).orElse(null);
         case "java.net.Inet4Address":
           return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrNull(() -> java.net.Inet4Address.getByName(s))).orElse(null);
+              .map(s -> Try.getOrElseNull(() -> java.net.Inet4Address.getByName(s))).orElse(null);
         case "java.net.Inet6Address":
           return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrNull(() -> java.net.Inet6Address.getByName(s))).orElse(null);
+              .map(s -> Try.getOrElseNull(() -> java.net.Inet6Address.getByName(s))).orElse(null);
         case "java.lang.Object":
           return resultSet.getObject(column);
         default:
