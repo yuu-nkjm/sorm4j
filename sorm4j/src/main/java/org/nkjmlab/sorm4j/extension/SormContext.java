@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.MessageUtils.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -128,7 +128,7 @@ public final class SormContext {
 
     Set<String> keySetWithoutAlias = accessors.keySet();
     if (!equalsAsCanonical(columns, keySetWithoutAlias)) {
-      throw new SormException(format(
+      throw new SormException(newMessage(
           "{} does not match any field. Table [{}] contains Columns {} but [{}] contains Fields {}.",
           columns.stream().filter(e -> !keySetWithoutAlias.contains(toCanonicalCase(e))).sorted()
               .collect(Collectors.toList()),

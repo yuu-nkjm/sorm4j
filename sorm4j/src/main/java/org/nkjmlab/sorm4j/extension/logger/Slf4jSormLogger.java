@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension.logger;
 
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
+import org.nkjmlab.sorm4j.internal.util.MessageUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
@@ -32,39 +32,39 @@ public class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
   @Override
   public void trace(String format, Object... params) {
     logger.trace(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
 
   @Override
   public void debug(String format, Object... params) {
     logger.debug(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void info(String format, Object... params) {
     logger.info(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void warn(String format, Object... params) {
     logger.warn(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void error(String format, Object... params) {
     logger.error(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void trace(int depth, String format, Object... params) {
     logger
         .trace(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + StringUtils.format(format, params));
+            + MessageUtils.newMessage(format, params));
   }
 
 
@@ -72,26 +72,26 @@ public class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
   public void debug(int depth, String format, Object... params) {
     logger
         .debug(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + StringUtils.format(format, params));
+            + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void info(int depth, String format, Object... params) {
     logger.info(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void warn(int depth, String format, Object... params) {
     logger.warn(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + StringUtils.format(format, params));
+        + MessageUtils.newMessage(format, params));
   }
 
   @Override
   public void error(int depth, String format, Object... params) {
     logger
         .error(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + StringUtils.format(format, params));
+            + MessageUtils.newMessage(format, params));
   }
 
 }

@@ -3,12 +3,12 @@ package org.nkjmlab.sorm4j.internal.util;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public final class StringUtils {
+public final class MessageUtils {
 
-  private StringUtils() {};
+  private MessageUtils() {};
 
 
-  public static String format(String msg, Object... params) {
+  public static String newMessage(String msg, Object... params) {
     if (params == null || params.length == 0) {
       return msg;
     }

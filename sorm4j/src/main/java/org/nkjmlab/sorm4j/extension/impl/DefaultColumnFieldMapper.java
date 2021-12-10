@@ -33,7 +33,7 @@ import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
 import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.internal.util.StringUtils;
+import org.nkjmlab.sorm4j.internal.util.MessageUtils;
 
 /**
  * Default implementation of {@link ColumnFieldMapper}
@@ -305,7 +305,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     for (String key : accessors.keySet()) {
       String aKey = toCanonicalCase(prefix + key);
       if (accessors.containsKey(aKey)) {
-        throw new SormException(StringUtils.format(
+        throw new SormException(MessageUtils.newMessage(
             "Modify table alias because table alias [{}] and column [{}] is concatenated and it becomes duplicated column",
             prefix, key));
       }

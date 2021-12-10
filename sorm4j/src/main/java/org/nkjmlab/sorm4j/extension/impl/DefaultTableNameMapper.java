@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension.impl;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.MessageUtils.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public TableName getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
-    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(format(
+    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(newMessage(
         "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
         tableName, OrmTable.class.getName(), candidates)));
   }
@@ -34,7 +34,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
-    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(format(
+    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(newMessage(
         "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
         objectClass.getName(), OrmTable.class.getName(), candidates)));
   }

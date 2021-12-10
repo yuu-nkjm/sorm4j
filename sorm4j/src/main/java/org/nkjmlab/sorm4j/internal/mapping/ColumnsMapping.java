@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
-import static org.nkjmlab.sorm4j.internal.util.StringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.MessageUtils.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
@@ -41,21 +42,58 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
     Constructor<T> ormConstructor = getOrmConstructor(objectClass);
 
-    this.pojoCreator = objectClass.isRecord() ? createRecordPojoCreator(objectClass)
-        : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
-            : new SetterPojoCreator<>(getDefaultConstructor(objectClass)));
+    // objectClass.isRecord() ? createRecordPojoCreator(objectClass)
+
+    Constructor<T> ormRecordConstructor = getOrmRecordConstructor(objectClass);
+    // objectClass.isRecord() ? createRecordPojoCreator(objectClass)
+    this.pojoCreator =
+        ormRecordConstructor != null ? createRecordPojoCreator(objectClass, ormRecordConstructor)
+            : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
+                : new SetterPojoCreator<>(getDefaultConstructor(objectClass)));
 
   }
+
+  private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass, Constructor<T> constructor) {
+    String[] parameterNames =
+        Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
+    return new ConstructorPojoCreator<>(constructor, parameterNames,
+        columnToAccessorMap.getColumnAliasPrefix());
+  }
+
+  private Constructor<T> getOrmRecordConstructor(Class<T> objectClass) {
+    OrmRecord a = objectClass.getAnnotation(OrmRecord.class);
+    if (a == null) {
+      return null;
+    }
+    return Try.getOrElseThrow(
+        () -> objectClass.getConstructor(Arrays.stream(objectClass.getDeclaredFields())
+            .map(f -> f.getType()).toArray(Class[]::new)),
+        e -> new SormException(
+            newMessage("The given container class [{}] should have the canonical constructor.",
+                objectClass),
+            e));
+  }
+  // private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass) {
+  // Constructor<T> constructor = Try.getOrElseThrow(
+  // () -> objectClass.getConstructor(Arrays.stream(objectClass.getRecordComponents())
+  // .map(cn -> cn.getType()).toArray(Class[]::new)),
+  // e -> new SormException(format(
+  // "The given container record class [{}] does not have a valid constructor for mapping.",
+  // objectClass), e));
+  // String[] parameterNames =
+  // Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
+  // return new ConstructorPojoCreator<>(constructor, parameterNames,
+  // columnToAccessorMap.getColumnAliasPrefix());
+  // }
 
   private Constructor<T> getOrmConstructor(Class<T> objectClass) {
     List<Constructor<?>> ormConstructors = Arrays.stream(objectClass.getConstructors())
         .filter(c -> c.getAnnotation(OrmConstructor.class) != null).collect(Collectors.toList());
-
     if (ormConstructors.isEmpty()) {
       return null;
     } else if (ormConstructors.size() > 1) {
       throw new SormException(
-          format("Constructor with parameters annotated by {} should be one or less. ",
+          newMessage("Constructor with parameters annotated by {} should be one or less. ",
               OrmConstructor.class.getName()));
     } else {
       @SuppressWarnings("unchecked")
@@ -73,24 +111,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
-    return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(format(
+    return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(newMessage(
         "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
         objectClass, OrmConstructor.class.getName()), e));
-  }
-
-
-
-  private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass) {
-    Constructor<T> constructor = Try.getOrElseThrow(
-        () -> objectClass.getConstructor(Arrays.stream(objectClass.getRecordComponents())
-            .map(cn -> cn.getType()).toArray(Class[]::new)),
-        e -> new SormException(format(
-            "The given container record class [{}] does not have a valid constructor for mapping.",
-            objectClass), e));
-    String[] parameterNames =
-        Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-    return new ConstructorPojoCreator<>(constructor, parameterNames,
-        columnToAccessorMap.getColumnAliasPrefix());
   }
 
 
