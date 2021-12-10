@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-parent</artifactId>
   <name>sorm4j-parent</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
-  <version>1.4.0</version>
+  <version>1.4.0-rc5</version>
   <packaging>pom</packaging>
   <url>https://github.com/nkjmlab</url>
   <licenses>
@@ -31,6 +29,8 @@
 
   <properties>
     <sorm4j-version>${project.version}</sorm4j-version>
+    <xstream-version-in-plugin>1.4.15</xstream-version-in-plugin>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <distributionManagement>
@@ -57,10 +57,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <compilerVersion>11</compilerVersion>
-          <source>11</source>
-          <target>11</target>
-          <encoding>UTF-8</encoding>
+          <release>11</release>
         </configuration>
       </plugin>
       <!-- from https://central.sonatype.org/pages/apache-maven.html#distribution-management-and-authentication -->
@@ -80,7 +77,7 @@
           <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.15</version>
+            <version>${xstream-version-in-plugin}</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -143,4 +140,3 @@
     </plugins>
   </build>
 </project>
-
