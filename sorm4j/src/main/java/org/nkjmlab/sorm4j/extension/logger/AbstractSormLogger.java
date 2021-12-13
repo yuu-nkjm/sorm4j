@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
-import org.nkjmlab.sorm4j.internal.util.MessageUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
@@ -17,7 +17,7 @@ public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logBeforeSql(String tag, Connection connection, ParameterizedSql psql) {
-    debug(MessageUtils.newMessage("[{}] At {}, Execute SQL [{}] to [{}]", tag,
+    debug(ParameterizedStringUtils.newString("[{}] At {}, Execute SQL [{}] to [{}]", tag,
         getOutsideInvokerOfLibrary(), psql.getBindedSql(), getDbUrl(connection)));
   }
 
@@ -25,7 +25,7 @@ public abstract class AbstractSormLogger implements SormLogger {
   @Override
   public void logBeforeMultiRow(String tag, Connection connection, Class<?> clazz, int length,
       String tableName) {
-    debug(MessageUtils.newMessage(
+    debug(ParameterizedStringUtils.newString(
         "[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]", tag,
         getOutsideInvokerOfLibrary(), length, clazz, tableName, getDbUrl(connection)));
   }
@@ -33,19 +33,19 @@ public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logAfterQuery(String tag, long elapsedTime, Object ret) {
-    debug(MessageUtils.newMessage("{} Read [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
+    debug(ParameterizedStringUtils.newString("{} Read [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
         ret instanceof Collection ? ((Collection<?>) ret).size() : 1));
   }
 
   @Override
   public void logAfterUpdate(String tag, long elapsedTime, int ret) {
-    debug(MessageUtils.newMessage("{} Affect [{}] rows", getTagAndElapsedTime(tag, elapsedTime), ret));
+    debug(ParameterizedStringUtils.newString("{} Affect [{}] rows", getTagAndElapsedTime(tag, elapsedTime), ret));
   }
 
 
   @Override
   public void logAfterMultiRow(String tag, long elapsedTime, int[] result) {
-    debug(MessageUtils.newMessage("{} Affect [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
+    debug(ParameterizedStringUtils.newString("{} Affect [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
         IntStream.of(result).sum()));
   }
 

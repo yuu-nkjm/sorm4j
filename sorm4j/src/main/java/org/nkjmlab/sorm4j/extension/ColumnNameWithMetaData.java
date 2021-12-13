@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.extension;
 
-import static org.nkjmlab.sorm4j.internal.util.MessageUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
@@ -27,7 +27,7 @@ public class ColumnNameWithMetaData extends ColumnName {
     // this.isNullable = isNullable;
     // this.isAutoIncremented = isAutoIncremented;
     // this.isGenerated = isGenerated;
-    this.msg = newMessage("{{}: {} [{}({})] [n={},a={},g={}]}", String.format("%02d", ordinalPosition),
+    this.msg = newString("{{}: {} [{}({})] [n={},a={},g={}]}", String.format("%02d", ordinalPosition),
         name, typeName, dataType, isNullable, isAutoIncremented, isGenerated);
   }
 

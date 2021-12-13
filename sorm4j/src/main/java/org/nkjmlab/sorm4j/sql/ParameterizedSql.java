@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
-import org.nkjmlab.sorm4j.internal.util.MessageUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 
 /**
@@ -100,7 +100,7 @@ public interface ParameterizedSql {
     if (parameters == null || parameters.length == 0) {
       return sql;
     }
-    return MessageUtils.replacePlaceholder(sql, "{?}", parameters.length,
+    return ParameterizedStringUtils.newString(sql, "{?}", parameters.length,
         index -> parameters[index] == null ? null : parameters[index].toString());
   }
 
@@ -128,7 +128,7 @@ public interface ParameterizedSql {
     String _sql = sql.replaceAll("\\{:.*?\\}", "{?}");
     Object[] _parameters = orderdParams.values().toArray();
 
-    return MessageUtils.replacePlaceholder(_sql, "{?}", _parameters.length,
+    return ParameterizedStringUtils.newString(_sql, "{?}", _parameters.length,
         index -> _parameters[index] == null ? null : _parameters[index].toString());
   }
 

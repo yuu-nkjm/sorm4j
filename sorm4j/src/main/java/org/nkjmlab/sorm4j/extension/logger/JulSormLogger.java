@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.extension.logger;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.nkjmlab.sorm4j.internal.util.MessageUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 public class JulSormLogger extends AbstractSormLogger implements SormLogger {
 
@@ -29,28 +29,28 @@ public class JulSormLogger extends AbstractSormLogger implements SormLogger {
 
   @Override
   public void trace(String format, Object... params) {
-    this.logger.finer(MessageUtils.newMessage(format, params));
+    this.logger.finer(ParameterizedStringUtils.newString(format, params));
   }
 
 
   @Override
   public void debug(String format, Object... params) {
-    this.logger.fine(MessageUtils.newMessage(format, params));
+    this.logger.fine(ParameterizedStringUtils.newString(format, params));
   }
 
   @Override
   public void info(String format, Object... params) {
-    this.logger.info(MessageUtils.newMessage(format, params));
+    this.logger.info(ParameterizedStringUtils.newString(format, params));
   }
 
   @Override
   public void warn(String format, Object... params) {
-    this.logger.warning(MessageUtils.newMessage(format, params));
+    this.logger.warning(ParameterizedStringUtils.newString(format, params));
   }
 
   @Override
   public void error(String format, Object... params) {
-    this.logger.severe(MessageUtils.newMessage(format, params));
+    this.logger.severe(ParameterizedStringUtils.newString(format, params));
   }
 
   @Override

@@ -3,16 +3,16 @@ package org.nkjmlab.sorm4j.internal.util;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public final class MessageUtils {
+public final class ParameterizedStringUtils {
 
-  private MessageUtils() {};
+  private ParameterizedStringUtils() {};
 
 
-  public static String newMessage(String msg, Object... params) {
+  public static String newString(String msg, Object... params) {
     if (params == null || params.length == 0) {
       return msg;
     }
-    return replacePlaceholder(msg, "{}", params.length, index -> {
+    return newString(msg, "{}", params.length, index -> {
       Object o = params[index];
       if (o == null) {
         return "null";
@@ -26,7 +26,7 @@ public final class MessageUtils {
   }
 
 
-  public static String replacePlaceholder(String messege, String placeholder, int numOfPlaceholder,
+  public static String newString(String messege, String placeholder, int numOfPlaceholder,
       Function<Integer, String> placeholderReplacer) {
     final int placeholderLength = placeholder.length();
     final StringBuilder sbuf = new StringBuilder(messege.length() + 50);

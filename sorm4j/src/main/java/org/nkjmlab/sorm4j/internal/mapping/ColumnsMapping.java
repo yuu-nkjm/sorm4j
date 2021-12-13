@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
-import static org.nkjmlab.sorm4j.internal.util.MessageUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -69,7 +69,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
         () -> objectClass.getConstructor(Arrays.stream(objectClass.getDeclaredFields())
             .map(f -> f.getType()).toArray(Class[]::new)),
         e -> new SormException(
-            newMessage("The given container class [{}] should have the canonical constructor.",
+            newString("The given container class [{}] should have the canonical constructor.",
                 objectClass),
             e));
   }
@@ -93,7 +93,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       return null;
     } else if (ormConstructors.size() > 1) {
       throw new SormException(
-          newMessage("Constructor with parameters annotated by {} should be one or less. ",
+          newString("Constructor with parameters annotated by {} should be one or less. ",
               OrmConstructor.class.getName()));
     } else {
       @SuppressWarnings("unchecked")
@@ -111,7 +111,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
-    return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(newMessage(
+    return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(newString(
         "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
         objectClass, OrmConstructor.class.getName()), e));
   }

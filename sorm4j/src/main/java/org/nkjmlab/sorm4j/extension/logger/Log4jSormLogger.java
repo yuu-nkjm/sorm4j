@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.extension.logger;
 
 import org.apache.logging.log4j.Level;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
-import org.nkjmlab.sorm4j.internal.util.MessageUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
@@ -46,7 +46,7 @@ public class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
     this.logger.printf(level,
         "%n  "
             + MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + MessageUtils.newMessage(format, params));
+            + ParameterizedStringUtils.newString(format, params));
   }
 
   @Override
