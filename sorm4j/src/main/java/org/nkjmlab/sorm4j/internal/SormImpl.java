@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
@@ -16,16 +15,12 @@ import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.internal.typed.TypedOrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.typed.TypedOrmImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.typed.TypedOrm;
-import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 /**
  * An entry point of object-relation mapping.
@@ -163,37 +158,6 @@ public final class SormImpl implements Sorm {
     public void close() {
       rollback();
       super.close();
-    }
-
-    @Override
-    public <T> TypedOrmTransaction<T> type(Class<T> objectClass) {
-      return new TypedOrmTransactionImpl<>(objectClass, this);
-    }
-
-  }
-
-  public static class TypedOrmTransactionImpl<T> extends TypedOrmConnectionImpl<T>
-      implements TypedOrmTransaction<T> {
-
-    public TypedOrmTransactionImpl(Class<T> objectClass, OrmTransactionImpl ormTransaction) {
-      super(objectClass, ormTransaction);
-      ormTransaction.begin();
-    }
-
-    @Override
-    public void close() {
-      rollback();
-      super.close();
-    }
-
-    @Override
-    public <S> TypedOrmTransaction<S> type(Class<S> objectClass) {
-      return new TypedOrmTransactionImpl<>(objectClass, (OrmTransactionImpl) conn);
-    }
-
-    @Override
-    public OrmTransaction untype() {
-      return (OrmTransactionImpl) conn;
     }
 
   }
@@ -551,15 +515,6 @@ public final class SormImpl implements Sorm {
   @Override
   public int executeUpdate(ParameterizedSql sql) {
     return applyAndClose(conn -> conn.executeUpdate(sql));
-  }
-
-  private final Map<Class<?>, TypedOrm<?>> typedOrms = new ConcurrentHashMap<>();
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <S> TypedOrm<S> type(Class<S> objectClass) {
-    return (TypedOrm<S>) typedOrms.computeIfAbsent(objectClass,
-        oc -> new TypedOrmImpl<>(objectClass, this));
   }
 
   @Override

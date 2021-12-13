@@ -55,7 +55,7 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   @Override
   public T one() {
     @SuppressWarnings("unchecked")
-    T ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
+    T ret = Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
         : ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
@@ -70,7 +70,7 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   public T first() {
     @SuppressWarnings("unchecked")
     T ret =
-        Try.getOrThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
+        Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
             : ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
@@ -84,8 +84,8 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   @Override
   public List<T> toList() {
     @SuppressWarnings("unchecked")
-    List<T> ret = Try.getOrThrow(() -> objectClass.equals(MAP_CLASS)
-        ? (List<T>) Try.getOrThrow(() -> ormMapper.traverseAndMapToMapList(resultSet), Try::rethrow)
+    List<T> ret = Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS)
+        ? (List<T>) Try.getOrElseThrow(() -> ormMapper.traverseAndMapToMapList(resultSet), Try::rethrow)
         : ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
@@ -93,7 +93,7 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrThrow(() -> ResultSetTraverser.from(rowMapper).traverseAndMap(resultSet),
+    List<T> ret = Try.getOrElseThrow(() -> ResultSetTraverser.from(rowMapper).traverseAndMap(resultSet),
         Try::rethrow);
     close();
     return ret;

@@ -172,7 +172,7 @@ public class BeanTest {
                 "Expected not null value but got null as result of [" + sql + "]");
           }
 
-          // TODO: maybe test compatibility of return type with field type?
+          // maybe test compatibility of return type with field type?
           // compare values using a method that takes into consideration "compatible" types
           // (eg char[]-String, double-BigDecimal, etc)
           Object retConverted = DynamicBean.convertToType(fieldValue.getClass(), ret);

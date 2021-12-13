@@ -23,7 +23,6 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
 
 class OrmConnectionTest {
 
@@ -580,10 +579,8 @@ class OrmConnectionTest {
   void testTransaction() {
     Guest a = GUEST_ALICE;
     sorm.acceptTransactionHandler(m -> {
-      TypedOrmTransaction<Guest> tmp = m.type(Guest.class);
-      tmp.insert(a);
-      tmp.rollback();
-
+      m.insert(a);
+      m.rollback();
     });
 
 

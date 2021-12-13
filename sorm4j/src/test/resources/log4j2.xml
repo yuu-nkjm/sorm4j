@@ -2,6 +2,7 @@
 <!DOCTYPE configuration>
 <configuration status="OFF">
   <Properties>
+    <property name="root_log_level">DEBUG</property>
     <property name="sorm4j_log_level">DEBUG</property>
     <property name="log_pattern">${log_pattern_loc}</property>
     <property name="log_pattern_loc">
@@ -26,6 +27,10 @@
     </Console>
   </Appenders>
   <Loggers>
+    <Root level="${root_log_level}">
+      <AppenderRef ref="stdout" />
+      <AppenderRef ref="stderr" />
+    </Root>
     <Logger name="org.nkjmlab.sorm4j" level="${sorm4j_log_level}" additivity="false">
       <AppenderRef ref="stdout" />
       <AppenderRef ref="stderr" />

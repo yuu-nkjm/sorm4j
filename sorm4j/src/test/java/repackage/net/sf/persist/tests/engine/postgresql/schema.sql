@@ -16,10 +16,10 @@ create table numeric_types (
 
 create table string_types (
 	char1_col char(1),
-	char_col char(255),
-	varchar_col varchar(255),
+	-- char_col char(2048),
+	varchar_col varchar(2048),
 	text_col text,
-	clob_col oid
+	clob_col text
 );
 
 
@@ -31,6 +31,6 @@ create table datetime_types (
 
 create table binary_types (
 	bytea_col bytea,
-	blob_col oid
+	blob_col bytea
 );
 

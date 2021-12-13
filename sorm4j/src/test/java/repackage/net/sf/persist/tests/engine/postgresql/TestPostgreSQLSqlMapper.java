@@ -15,9 +15,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +34,9 @@ import org.postgresql.util.PGobject;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
+  private static final org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
+
   private static DataSource dataSource;
 
   @BeforeAll
@@ -62,6 +62,8 @@ public class TestPostgreSQLSqlMapper {
       }
     });
     Sorm.setDefaultContext(builder -> builder.setSqlParametersSetter(ps).build());
+
+
   }
 
 
@@ -70,73 +72,79 @@ public class TestPostgreSQLSqlMapper {
    *
    * @throws SQLException
    */
-  private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
+  // private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
   private static final LocalDate localDate = LocalDate.of(2019, 9, 27);
   private static final LocalTime localTime = LocalTime.of(13, 23);
   private static final LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-  private static final OffsetTime offsetTime = OffsetTime.of(localTime, JST_OFFSET);
-  private static final OffsetDateTime offsetDateTime =
-      OffsetDateTime.of(localDate, localTime, JST_OFFSET);
+  // private static final OffsetTime offsetTime = OffsetTime.of(localTime, JST_OFFSET);
+  // private static final OffsetDateTime offsetDateTime =
+  // OffsetDateTime.of(localDate, localTime, JST_OFFSET);
 
 
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
       OrmConnection c = Sorm.toOrmConnection(conn);
-      doTest(c, "c_boolean", true);
-      doTest(c, "c_integer", 1);
-      doTest(c, "c_integer", new BigDecimal("1"));
-      doTest(c, "c_decimal", new BigDecimal("0.5"));
-      doTest(c, "c_double", 0.5);
-      doTest(c, "c_double", new BigDecimal("0.5"));
-      doTest(c, "c_varchar", "varchar");
-      doTest(c, "c_text", "long long text");
-      doTest(c, "c_bytea", new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF});
-      doTest(c, "c_uuid", UUID.fromString("33ee757a-19b3-45dc-be79-f1d65ac5d1a4"));
-      doTest(c, "c_date", localDate);
-      doTest(c, "c_date", Date.valueOf(localDate));
-      doTest(c, "c_time", localTime);
-      doTest(c, "c_time", Time.valueOf(localTime));
-      doTest(c, "c_timetz", offsetTime);
-      doTest(c, "c_timestamp", localDateTime);
-      doTest(c, "c_timestamp", Timestamp.valueOf(localDateTime));
-      doTest(c, "c_timestamptz", offsetDateTime);
-      doTest(c, "c_inet_ipv4", InetAddress.getByName("192.168.1.1"));
-      doTest(c, "c_inet_ipv6", InetAddress.getByName("::1"));
-      doTest(c, "c_url", new URL("https://example.com"));
-      doTest(c, "c_integer_array", new Integer[] {1, 2, 3});
-      doTest(c, "c_integer_array", new int[] {1, 2, 3});
-      doTest(c, "c_varchar_array", new String[] {"A", "B", "C"});
+      System.out.println(c.readMapFirst("select * from sql_mapper_test"));
 
-      doTest(c, "c_integer_array", List.of(1, 2, 3));
-      doTest(c, "c_varchar_array", List.of("A", "B", "C"));
+      doTest(c, "testName", "c_boolean", true);
+      doTest(c, "testName", "c_integer", 1);
+      doTest(c, "testName", "c_integer", new BigDecimal("1"));
+      doTest(c, "c_decimal", "c_decimal", new BigDecimal("0.5"));
+      doTest(c, "testName", "c_double", 0.5);
+      doTest(c, "testName", "c_double", new BigDecimal("0.5"));
+      doTest(c, "testName", "c_varchar", "varchar");
+      doTest(c, "testName", "c_text", "long long text");
+      doTest(c, "c_bytea by byte[]", "c_bytea",
+          new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF});
+      doTest(c, "testName", "c_uuid", UUID.fromString("33ee757a-19b3-45dc-be79-f1d65ac5d1a4"));
+      doTest(c, "testName", "c_date", localDate);
+      doTest(c, "testName", "c_date", Date.valueOf(localDate));
+      doTest(c, "testName", "c_time", localTime);
+      doTest(c, "testName", "c_time", Time.valueOf(localTime));
+      // doTest(c, "testName","c_timetz", offsetTime);
+      doTest(c, "testName", "c_timestamp", localDateTime);
+      doTest(c, "testName", "c_timestamp", Timestamp.valueOf(localDateTime));
+      // doTest(c, "testName","c_timestamptz", offsetDateTime);
+      // doTest(c, "testName","c_inet_ipv4", InetAddress.getByName("192.168.1.1"));
+      // doTest(c, "testName","c_inet_ipv6", InetAddress.getByName("::1"));
+      doTest(c, "testName", "c_url", new URL("https://example.com"));
+
+      doTest(c, "c_integer_array by Integer[]", "c_integer_array", new Integer[] {1, 2, 3});
+      doTest(c, "c_integer_array by int[]", "c_integer_array", new int[] {1, 2, 3});
+
+      doTest(c, "c_integer_array by List", "c_integer_array", List.of(1, 2, 3));
+
+      doTest(c, "c_varchar_array by String[]", "c_varchar_array", new String[] {"A", "B", "C"});
+      doTest(c, "c_varchar_array by List", "c_varchar_array", List.of("A", "B", "C"));
 
 
-      System.out.println("--------");
-      doTestIn(c, "c_integer", List.of(1, 2, 3));
-      doTestIn(c, "c_integer", new Integer[] {1, 2, 3});
-      doTestIn(c, "c_integer", new int[] {1, 2, 3});
-      doTestIn(c, "c_varchar", List.of("integer", "varchar", "text"));
-      doTestIn(c, "c_varchar", new String[] {"integer", "varchar", "text"});
+      log.debug("--------");
+      doTestInClause(c, "c integer by List", "c_integer", List.of(1, 2, 3));
+      doTestInClause(c, "c integer by Integer[]", "c_integer", new Integer[] {1, 2, 3});
+      doTestInClause(c, "c integer by int[]", "c_integer", new int[] {1, 2, 3});
+      doTestInClause(c, "c_varchar by List", "c_varchar", List.of("integer", "varchar", "text"));
+      doTestInClause(c, "c_varchar by String[]", "c_varchar",
+          new String[] {"integer", "varchar", "text"});
     }
   }
 
-  private void doTest(OrmConnection c, String column, Object param) {
-    bindTest(c, column, param);
-    mapTest(c, column, param);
+  private void doTest(OrmConnection c, String testName, String column, Object param) {
+    bindTest(c, testName, column, param);
+    mapTest(c, testName, column, param);
   }
 
-  private void mapTest(OrmConnection c, String column, Object param) {
+  private void mapTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "map: " + column + "(" + param.getClass() + ") ";
     try {
       Object ret = c.readFirst(param.getClass(), "SELECT " + column + " FROM sql_mapper_test");
       if (equals(ret, param)) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
-        System.err.println(messagePrefix + "fail => " + ret);
+        log.error("[" + testName + "] " + messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
     }
   }
 
@@ -152,28 +160,28 @@ public class TestPostgreSQLSqlMapper {
     }
   }
 
-  private void bindTest(OrmConnection c, String column, Object param) {
+  private void bindTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "bind: " + column + "(" + param.getClass() + ") ";
     try {
       Map<String, Object> ret = c
           .readMapFirst("SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
       if (ret != null) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
-        System.err.println(messagePrefix + "fail => " + ret);
+        log.error("[" + testName + "] " + messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
       // e.printStackTrace();
     }
 
   }
 
-  private void doTestIn(OrmConnection c, String column, Object param) {
-    bindInTest(c, column, param);
+  private void doTestInClause(OrmConnection c, String testName, String column, Object param) {
+    bindInClauseTest(c, testName, column, param);
   }
 
-  private void bindInTest(OrmConnection c, String column, Object param) {
+  private void bindInClauseTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "bindIn: " + column + "(" + param.getClass() + ") ";
     try {
       ParameterizedSql statement = OrderedParameterSql
@@ -181,12 +189,12 @@ public class TestPostgreSQLSqlMapper {
           .addParameter(param).parse();
       Map<String, Object> ret = c.readMapFirst(statement);
       if (ret != null) {
-        System.out.println(messagePrefix + "success => " + ret);
+        log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
-        System.out.println(messagePrefix + "fail => " + ret);
+        log.error("[" + testName + "] " + messagePrefix + "fail => " + ret);
       }
     } catch (Exception e) {
-      System.err.println(messagePrefix + "fail => " + e.getMessage());
+      log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
     }
   }
 

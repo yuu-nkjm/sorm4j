@@ -16,7 +16,7 @@ class SelectSqlBuilderTest {
     SormTestUtils.dropAndCreateTableAll(sormImpl);
 
     sormImpl.accept(con -> {
-      String sql = SelectSql.builder().from(con.type(Guest.class).getTableName()).build();
+      String sql = SelectSql.builder().from(con.getTableName(Guest.class)).build();
       assertThat(sql).contains("select * from GUESTS");
     });
 

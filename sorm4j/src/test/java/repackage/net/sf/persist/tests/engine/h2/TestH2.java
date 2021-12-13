@@ -59,7 +59,7 @@ public class TestH2 {
       Class<?>[] otherTypes = new Class<?>[] {Object.class};
 
       BeanMap beanMap = new BeanMap("BinaryTypes")
-          .addField(new FieldMap("binaryCol").setTypes(binaryTypes).setSize(255))
+          // .addField(new FieldMap("binaryCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("blobCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("otherCol").setTypes(otherTypes).setSize(255));
 
@@ -159,7 +159,7 @@ public class TestH2 {
 
       // uuid not being tested
       BeanMap beanMap = new BeanMap("StringTypes")
-          .addField(new FieldMap("charCol").setTypes(stringTypes).setSize(255))
+          // .addField(new FieldMap("charCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("varcharCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("varcharIgnorecaseCol").setTypes(stringTypes).setSize(255))
           .addField(new FieldMap("clobCol").setTypes(clobTypes).setSize(8192));

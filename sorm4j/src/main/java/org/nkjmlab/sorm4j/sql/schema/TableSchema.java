@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.sql.schema;
 
 import static java.lang.String.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,12 @@ public class TableSchema {
       return this;
     }
 
+    public Builder addColumnDefinition(Enum<?> columnName, String... dataTypeAndOptions) {
+      addColumnDefinition(columnName.name(), dataTypeAndOptions);
+      return this;
+    }
+
+
     /**
      * Adds a column pair for an index key.
      *
@@ -118,6 +125,12 @@ public class TableSchema {
       indexColumns.add(indexColumnPair);
       return this;
     }
+
+    public Builder addIndexColumn(Enum<?>... indexColumnPair) {
+      addIndexColumn(toStringArray(indexColumnPair));
+      return this;
+    }
+
 
     /**
      * Adds an unique constraint.
@@ -136,6 +149,11 @@ public class TableSchema {
       return this;
     }
 
+    public Builder addUniqueConstraint(Enum<?>... uniqueColumnPair) {
+      uniqueColumnPairs.add(toStringArray(uniqueColumnPair));
+      return this;
+    }
+
     /**
      * Sets attributes as primary key attributes.
      *
@@ -151,6 +169,16 @@ public class TableSchema {
     public Builder setPrimaryKey(String... attributes) {
       this.primaryKeys = attributes;
       return this;
+    }
+
+    public Builder setPrimaryKey(Enum<?>... attributes) {
+      setPrimaryKey(toStringArray(attributes));
+      return this;
+    }
+
+
+    private static String[] toStringArray(Enum<?>[] enums) {
+      return Arrays.stream(enums).map(e -> e.name()).toArray(String[]::new);
     }
 
     /**
@@ -175,18 +203,14 @@ public class TableSchema {
     }
 
     private static String createPrimaryKeyConstraint(String[] primaryKeys) {
-      if (primaryKeys == null || primaryKeys.length == 0) {
-        return "";
-      }
-      return ", primary key" + "(" + join(", ", primaryKeys) + ")";
+      return (primaryKeys == null || primaryKeys.length == 0) ? ""
+          : ", primary key" + "(" + join(", ", primaryKeys) + ")";
     }
 
     private static String createUniqueConstraint(List<String[]> uniqueColumnPairs) {
-      if (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0) {
-        return "";
-      }
-      return ", " + String.join(", ", uniqueColumnPairs.stream()
-          .map(u -> "unique" + "(" + join(", ", u) + ")").toArray(String[]::new));
+      return (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0) ? ""
+          : ", " + String.join(", ", uniqueColumnPairs.stream()
+              .map(u -> "unique" + "(" + join(", ", u) + ")").toArray(String[]::new));
     }
 
     private static List<String> getColumunNames(Map<String, String[]> columnDefinitions) {

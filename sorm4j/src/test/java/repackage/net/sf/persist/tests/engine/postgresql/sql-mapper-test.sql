@@ -13,15 +13,15 @@
      -- datetime
      c_date date,
      c_time time,
-     c_timetz timetz,
+     -- c_timetz timetz,
      c_timestamp timestamp,
-     c_timestamptz timestamptz,
+     -- c_timestamptz timestamptz,
      -- complex
-     c_inet_ipv4 inet,
-     c_inet_ipv6 inet,
+     -- c_inet_ipv4 inet,
+     -- c_inet_ipv6 inet,
      c_url text,
-     c_integer_array integer[],
-     c_varchar_array varchar(10)[]
+     c_integer_array integer ARRAY,
+     c_varchar_array varchar ARRAY
  );
 
  insert into sql_mapper_test (
@@ -37,12 +37,12 @@
      -- datetime
      c_date,
      c_time,
-     c_timetz,
+     -- c_timetz,
      c_timestamp,
-     c_timestamptz,
+     -- c_timestamptz,
      -- complex
-     c_inet_ipv4,
-     c_inet_ipv6,
+     -- c_inet_ipv4,
+     -- c_inet_ipv6,
      c_url,
      c_integer_array,
      c_varchar_array
@@ -59,12 +59,12 @@
      -- datetime
      '2019-09-27',
      '13:23',
-     '13:23+09:00',
+     -- '13:23+09:00',
      '2019-09-27T13:23',
-     '2019-09-27T13:23+09:00',
+     -- '2019-09-27T13:23+09:00',
      -- complex
-     inet '192.168.1.1',
-     inet '::1',
+     -- inet '192.168.1.1',
+     -- inet '::1',
      'https://example.com',
      array[1, 2, 3],
      array['A', 'B', 'C']

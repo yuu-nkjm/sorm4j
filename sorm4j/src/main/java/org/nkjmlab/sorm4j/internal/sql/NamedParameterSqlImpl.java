@@ -85,7 +85,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
       if (bean != null) {
         Accessor acc = getAccessor(parameterName);
         if (acc != null) {
-          orderdParams.put(pos, Try.getOrNull(() -> acc.get(bean)));
+          orderdParams.put(pos, Try.getOrElseNull(() -> acc.get(bean)));
         }
         if (parameters.containsKey(parameterName)) {
           orderdParams.put(pos, parameters.get(parameterName));

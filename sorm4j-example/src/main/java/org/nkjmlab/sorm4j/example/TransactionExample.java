@@ -51,7 +51,7 @@ public class TransactionExample {
 
 
     try (OrmTransaction tran = sorm.openTransaction()) {
-      tran.type(Customer.class).insert(Customer.DAVE);
+      tran.insert(Customer.DAVE);
       tran.commit();
     }
     int num5 = sorm.apply(conn -> conn.readOne(Integer.class, "select count(*) from customer"));

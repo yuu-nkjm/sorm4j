@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import org.nkjmlab.sorm4j.typed.TypedOrmTransaction;
-
 /**
  * An transaction with object relation mapping.
  *
@@ -16,7 +14,5 @@ public interface OrmTransaction extends OrmConnection {
   @Override
   void close();
 
-  @Override
-  <T> TypedOrmTransaction<T> type(Class<T> objectClass);
 
 }

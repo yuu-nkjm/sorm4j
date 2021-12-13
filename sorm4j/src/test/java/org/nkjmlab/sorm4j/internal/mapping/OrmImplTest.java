@@ -381,10 +381,4 @@ class OrmImplTest {
     sorm.executeUpdate(ParameterizedSql.parse("insert into players values(?,?,?)", 9, "A", "B"));
   }
 
-
-  @Test
-  void testType() {
-    sorm.type(Player.class);
-  }
-
 }
