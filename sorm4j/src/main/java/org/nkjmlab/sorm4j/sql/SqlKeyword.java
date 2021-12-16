@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *      Wikipedia</a>
  */
 @Experimental
-public interface SqlKeyword {
+public class SqlKeyword {
 
   public static final String ALL = wrapSpace("ALL").toLowerCase();
   public static final String AND = wrapSpace("AND").toLowerCase();
@@ -87,6 +87,7 @@ public interface SqlKeyword {
   public static final String ORDER_BY = wrapSpace("ORDER BY").toLowerCase();
   public static final String SUM = wrapSpace("SUM").toLowerCase();
 
+  private SqlKeyword() {}
 
   private static String wrapSpace(String str) {
     return " " + str + " ";
