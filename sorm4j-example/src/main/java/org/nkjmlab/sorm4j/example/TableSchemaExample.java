@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j.example;
 
-import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
+import static org.nkjmlab.sorm4j.sql.schema.TableSchema.Keyword.*;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.sql.schema.TableSchema;
-import org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword;
+import org.nkjmlab.sorm4j.sql.schema.TableSchema.Keyword;
 
 public class TableSchemaExample {
 
@@ -38,8 +38,8 @@ public class TableSchemaExample {
     public QuizTable(DataSource dataSorce) {
       this.sorm = Sorm.create(dataSorce);
       this.schema = TableSchema.builder().setTableName(TABLE_NAME)
-          .addColumnDefinition(ID, TableSchemaKeyword.INT, TableSchemaKeyword.AUTO_INCREMENT,
-              TableSchemaKeyword.PRIMARY_KEY)
+          .addColumnDefinition(ID, Keyword.INT, Keyword.AUTO_INCREMENT,
+              Keyword.PRIMARY_KEY)
           .addColumnDefinition(BOOK_NAME, VARCHAR).addColumnDefinition(BOOK_NAME, VARCHAR)
           .addColumnDefinition(QUESTION, VARCHAR).addColumnDefinition(ANSWER, VARCHAR).build();
     }
