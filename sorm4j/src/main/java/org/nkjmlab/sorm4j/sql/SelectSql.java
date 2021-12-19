@@ -529,9 +529,8 @@ public class SelectSql {
     return wrapSpace(SELECT + DISTINCT + joinCommaAndSpace(selectClauses));
   }
 
-
-  public static String selectFrom(String tableName) {
-    return wrapSpace(select(STAR) + from(tableName));
+  public static String selectStarFrom(String tableName) {
+    return SELECT_STAR + (tableName);
   }
 
   public static String sum(String column) {

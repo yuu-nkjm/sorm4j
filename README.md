@@ -57,13 +57,13 @@ Reads matching rows from table:
 
 ```java
 List<Customer> list =
-  sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where id>?", 5));
+  sorm.readList(Customer.class, "select * from customer where id>?", 5);
 ```
 
 Inserts a new row:
 
 ```java
-sorm.apply(conn-> conn.insert(new Customer(1, "Alice", "Tokyo")));
+sorm.insert(new Customer(1, "Alice", "Tokyo"));
 ```
 
 ## Benchmarking with Oracle JMH (average operation times: microsec/op)

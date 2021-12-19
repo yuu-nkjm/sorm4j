@@ -16,6 +16,10 @@ public final class TableSql {
 
   private static final Map<String, String> multiRowSqlMap = new ConcurrentHashMap<>();
 
+  public static void clearMultiRowSqlCache() {
+    multiRowSqlMap.clear();
+  }
+
   private final String insertOrMergePlaceholders;
   private final String selectByPrimaryKeySql;
   private final String selectAllSql;
