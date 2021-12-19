@@ -1,16 +1,20 @@
 package org.nkjmlab.sorm4j.internal;
 
+import static org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
@@ -36,9 +40,9 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
+import org.nkjmlab.sorm4j.sql.result.Tuple;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.sql.result.Tuples;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -369,6 +373,45 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
         mapping -> mapping.insert(getJdbcConnection(), objects), () -> new int[0]);
+  }
+
+  @Override
+  public int insertMapOn(String tableName, Map<String, Object> object) {
+    List<String> cols = new ArrayList<>(object.keySet());
+    return executeUpdate(createInsertSql(tableName, cols),
+        cols.stream().map(col -> object.get(col)).toArray());
+  }
+
+  private String createInsertSql(String tableName, List<String> cols) {
+    String ps = String.join(",",
+        Stream.generate(() -> "?").limit(cols.size()).collect(Collectors.toList()));
+    String sql =
+        "insert into " + tableName + " (" + String.join(",", cols) + ") VALUES (" + ps + ")";
+    return sql;
+  }
+
+
+  @Override
+  public int[] insertMapOn(String tableName,
+      @SuppressWarnings("unchecked") Map<String, Object>... objects) {
+    return insertMapOn(tableName, Arrays.asList(objects));
+  }
+
+  @Override
+  public int[] insertMapOn(String tableName, List<Map<String, Object>> objects) {
+    boolean origAutoCommit = getAutoCommit(connection);
+    try {
+      connection.setAutoCommit(false);
+      int[] ret = objects.stream().mapToInt(o -> insertMapOn(tableName, o)).toArray();
+      connection.setAutoCommit(true);
+      return ret;
+    } catch (Exception e) {
+      rollbackIfRequired(connection, origAutoCommit);
+      throw Try.rethrow(e);
+    } finally {
+      commitIfRequired(connection, origAutoCommit);
+      setAutoCommit(origAutoCommit);
+    }
   }
 
   @Override
@@ -725,7 +768,7 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuples.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet),
+            ret1.add(Tuple.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet),
                 loadSinglePojo(t3, resultSet)));
           }
           return ret1;
@@ -746,7 +789,7 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuples.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet)));
+            ret1.add(Tuple.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet)));
           }
           return ret1;
         });
@@ -766,7 +809,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrElseThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel), Try::rethrow);
+    Try.runOrElseThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
+        Try::rethrow);
   }
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
@@ -895,6 +939,5 @@ public class OrmConnectionImpl implements OrmConnection {
       }
       return new ColumnsAndTypes(columns, columnTypes);
     }
-
   }
 }

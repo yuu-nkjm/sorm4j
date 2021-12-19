@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j;
 
 import java.util.List;
+import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 /**
@@ -209,6 +211,37 @@ public interface OrmUpdater {
   <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
+   *
+   * @param tableName
+   * @param object
+   * @return
+   */
+  @Experimental
+  int insertMapOn(String tableName, Map<String, Object> object);
+
+  /**
+   * This method is experimental.
+   *
+   * @param tableName
+   * @param objects
+   * @return
+   */
+  @Experimental
+  int[] insertMapOn(String tableName,
+      @SuppressWarnings("unchecked") Map<String, Object>... objects);
+
+  /**
+   * This method is experimental.
+   *
+   * @param tableName
+   * @param objects
+   * @return
+   */
+  @Experimental
+  int[] insertMapOn(String tableName, List<Map<String, Object>> objects);
+
+
+  /**
    * Merges by objects on the table corresponding to the class of the given objects.
    *
    * @param <T>
@@ -321,5 +354,6 @@ public interface OrmUpdater {
    * @return
    */
   <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects);
+
 
 }

@@ -312,6 +312,23 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public int insertMapOn(String tableName, Map<String, Object> object) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, object));
+  }
+
+  @Override
+  public int[] insertMapOn(String tableName, Map<String, Object>... objects) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, objects));
+  }
+
+  @Override
+  public int[] insertMapOn(String tableName, List<Map<String, Object>> objects) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, objects));
+  }
+
+
+
+  @Override
   public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insert(objects));
   }
@@ -531,5 +548,6 @@ public final class SormImpl implements Sorm {
     sormContext.getLoggerContext().forceLogging = false;
     return ret;
   }
+
 
 }
