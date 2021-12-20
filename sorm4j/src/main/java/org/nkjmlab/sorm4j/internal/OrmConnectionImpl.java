@@ -252,10 +252,22 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> boolean exists(T object) {
     final TableMapping<T> mapping = getCastedTableMapping(object.getClass());
     mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    return existsHelper(mapping, object);
+  }
+
+  private <T> boolean existsHelper(TableMapping<T> mapping, T object) {
+    mapping.throwExeptionIfPrimaryKeysIsNotExist();
     final String sql = mapping.getSql().getExistsSql();
     return readFirst(Integer.class, sql, mapping.getPrimaryKeyParameters(object)) != null;
   }
 
+
+  @Override
+  public <T> boolean exists(String tableName, T object) {
+    final TableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
+    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    return existsHelper(mapping, object);
+  }
 
   private <T> TableMapping<T> getCastedTableMapping(Class<?> objectClass) {
     return sormContext.getCastedTableMapping(connection, objectClass);
@@ -940,4 +952,5 @@ public class OrmConnectionImpl implements OrmConnection {
       return new ColumnsAndTypes(columns, columnTypes);
     }
   }
+
 }

@@ -16,9 +16,14 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.sql.BasicCommand;
+import org.nkjmlab.sorm4j.sql.Command;
+import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
+import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
@@ -261,6 +266,11 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public <T> boolean exists(String tableName, T object) {
+    return applyAndClose(conn -> conn.exists(tableName, object));
+  }
+
+  @Override
   public <T> int[] delete(List<T> objects) {
     return applyAndClose(conn -> conn.delete(objects));
   }
@@ -317,7 +327,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public int[] insertMapOn(String tableName, Map<String, Object>... objects) {
+  public int[] insertMapOn(String tableName,
+      @SuppressWarnings("unchecked") Map<String, Object>... objects) {
     return applyAndClose(conn -> conn.insertMapOn(tableName, objects));
   }
 
@@ -547,6 +558,51 @@ public final class SormImpl implements Sorm {
     R ret = apply(handler);
     sormContext.getLoggerContext().forceLogging = false;
     return ret;
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
+    return applyAndClose(conn -> conn.readAllLazy(objectClass));
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.readLazy(objectClass, sql, parameters));
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.readLazy(objectClass, sql));
+  }
+
+  @Override
+  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.readMapLazy(sql));
+  }
+
+  @Override
+  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.readMapLazy(sql, parameters));
+  }
+
+  @Override
+  public Command createCommand(ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.createCommand(sql));
+  }
+
+  @Override
+  public BasicCommand createCommand(String sql) {
+    return applyAndClose(conn -> conn.createCommand(sql));
+  }
+
+  @Override
+  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.createCommand(sql, parameters));
+  }
+
+  @Override
+  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
+    return applyAndClose(conn -> conn.createCommand(sql, parameters));
   }
 
 

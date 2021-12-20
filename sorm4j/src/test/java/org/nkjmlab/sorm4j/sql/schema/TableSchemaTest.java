@@ -46,10 +46,8 @@ class TableSchemaTest {
 
   @Test
   void testSchemeBuilder2() {
-    TableSchema schema1 =
-        TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID.name(), INT)
-            .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
-
+    TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID.name(), INT)
+        .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
   }
 
 

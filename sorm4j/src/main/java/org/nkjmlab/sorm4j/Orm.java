@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.sql.CommandFunction;
 
 /**
  * ORM functions with an instant connection. When executing ORM function, this object gets a
@@ -11,6 +12,6 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  */
 @Experimental
 public interface Orm
-    extends OrmReader, OrmUpdater, OrmMapReader, TableMetaDataFunction, SqlExecutor {
+    extends OrmFunction, OrmFunctionWithUniqueMapping, OrmLazyReader, SqlExecutor, CommandFunction {
 
 }

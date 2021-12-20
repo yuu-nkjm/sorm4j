@@ -21,12 +21,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-jmh</artifactId>
-  <version>1.4.0-rc6</version>
+  <version>1.4.0-rc7</version>
   <packaging>jar</packaging>
   <name>Sorm4j benchmark</name>
 
   <properties>
-    <sorm4j-version>1.4.0-rc6</sorm4j-version>
+    <sorm4j-version>1.4.0-rc7</sorm4j-version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

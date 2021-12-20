@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.extension.impl;
 
-
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
