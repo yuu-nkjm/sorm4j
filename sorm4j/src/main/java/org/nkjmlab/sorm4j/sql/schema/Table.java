@@ -310,7 +310,6 @@ public interface Table<T> {
   /**
    * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
    *
-   * @param <T>
    * @return
    */
   default LazyResultSet<T> readAllLazy() {
@@ -320,7 +319,6 @@ public interface Table<T> {
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    *
-   * @param <T>
    * @param sql
    * @return
    */

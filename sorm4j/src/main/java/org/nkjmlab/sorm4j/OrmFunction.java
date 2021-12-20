@@ -197,7 +197,7 @@ public interface OrmFunction {
 
 
   /**
-   * See {@link OrmMapReader#readMapFirst(String, Object...)}
+   * See {@link #readMapFirst(String, Object...)}
    *
    * @param sql
    * @return
@@ -225,7 +225,7 @@ public interface OrmFunction {
 
 
   /**
-   * See {@link OrmMapReader#readMapList(String, Object...)}
+   * See {@link #readMapList(String, Object...)}
    *
    * @param sql
    * @return
@@ -254,7 +254,7 @@ public interface OrmFunction {
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
 
   /**
-   * See {@link OrmMapReader#readMapOne(String, Object...)}
+   * See {@link #readMapOne(String, Object...)}
    *
    * @param sql
    * @return

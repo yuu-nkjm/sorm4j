@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.OrmMapLazyReader;
+import org.nkjmlab.sorm4j.OrmFunction;
+import org.nkjmlab.sorm4j.OrmLazyReader;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -111,28 +112,28 @@ public interface Command {
 
 
   /**
-   * See {@link OrmMapReader#readMapFirst(String, Object...)}
+   * See {@link OrmFunction#readMapFirst(String, Object...)}
    *
    * @return
    */
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link OrmMapLazyReader#readMapLazy(String, Object...)}
+   * See {@link OrmLazyReader#readMapLazy(String, Object...)}
    *
    * @return
    */
   LazyResultSet<Map<String, Object>> readMapLazy();
 
   /**
-   * See {@link OrmMapReader#readMapList(String, Object...)}
+   * See {@link OrmFunction#readMapList(String, Object...)}
    *
    * @return
    */
   List<Map<String, Object>> readMapList();
 
   /**
-   * See {@link OrmMapReader#readMapOne(String, Object...)}
+   * See {@link OrmFunction#readMapOne(String, Object...)}
    *
    * @return
    */
