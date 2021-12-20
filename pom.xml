@@ -111,7 +111,6 @@
           <excludePackageNames>org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
           <quiet>true</quiet>
           <doclint>none</doclint>
-          <additionalOptions>--frames</additionalOptions>
         </configuration>
         <executions>
           <execution>
