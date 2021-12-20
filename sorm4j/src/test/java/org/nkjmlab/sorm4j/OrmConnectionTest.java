@@ -66,7 +66,7 @@ class OrmConnectionTest {
       List<Location> gs = m.readList(Location.class, "select * from players");
 
       List<Tuple2<Guest, Player>> result = m.readTupleList(Guest.class, Player.class,
-          "select g.id gid, g.name gname, g.address gaddress, p.id pid, p.name pname, p.address paddress from guests g join players p on g.id=p.id");
+          "select g.id as gid, g.name as gname, g.address as gaddress, p.id as pid, p.name as pname, p.address as paddress from guests g join players p on g.id=p.id");
 
       assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
       assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
@@ -74,9 +74,9 @@ class OrmConnectionTest {
 
       List<Tuple3<Guest, Player, Location>> result1 =
           m.readTupleList(Guest.class, Player.class, Location.class,
-              "select g.id gid, g.name gname, g.address gaddress, "
-                  + "p.id pid, p.name pname, p.address paddress, " + "l.id lid, l.name lname "
-                  + "from guests g " + "join players p on g.id=p.id "
+              "select g.id as gid, g.name as gname, g.address as gaddress, "
+                  + "p.id as pid, p.name as pname, p.address as paddress, "
+                  + "l.id lid, l.name lname " + "from guests g " + "join players p on g.id=p.id "
                   + "join locations l on g.id=l.id");
 
       assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
