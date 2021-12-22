@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.ConsumerHandler;
 import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.OrmFunction;
-import org.nkjmlab.sorm4j.OrmLazyReader;
 import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.annotation.Experimental;

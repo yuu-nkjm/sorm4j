@@ -37,12 +37,12 @@ import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
+import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -354,8 +354,8 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass, String tableName) {
-    return sormContext.getTableMapping(connection, tableName, objectClass).getTableMetaData();
+  public TableMetaData getTableMetaData(String tableName) {
+    return sormContext.getTableMetaData(connection, tableName);
   }
 
 

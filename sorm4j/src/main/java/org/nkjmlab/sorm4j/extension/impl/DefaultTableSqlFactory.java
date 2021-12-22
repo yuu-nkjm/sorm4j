@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.extension.TableSql;
 import org.nkjmlab.sorm4j.extension.TableSqlFactory;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
+import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 public class DefaultTableSqlFactory implements TableSqlFactory {
 

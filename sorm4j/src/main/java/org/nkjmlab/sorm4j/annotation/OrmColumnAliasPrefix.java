@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.nkjmlab.sorm4j.OrmFunction;
 
 /**
  * Defines a prefix for field alias. When "name" field mapped to "name" column and the value of

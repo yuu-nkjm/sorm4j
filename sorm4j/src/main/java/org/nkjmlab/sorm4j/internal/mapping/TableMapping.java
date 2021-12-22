@@ -29,8 +29,8 @@ import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * Holds mapping data from a given class and a table
@@ -97,8 +97,8 @@ public final class TableMapping<T> extends Mapping<T> {
 
   public Object[] getParameters(Object object, List<String> columns) {
     if (object == null) {
-      throw new SormException(ParameterizedStringUtils
-          .newString("Fail to get value from a instance of [{}] but it is null.", getObjectClass()));
+      throw new SormException(ParameterizedStringUtils.newString(
+          "Fail to get value from a instance of [{}] but it is null.", getObjectClass()));
     }
     final Accessor[] accessors = accessorsMap.computeIfAbsent(columns, k -> columns.stream()
         .map(columnName -> getAccessor(object, columnName)).toArray(Accessor[]::new));
