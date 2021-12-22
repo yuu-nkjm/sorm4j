@@ -750,7 +750,7 @@ public class OrmBenchmarkPostSimple {
   public static class Post {
     public static final String DROP_AND_CREATE_TABLE = "DROP TABLE IF EXISTS post;"
         + "CREATE TABLE post ( "
-        + "id INT NOT NULL IDENTITY PRIMARY KEY , text VARCHAR(255) , creation_date DATETIME , last_change_date DATETIME , "
+        + "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date DATETIME , last_change_date DATETIME , "
         + "counter1 INT , counter2 DOUBLE);";
 
 
