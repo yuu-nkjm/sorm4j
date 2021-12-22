@@ -120,10 +120,10 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
         removedEmbeddedParams.add(parameters[i]);
       }
     }
-    String _sql =
-        ParameterizedStringUtils.newString(sql, EMBEDDED_PLACEHOLDER, specialParameterIndexes.size(),
-            index -> parameters[specialParameterIndexes.get(index)] == null ? "null"
-                : parameters[specialParameterIndexes.get(index)].toString());
+    String _sql = ParameterizedStringUtils.newString(sql, EMBEDDED_PLACEHOLDER,
+        specialParameterIndexes.size(),
+        index -> parameters[specialParameterIndexes.get(index)] == null ? "null"
+            : parameters[specialParameterIndexes.get(index)].toString());
 
     return new ParameterizedSqlImpl(_sql, removedEmbeddedParams.toArray());
   }
