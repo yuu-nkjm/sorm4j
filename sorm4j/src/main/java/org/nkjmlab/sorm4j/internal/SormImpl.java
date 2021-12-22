@@ -21,11 +21,11 @@ import org.nkjmlab.sorm4j.sql.Command;
 import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.result.Tuple3;
+import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * An entry point of object-relation mapping.
@@ -151,21 +151,6 @@ public final class SormImpl implements Sorm {
     return "Sorm [dataSource=" + dataSource + ", sormConfig=" + sormContext + "]";
   }
 
-
-  public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
-
-    public OrmTransactionImpl(Connection connection, SormContext context) {
-      super(connection, context);
-      begin(context.getTransactionIsolationLevel());
-    }
-
-    @Override
-    public void close() {
-      rollback();
-      super.close();
-    }
-
-  }
 
   private <R> R applyAndClose(FunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = openConnection()) {
@@ -469,8 +454,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass, String tableName) {
-    return applyAndClose(conn -> conn.getTableMetaData(objectClass, tableName));
+  public TableMetaData getTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getTableMetaData(tableName));
   }
 
   @Override
