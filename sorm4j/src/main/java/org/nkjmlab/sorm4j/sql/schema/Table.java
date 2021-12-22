@@ -12,11 +12,8 @@ import org.nkjmlab.sorm4j.ResultSetTraverser;
 import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.SelectSql;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
 import org.nkjmlab.sorm4j.sql.result.Tuple2;
@@ -24,9 +21,12 @@ import org.nkjmlab.sorm4j.sql.result.Tuple2;
 @Experimental
 public interface Table<T> {
 
+  /**
+   * Gets the table schema.
+   *
+   * @return
+   */
   TableSchema getTableSchema();
-
-  Sorm getSorm();
 
   /**
    * Gets parameter type <T> as object class.
@@ -34,6 +34,13 @@ public interface Table<T> {
    * @return
    */
   Class<T> getObjectClass();
+
+  /**
+   * Gets Sorm objects
+   *
+   * @return
+   */
+  Sorm getSorm();
 
   default void createTableAndIndexesIfNotExists() {
     getTableSchema().createTableAndIndexesIfNotExists(getSorm());
@@ -47,6 +54,9 @@ public interface Table<T> {
     getTableSchema().createIndexesIfNotExists(getSorm());
   }
 
+  default void dropTableIfExists() {
+    getTableSchema().dropTableIfExists(getSorm());
+  }
 
   default List<T> readAll() {
     return getSorm().readAll(getObjectClass());
@@ -88,6 +98,27 @@ public interface Table<T> {
     return getSorm().readOne(getObjectClass(), sql, parameters);
   }
 
+
+  /**
+   * @see OrmLazyReader#readAllLazy(Class)
+   */
+  default LazyResultSet<T> readAllLazy() {
+    return getSorm().readAllLazy(getObjectClass());
+  }
+
+  /**
+   * @see OrmLazyReader#readLazy(Class, ParameterizedSql)
+   */
+  default LazyResultSet<T> readLazy(ParameterizedSql sql) {
+    return getSorm().readLazy(getObjectClass(), sql);
+  }
+
+  /**
+   * @see OrmLazyReader#readLazy(Class, String, Object...)
+   */
+  default LazyResultSet<T> readLazy(String sql, Object... parameters) {
+    return getSorm().readLazy(getObjectClass(), sql, parameters);
+  }
 
   default RowMapper<T> getRowMapper() {
     return getSorm().getRowMapper(getObjectClass());
@@ -232,7 +263,7 @@ public interface Table<T> {
 
 
   default TableMetaData getTableMetaData() {
-    return getSorm().getTableMetaData(getObjectClass(), getTableName());
+    return getSorm().getTableMetaData(getTableName());
   }
 
 
@@ -301,43 +332,25 @@ public interface Table<T> {
       params.add(t.getT2());
     });
 
-    return ParameterizedSql.of(SelectSql.selectStarFrom(getTableSchema().getTableName()) + WHERE
-        + String.join(AND, conditions), params);
-
+    return ParameterizedSql.of(
+        SelectSql.selectStarFrom(getTableSchema().getTableName()) + WHERE + String.join(AND, conditions),
+        params);
   }
 
-
-  /**
-   * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
-   *
-   * @return
-   */
-  default LazyResultSet<T> readAllLazy() {
-    return getSorm().readAllLazy(getObjectClass());
+  default <S> List<Tuple2<T, S>> join(Table<S> other, ParameterizedSql sql) {
+    return getSorm().readTupleList(getObjectClass(), other.getObjectClass(), sql);
   }
 
-  /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
-   *
-   * @param sql
-   * @return
-   */
-  default LazyResultSet<T> readLazy(ParameterizedSql sql) {
-    return getSorm().readLazy(getObjectClass(), sql);
+  default <S> List<Tuple2<T, S>> join(Table<S> other, String sql, Object... parameters) {
+    return getSorm().readTupleList(getObjectClass(), other.getObjectClass(), sql, parameters);
   }
 
   /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
    *
-   * @param sql
-   * @param parameters
-   * @return
+   * @see TableMetaData#getColumnAliases()
    */
-  default LazyResultSet<T> readLazy(String sql, Object... parameters) {
-    return getSorm().readLazy(getObjectClass(), sql, parameters);
+  default String getColumnAliases() {
+    return getTableMetaData().getColumnAliases();
   }
 
 }

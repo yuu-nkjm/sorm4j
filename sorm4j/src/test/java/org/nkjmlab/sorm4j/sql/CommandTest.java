@@ -225,7 +225,7 @@ class CommandTest {
             ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
     sorm.apply(conn -> conn.getRowToMapMapper());
-    sorm.apply(conn -> conn.getTableMetaData(Player.class, "players"));
+    sorm.apply(conn -> conn.getTableMetaData("players"));
   }
 
 

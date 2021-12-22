@@ -77,16 +77,17 @@ public class SqlKeyword {
   public static final String ASC = wrapSpace("asc");
   public static final String BETWEEN = wrapSpace("between");
   public static final String CAST = wrapSpace("cast");
-  public static final String COUNT = wrapSpace("count");
   public static final String DESC = wrapSpace("desc");
   public static final String GROUP_BY = wrapSpace("group by");
   public static final String LIMIT = wrapSpace("limit");
   public static final String MAX = wrapSpace("max");
   public static final String MIN = wrapSpace("min");
   public static final String ORDER_BY = wrapSpace("order by");
+  public static final String COUNT = wrapSpace("count");
+  public static final String AVG = wrapSpace("avg");
   public static final String SUM = wrapSpace("sum");
-
-
+  public static final String IS_NULL = wrapSpace("is null");
+  public static final String IS_NOT_NULL = wrapSpace("is not null");
 
   private SqlKeyword() {}
 
