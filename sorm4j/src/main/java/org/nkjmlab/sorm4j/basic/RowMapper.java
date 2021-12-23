@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.basic;
 
 import java.sql.ResultSet;
 
@@ -9,6 +9,7 @@ import java.sql.ResultSet;
  * @author nkjm
  *
  * @param <T>
+ * @see <a href="https://scrapbox.io/sorm4j/RowMapper">RowMapper - Sorm4j</a>
  * @see {@link ResultSetTraverser}
  */
 @FunctionalInterface

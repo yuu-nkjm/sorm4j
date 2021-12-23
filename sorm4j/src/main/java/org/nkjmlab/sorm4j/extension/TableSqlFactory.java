@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension;
 
 import java.sql.Connection;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 
 public interface TableSqlFactory {
 

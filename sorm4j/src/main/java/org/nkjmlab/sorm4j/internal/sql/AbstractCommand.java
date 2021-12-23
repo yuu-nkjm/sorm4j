@@ -1,18 +1,15 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
-import org.nkjmlab.sorm4j.sql.Command;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.command.Command;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 public abstract class AbstractCommand implements Command {
 
@@ -23,16 +20,6 @@ public abstract class AbstractCommand implements Command {
   }
 
   protected abstract ParameterizedSql parse();
-
-  @Override
-  public void acceptPreparedStatementHandler(ConsumerHandler<PreparedStatement> handler) {
-    conn.acceptPreparedStatementHandler(parse(), handler);
-  }
-
-  @Override
-  public <T> T applyPreparedStatementHandler(FunctionHandler<PreparedStatement, T> handler) {
-    return conn.applyPreparedStatementHandler(parse(), handler);
-  }
 
   @Override
   public <T> T executeQuery(ResultSetTraverser<T> resultSetTraverser) {

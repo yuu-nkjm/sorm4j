@@ -6,26 +6,26 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.basic.ConsumerHandler;
+import org.nkjmlab.sorm4j.basic.FunctionHandler;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.command.BasicCommand;
+import org.nkjmlab.sorm4j.command.Command;
+import org.nkjmlab.sorm4j.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.BasicCommand;
-import org.nkjmlab.sorm4j.sql.Command;
-import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * An entry point of object-relation mapping.
@@ -499,15 +499,15 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler) {
-    acceptAndClose(conn -> conn.acceptPreparedStatementHandler(sql, handler));
+  public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      ResultSetTraverser<T> traverser) {
+    return applyAndClose(conn -> conn.executeQuery(statementSupplier, traverser));
   }
 
   @Override
-  public <T> T applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, T> handler) {
-    return applyAndClose(conn -> conn.applyPreparedStatementHandler(sql, handler));
+  public <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      RowMapper<T> rowMapper) {
+    return applyAndClose(conn -> conn.executeQuery(statementSupplier, rowMapper));
   }
 
   @Override
@@ -589,6 +589,5 @@ public final class SormImpl implements Sorm {
   public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
     return applyAndClose(conn -> conn.createCommand(sql, parameters));
   }
-
 
 }

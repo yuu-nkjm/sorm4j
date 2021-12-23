@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 public class TableMetaDataImpl implements TableMetaData {
 

@@ -1,12 +1,13 @@
 package org.nkjmlab.sorm4j.sql.schema;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.sql.schema.TableSchema.Keyword.*;
 import static org.nkjmlab.sorm4j.sql.schema.TableSchemaTest.TempGuestTable.Column.*;
+import static org.nkjmlab.sorm4j.table.TableSchema.Keyword.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.table.TableSchema;
 
 class TableSchemaTest {
 

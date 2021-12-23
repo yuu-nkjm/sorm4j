@@ -6,6 +6,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.basic.ConsumerHandler;
+import org.nkjmlab.sorm4j.basic.FunctionHandler;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;

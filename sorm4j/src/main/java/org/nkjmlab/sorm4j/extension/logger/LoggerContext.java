@@ -24,7 +24,7 @@ public final class LoggerContext {
    *
    */
   public enum Category {
-    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE, HANDLE_PREPAREDSTATEMENT;
+    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE;
   }
 
 

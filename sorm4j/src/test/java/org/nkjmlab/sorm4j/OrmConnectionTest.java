@@ -12,17 +12,18 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.Guest;
+import org.nkjmlab.sorm4j.common.InsertResult;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 class OrmConnectionTest {
 
@@ -44,15 +45,6 @@ class OrmConnectionTest {
 
   }
 
-  @Test
-  void testApplyPreparedStatementHandler() {
-    sorm.accept(conn -> {
-      conn.acceptPreparedStatementHandler(
-          ParameterizedSql.parse("select * from guests where id=?", 1), pstmt -> pstmt.execute());
-      conn.applyPreparedStatementHandler(
-          ParameterizedSql.parse("select * from guests where id=?", 1), pstmt -> pstmt.execute());
-    });
-  }
 
   @Test
   void testJoin() {

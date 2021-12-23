@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql.result;
+package org.nkjmlab.sorm4j.common;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 

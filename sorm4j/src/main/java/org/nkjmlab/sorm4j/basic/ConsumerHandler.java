@@ -1,4 +1,6 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.basic;
+
+import org.nkjmlab.sorm4j.Sorm;
 
 /**
  * Interface for handling without a return value.

@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
@@ -29,8 +31,6 @@ import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * Holds mapping data from a given class and a table

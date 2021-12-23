@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql.schema;
+package org.nkjmlab.sorm4j.common;
 
 import java.sql.Connection;
 import java.util.List;

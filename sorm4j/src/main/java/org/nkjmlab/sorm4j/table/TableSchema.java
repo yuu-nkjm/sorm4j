@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql.schema;
+package org.nkjmlab.sorm4j.table;
 
 import static java.lang.String.*;
 import java.util.ArrayList;
@@ -7,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.SqlExecutor;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.basic.SqlExecutor;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and

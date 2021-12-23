@@ -13,8 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
@@ -30,7 +31,6 @@ import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * A context for sorm.

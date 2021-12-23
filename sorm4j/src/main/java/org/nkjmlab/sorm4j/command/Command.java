@@ -1,17 +1,14 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.command;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 
 
 /**
@@ -22,24 +19,6 @@ import org.nkjmlab.sorm4j.sql.result.Tuple3;
  */
 @Experimental
 public interface Command {
-  /**
-   * Accepts handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param handler
-   */
-  @Experimental
-  void acceptPreparedStatementHandler(ConsumerHandler<PreparedStatement> handler);
-
-
-  /**
-   * Applies handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param <T>
-   * @param handler
-   * @return
-   */
-  @Experimental
-  <T> T applyPreparedStatementHandler(FunctionHandler<PreparedStatement, T> handler);
 
   /**
    * Executes a query and apply the given handler to the returned result set.

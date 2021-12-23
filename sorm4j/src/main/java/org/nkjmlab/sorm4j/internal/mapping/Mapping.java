@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import java.lang.reflect.InvocationTargetException;
-import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;

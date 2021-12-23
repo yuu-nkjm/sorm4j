@@ -6,19 +6,20 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.basic.SqlExecutor;
+import org.nkjmlab.sorm4j.command.CommandExecutor;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.sql.BasicCommand;
-import org.nkjmlab.sorm4j.sql.Command;
-import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * ORM functions with an instant connection. When executing ORM function, this object gets a
@@ -28,49 +29,14 @@ import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
  *
  */
 @Experimental
-public interface Orm extends SqlExecutor {
-  /**
-   * Creates a {@link Command} from SQL string.
-   *
-   * @param sql
-   * @return
-   */
-  Command createCommand(ParameterizedSql sql);
-
-
-  /**
-   * Creates a {@link BasicCommand} from SQL string.
-   *
-   * @param sql
-   * @return
-   */
-  BasicCommand createCommand(String sql);
-
-
-  /**
-   * Creates a {@link OrderedParameterCommand} from SQL string.
-   *
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  OrderedParameterCommand createCommand(String sql, Object... parameters);
-
-  /**
-   * Creates a {@link NamedParameterCommand} from SQL string.
-   *
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  NamedParameterCommand createCommand(String sql, Map<String, Object> parameters);
+public interface Orm extends CommandExecutor, SqlExecutor {
 
   /**
    * Deletes objects from the table corresponding to the class of the given objects.
    *
-   * @param <T>
-   * @param objects
-   * @return
+   * @param <T> the object's element type which is mapped to the unique table.
+   * @param objects the objects to delete to
+   * @return the number of affected rows
    */
   <T> int[] delete(List<T> objects);
 
@@ -78,16 +44,16 @@ public interface Orm extends SqlExecutor {
   /**
    * Deletes an object from the table corresponding to the class of the given objects.
    *
-   * @param <T>
-   * @param object
-   * @return
+   * @param <T> the object's type which is mapped to the unique table.
+   * @param object the object to delete to
+   * @return the number of affected rows
    */
   <T> int delete(T object);
 
   /**
    * Deletes objects.
    *
-   * @param <T>
+   * @param <T> the object's element type which is mapped to the unique table.
    * @param objects
    * @return
    */
@@ -96,11 +62,11 @@ public interface Orm extends SqlExecutor {
   /**
    * Deletes all objects on the table corresponding to the given class.
    *
-   * @param <T>
-   * @param objectClass
+   * @param <T> the type to indicate the unique table.
+   * @param type the type to indicate the unique table.
    * @return
    */
-  <T> int deleteAll(Class<T> objectClass);
+  <T> int deleteAll(Class<T> type);
 
   /**
    * Deletes all objects on the table corresponding to the given table name.
@@ -113,7 +79,7 @@ public interface Orm extends SqlExecutor {
   /**
    * Deletes objects on the table of the given table name.
    *
-   * @param <T>
+   * @param <T> the object's element type.
    * @param tableName
    * @param objects
    * @return
@@ -123,7 +89,7 @@ public interface Orm extends SqlExecutor {
   /**
    * Deletes object on the table of the given table name.
    *
-   * @param <T>
+   * @param <T> the object's type.
    * @param tableName
    * @param object
    * @return
@@ -133,7 +99,7 @@ public interface Orm extends SqlExecutor {
   /**
    * Deletes objects on the table of the given table name.
    *
-   * @param <T>
+   * @param <T> the object's element type.
    * @param tableName
    * @param objects
    * @return
@@ -144,6 +110,8 @@ public interface Orm extends SqlExecutor {
   /**
    * Returns the object which has same primary key exists or not.
    *
+   * @param <T> the object's type.
+   * @param tableName
    * @param object
    * @return
    */
@@ -152,6 +120,7 @@ public interface Orm extends SqlExecutor {
   /**
    * Returns the object which has same primary key exists or not.
    *
+   * @param <T> the object's type which is mapped to the unique table.
    * @param object
    * @return
    */
@@ -169,11 +138,11 @@ public interface Orm extends SqlExecutor {
    * Gets function which traverses and maps the all the rows in the given resultSet to an object
    * list.
    *
-   * @param <T>
-   * @param objectClass
+   * @param <T> the read object's type.
+   * @param type
    * @return
    */
-  <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> objectClass);
+  <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> type);
 
 
   /**
@@ -181,10 +150,10 @@ public interface Orm extends SqlExecutor {
    * {@link ResultSet#next()}.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @return
    */
-  <T> RowMapper<T> getRowMapper(Class<T> objectClass);
+  <T> RowMapper<T> getRowMapper(Class<T> type);
 
   /**
    * Gets a function which maps one row in the resultSet to an object. The method does not call
@@ -199,10 +168,10 @@ public interface Orm extends SqlExecutor {
   /**
    * Gets table metadata corresponding to the given object class.
    *
-   * @param objectClass
+   * @param type
    * @return
    */
-  TableMetaData getTableMetaData(Class<?> objectClass);
+  TableMetaData getTableMetaData(Class<?> type);
 
   /**
    * Gets table metadata to the given object class and the table name.
@@ -216,10 +185,10 @@ public interface Orm extends SqlExecutor {
   /**
    * Gets table name corresponding to the given object class.
    *
-   * @param objectClass
+   * @param type
    * @return
    */
-  String getTableName(Class<?> objectClass);
+  String getTableName(Class<?> type);
 
   /**
    * Inserts objects on the table corresponding to the class of the given objects.
@@ -437,63 +406,63 @@ public interface Orm extends SqlExecutor {
    * Reads all rows from the table indicated by object class.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @return
    */
-  <T> List<T> readAll(Class<T> objectClass);
+  <T> List<T> readAll(Class<T> type);
 
 
   /**
    * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @return
    */
-  <T> LazyResultSet<T> readAllLazy(Class<T> objectClass);
+  <T> LazyResultSet<T> readAllLazy(Class<T> type);
 
 
   /**
    * Reads an object by its primary keys from the table indicated by object class.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param primaryKeyValues
    * @return
    */
-  <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues);
+  <T> T readByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
    * Reads an object from the database.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param sql
    * @return
    */
-  <T> T readFirst(Class<T> objectClass, ParameterizedSql sql);
+  <T> T readFirst(Class<T> type, ParameterizedSql sql);
 
   /**
    * Reads an object from the database.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
    * @param parameters are ordered parameter.
    * @return
    */
-  <T> T readFirst(Class<T> objectClass, String sql, Object... parameters);
+  <T> T readFirst(Class<T> type, String sql, Object... parameters);
 
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param sql
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql);
+  <T> LazyResultSet<T> readLazy(Class<T> type, ParameterizedSql sql);
 
   /**
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
@@ -502,25 +471,32 @@ public interface Orm extends SqlExecutor {
    * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param sql
    * @param parameters
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters);
+  <T> LazyResultSet<T> readLazy(Class<T> type, String sql, Object... parameters);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
    * into instances of the given object class. Only the columns returned from the SQL query will be
    * set into the object instance.
    *
+   * <b>Example: </b>
+   *
+   * <pre>
+   * ParameterizedSql sql = ParameterizedSql.from("select * from customer");
+   * sorm.readList(Customer.class, sql);
+   * </pre>
+   *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param sql
    * @return
    */
 
-  <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql);
+  <T> List<T> readList(Class<T> type, ParameterizedSql sql);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -531,7 +507,7 @@ public interface Orm extends SqlExecutor {
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object[])}
    *
    */
-  <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters);
+  <T> List<T> readList(Class<T> type, String sql, Object... parameters);
 
   /**
    * See {@link #readMapFirst(String, Object...)}
@@ -646,25 +622,25 @@ public interface Orm extends SqlExecutor {
   /**
    * Reads only one object from the database.
    *
-   * @param <T>
-   * @param objectClass
+   * @param <T> the type to map the result set rows to
+   * @param type the type to map the result set rows to
    * @param sql
    * @return
    */
-  <T> T readOne(Class<T> objectClass, ParameterizedSql sql);
+  <T> T readOne(Class<T> type, ParameterizedSql sql);
 
 
   /**
    * Reads only one object from the database.
    *
-   * @param <T>
-   * @param objectClass
+   * @param <T> the type to map the result set rows to
+   * @param type the type to map the result set rows to
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
    * @param parameters are ordered parameter.
    * @return
    */
-  <T> T readOne(Class<T> objectClass, String sql, Object... parameters);
+  <T> T readOne(Class<T> type, String sql, Object... parameters);
 
 
   /**

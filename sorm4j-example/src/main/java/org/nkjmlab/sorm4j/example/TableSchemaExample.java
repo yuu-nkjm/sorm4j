@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j.example;
 
-import static org.nkjmlab.sorm4j.sql.schema.TableSchema.Keyword.*;
+import static org.nkjmlab.sorm4j.table.TableSchema.Keyword.*;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sql.schema.TableSchema;
-import org.nkjmlab.sorm4j.sql.schema.TableSchema.Keyword;
+import org.nkjmlab.sorm4j.table.TableSchema;
+import org.nkjmlab.sorm4j.table.TableSchema.Keyword;
 
 public class TableSchemaExample {
 

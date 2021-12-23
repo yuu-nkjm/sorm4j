@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import java.sql.ResultSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -349,14 +350,14 @@ class OrmImplTest {
 
   @Test
   void testAcceptPreparedStatementHandler() {
-    sorm.acceptPreparedStatementHandler(ParameterizedSql.parse("select * from players"),
-        stmt -> stmt.execute());
+    sorm.executeQuery(con -> con.prepareStatement("select * from players"),
+        sorm.getRowMapper(Player.class));
   }
 
   @Test
   void testApplyPreparedStatementHandler() {
-    sorm.applyPreparedStatementHandler(ParameterizedSql.parse("select * from players"),
-        stmt -> stmt.execute());
+    sorm.executeQuery(con -> con.prepareStatement("select * from players"),
+        sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
@@ -369,6 +370,9 @@ class OrmImplTest {
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
     sorm.executeQuery(ParameterizedSql.parse("select * from players"),
         sorm.getRowMapper(Player.class));
+
+    sorm.executeQuery(ParameterizedSql.parse("select * from players"), (ResultSet rs,
+        int index) -> new Player(rs.getInt("id"), rs.getString("name"), rs.getString("address")));
   }
 
   @Test

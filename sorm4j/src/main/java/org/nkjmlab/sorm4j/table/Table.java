@@ -1,22 +1,20 @@
-package org.nkjmlab.sorm4j.sql.schema;
+package org.nkjmlab.sorm4j.table;
 
 import static org.nkjmlab.sorm4j.sql.SqlKeyword.*;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.SelectSql;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
 
 @Experimental
 public interface Table<T> {
@@ -33,7 +31,7 @@ public interface Table<T> {
    *
    * @return
    */
-  Class<T> getObjectClass();
+  Class<T> getValueType();
 
   /**
    * Gets Sorm objects
@@ -59,43 +57,43 @@ public interface Table<T> {
   }
 
   default List<T> readAll() {
-    return getSorm().readAll(getObjectClass());
+    return getSorm().readAll(getValueType());
   }
 
 
   default T readByPrimaryKey(Object... primaryKeyValues) {
-    return getSorm().readByPrimaryKey(getObjectClass(), primaryKeyValues);
+    return getSorm().readByPrimaryKey(getValueType(), primaryKeyValues);
   }
 
 
   default T readFirst(ParameterizedSql sql) {
-    return getSorm().readFirst(getObjectClass(), sql);
+    return getSorm().readFirst(getValueType(), sql);
   }
 
 
   default T readFirst(String sql, Object... parameters) {
-    return getSorm().readFirst(getObjectClass(), sql, parameters);
+    return getSorm().readFirst(getValueType(), sql, parameters);
   }
 
 
 
   default List<T> readList(ParameterizedSql sql) {
-    return getSorm().readList(getObjectClass(), sql);
+    return getSorm().readList(getValueType(), sql);
   }
 
 
   default List<T> readList(String sql, Object... parameters) {
-    return getSorm().readList(getObjectClass(), sql, parameters);
+    return getSorm().readList(getValueType(), sql, parameters);
   }
 
 
   default T readOne(ParameterizedSql sql) {
-    return getSorm().readOne(getObjectClass(), sql);
+    return getSorm().readOne(getValueType(), sql);
   }
 
 
   default T readOne(String sql, Object... parameters) {
-    return getSorm().readOne(getObjectClass(), sql, parameters);
+    return getSorm().readOne(getValueType(), sql, parameters);
   }
 
 
@@ -103,30 +101,30 @@ public interface Table<T> {
    * @see OrmLazyReader#readAllLazy(Class)
    */
   default LazyResultSet<T> readAllLazy() {
-    return getSorm().readAllLazy(getObjectClass());
+    return getSorm().readAllLazy(getValueType());
   }
 
   /**
    * @see OrmLazyReader#readLazy(Class, ParameterizedSql)
    */
   default LazyResultSet<T> readLazy(ParameterizedSql sql) {
-    return getSorm().readLazy(getObjectClass(), sql);
+    return getSorm().readLazy(getValueType(), sql);
   }
 
   /**
    * @see OrmLazyReader#readLazy(Class, String, Object...)
    */
   default LazyResultSet<T> readLazy(String sql, Object... parameters) {
-    return getSorm().readLazy(getObjectClass(), sql, parameters);
+    return getSorm().readLazy(getValueType(), sql, parameters);
   }
 
   default RowMapper<T> getRowMapper() {
-    return getSorm().getRowMapper(getObjectClass());
+    return getSorm().getRowMapper(getValueType());
   }
 
 
   default ResultSetTraverser<List<T>> getResultSetTraverser() {
-    return getSorm().getResultSetTraverser(getObjectClass());
+    return getSorm().getResultSetTraverser(getValueType());
   }
 
 
@@ -267,19 +265,6 @@ public interface Table<T> {
   }
 
 
-
-  default void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler) {
-    getSorm().acceptPreparedStatementHandler(sql, handler);
-  }
-
-
-  default <S> S applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, S> handler) {
-    return getSorm().applyPreparedStatementHandler(sql, handler);
-  }
-
-
   default <S> S executeQuery(ParameterizedSql sql, ResultSetTraverser<S> traverser) {
     return getSorm().executeQuery(sql, traverser);
   }
@@ -301,15 +286,15 @@ public interface Table<T> {
 
 
   default List<T> readListAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readList(getObjectClass(), getAllMatchSql(tuppleOfNameAndValue));
+    return getSorm().readList(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
   }
 
   default T readFirstAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readFirst(getObjectClass(), getAllMatchSql(tuppleOfNameAndValue));
+    return getSorm().readFirst(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
   }
 
   default T readOneAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readOne(getObjectClass(), getAllMatchSql(tuppleOfNameAndValue));
+    return getSorm().readOne(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
   }
 
   default List<Map<String, Object>> readMapListAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
@@ -332,17 +317,16 @@ public interface Table<T> {
       params.add(t.getT2());
     });
 
-    return ParameterizedSql.of(
-        SelectSql.selectStarFrom(getTableSchema().getTableName()) + WHERE + String.join(AND, conditions),
-        params);
+    return ParameterizedSql.of(SelectSql.selectStarFrom(getTableSchema().getTableName()) + WHERE
+        + String.join(AND, conditions), params);
   }
 
   default <S> List<Tuple2<T, S>> join(Table<S> other, ParameterizedSql sql) {
-    return getSorm().readTupleList(getObjectClass(), other.getObjectClass(), sql);
+    return getSorm().readTupleList(getValueType(), other.getValueType(), sql);
   }
 
   default <S> List<Tuple2<T, S>> join(Table<S> other, String sql, Object... parameters) {
-    return getSorm().readTupleList(getObjectClass(), other.getObjectClass(), sql, parameters);
+    return getSorm().readTupleList(getValueType(), other.getValueType(), sql, parameters);
   }
 
   /**
