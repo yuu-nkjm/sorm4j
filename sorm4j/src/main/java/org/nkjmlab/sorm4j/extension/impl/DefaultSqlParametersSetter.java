@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;

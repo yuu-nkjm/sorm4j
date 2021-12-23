@@ -21,12 +21,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-jmh</artifactId>
-  <version>1.4.0-rc5</version>
+  <version>1.4.0-rc7</version>
   <packaging>jar</packaging>
   <name>Sorm4j benchmark</name>
 
   <properties>
-    <sorm4j-version>1.4.0-rc5</sorm4j-version>
+    <sorm4j-version>1.4.0-rc7</sorm4j-version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -70,13 +70,13 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.200</version>
+      <version>2.0.202</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>4.0.2</version>
+      <version>5.0.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.sql2o/sql2o -->
     <dependency>
@@ -88,33 +88,33 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-core</artifactId>
-      <version>3.18.0</version>
+      <version>3.25.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.jooq/jooq -->
     <dependency>
       <groupId>org.jooq</groupId>
       <artifactId>jooq</artifactId>
-      <version>3.14.8</version>
+      <version>3.15.5</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
-      <version>3.5.6</version>
+      <version>3.5.8</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>5.3.5</version>
+      <version>5.3.14</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.10.10</version>
+      <version>2.10.13</version>
     </dependency>
 
   </dependencies>

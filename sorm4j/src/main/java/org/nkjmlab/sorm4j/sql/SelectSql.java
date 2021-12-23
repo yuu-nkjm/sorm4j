@@ -18,6 +18,15 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 @Experimental
 public class SelectSql {
 
+  /**
+   * Creates {@link Builder} object.
+   *
+   * @return
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private String columns = "*";
@@ -135,28 +144,16 @@ public class SelectSql {
     }
 
 
-    /**
-     * Creates order by clause.
-     *
-     * @param orderBys
-     * @return
-     */
-    public Builder orderBy(OrderBy... orderBys) {
-      this.orderBy = String.join(", ",
-          Arrays.stream(orderBys).map(ob -> ob.toString()).collect(Collectors.toList()));
-      return this;
-    }
-
 
     /**
      * Creates order by clause.
      *
-     * @param column
-     * @param ascOrDesc
+     * @see <a href="http://www.h2database.com/html/grammar.html#select_order">SQL Grammar</a>
+     * @param order
      * @return
      */
-    public Builder orderBy(String column, String ascOrDesc) {
-      orderBy(new OrderBy(column, ascOrDesc));
+    public Builder orderBy(String... order) {
+      orderBy = String.join(" ", order);
       return this;
     }
 
@@ -278,8 +275,7 @@ public class SelectSql {
      * @param conds
      */
     private Condition(String op, Object... conds) {
-      this("(" + String.join(" " + op + " ",
-          Arrays.stream(conds).map(c -> c.toString()).collect(Collectors.toList())) + ")");
+      this(wrapParentheses(joinObjects(wrapSpace(op), conds)));
     }
 
     /**
@@ -290,7 +286,7 @@ public class SelectSql {
      * @param right
      */
     private Condition(Object left, String op, Object right) {
-      this.condition = left + op + right;
+      this.condition = left + " " + op.trim() + " " + right;
     }
 
 
@@ -300,24 +296,126 @@ public class SelectSql {
     }
   }
 
-  /**
-   * Value object for order by clause.
-   */
-  public static class OrderBy {
-    private final String ascOrDesc;
-    private final String column;
-
-    private OrderBy(String column, String ascOrDesc) {
-      this.column = column;
-      this.ascOrDesc = ascOrDesc;
-    }
-
-    @Override
-    public String toString() {
-      return column + " " + ascOrDesc;
-    }
+  public static String select(String selectClause) {
+    return wrapSpace(SELECT + selectClause);
   }
 
+  public static String select(Object... selectClauses) {
+    return wrapSpace(SELECT + joinCommaAndSpace(selectClauses));
+  }
+
+  public static String selectDistinct(Object... selectClauses) {
+    return wrapSpace(SELECT + DISTINCT + joinCommaAndSpace(selectClauses));
+  }
+
+  public static String selectStarFrom(String tableName) {
+    return SELECT_STAR + (tableName);
+  }
+
+  /**
+   * <p>
+   * Creates AS alias.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
+   * </pre>
+   */
+  public static String as(Object src, String alias) {
+    return src + AS + alias;
+  }
+
+  /**
+   * Creates cast as.
+   *
+   * Example
+   *
+   * <pre>
+   * castAs("A", "DOUBLE") generates "cast (A as DOUBLE)"
+   *
+   * @param src
+   * @param toType
+   * @return
+   */
+  public static String castAs(String src, String toType) {
+    return wrapSpace(CAST + wrapParentheses(src + AS + toType));
+  }
+
+  public static String column(String tableName, String... colNames) {
+    return Arrays.stream(colNames).map(col -> column(tableName, col))
+        .collect(Collectors.joining(", "));
+  }
+
+  public static String from(String tableName) {
+    return wrapSpace(FROM + tableName);
+  }
+
+  public static String where() {
+    return wrapSpace(WHERE);
+  }
+
+  public static String where(String searchCondition) {
+    return wrapSpace(WHERE + searchCondition);
+  }
+
+  public static String where(Condition searchCondition) {
+    return where(searchCondition.toString());
+  }
+
+  /** operator **/
+
+  /**
+   * Creates a string of binary operator and operands which wrapped parentheses.
+   *
+   * <p>
+   * Examples
+   *
+   * <pre>
+   * op(op("A", "/", "B"), "+", op("C", "/", "D"))
+   *
+   * generates
+   *
+   * "((A / B) + (C / D))"
+   *
+   * @param left
+   * @param operator
+   * @param right
+   * @return
+   */
+  public static String op(Object left, String operator, Object right) {
+    return wrapParentheses(left + wrapSpace(operator) + right);
+  }
+
+  /**
+   * <p>
+   * Creates {@link Condition} instance.
+   *
+   * <p>
+   * For example,
+   *
+   * <pre>
+   * and(cond("id=?"), "name=?")  returns "id=? and name=?"
+   * </pre>
+   */
+  public static Condition cond(String cond) {
+    return new Condition(cond);
+  }
+
+  /**
+   * Creates a condition with binary operator
+   *
+   * @param left
+   * @param operator
+   * @param right
+   */
+
+  public static Condition cond(Object left, String operator, Object right) {
+    return new Condition(left, operator, right);
+  }
+
+  /** Conditions **/
   /**
    * <p>
    * Creates AND condition with concatenating arguments.
@@ -335,86 +433,82 @@ public class SelectSql {
     return new Condition("and", conds);
   }
 
-
-
   /**
    * <p>
-   * Creates AS alias.
-   *
+   * Creates OR condition with concatenating arguments.
    * <p>
    * For example,
    *
    * <pre>
-   * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
+   * or("id=?", "name=?") returns "id=? or name=?"
    * </pre>
    */
-  public static String as(Object src, String alias) {
-    return src + AS + alias;
+  public static Condition or(Object... conds) {
+    return new Condition("or", conds);
   }
 
-  public static String between(String colName, Object beginExp, Object endExp) {
-    return wrapSpace(colName + BETWEEN + literal(beginExp) + AND + literal(endExp));
+  public static Condition between(Object colName, Object startInclusive, Object endInclusive) {
+    return new Condition(colName + BETWEEN + literal(startInclusive) + AND + literal(endInclusive));
   }
 
-  public static String castAs(String src, String toType) {
-    return wrapSpace(CAST + wrapParentheses(src + AS + toType));
-  }
-
-
-  public static String column(String tableName, String... colNames) {
-    return Arrays.stream(colNames).map(col -> column(tableName, col))
-        .collect(Collectors.joining(", "));
+  public static Condition in(Object colName, Object... values) {
+    return new Condition(colName + IN + wrapParentheses(
+        joinComma(Arrays.stream(values).map(o -> literal(o)).collect(Collectors.toList()))));
   }
 
 
-  /**
-   * <p>
-   * Creates {@link Condition} instance.
-   *
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * and(cond("id=?"), "name=?")  returns "id=? and name=?"
-   * </pre>
-   */
-  public static Condition condition(String cond) {
-    return new Condition(cond);
-  }
-
-  /**
-   * Condition with binary operator
-   *
-   * @param left
-   * @param op
-   * @param right
-   */
-
-  public static Condition condition(Object left, String op, Object right) {
-    return new Condition(left, op, right);
-  }
-
-  public static String cond(Object left, String op, Object right) {
-    return left + op + right;
-  }
-
-
-  public static String count(String colName) {
-    return wrapSpace(COUNT + wrapParentheses(colName));
-  }
-
-
-  public static String from(String tableName) {
-    return wrapSpace(FROM + tableName);
-  }
-
-  public static String groupBy(String... groups) {
+  public static String groupBy(Object... groups) {
     return wrapSpace(GROUP_BY + joinCommaAndSpace(groups));
   }
 
-  public static String limit(int limit) {
+  public static String limit(Object limit) {
     return wrapSpace(LIMIT + limit);
   }
+
+  /**
+   * Creates orderBy clause.
+   *
+   * @param order
+   * @return
+   */
+  public static String orderBy(Object... order) {
+    return ORDER_BY + joinSpace(order);
+  }
+
+  public static String orderBy(Object column) {
+    return orderBy(column, ASC);
+  }
+
+  public static String orderByAsc(Object column) {
+    return orderBy(ORDER_BY, ASC);
+  }
+
+  public static String orderByDesc(Object column) {
+    return orderBy(ORDER_BY, DESC);
+  }
+
+  /** functions **/
+
+  public static String func(String functionName, Object args) {
+    return wrapSpace(functionName + wrapParentheses(args));
+  }
+
+  public static String func(String functionName, Object... args) {
+    return wrapSpace(functionName + wrapParentheses(joinCommaAndSpace(args)));
+  }
+
+  public static String count(String column) {
+    return func(COUNT, column);
+  }
+
+  public static String sum(String column) {
+    return func(SUM, column);
+  }
+
+  public static String avg(String column) {
+    return func(AVG, column);
+  }
+
 
   /**
    * Converts the given arguments to SQL literal.
@@ -450,62 +544,6 @@ public class SelectSql {
     }
   }
 
-
-  public static String func(String functionName, String column) {
-    return wrapSpace(functionName + wrapParentheses(column));
-  }
-
-  public static String func(String functionName, String... columns) {
-    return wrapSpace(functionName + wrapParentheses(joinCommaAndSpace(columns)));
-  }
-
-
-  /**
-   * Creates {@link Builder} object.
-   *
-   * @return
-   */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /**
-   * <p>
-   * Creates OR condition with concatenating arguments.
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * or("id=?", "name=?") returns "id=? or name=?"
-   * </pre>
-   */
-  public static Condition or(Object... conds) {
-    return new Condition("or", conds);
-  }
-
-  /**
-   * Creates {@link OrderBy} objects.
-   *
-   * @param column
-   * @param ascOrDesc
-   * @return
-   */
-  public static OrderBy orderBy(String column, String ascOrDesc) {
-    return new OrderBy(column, ascOrDesc);
-  }
-
-  public static String orderBy(String column) {
-    return wrapSpace(ORDER_BY + column);
-  }
-
-  public static String orderByAsc(String column) {
-    return wrapSpace(ORDER_BY + column + ASC);
-  }
-
-  public static String orderByDesc(String column) {
-    return wrapSpace(ORDER_BY + column + DESC);
-  }
-
   /**
    * Returns single quoted expression. If it includes single quotations, they will be escaped.
    *
@@ -516,45 +554,32 @@ public class SelectSql {
     return wrapSingleQuote(str.contains("'") ? str.replaceAll("'", "''") : str);
   }
 
-
-  public static String select(String selectClause) {
-    return wrapSpace(SELECT + selectClause);
+  public static String joinCommaAndSpace(Object... elements) {
+    return joinObjects(", ", elements);
   }
 
-  public static String select(String... selectClauses) {
-    return wrapSpace(SELECT + joinCommaAndSpace(selectClauses));
+  public static String joinComma(Object... elements) {
+    return joinObjects(",", elements);
   }
 
-  public static String selectDistinct(String... selectClauses) {
-    return wrapSpace(SELECT + DISTINCT + joinCommaAndSpace(selectClauses));
+  public static String joinSpace(Object... elements) {
+    return joinObjects(" ", elements);
   }
 
-
-  public static String selectFrom(String tableName) {
-    return wrapSpace(select(STAR) + from(tableName));
+  public static String joinObjects(String delimiter, Object... elements) {
+    return String.join(delimiter,
+        Arrays.stream(elements).map(o -> o.toString()).toArray(String[]::new));
   }
 
-  public static String sum(String column) {
-    return wrapSpace(SUM + wrapParentheses(column));
-  }
-
-  public static String where(String whereClause) {
-    return wrapSpace(WHERE + whereClause);
-  }
-
-  private static String joinCommaAndSpace(String... elements) {
-    return String.join(", ", elements);
-  }
-
-  private static String wrapParentheses(String str) {
+  public static String wrapParentheses(Object str) {
     return "(" + str + ")";
   }
 
-  private static String wrapSingleQuote(String str) {
+  public static String wrapSingleQuote(Object str) {
     return "'" + str + "'";
   }
 
-  private static String wrapSpace(String str) {
+  public static String wrapSpace(Object str) {
     return " " + str + " ";
   }
 }

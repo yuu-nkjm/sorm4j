@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.TableName;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
 

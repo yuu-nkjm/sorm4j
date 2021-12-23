@@ -5,14 +5,46 @@ import java.util.function.Function;
 
 public final class ParameterizedStringUtils {
 
-  private ParameterizedStringUtils() {};
+  private ParameterizedStringUtils() {}
 
-
+  /**
+   *
+   * Creates a new parameterized message like <a href=
+   * "https://logging.apache.org/log4j/2.x/log4j-api/apidocs/org/apache/logging/log4j/message/ParameterizedMessageFactory.html#newMessage-java.lang.String-java.lang.Object...-">ParameterizedMessageFactory
+   * (Apache Log4j API 2.14.1 API)</a>
+   *
+   * <p>
+   * This method simulate as follows:
+   * <code>ParameterizedMessageFactory.INSTANCE.newMessage(msg, params).getFormattedMessage()</code>
+   *
+   * <p>
+   * Examples
+   *
+   * <pre>
+   * newString("My name is {}. My score is {}", "Alice",100) => "My name is Alice. My score is 100";
+   *
+   * newString("{}" , 1) => "1";
+   *
+   * newString("{}{}", 1) => "1{}";
+   *
+   * newString("{}", 1, 2) => "1";
+   *
+   * @param msg including place holders. placeholder is "{}"
+   * @param params
+   * @return
+   */
   public static String newString(String msg, Object... params) {
+    return newStringWithPlaceHolder(msg, "{}", params);
+  }
+
+  /**
+   * @see #newString(String, Object...)
+   */
+  public static String newStringWithPlaceHolder(String msg, String placeholder, Object... params) {
     if (params == null || params.length == 0) {
       return msg;
     }
-    return newString(msg, "{}", params.length, index -> {
+    return newString(msg, placeholder, params.length, index -> {
       Object o = params[index];
       if (o == null) {
         return "null";
@@ -26,19 +58,23 @@ public final class ParameterizedStringUtils {
   }
 
 
-  public static String newString(String messege, String placeholder, int numOfPlaceholder,
-      Function<Integer, String> placeholderReplacer) {
-    final int placeholderLength = placeholder.length();
-    final StringBuilder sbuf = new StringBuilder(messege.length() + 50);
+
+  public static String newString(String msg, String placeholder, int numOfParameter,
+      Function<Integer, String> parameterReplacer) {
+    final StringBuilder sbuf = new StringBuilder(msg.length() + 50);
     int i = 0;
     int j;
-    for (int p = 0; p < numOfPlaceholder; p++) {
-      j = messege.indexOf(placeholder, i);
-      sbuf.append(messege, i, j);
-      sbuf.append(placeholderReplacer.apply(p));
-      i = j + placeholderLength;
+    final int placeholderStringLength = placeholder.length();
+    for (int p = 0; p < numOfParameter; p++) {
+      j = msg.indexOf(placeholder, i);
+      if (j == -1) {
+        break;
+      }
+      sbuf.append(msg, i, j);
+      sbuf.append(parameterReplacer.apply(p));
+      i = j + placeholderStringLength;
     }
-    sbuf.append(messege, i, messege.length());
+    sbuf.append(msg, i, msg.length());
     return sbuf.toString();
   }
 

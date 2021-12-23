@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-example</artifactId>
-  <version>1.4.0-rc5</version>
+  <version>1.4.0-rc7</version>
   <description>Example of Sorm4j</description>
 
   <properties>
-    <sorm4j-version>1.4.0-rc5</sorm4j-version>
+    <sorm4j-version>1.4.0-rc7</sorm4j-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <additionalparam>-Xdoclint:none</additionalparam>
     <downloadSources>true</downloadSources>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.15.0</version>
+      <version>2.17.0</version>
     </dependency>
   </dependencies>
   <build>

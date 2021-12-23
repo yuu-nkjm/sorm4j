@@ -1,6 +1,9 @@
 # Sorm4j: Simple micro Object-Relation Mapper for Java
 
-![](https://i.gyazo.com/1f05d989533d039fb5b3920352a9da5d.png) ![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j) [![javadoc](https://javadoc.io/badge2/org.nkjmlab/sorm4j/javadoc.svg)](https://javadoc.io/doc/org.nkjmlab/sorm4j) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![](https://i.gyazo.com/1f05d989533d039fb5b3920352a9da5d.png)
+
+![Build](https://travis-ci.org/yuu-nkjm/sorm4j.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=master&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=master) [![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j) [![javadoc](https://javadoc.io/badge2/org.nkjmlab/sorm4j/javadoc.svg)](https://javadoc.io/doc/org.nkjmlab/sorm4j) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Web Sites](https://img.shields.io/badge/Web%20Site-scrapbox-important.svg)](https://scrapbox.io/sorm4j/)
 
 Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. Sorm4j is a sort of JDBC wrapper. It provides simple functionalities to do select, insert, update, delete and merge.
 
@@ -13,12 +16,11 @@ Here is an example with lambda expressions:
 Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","username","password");
 
 // insert
-sorm.apply(conn -> conn.insert(new Customer(1, "Alice", "Tokyo")));
+sorm.insert(new Customer(1, "Alice", "Tokyo"));
 
 // select
 List<Customer> customers =
-  sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where address=?","Tokyo"));
-
+  sorm.readList(Customer.class, "select * from customer where address=?","Tokyo");
 ```
 
 Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has no runtime dependencies. It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
@@ -27,13 +29,13 @@ Sorm4j requires Java 11 (or above) to run and build.
 
 
 ## Quickstart
-The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j). Add dependency to your pom.xml:
+The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j). Add dependency to your `pom.xml`:
 
 ```xml
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.4.0-rc5</version>
+   <version>1.4.0-rc7</version>
  </dependency>
 ```
 
@@ -57,32 +59,32 @@ Reads matching rows from table:
 
 ```java
 List<Customer> list =
-  sorm.apply(conn -> conn.readList(Customer.class, "select * from customer where id>?", 5));
+  sorm.readList(Customer.class, "select * from customer where id>?", 5);
 ```
 
 Inserts a new row:
 
 ```java
-sorm.apply(conn-> conn.insert(new Customer(1, "Alice", "Tokyo")));
+sorm.insert(new Customer(1, "Alice", "Tokyo"));
 ```
 
-## Benchmarking with Oracle JMH (average operation times: microsec/op)
+## Benchmarking with Oracle JMH (average operation times: microsec/op) (1.4.0-rc7)
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
-|Hand coded (baseline)|5.8 |6.1 |5059 |23741|
-|Sorm4j|6.1 (5% slower)|7.2 (18% slower)|4419 (-13% slower)|22753 (-4% slower)|
-|Sql2o|8.2 (41% slower)|10.8 (77% slower)|5424 (7% slower)|45751 (93% slower)|
-|JDBI|18.4 (217% slower)|12.6 (107% slower)|5683 (12% slower)|39657 (67% slower)|
-|JOOQ|36.6 (531% slower)| |14245 (182% slower)| |
-|MyBatis|12.4 (114% slower)| |12701 (151% slower)| |
-|Spring JDBCTemplate|10.2 (76% slower)| | | |
-|Apache DbUtils|7.3 (26% slower)| | | |
+|Hand coded (baseline)| 4.0 | 4.8 | 3571 | 22376 
+|Sorm4j| 4.6 (15% slower)| 5.7 (19% slower)| 3613 (1% slower)| 22475 (0% slower)
+|Sql2o| 6.2 (55% slower)| 9.4 (96% slower)| 4114 (15% slower)| 43301 (94% slower)
+|JDBI| 16.9 (323% slower)| 11.7 (144% slower)| 4946 (39% slower)| 37147 (66% slower)
+|JOOQ| 42.2 (955% slower)|  | 14491 (306% slower)| 
+|MyBatis| 9.7 (143% slower)|  | 9976 (179% slower)| 
+|Spring JdbcTemplate| 8.4 (110% slower)|  | | 
+|Apache DbUtils| 5.4 (35% slower)|  | | 
 
-- `read`: reads one row from table including 10,240 row using primary key
+- `read`: reads one row from table including 10,240
 - `insert`: inserts one row to table
 - `read multirow`: reads all rows from table including 10,240 row
-- `insert multirow`: inserts the all given 10,240 rows to table.
+- `insert multirow`: inserts the all given 10,240 rows to table
 
 Sorm4j is evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
 

@@ -6,21 +6,26 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.basic.ConsumerHandler;
+import org.nkjmlab.sorm4j.basic.FunctionHandler;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.command.BasicCommand;
+import org.nkjmlab.sorm4j.command.Command;
+import org.nkjmlab.sorm4j.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.TableMetaData;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
 
 /**
  * An entry point of object-relation mapping.
@@ -147,21 +152,6 @@ public final class SormImpl implements Sorm {
   }
 
 
-  public static final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
-
-    public OrmTransactionImpl(Connection connection, SormContext context) {
-      super(connection, context);
-      begin(context.getTransactionIsolationLevel());
-    }
-
-    @Override
-    public void close() {
-      rollback();
-      super.close();
-    }
-
-  }
-
   private <R> R applyAndClose(FunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = openConnection()) {
       return handler.apply(conn);
@@ -261,6 +251,11 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public <T> boolean exists(String tableName, T object) {
+    return applyAndClose(conn -> conn.exists(tableName, object));
+  }
+
+  @Override
   public <T> int[] delete(List<T> objects) {
     return applyAndClose(conn -> conn.delete(objects));
   }
@@ -310,6 +305,24 @@ public final class SormImpl implements Sorm {
   public <T> int insert(T object) {
     return applyAndClose(conn -> conn.insert(object));
   }
+
+  @Override
+  public int insertMapOn(String tableName, Map<String, Object> object) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, object));
+  }
+
+  @Override
+  public int[] insertMapOn(String tableName,
+      @SuppressWarnings("unchecked") Map<String, Object>... objects) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, objects));
+  }
+
+  @Override
+  public int[] insertMapOn(String tableName, List<Map<String, Object>> objects) {
+    return applyAndClose(conn -> conn.insertMapOn(tableName, objects));
+  }
+
+
 
   @Override
   public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
@@ -441,8 +454,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass, String tableName) {
-    return applyAndClose(conn -> conn.getTableMetaData(objectClass, tableName));
+  public TableMetaData getTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getTableMetaData(tableName));
   }
 
   @Override
@@ -486,15 +499,15 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler) {
-    acceptAndClose(conn -> conn.acceptPreparedStatementHandler(sql, handler));
+  public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      ResultSetTraverser<T> traverser) {
+    return applyAndClose(conn -> conn.executeQuery(statementSupplier, traverser));
   }
 
   @Override
-  public <T> T applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, T> handler) {
-    return applyAndClose(conn -> conn.applyPreparedStatementHandler(sql, handler));
+  public <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      RowMapper<T> rowMapper) {
+    return applyAndClose(conn -> conn.executeQuery(statementSupplier, rowMapper));
   }
 
   @Override
@@ -530,6 +543,51 @@ public final class SormImpl implements Sorm {
     R ret = apply(handler);
     sormContext.getLoggerContext().forceLogging = false;
     return ret;
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
+    return applyAndClose(conn -> conn.readAllLazy(objectClass));
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.readLazy(objectClass, sql, parameters));
+  }
+
+  @Override
+  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.readLazy(objectClass, sql));
+  }
+
+  @Override
+  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.readMapLazy(sql));
+  }
+
+  @Override
+  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.readMapLazy(sql, parameters));
+  }
+
+  @Override
+  public Command createCommand(ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.createCommand(sql));
+  }
+
+  @Override
+  public BasicCommand createCommand(String sql) {
+    return applyAndClose(conn -> conn.createCommand(sql));
+  }
+
+  @Override
+  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.createCommand(sql, parameters));
+  }
+
+  @Override
+  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
+    return applyAndClose(conn -> conn.createCommand(sql, parameters));
   }
 
 }

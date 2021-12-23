@@ -56,8 +56,7 @@ public interface ResultSetConverter {
    * corresponding column types.
    *
    * <p>
-   * Keys in the results returned in lower case by default. The setting is changed by
-   * {@link #setLetterCaseOfKeyInMap}.
+   * Keys in the results returned in lower case by default.
    *
    * @param options
    * @param resultSet

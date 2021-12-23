@@ -1,10 +1,10 @@
-package org.nkjmlab.sorm4j.sql.result;
+package org.nkjmlab.sorm4j.common;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.RowMapper;
+import org.nkjmlab.sorm4j.basic.RowMapper;
 
 
 /**

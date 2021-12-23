@@ -1,7 +1,9 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.basic;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
@@ -15,29 +17,36 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  */
 public interface SqlExecutor {
 
-
   /**
-   * Accepts handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param sql
-   * @param handler
-   */
-  @Experimental
-  void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler);
-
-
-  /**
-   * Applies handler for {@link PreparedStatement} which has sets the given parameters.
+   * Executes the query with the given PreparedStatement and applies the given RowMapper. If you
+   * want to set parameters to a PreparedStatement object by yourself, you can use this method. You
+   * can use your {@link ResultSetTraverser} or the object getting by
+   * {@link Orm#getResultSetTraverser(Class)};
    *
    * @param <T>
-   * @param sql
-   * @param handler
+   * @param statementSupplier
+   * @param traverser
    * @return
    */
   @Experimental
-  <T> T applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, T> handler);
+  <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      ResultSetTraverser<T> traverser);
+
+
+  /**
+   * Executes the query with the given PreparedStatement and applies the given RowMapper. If you
+   * want to set parameters to a PreparedStatement object by yourself, you can use this method. You
+   * can use your {@link RowMapper} or the object getting by {@link Orm#getRowMapper(Class)};
+   *
+   * @param <T>
+   * @param statementSupplier
+   * @param rowMapper
+   * @return
+   */
+  @Experimental
+  <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      RowMapper<T> rowMapper);
+
 
   /**
    * Executes a query and apply the given {@link ResultSetTraverser} to the returned result set.
@@ -86,5 +95,6 @@ public interface SqlExecutor {
    * @return
    */
   int executeUpdate(ParameterizedSql sql);
+
 
 }

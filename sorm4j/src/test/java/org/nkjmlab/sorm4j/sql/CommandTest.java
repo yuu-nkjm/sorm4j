@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,8 +13,8 @@ import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 
 class CommandTest {
 
@@ -28,8 +29,11 @@ class CommandTest {
   void testAcceptPreparedStatementHandler() {
     sorm.accept(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      conn.createCommand("select * from guests where id=?", 1)
-          .acceptPreparedStatementHandler(pstmt -> pstmt.execute());
+      conn.executeQuery(con -> {
+        PreparedStatement stmt = con.prepareStatement("select * from guests where id=?");
+        stmt.setInt(1, 1);
+        return stmt;
+      }, conn.getRowMapper(Guest.class));
     });
   }
 
@@ -37,8 +41,12 @@ class CommandTest {
   void testApplyPreparedStatementHandler() {
     sorm.accept(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      conn.createCommand("select * from guests where id=?", 1)
-          .applyPreparedStatementHandler(pstmt -> pstmt.execute());
+
+      conn.executeQuery(con -> {
+        PreparedStatement stmt = con.prepareStatement("select * from guests where id=?");
+        stmt.setInt(1, 1);
+        return stmt;
+      }, conn.getResultSetToMapTraverser());
 
       conn.createCommand("select * from guests where id=:id", Map.of("id", 1));
 
@@ -225,7 +233,7 @@ class CommandTest {
             ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
     sorm.apply(conn -> conn.getRowToMapMapper());
-    sorm.apply(conn -> conn.getTableMetaData(Player.class, "players"));
+    sorm.apply(conn -> conn.getTableMetaData("players"));
   }
 
 

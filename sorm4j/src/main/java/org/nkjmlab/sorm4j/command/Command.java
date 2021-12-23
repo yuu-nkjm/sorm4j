@@ -1,19 +1,15 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.command;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
-import org.nkjmlab.sorm4j.OrmMapLazyReader;
-import org.nkjmlab.sorm4j.OrmMapReader;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 
 
 /**
@@ -24,24 +20,6 @@ import org.nkjmlab.sorm4j.sql.result.Tuple3;
  */
 @Experimental
 public interface Command {
-  /**
-   * Accepts handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param handler
-   */
-  @Experimental
-  void acceptPreparedStatementHandler(ConsumerHandler<PreparedStatement> handler);
-
-
-  /**
-   * Applies handler for {@link PreparedStatement} which has sets the given parameters.
-   *
-   * @param <T>
-   * @param handler
-   * @return
-   */
-  @Experimental
-  <T> T applyPreparedStatementHandler(FunctionHandler<PreparedStatement, T> handler);
 
   /**
    * Executes a query and apply the given handler to the returned result set.
@@ -112,28 +90,28 @@ public interface Command {
 
 
   /**
-   * See {@link OrmMapReader#readMapFirst(String, Object...)}
+   * See {@link Orm#readMapFirst(String, Object...)}
    *
    * @return
    */
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link OrmMapLazyReader#readMapLazy(String, Object...)}
+   * See {@link Orm#readMapLazy(String, Object...)}
    *
    * @return
    */
   LazyResultSet<Map<String, Object>> readMapLazy();
 
   /**
-   * See {@link OrmMapReader#readMapList(String, Object...)}
+   * See {@link Orm#readMapList(String, Object...)}
    *
    * @return
    */
   List<Map<String, Object>> readMapList();
 
   /**
-   * See {@link OrmMapReader#readMapOne(String, Object...)}
+   * See {@link Orm#readMapOne(String, Object...)}
    *
    * @return
    */

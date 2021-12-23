@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql.result;
+package org.nkjmlab.sorm4j.common;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
@@ -9,8 +9,8 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  */
 @Experimental
-public final class Tuples {
-  private Tuples() {}
+public final class Tuple {
+  private Tuple() {}
 
   public static <T1, T2> Tuple2<T1, T2> of(T1 t1, T2 t2) {
     return new Tuple2<T1, T2>(t1, t2);

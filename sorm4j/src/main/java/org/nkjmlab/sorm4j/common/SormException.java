@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.common;
 
 /**
  * Represents an exception thrown by Sorm4j.
