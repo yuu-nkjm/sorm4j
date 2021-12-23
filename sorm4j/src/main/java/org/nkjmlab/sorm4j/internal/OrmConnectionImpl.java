@@ -15,12 +15,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.ConsumerHandler;
-import org.nkjmlab.sorm4j.FunctionHandler;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.ResultSetTraverser;
-import org.nkjmlab.sorm4j.RowMapper;
-import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.basic.FunctionHandler;
+import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
+import org.nkjmlab.sorm4j.basic.RowMapper;
+import org.nkjmlab.sorm4j.command.BasicCommand;
+import org.nkjmlab.sorm4j.command.Command;
+import org.nkjmlab.sorm4j.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.common.LazyResultSet;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple;
+import org.nkjmlab.sorm4j.common.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple3;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
@@ -32,17 +41,7 @@ import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.LazyResultSetImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.BasicCommand;
-import org.nkjmlab.sorm4j.sql.Command;
-import org.nkjmlab.sorm4j.sql.NamedParameterCommand;
-import org.nkjmlab.sorm4j.sql.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.result.LazyResultSet;
-import org.nkjmlab.sorm4j.sql.result.Tuple;
-import org.nkjmlab.sorm4j.sql.result.Tuple2;
-import org.nkjmlab.sorm4j.sql.result.Tuple3;
-import org.nkjmlab.sorm4j.sql.schema.TableMetaData;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -72,41 +71,8 @@ public class OrmConnectionImpl implements OrmConnection {
     this.sormContext = sormContext;
   }
 
-
-  @Override
-  public void acceptPreparedStatementHandler(ParameterizedSql sql,
-      ConsumerHandler<PreparedStatement> handler) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, sql.getParameters());
-      handler.accept(stmt);
-
-      getLoggerConfig().createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
-          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql));
-
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
   private LoggerContext getLoggerConfig() {
     return sormContext.getLoggerContext();
-  }
-
-
-  @Override
-  public <T> T applyPreparedStatementHandler(ParameterizedSql sql,
-      FunctionHandler<PreparedStatement, T> handler) {
-    try (PreparedStatement stmt = connection.prepareStatement(sql.getSql())) {
-      getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, sql.getParameters());
-
-      getLoggerConfig().createLogPoint(LoggerContext.Category.HANDLE_PREPAREDSTATEMENT)
-          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql));
-      T ret = handler.apply(stmt);
-
-      return ret;
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
   }
 
   @Override
@@ -224,9 +190,22 @@ public class OrmConnectionImpl implements OrmConnection {
     return sqlFunction.apply(mapping);
   }
 
+
+  @Override
+  public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      ResultSetTraverser<T> traverser) {
+    return executeQueryAndClose(connection, traverser, statementSupplier);
+  }
+
+  @Override
+  public <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      RowMapper<T> rowMapper) {
+    return executeQueryAndClose(connection, ResultSetTraverser.from(rowMapper), statementSupplier);
+  }
+
   @Override
   public <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> resultSetTraverser) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql.getSql(), sql.getParameters(), resultSetTraverser);
   }
 
@@ -627,7 +606,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters, resultSet -> loadFirst(objectClass, resultSet));
   }
 
@@ -664,7 +643,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters,
         resultSet -> traverseAndMapToList(objectClass, resultSet));
   }
@@ -676,7 +655,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           if (resultSet.next()) {
@@ -719,7 +698,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters, resultSet -> traverseAndMapToMapList(resultSet));
   }
 
@@ -732,7 +711,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           Map<String, Object> ret = null;
@@ -754,7 +733,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
@@ -776,7 +755,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, String sql, Object... parameters) {
-    List<Tuple3<T1, T2, T3>> ret = executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(),
+    List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(),
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -797,7 +776,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters) {
-    List<Tuple2<T1, T2>> ret = executeQueryAndRead(getLoggerConfig(), sormContext.getOptions(),
+    List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(),
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -883,24 +862,41 @@ public class OrmConnectionImpl implements OrmConnection {
     return sqlFunc.apply((T[]) objects.toArray(Object[]::new));
   }
 
-  static <R> R executeQueryAndRead(LoggerContext loggerContext, SormOptions options,
-      Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
-      Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
 
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-      sqlParametersSetter.setParameters(options, stmt, parameters);
-      final Optional<LogPoint> lp =
-          loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_QUERY);
-      lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
-
-      try (ResultSet resultSet = stmt.executeQuery()) {
-        R ret = resultSetTraverser.traverseAndMap(resultSet);
-        lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
-        return ret;
-      }
+  static <R> R executeQueryAndClose(Connection connection, ResultSetTraverser<R> resultSetTraverser,
+      FunctionHandler<Connection, PreparedStatement> statementSupplier) {
+    try (PreparedStatement stmt = statementSupplier.apply(connection);
+        ResultSet resultSet = stmt.executeQuery()) {
+      return resultSetTraverser.traverseAndMap(resultSet);
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
+  }
+
+
+  static <R> R executeQueryAndClose(LoggerContext loggerContext, SormOptions options,
+      Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
+      Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
+    final Optional<LogPoint> lp =
+        loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_QUERY);
+    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+
+    FunctionHandler<Connection, PreparedStatement> statementSupplier =
+        createAndSetPreparedStatement(options, connection, sqlParametersSetter, sql, parameters);
+
+    R ret = executeQueryAndClose(connection, resultSetTraverser, statementSupplier);
+    lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
+    return ret;
+  }
+
+  private static FunctionHandler<Connection, PreparedStatement> createAndSetPreparedStatement(
+      SormOptions options, Connection connection, SqlParametersSetter sqlParametersSetter,
+      String sql, Object[] parameters) {
+    return con -> {
+      PreparedStatement stmt = con.prepareStatement(sql);
+      sqlParametersSetter.setParameters(options, stmt, parameters);
+      return stmt;
+    };
   }
 
   public static final int executeUpdateAndClose(LoggerContext loggerContext, SormOptions options,
