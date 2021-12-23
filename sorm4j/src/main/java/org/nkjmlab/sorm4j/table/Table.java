@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
@@ -98,21 +99,21 @@ public interface Table<T> {
 
 
   /**
-   * @see OrmLazyReader#readAllLazy(Class)
+   * @see Orm#readAllLazy(Class)
    */
   default LazyResultSet<T> readAllLazy() {
     return getSorm().readAllLazy(getValueType());
   }
 
   /**
-   * @see OrmLazyReader#readLazy(Class, ParameterizedSql)
+   * @see Orm#readLazy(Class, ParameterizedSql)
    */
   default LazyResultSet<T> readLazy(ParameterizedSql sql) {
     return getSorm().readLazy(getValueType(), sql);
   }
 
   /**
-   * @see OrmLazyReader#readLazy(Class, String, Object...)
+   * @see Orm#readLazy(Class, String, Object...)
    */
   default LazyResultSet<T> readLazy(String sql, Object... parameters) {
     return getSorm().readLazy(getValueType(), sql, parameters);

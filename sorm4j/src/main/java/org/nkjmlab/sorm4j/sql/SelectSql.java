@@ -148,12 +148,12 @@ public class SelectSql {
     /**
      * Creates order by clause.
      *
-     * @param column
-     * @param ascOrDesc
+     * @see <a href="http://www.h2database.com/html/grammar.html#select_order">SQL Grammar</a>
+     * @param order
      * @return
      */
-    public Builder orderBy(String... columnAndascOrDesc) {
-      orderBy = String.join(" ", columnAndascOrDesc);
+    public Builder orderBy(String... order) {
+      orderBy = String.join(" ", order);
       return this;
     }
 
@@ -468,12 +468,11 @@ public class SelectSql {
   /**
    * Creates orderBy clause.
    *
-   * @param column
-   * @param ascOrDesc
+   * @param order
    * @return
    */
-  public static String orderBy(Object... columnAndAscOrDesc) {
-    return ORDER_BY + joinSpace(columnAndAscOrDesc);
+  public static String orderBy(Object... order) {
+    return ORDER_BY + joinSpace(order);
   }
 
   public static String orderBy(Object column) {
