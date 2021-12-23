@@ -582,49 +582,49 @@ public class OrmBenchmarkPostSimple {
 
 
   @Benchmark
-  public void handCodedSelectAll() {
+  public void handCodedReadAll() {
     handCodedBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void handCodedSelectByPrimaryKey() {
+  public void handCodedReadOne() {
     handCodedBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
 
   @Benchmark
-  public void jDBISelectAll() {
+  public void jDBIReadAll() {
     jdbiBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
 
   @Benchmark
-  public void jDBISelectByPrimaryKey() {
+  public void jDBIReadOne() {
     jdbiBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void springJdbcTemplateSelectByPrimaryKey() {
+  public void springJdbcTemplateReadOne() {
     springJdbcTemplateBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void jOOQSelectAll() {
+  public void jOOQReadAll() {
     jooqBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void jOOQSelectByPrimaryKey() {
+  public void jOOQReadOne() {
     jooqBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void myBatisSelectAll() {
+  public void myBatisReadAll() {
     myBatisBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void myBatisSelectByPrimaryKey() {
+  public void myBatisReadOne() {
     myBatisBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
@@ -641,27 +641,27 @@ public class OrmBenchmarkPostSimple {
 
 
   @Benchmark
-  public void sormSelectAll() {
+  public void sormReadAll() {
     sormBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void apacheDbUtilsSelectByPrimaryKey() {
+  public void apacheDbUtilsReadOne() {
     apacheDbUtilsBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void sormSelectByPrimaryKey() {
+  public void sormReadOne() {
     sormBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void sql2oSelectAll() {
+  public void sql2oReadAll() {
     sql2oBench.selectAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
   @Benchmark
-  public void sql2oSelectByPrimaryKey() {
+  public void sql2oReadOne() {
     sql2oBench.selectOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
