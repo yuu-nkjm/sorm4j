@@ -68,23 +68,23 @@ Inserts a new row:
 sorm.insert(new Customer(1, "Alice", "Tokyo"));
 ```
 
-## Benchmarking with Oracle JMH (average operation times: microsec/op)
+## Benchmarking with Oracle JMH (average operation times: microsec/op) (1.4.0-rc7)
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
-|Hand coded (baseline)|5.8 |6.1 |5059 |23741|
-|Sorm4j|6.1 (5% slower)|7.2 (18% slower)|4419 (-13% slower)|22753 (-4% slower)|
-|Sql2o|8.2 (41% slower)|10.8 (77% slower)|5424 (7% slower)|45751 (93% slower)|
-|JDBI|18.4 (217% slower)|12.6 (107% slower)|5683 (12% slower)|39657 (67% slower)|
-|JOOQ|36.6 (531% slower)| |14245 (182% slower)| |
-|MyBatis|12.4 (114% slower)| |12701 (151% slower)| |
-|Spring JDBCTemplate|10.2 (76% slower)| | | |
-|Apache DbUtils|7.3 (26% slower)| | | |
+|Hand coded (baseline)| 4.0 | 4.8 | 3571 | 22376 
+|Sorm4j| 4.6 (15% slower)| 5.7 (19% slower)| 3613 (1% slower)| 22475 (0% slower)
+|Sql2o| 6.2 (55% slower)| 9.4 (96% slower)| 4114 (15% slower)| 43301 (94% slower)
+|JDBI| 16.9 (323% slower)| 11.7 (144% slower)| 4946 (39% slower)| 37147 (66% slower)
+|JOOQ| 42.2 (955% slower)|  | 14491 (306% slower)| 
+|MyBatis| 9.7 (143% slower)|  | 9976 (179% slower)| 
+|Spring JdbcTemplate| 8.4 (110% slower)|  | | 
+|Apache DbUtils| 5.4 (35% slower)|  | | 
 
-- `read`: reads one row from table including 10,240 row using primary key
+- `read`: reads one row from table including 10,240
 - `insert`: inserts one row to table
 - `read multirow`: reads all rows from table including 10,240 row
-- `insert multirow`: inserts the all given 10,240 rows to table.
+- `insert multirow`: inserts the all given 10,240 rows to table
 
 Sorm4j is evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
 
