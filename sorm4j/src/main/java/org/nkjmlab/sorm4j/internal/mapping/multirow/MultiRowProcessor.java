@@ -91,7 +91,8 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> lp = loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW);
+    Optional<LogPoint> lp =
+        loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW, MultiRowProcessor.class);
     lp.ifPresent(_lp -> _lp.logBeforeMultiRow(con, objects[0].getClass(), objects.length,
         tableMapping.getTableMetaData().getTableName()));
 

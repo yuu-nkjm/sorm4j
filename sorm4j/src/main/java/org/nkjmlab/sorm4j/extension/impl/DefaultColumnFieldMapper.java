@@ -133,14 +133,16 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
     }
     if (getter.getParameterCount() != 0) {
       if (logging) {
-        loggerContext.getLogger().warn("Getter [{}] should not have parameter but has {} params.",
-            getter, getter.getParameterCount());
+        loggerContext.getLogger(DefaultColumnFieldMapper.class).warn(
+            "Getter [{}] should not have parameter but has {} params.", getter,
+            getter.getParameterCount());
       }
       return null;
     }
     if (getter.getReturnType() == void.class) {
       if (logging) {
-        loggerContext.getLogger().warn("Getter [{}] must have return a parameter.", getter);
+        loggerContext.getLogger(DefaultColumnFieldMapper.class)
+            .warn("Getter [{}] must have return a parameter.", getter);
       }
     }
     return getter;
@@ -151,7 +153,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (setter.getParameterCount() != 1) {
-      loggerContext.getLogger().warn(
+      loggerContext.getLogger(DefaultColumnFieldMapper.class).warn(
           "Setter [{}] should have a single parameter but has {} params.", setter,
           setter.getParameterCount());
       return null;
@@ -197,7 +199,7 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
               : setters.get(canonicalColName);
 
       if (f == null && (g == null && s == null)) {
-        loggerContext.getLogger().debug(
+        loggerContext.getLogger(DefaultColumnFieldMapper.class).debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             canonicalColName);
       } else {

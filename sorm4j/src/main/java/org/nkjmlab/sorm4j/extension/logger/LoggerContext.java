@@ -36,12 +36,10 @@ public final class LoggerContext {
   @Experimental
   public volatile boolean forceLogging = false;
 
-  private final Map<String, SormLogger> loggers = new ConcurrentHashMap<>();
+  private final Map<Class<?>, SormLogger> loggers = new ConcurrentHashMap<>();
 
-  public SormLogger getLogger() {
-    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    String className = stackTrace[1].getClassName();
-    return loggers.computeIfAbsent(className, k -> loggerSupplier.get());
+  public SormLogger getLogger(Class<?> clazz) {
+    return loggers.computeIfAbsent(clazz, k -> loggerSupplier.get());
   }
 
   public LoggerContext(Supplier<SormLogger> loggerSupplier,
@@ -51,13 +49,20 @@ public final class LoggerContext {
         onCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(onCategories);
   }
 
+  public Optional<LogPoint> createLogPointBeforeSql(Category category, Class<?> clazz,
+      Connection connection, String sql, Object... parameters) {
+    Optional<LogPoint> lp = createLogPoint(category, clazz);
+    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+    return lp;
+  }
+
   @Experimental
-  public Optional<LogPoint> createLogPoint(LoggerContext.Category category) {
-    return isLogging(category) ? Optional.of(new LogPoint(category.name(), getLogger()))
+  public Optional<LogPoint> createLogPoint(LoggerContext.Category category, Class<?> callerClass) {
+    return isLogging(category) ? Optional.of(new LogPoint(category.name(), getLogger(callerClass)))
         : Optional.empty();
   }
 
-  private boolean isLogging(Category category) {
+  public boolean isLogging(Category category) {
     return forceLogging || onCategories.contains(category);
   }
 
@@ -186,7 +191,9 @@ public final class LoggerContext {
 
   @Override
   public String toString() {
-    return "LoggerContext [onCategories=" + onCategories + ", logger=" + getLogger() + "]";
+    return "LoggerContext [onCategories=" + onCategories + ", logger="
+        + getLogger(LoggerContext.class) + "]";
   }
+
 
 }

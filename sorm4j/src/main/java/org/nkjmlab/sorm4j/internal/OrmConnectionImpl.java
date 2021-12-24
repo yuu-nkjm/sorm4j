@@ -230,12 +230,12 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> boolean exists(T object) {
     final TableMapping<T> mapping = getCastedTableMapping(object.getClass());
-    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     return existsHelper(mapping, object);
   }
 
   private <T> boolean existsHelper(TableMapping<T> mapping, T object) {
-    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getExistsSql();
     return readFirst(Integer.class, sql, mapping.getPrimaryKeyParameters(object)) != null;
   }
@@ -244,7 +244,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> boolean exists(String tableName, T object) {
     final TableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
-    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     return existsHelper(mapping, object);
   }
 
@@ -593,7 +593,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
     final TableMapping<T> mapping = getTableMapping(objectClass);
-    mapping.throwExeptionIfPrimaryKeysIsNotExist();
+    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
     return readFirst(objectClass, sql, primaryKeyValues);
   }
@@ -623,8 +623,8 @@ public class OrmConnectionImpl implements OrmConnection {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, parameters);
 
-      getLoggerConfig().createLogPoint(LoggerContext.Category.EXECUTE_QUERY)
-          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+      getLoggerConfig().createLogPointBeforeSql(LoggerContext.Category.EXECUTE_QUERY,
+          OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
       LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
@@ -677,8 +677,8 @@ public class OrmConnectionImpl implements OrmConnection {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(sormContext.getOptions(), stmt, parameters);
 
-      getLoggerConfig().createLogPoint(LoggerContext.Category.EXECUTE_QUERY)
-          .ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+      getLoggerConfig().createLogPointBeforeSql(LoggerContext.Category.EXECUTE_QUERY,
+          OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
 
@@ -873,13 +873,12 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-
   static <R> R executeQueryAndClose(LoggerContext loggerContext, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
       Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
-    final Optional<LogPoint> lp =
-        loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_QUERY);
-    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+
+    final Optional<LogPoint> lp = loggerContext.createLogPointBeforeSql(
+        LoggerContext.Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
 
     FunctionHandler<Connection, PreparedStatement> statementSupplier =
         createAndSetPreparedStatement(options, connection, sqlParametersSetter, sql, parameters);
@@ -888,6 +887,8 @@ public class OrmConnectionImpl implements OrmConnection {
     lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
     return ret;
   }
+
+
 
   private static FunctionHandler<Connection, PreparedStatement> createAndSetPreparedStatement(
       SormOptions options, Connection connection, SqlParametersSetter sqlParametersSetter,
@@ -904,8 +905,9 @@ public class OrmConnectionImpl implements OrmConnection {
       Object[] parameters) {
 
     final Optional<LogPoint> lp =
-        loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
-    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+        loggerContext.createLogPointBeforeSql(LoggerContext.Category.EXECUTE_UPDATE,
+            OrmConnectionImpl.class, connection, sql, parameters);
+
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
