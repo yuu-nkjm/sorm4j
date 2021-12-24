@@ -25,6 +25,19 @@ public class StringCache {
     return lowerCaseCaches.computeIfAbsent(str, key -> str.toLowerCase(Locale.ENGLISH));
   }
 
+  /**
+   * Converts the given string to string in canonical case.
+   *
+   * <b>Example</b>
+   *
+   * <pre>
+   * STUDENT_ID = &gt; STUDENTID
+   * studentId = &gt; STUDENTID
+   * </pre>
+   *
+   * @param str
+   * @return
+   */
   public static String toCanonicalCase(String str) {
     return canonicalCaseCaches.computeIfAbsent(str,
         key -> str.replaceAll("_", "").replaceAll("\\s", "").toUpperCase(Locale.ENGLISH));
