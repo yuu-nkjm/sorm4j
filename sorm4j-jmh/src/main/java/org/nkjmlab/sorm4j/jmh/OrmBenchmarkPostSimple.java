@@ -9,10 +9,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -131,8 +130,8 @@ public class OrmBenchmarkPostSimple {
             Post p = new Post();
             p.setId(rs.getInt("id"));
             p.setText(rs.getString("text"));
-            p.setCreationDate(rs.getDate("creation_date"));
-            p.setLastChangeDate(rs.getDate("last_change_date"));
+            p.setCreationDate(rs.getTimestamp("creation_date"));
+            p.setLastChangeDate(rs.getTimestamp("last_change_date"));
             p.setCounter1(getNullableInt(rs, "counter1"));
             p.setCounter2(getNullableDouble(rs, "counter2"));
             ret.add(p);
@@ -154,8 +153,8 @@ public class OrmBenchmarkPostSimple {
             Post p = new Post();
             p.setId(rs.getInt("id"));
             p.setText(rs.getString("text"));
-            p.setCreationDate(rs.getDate("creation_date"));
-            p.setLastChangeDate(rs.getDate("last_change_date"));
+            p.setCreationDate(rs.getTimestamp("creation_date"));
+            p.setLastChangeDate(rs.getTimestamp("last_change_date"));
             p.setCounter1(getNullableInt(rs, "counter1"));
             p.setCounter2(getNullableDouble(rs, "counter2"));
             return p;
@@ -783,8 +782,8 @@ public class OrmBenchmarkPostSimple {
       ThreadLocalRandom r = ThreadLocalRandom.current();
       Post p = new Post();
       p.text = "a name " + seed;
-      p.creationDate = new DateTime(System.currentTimeMillis() + r.nextInt()).toDate();
-      p.lastChangeDate = new DateTime(System.currentTimeMillis() + r.nextInt()).toDate();
+      p.creationDate = Timestamp.valueOf(LocalDateTime.now());
+      p.lastChangeDate = Timestamp.valueOf(LocalDateTime.now());
       p.counter1 = r.nextDouble() > 0.9 ? r.nextInt() : null;
       p.counter2 = r.nextDouble() > 0.9 ? r.nextDouble() : null;
       return p;
@@ -793,8 +792,8 @@ public class OrmBenchmarkPostSimple {
     private static Post createPost() {
       Post p = new Post();
       p.text = "a name test";
-      p.creationDate = new DateTime(System.currentTimeMillis()).toDate();
-      p.lastChangeDate = new DateTime(System.currentTimeMillis()).toDate();
+      p.creationDate = Timestamp.valueOf(LocalDateTime.now());
+      p.lastChangeDate = Timestamp.valueOf(LocalDateTime.now());
       p.counter1 = 1;
       p.counter2 = 999.0;
       return p;
@@ -803,16 +802,16 @@ public class OrmBenchmarkPostSimple {
     private int id;
     private Integer counter1;
     private Double counter2;
-    private Date creationDate;
-    private Date lastChangeDate;
+    private Timestamp creationDate;
+    private Timestamp lastChangeDate;
 
     private String text;
 
     public Post() {}
 
     @OrmConstructor({"id", "counter1", "counter2", "creationDate", "lastChangeDate", "text"})
-    public Post(int id, Integer counter1, Double counter2, Date creationDate, Date lastChangeDate,
-        String text) {
+    public Post(int id, Integer counter1, Double counter2, Timestamp creationDate,
+        Timestamp lastChangeDate, String text) {
       this.id = id;
       this.counter1 = counter1;
       this.counter2 = counter2;
@@ -829,7 +828,7 @@ public class OrmBenchmarkPostSimple {
       return counter2;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
       return creationDate;
     }
 
@@ -837,7 +836,7 @@ public class OrmBenchmarkPostSimple {
       return id;
     }
 
-    public Date getLastChangeDate() {
+    public Timestamp getLastChangeDate() {
       return lastChangeDate;
     }
 
@@ -853,7 +852,7 @@ public class OrmBenchmarkPostSimple {
       this.counter2 = counter2;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
       this.creationDate = creationDate;
     }
 
@@ -861,7 +860,7 @@ public class OrmBenchmarkPostSimple {
       this.id = id;
     }
 
-    public void setLastChangeDate(Date lastChangeDate) {
+    public void setLastChangeDate(Timestamp lastChangeDate) {
       this.lastChangeDate = lastChangeDate;
     }
 
