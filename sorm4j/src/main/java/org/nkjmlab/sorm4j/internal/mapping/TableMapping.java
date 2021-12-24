@@ -17,7 +17,6 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.common.InsertResult;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
@@ -37,7 +36,6 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 public final class TableMapping<T> extends Mapping<T> {
 
-  private final Map<List<String>, Accessor[]> accessorsMap = new ConcurrentHashMap<>();
   private final Map<String, Class<?>> setterParameterTypeMap = new ConcurrentHashMap<>();
   private final SqlParametersSetter sqlParametersSetter;
   private final MultiRowProcessor<T> multiRowProcessor;
@@ -63,7 +61,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
   private Class<?> getSetterParamType(String column) {
     return setterParameterTypeMap.computeIfAbsent(column,
-        k -> columnToAccessorMap.get(column).getSetterParameterType());
+        k -> getColumnToAccessorMap().get(column).getSetterParameterType());
   }
 
   public TableSql getSql() {
@@ -100,11 +98,10 @@ public final class TableMapping<T> extends Mapping<T> {
       throw new SormException(ParameterizedStringUtils.newString(
           "Fail to get value from a instance of [{}] but it is null.", getObjectClass()));
     }
-    final Accessor[] accessors = accessorsMap.computeIfAbsent(columns, k -> columns.stream()
-        .map(columnName -> getAccessor(object, columnName)).toArray(Accessor[]::new));
-    final Object[] ret = new Object[accessors.length];
+    final Object[] ret = new Object[columns.size()];
+
     for (int i = 0; i < ret.length; i++) {
-      ret[i] = getValue(object, accessors[i]);
+      ret[i] = getColumnToAccessorMap().getValue(object, columns.get(i));
     }
     return ret;
   }
@@ -119,7 +116,7 @@ public final class TableMapping<T> extends Mapping<T> {
         Class<?> classType = getSetterParamType(columnName);
         final Object value =
             resultSetConverter.convertColumnValueTo(options, resultSet, 1, columnType, classType);
-        setValue(object, columnName, value);
+        getColumnToAccessorMap().setValue(object, columnName, value);
         ret.add(value);
       }
       return ret;
@@ -140,9 +137,8 @@ public final class TableMapping<T> extends Mapping<T> {
 
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
 
-    final Optional<LogPoint> lp =
-        loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
-    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
+    final Optional<LogPoint> lp = loggerContext.createLogPointBeforeSql(
+        LoggerContext.Category.EXECUTE_UPDATE, TableMapping.class, connection, sql, parameters);
 
     int ret = OrmConnectionImpl.executeUpdateAndClose(loggerContext, options, connection,
         sqlParametersSetter, sql, parameters);
@@ -161,11 +157,11 @@ public final class TableMapping<T> extends Mapping<T> {
    */
 
   public int update(Connection connection, T object) {
-    throwExeptionIfPrimaryKeysIsNotExist();
+    throwExeptionIfPrimaryKeyIsNotExist();
     return executeUpdate(connection, getSql().getUpdateSql(), getUpdateParameters(object));
   }
 
-  public void throwExeptionIfPrimaryKeysIsNotExist() {
+  public void throwExeptionIfPrimaryKeyIsNotExist() {
     if (!tableMetaData.hasPrimaryKey()) {
       throw new SormException("This opperation requiers primary keys but Table ["
           + tableMetaData.getTableName() + "] doesn't have them.");
@@ -190,7 +186,7 @@ public final class TableMapping<T> extends Mapping<T> {
    */
 
   public int[] update(Connection connection, @SuppressWarnings("unchecked") T... objects) {
-    throwExeptionIfPrimaryKeysIsNotExist();
+    throwExeptionIfPrimaryKeyIsNotExist();
     return batch(connection, sql.getUpdateSql(), obj -> getUpdateParameters(obj), objects);
   }
 
@@ -200,7 +196,7 @@ public final class TableMapping<T> extends Mapping<T> {
    *
    */
   public int delete(Connection connection, T object) {
-    throwExeptionIfPrimaryKeysIsNotExist();
+    throwExeptionIfPrimaryKeyIsNotExist();
     return executeUpdate(connection, getSql().getDeleteSql(), getDeleteParameters(object));
   }
 
@@ -212,7 +208,7 @@ public final class TableMapping<T> extends Mapping<T> {
    */
 
   public int[] delete(Connection connection, @SuppressWarnings("unchecked") T... objects) {
-    throwExeptionIfPrimaryKeysIsNotExist();
+    throwExeptionIfPrimaryKeyIsNotExist();
     return batch(connection, sql.getDeleteSql(), obj -> getDeleteParameters(obj), objects);
   }
 
@@ -236,9 +232,8 @@ public final class TableMapping<T> extends Mapping<T> {
       sqlParametersSetter.setParameters(options, stmt, parameters);
 
       final Optional<LogPoint> lp =
-          loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE);
-
-      lp.ifPresent(_lp -> _lp.logBeforeSql(connection, insertSql, parameters));
+          loggerContext.createLogPointBeforeSql(LoggerContext.Category.EXECUTE_UPDATE,
+              TableMapping.class, connection, insertSql, parameters);
 
       int rowsModified = stmt.executeUpdate();
 
@@ -302,5 +297,4 @@ public final class TableMapping<T> extends Mapping<T> {
   public TableMetaData getTableMetaData() {
     return tableMetaData;
   }
-
 }

@@ -1,10 +1,14 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
+import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 public final class ColumnToAccessorMap {
 
@@ -64,6 +68,48 @@ public final class ColumnToAccessorMap {
 
   public String getColumnAliasPrefix() {
     return columnAliasPrefix;
+  }
+
+  final void setValue(Object object, String columnName, Object value) {
+    final Accessor acc = get(columnName);
+    if (acc == null) {
+      throw new SormException(ParameterizedStringUtils.newString("Error: setting value [{}]"
+          + " of type [{}] in [{}]"
+          + " because column [{}] does not have a corresponding setter method or field access =>[{}]",
+          value, value.getClass().getSimpleName(), object.getClass().getName(), columnName,
+          columnToAccessorMap.toString()));
+    }
+    try {
+      acc.set(object, value);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new SormException(newString(
+          "Could not set a value for column [{}] to instance of [{}] with [{}]. The value is=[{}]",
+          columnName, object == null ? "null" : object.getClass().getSimpleName(),
+          acc.getFormattedString(), value), e);
+
+    }
+  }
+
+  private final Accessor getAccessor(Object object, String columnName) {
+    final Accessor acc = get(columnName);
+    if (acc == null) {
+      throw new SormException(newString(
+          "Error: getting value from [{}] because column [{}] does not have a corresponding getter method or field access. {}",
+          object.getClass(), columnName, this));
+    }
+    return acc;
+  }
+
+  final Object getValue(Object object, String columnName) {
+    Accessor acc = getAccessor(object, columnName);
+    try {
+      return acc.get(object);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new SormException(ParameterizedStringUtils.newString(
+          "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
+          (object == null ? "null" : object.getClass().getName()), acc.getFormattedString(),
+          acc.getFormattedString(), object), e);
+    }
   }
 
 }

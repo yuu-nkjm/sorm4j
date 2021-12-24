@@ -26,9 +26,9 @@ class TableMappingTest {
   void testGetValue() {
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         Guest g = new Guest();
-        tm.getValue(g, tm.getAccessor(g, "hoge"));
+        tm.getValue(g, "hoge");
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not have a corresponding");
@@ -36,9 +36,9 @@ class TableMappingTest {
 
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         String s = new String();
-        tm.getValue(s, tm.getAccessor(s, "id"));
+        tm.getValue(s, "id");
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Could not get a value");
@@ -66,7 +66,7 @@ class TableMappingTest {
   void testSetValue() {
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "hoge", 0);
       });
     } catch (Exception e) {
@@ -74,7 +74,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "id", "String");
       });
     } catch (Exception e) {
@@ -82,7 +82,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        TableMapping<Player> tm = getTableMapping(m, Player.class);
+        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {

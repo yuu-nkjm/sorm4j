@@ -145,7 +145,7 @@ public final class Accessor {
     @Override
     public void set(Object object, Object value)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-      throw new SormException("No valid setter for " + object);
+      throw new IllegalAccessException();
     }
 
     @Override
