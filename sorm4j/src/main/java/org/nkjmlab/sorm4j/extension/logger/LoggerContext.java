@@ -2,6 +2,8 @@ package org.nkjmlab.sorm4j.extension.logger;
 
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +47,8 @@ public final class LoggerContext {
   public LoggerContext(Supplier<SormLogger> loggerSupplier,
       Set<LoggerContext.Category> onCategories) {
     this.loggerSupplier = loggerSupplier;
-    this.onCategories = onCategories;
+    this.onCategories =
+        onCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(onCategories);
   }
 
   @Experimental
