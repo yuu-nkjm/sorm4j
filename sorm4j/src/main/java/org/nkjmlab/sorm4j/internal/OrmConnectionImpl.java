@@ -54,7 +54,7 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  *
  */
 public class OrmConnectionImpl implements OrmConnection {
-
+  private static final Supplier<int[]> EMPTY_INT_SUPPLIER = () -> new int[0];
   private final SormContext sormContext;
   private final Connection connection;
   private final List<LazyResultSet<?>> lazyResultSets = new ArrayList<>();
@@ -136,7 +136,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] delete(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.delete(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.delete(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   @Override
@@ -162,7 +162,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.delete(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.delete(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   /**
@@ -267,7 +267,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   private int getOneSqlType(Class<?> objectClass, ResultSet resultSet) {
-    return Try.getOrElseThrow(() -> {
+    try {
       ResultSetMetaData metaData = resultSet.getMetaData();
       if (metaData.getColumnCount() != 1) {
         throw new SormException("ResultSet returned [" + metaData.getColumnCount()
@@ -275,7 +275,9 @@ public class OrmConnectionImpl implements OrmConnection {
             + objectClass.getName() + "]");
       }
       return metaData.getColumnType(1);
-    }, Try::rethrow);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
 
@@ -363,7 +365,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insert(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.insert(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   @Override
@@ -461,7 +463,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insert(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.insert(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
@@ -565,7 +567,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] merge(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects, mapping -> mapping.merge(getJdbcConnection(), objects),
-        () -> new int[0]);
+        EMPTY_INT_SUPPLIER);
   }
 
   @Override
@@ -581,7 +583,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.merge(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.merge(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   @Override
@@ -809,15 +811,17 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrElseThrow(
-        () -> getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
-            ? loadNativeObjectList(objectClass, resultSet)
-            : loadPojoList(objectClass, resultSet),
-        Try::rethrow);
+    try {
+      return getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
+          ? loadNativeObjectList(objectClass, resultSet)
+          : loadPojoList(objectClass, resultSet);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
   public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
-    return Try.getOrElseThrow(() -> {
+    try {
       final List<Map<String, Object>> ret = new ArrayList<>();
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       while (resultSet.next()) {
@@ -825,7 +829,9 @@ public class OrmConnectionImpl implements OrmConnection {
             ct.getColumns(), ct.getColumnTypes()));
       }
       return ret;
-    }, Try::rethrow);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
   @Override
@@ -841,7 +847,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] update(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.update(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   @Override
@@ -857,7 +863,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.update(getJdbcConnection(), objects), () -> new int[0]);
+        mapping -> mapping.update(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
 

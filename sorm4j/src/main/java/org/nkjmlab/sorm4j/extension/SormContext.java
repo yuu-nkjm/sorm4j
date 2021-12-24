@@ -92,13 +92,16 @@ public final class SormContext {
       Class<T> objectClass) {
     String key = tableName.getName() + "-" + objectClass.getName();
     @SuppressWarnings("unchecked")
-    TableMapping<T> ret =
-        (TableMapping<T>) tableMappings.computeIfAbsent(key, Try.createFunctionWithThrow(_key -> {
-          TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
-          sormConfig.getLoggerContext().createLogPoint(Category.MAPPING, SormContext.class)
-              .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
-          return m;
-        }, Try::rethrow));
+    TableMapping<T> ret = (TableMapping<T>) tableMappings.computeIfAbsent(key, _key -> {
+      try {
+        TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
+        sormConfig.getLoggerContext().createLogPoint(Category.MAPPING, SormContext.class)
+            .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
+        return m;
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
     return ret;
   }
 
@@ -187,8 +190,7 @@ public final class SormContext {
     @SuppressWarnings("unchecked")
     ColumnsMapping<T> ret = (ColumnsMapping<T>) columnsMappings.computeIfAbsent(objectClass, _k -> {
       ColumnsMapping<T> m = createColumnsMapping(objectClass);
-      sormConfig.getLoggerContext().createLogPoint(Category.MAPPING,
-          SormContext.class)
+      sormConfig.getLoggerContext().createLogPoint(Category.MAPPING, SormContext.class)
           .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
 
       return m;
@@ -197,9 +199,13 @@ public final class SormContext {
   }
 
   private TableName toTableName(Connection connection, Class<?> objectClass) {
-    return classNameToValidTableNameMap.computeIfAbsent(objectClass, Try.createFunctionWithThrow(
-        k -> sormConfig.getTableNameMapper().getTableName(objectClass, connection.getMetaData()),
-        Try::rethrow));
+    return classNameToValidTableNameMap.computeIfAbsent(objectClass, k -> {
+      try {
+        return sormConfig.getTableNameMapper().getTableName(objectClass, connection.getMetaData());
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
   }
 
   public String getTableName(Connection connection, Class<?> objectClass) {
@@ -207,10 +213,13 @@ public final class SormContext {
   }
 
   private TableName toTableName(Connection connection, String tableName) {
-    return tableNameToValidTableNameMap.computeIfAbsent(tableName,
-        Try.createFunctionWithThrow(
-            k -> sormConfig.getTableNameMapper().getTableName(tableName, connection.getMetaData()),
-            Try::rethrow));
+    return tableNameToValidTableNameMap.computeIfAbsent(tableName, k -> {
+      try {
+        return sormConfig.getTableNameMapper().getTableName(tableName, connection.getMetaData());
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
   }
 
 
