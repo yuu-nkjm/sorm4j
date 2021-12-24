@@ -530,21 +530,25 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    return Try.getOrElseThrow(() -> {
+    try {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       return getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
           ct.getColumns(), ct.getColumnTypes());
-    }, Try::rethrow);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
 
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) {
-    return Try.getOrElseThrow(
-        () -> getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
-            ? getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
-                getOneSqlType(objectClass, resultSet), objectClass)
-            : loadSinglePojo(objectClass, resultSet),
-        Try::rethrow);
+    try {
+      return getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
+          ? getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
+              getOneSqlType(objectClass, resultSet), objectClass)
+          : loadSinglePojo(objectClass, resultSet);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
 
@@ -876,29 +880,20 @@ public class OrmConnectionImpl implements OrmConnection {
   static <R> R executeQueryAndClose(LoggerContext loggerContext, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
       Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
-
     final Optional<LogPoint> lp = loggerContext.createLogPointBeforeSql(
         LoggerContext.Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
-
-    FunctionHandler<Connection, PreparedStatement> statementSupplier =
-        createAndSetPreparedStatement(options, connection, sqlParametersSetter, sql, parameters);
-
-    R ret = executeQueryAndClose(connection, resultSetTraverser, statementSupplier);
-    lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
-    return ret;
-  }
-
-
-
-  private static FunctionHandler<Connection, PreparedStatement> createAndSetPreparedStatement(
-      SormOptions options, Connection connection, SqlParametersSetter sqlParametersSetter,
-      String sql, Object[] parameters) {
-    return con -> {
-      PreparedStatement stmt = con.prepareStatement(sql);
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);
-      return stmt;
-    };
+      ResultSet resultSet = stmt.executeQuery();
+      R ret = resultSetTraverser.traverseAndMap(resultSet);
+      lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
+      return ret;
+    } catch (Exception e) {
+      throw Try.rethrow(e);
+    }
   }
+
+
 
   public static final int executeUpdateAndClose(LoggerContext loggerContext, SormOptions options,
       Connection connection, SqlParametersSetter sqlParametersSetter, String sql,
@@ -907,7 +902,6 @@ public class OrmConnectionImpl implements OrmConnection {
     final Optional<LogPoint> lp =
         loggerContext.createLogPointBeforeSql(LoggerContext.Category.EXECUTE_UPDATE,
             OrmConnectionImpl.class, connection, sql, parameters);
-
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       sqlParametersSetter.setParameters(options, stmt, parameters);

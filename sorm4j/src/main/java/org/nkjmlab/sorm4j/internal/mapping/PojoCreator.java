@@ -11,21 +11,21 @@ import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-abstract class PojoCreator<S> {
+abstract class PojoCreator<T> {
   private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
-  protected final Constructor<S> constructor;
+  protected final Constructor<T> constructor;
   protected final ColumnToAccessorMap columnToAccessorMap;
 
-  public PojoCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<S> constructor) {
+  public PojoCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
     this.columnToAccessorMap = columnToAccessorMap;
     this.constructor = constructor;
     // constructor.setAccessible(true);
   }
 
-  abstract List<S> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
+  abstract List<T> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
       ResultSet resultSet, ResultSetMetaData metaData, String[] columns) throws SQLException;
 
-  abstract S loadPojo(ResultSetConverter resultSetConverter, SormOptions options,
+  abstract T loadPojo(ResultSetConverter resultSetConverter, SormOptions options,
       ResultSet resultSet, ResultSetMetaData metaData, String[] columns) throws SQLException;
 
 
