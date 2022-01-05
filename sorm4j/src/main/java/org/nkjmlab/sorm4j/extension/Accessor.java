@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.common.SormException;
  */
 public final class Accessor {
 
+  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
   private static final EmptyGetter EMPTY_GETTER = new EmptyGetter();
   private static final EmptySetter EMPTY_SETTER = new EmptySetter();
   private final GetterAccessor getter;
@@ -94,7 +95,7 @@ public final class Accessor {
     @Override
     public Object get(Object object)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-      return getter.invoke(object, new Object[] {});
+      return getter.invoke(object, EMPTY_OBJECT_ARRAY);
     }
 
     @Override
@@ -171,7 +172,7 @@ public final class Accessor {
     @Override
     public void set(Object object, Object value)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-      setter.invoke(object, new Object[] {value});
+      setter.invoke(object, value);
     }
 
     @Override
