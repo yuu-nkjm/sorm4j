@@ -41,6 +41,7 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.internal.util.Try;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -65,11 +66,11 @@ import org.sql2o.tools.FeatureDetector;
  *
  */
 @Warmup(iterations = 1)
-@Measurement(iterations = 1)
+@Measurement(iterations = 3)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @BenchmarkMode(Mode.AverageTime)
-@Threads(1)
-@Fork(1)
+@Threads(5)
+@Fork(5)
 @State(Scope.Thread)
 public class OrmBenchmarkPostSimple {
 
@@ -110,7 +111,7 @@ public class OrmBenchmarkPostSimple {
   public static interface BenchmarkBase {
     List<Post> selectAll(int input);
 
-    void multiRowInsert(Post... inputs);
+    int[] multiRowInsert(Post... inputs);
 
     Post selectOneRow(int input);
 
@@ -149,17 +150,15 @@ public class OrmBenchmarkPostSimple {
           PreparedStatement stmt = conn.prepareStatement(SELECT_TYPICAL_SQL + " WHERE id = ?")) {
         stmt.setInt(1, input);
         try (ResultSet rs = stmt.executeQuery()) {
-          while (rs.next()) {
-            Post p = new Post();
-            p.setId(rs.getInt("id"));
-            p.setText(rs.getString("text"));
-            p.setCreationDate(rs.getTimestamp("creation_date"));
-            p.setLastChangeDate(rs.getTimestamp("last_change_date"));
-            p.setCounter1(getNullableInt(rs, "counter1"));
-            p.setCounter2(getNullableDouble(rs, "counter2"));
-            return p;
-          }
-          return null;
+          rs.next();
+          Post p = new Post();
+          p.setId(rs.getInt("id"));
+          p.setText(rs.getString("text"));
+          p.setCreationDate(rs.getTimestamp("creation_date"));
+          p.setLastChangeDate(rs.getTimestamp("last_change_date"));
+          p.setCounter1(getNullableInt(rs, "counter1"));
+          p.setCounter2(getNullableDouble(rs, "counter2"));
+          return p;
         }
       } catch (SQLException e) {
         throw new RuntimeException("error when executing query", e);
@@ -180,8 +179,9 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       int i = 0;
+      int[] ret = new int[inputs.length / batchSize + 1];
       try (Connection connection = dataSource.getConnection()) {
         PreparedStatement stmt = null;
         for (i = 0; i < inputs.length; i++) {
@@ -190,12 +190,13 @@ public class OrmBenchmarkPostSimple {
           }
           setParametersToStatement(stmt, inputs[i], i % batchSize);
           if (i % batchSize == batchSize - 1) {
-            stmt.executeUpdate();
+            ret[i / batchSize] = stmt.executeUpdate();
           }
         }
         stmt.close();
+        return ret;
       } catch (SQLException e) {
-        e.printStackTrace();
+        throw Try.rethrow(e);
       }
     }
 
@@ -203,8 +204,8 @@ public class OrmBenchmarkPostSimple {
         throws SQLException {
       final int cols = 5;
       stmt.setString((cols * i) + 1, a.getText());
-      stmt.setTimestamp((cols * i) + 2, new Timestamp(a.getCreationDate().getTime()));
-      stmt.setTimestamp((cols * i) + 3, new Timestamp(a.getLastChangeDate().getTime()));
+      stmt.setTimestamp((cols * i) + 2, a.getCreationDate());
+      stmt.setTimestamp((cols * i) + 3, a.getLastChangeDate());
       stmt.setInt((cols * i) + 4, a.getCounter1() != null ? a.getCounter1() : -1);
       stmt.setDouble((cols * i) + 5, a.getCounter2() != null ? a.getCounter2() : -1);
     }
@@ -276,7 +277,7 @@ public class OrmBenchmarkPostSimple {
 
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -309,13 +310,13 @@ public class OrmBenchmarkPostSimple {
 
 
     @Override
-    public void multiRowInsert(Post... inputs) {
-      jdbi.useHandle(handle -> {
+    public int[] multiRowInsert(Post... inputs) {
+      return jdbi.withHandle(handle -> {
         PreparedBatch batch = handle.prepareBatch(insertSqlWithNamedParameter);
         for (Post a : inputs) {
           batch.bindBean(a).add();
         }
-        batch.execute();
+        return batch.execute();
       });
     }
 
@@ -349,7 +350,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -405,7 +406,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -422,8 +423,9 @@ public class OrmBenchmarkPostSimple {
 
     @Override
     public Post selectOneRow(int input) {
-      return sorm
-          .apply(conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
+      // return sorm
+      // .apply(conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
+      return sorm.apply(conn -> conn.readByPrimaryKey(Post.class, input));
     }
 
     @Override
@@ -432,8 +434,8 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
-      sorm.accept(conn -> conn.insert(inputs));
+    public int[] multiRowInsert(Post... inputs) {
+      return sorm.apply(conn -> conn.insert(inputs));
     }
   }
 
@@ -458,7 +460,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -512,14 +514,15 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public void multiRowInsert(Post... inputs) {
+    public int[] multiRowInsert(Post... inputs) {
       try (org.sql2o.Connection conn = sql2o.open()) {
         Query query = conn.createQuery(insertSqlWithNamedParameter);
         for (Post a : inputs) {
           query.bind(a).addToBatch();
         }
-        query.executeBatch();
+        int[] ret = query.executeBatch().getBatchResult();
         query.close();
+        return ret;
       }
     }
 
@@ -632,7 +635,7 @@ public class OrmBenchmarkPostSimple {
     System.out.println(System.lineSeparator() + "### setup ##################");
     Sorm sorm = Sorm.create(dataSource);
     sorm.accept(conn -> {
-      conn.executeUpdate(Post.DROP_AND_CREATE_TABLE);
+      conn.executeUpdate(Post.CREATE_TABLE_IF_NOT_EXISTS);
       conn.insert(IntStream.range(0, OrmBenchmarkPostSimple.NUM_OF_ROWS)
           .mapToObj(i -> Post.createRandom(i)).toArray(Post[]::new));
     });
@@ -747,8 +750,7 @@ public class OrmBenchmarkPostSimple {
   }
 
   public static class Post {
-    public static final String DROP_AND_CREATE_TABLE = "DROP TABLE IF EXISTS post;"
-        + "CREATE TABLE post ( "
+    public static final String CREATE_TABLE_IF_NOT_EXISTS = "CREATE TABLE IF NOT EXISTS post ( "
         + "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date DATETIME , last_change_date DATETIME , "
         + "counter1 INT , counter2 DOUBLE);";
 
@@ -762,7 +764,7 @@ public class OrmBenchmarkPostSimple {
         + ")";
 
     private static final String insertSqlPrefix =
-        "insert into post(" + String.join(",", colsWithoutId) + ") values";
+        "insert into post (" + String.join(",", colsWithoutId) + ") values ";
 
     public static final String insertSql = insertSqlPrefix + placeHolders;
     public static final String insertSqlWithNamedParameter =
