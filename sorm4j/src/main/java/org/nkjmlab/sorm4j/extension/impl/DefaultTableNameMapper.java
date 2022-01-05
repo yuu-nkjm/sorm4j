@@ -47,7 +47,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
    * @param objectClass
    * @return
    */
-  protected List<String> guessTableNameCandidates(Class<?> objectClass) {
+  private List<String> guessTableNameCandidates(Class<?> objectClass) {
 
     List<String> annotatedTableName = Optional.ofNullable(objectClass.getAnnotation(OrmTable.class))
         .map(a -> List.of(a.value())).orElse(Collections.emptyList());
@@ -76,7 +76,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
    *
    * @see {@link java.sql.DatabaseMetaData#getTables}
    */
-  protected Optional<TableName> convertToExactTableName(DatabaseMetaData metaData,
+  private Optional<TableName> convertToExactTableName(DatabaseMetaData metaData,
       List<String> tableNameCandidates) {
     try (
         ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
@@ -101,7 +101,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
    * @param exactTableName is the table name on the database
    * @return
    */
-  protected boolean isMatch(List<String> candidates, String exactTableName) {
+  private boolean isMatch(List<String> candidates, String exactTableName) {
     return containsAsCanonical(candidates, exactTableName);
   }
 
