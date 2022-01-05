@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
@@ -31,7 +30,6 @@ import org.nkjmlab.sorm4j.extension.Accessor;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.ColumnName;
 import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
-import org.nkjmlab.sorm4j.extension.FieldName;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
@@ -272,22 +270,12 @@ public class DefaultColumnFieldMapper implements ColumnFieldMapper {
    * @return
    * @throws SQLException
    */
-  protected String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
+  private String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
     // oracle expects a pattern such as "%" to work
     return "Oracle".equalsIgnoreCase(metaData.getDatabaseProductName()) ? "%" : null;
   }
 
-  /**
-   * Guesses candidates of column name from the given field name.
-   *
-   * @param fieldName
-   * @return
-   */
 
-  protected List<ColumnName> guessColumnNameCandidates(FieldName fieldName) {
-    final String _fieldName = fieldName.getName();
-    return Stream.of(toCanonicalCase(_fieldName)).map(ColumnName::new).collect(Collectors.toList());
-  }
 
   @Override
   public String getColumnAliasPrefix(Class<?> objectClass) {
