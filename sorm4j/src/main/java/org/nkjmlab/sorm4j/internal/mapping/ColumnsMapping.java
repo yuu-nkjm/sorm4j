@@ -7,6 +7,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
@@ -26,6 +29,10 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 public final class ColumnsMapping<T> extends Mapping<T> {
 
+  private static final ConcurrentMap<Class<?>, String[]> primaryKeyColumnLabels =
+      new ConcurrentHashMap<>();
+
+  private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
   private final PojoCreator<T> pojoCreator;
 
   public ColumnsMapping(SormOptions options, ResultSetConverter resultSetConverter,
@@ -64,18 +71,6 @@ public final class ColumnsMapping<T> extends Mapping<T> {
                 objectClass),
             e));
   }
-  // private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass) {
-  // Constructor<T> constructor = Try.getOrElseThrow(
-  // () -> objectClass.getConstructor(Arrays.stream(objectClass.getRecordComponents())
-  // .map(cn -> cn.getType()).toArray(Class[]::new)),
-  // e -> new SormException(format(
-  // "The given container record class [{}] does not have a valid constructor for mapping.",
-  // objectClass), e));
-  // String[] parameterNames =
-  // Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-  // return new ConstructorPojoCreator<>(constructor, parameterNames,
-  // columnToAccessorMap.getColumnAliasPrefix());
-  // }
 
   private Constructor<T> getOrmConstructor(Class<T> objectClass) {
     List<Constructor<?>> ormConstructors = Arrays.stream(objectClass.getConstructors())
@@ -116,17 +111,61 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
   public List<T> loadPojoList(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
-    return pojoCreator.loadPojoList(resultSetConverter, options, resultSet, metaData,
-        createColumnLabels(resultSet, metaData));
+    String[] columns = createColumnLabels(resultSet, metaData);
+    String columnsString = getObjectColumnsString(columns);
+    int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
+    return pojoCreator.loadPojoList(resultSetConverter, options, resultSet, columns, columnTypes,
+        columnsString);
   }
 
   public T loadPojo(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
-    return pojoCreator.loadPojo(resultSetConverter, options, resultSet, metaData,
-        createColumnLabels(resultSet, metaData));
+    String[] columns = createColumnLabels(resultSet, metaData);
+    String columnsString = getObjectColumnsString(columns);
+    int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
+    return pojoCreator.loadPojo(resultSetConverter, options, resultSet, columns, columnTypes,
+        columnsString);
   }
 
-  public String[] createColumnLabels(ResultSet resultSet, ResultSetMetaData metaData)
+  public T loadPojoByPrimaryKey(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+    String[] columns = primaryKeyColumnLabels.computeIfAbsent(objectClass, key -> {
+      try {
+        return createColumnLabels(resultSet, resultSet.getMetaData());
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
+    String columnsString = getObjectColumnsString(columns);
+    int[] columnTypes = getColumnTypes(resultSet, null, columns, columnsString);
+    return pojoCreator.loadPojo(resultSetConverter, options, resultSet, columns, columnTypes,
+        columnsString);
+  }
+
+  private String getObjectColumnsString(String[] columns) {
+    return String.join("-", columns);
+  }
+
+
+
+  private int[] getColumnTypes(ResultSet resultSet, ResultSetMetaData metaData, String[] columns,
+      String columnsStr) {
+    return columnTypesMap.computeIfAbsent(columnsStr, k -> {
+      try {
+        ResultSetMetaData _metaData = metaData == null ? resultSet.getMetaData() : metaData;
+        int n = _metaData.getColumnCount();
+        int[] ret = new int[n];
+        for (int i = 1; i <= ret.length; i++) {
+          ret[i - 1] = _metaData.getColumnType(i);
+        }
+        return ret;
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
+  }
+
+
+  private String[] createColumnLabels(ResultSet resultSet, ResultSetMetaData metaData)
       throws SQLException {
     final int colNum = metaData.getColumnCount();
     final String[] columns = new String[colNum];

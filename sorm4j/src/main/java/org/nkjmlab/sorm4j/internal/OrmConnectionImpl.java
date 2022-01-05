@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -467,18 +468,11 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    if (resultSet.next()) {
-      return mapRowToObject(objectClass, resultSet);
-    }
-    return null;
+    return resultSet.next() ? mapRowToObject(objectClass, resultSet) : null;
   }
 
   public Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
-    Map<String, Object> ret = null;
-    if (resultSet.next()) {
-      ret = mapRowToMap(resultSet);
-    }
-    return ret;
+    return resultSet.next() ? mapRowToMap(resultSet) : Collections.emptyMap();
   }
 
   private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
@@ -519,15 +513,13 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
-    return mapping.loadPojoList(resultSet);
+    return getColumnsMapping(objectClass).loadPojoList(resultSet);
   }
 
 
   private final <T> T loadSinglePojo(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    ColumnsMapping<T> mapping = getColumnsMapping(objectClass);
-    return mapping.loadPojo(resultSet);
+    return getColumnsMapping(objectClass).loadPojo(resultSet);
   }
 
 
@@ -601,7 +593,12 @@ public class OrmConnectionImpl implements OrmConnection {
     final TableMapping<T> mapping = getTableMapping(objectClass);
     mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
-    return readFirst(objectClass, sql, primaryKeyValues);
+    return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
+        getSqlParametersSetter(), sql, primaryKeyValues, resultSet -> {
+          return resultSet.next()
+              ? getColumnsMapping(objectClass).loadPojoByPrimaryKey(objectClass, resultSet)
+              : null;
+        });
   }
 
 

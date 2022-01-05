@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,12 +99,10 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
 
   @Override
   List<S> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
-      ResultSet resultSet, ResultSetMetaData metaData, String[] columns) throws SQLException {
-    String objectobjectColumnsStr = getObjectColumnsStr(columns);
-
-    final int[] columnTypes = getColumnTypes(resultSet, metaData, columns, objectobjectColumnsStr);
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
     final ConstructorParameter[] constructorParameters =
-        getCorrespondingParameter(columns, objectobjectColumnsStr);
+        getCorrespondingParameter(columns, columnsString);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
@@ -117,11 +114,9 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
 
   @Override
   S loadPojo(ResultSetConverter resultSetConverter, SormOptions options, ResultSet resultSet,
-      ResultSetMetaData metaData, String[] columns) throws SQLException {
-    String objectColumnsStr = getObjectColumnsStr(columns);
-    final int[] columnTypes = getColumnTypes(resultSet, metaData, columns, objectColumnsStr);
+      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
     final ConstructorParameter[] constructorParameters =
-        getCorrespondingParameter(columns, objectColumnsStr);
+        getCorrespondingParameter(columns, columnsString);
     return createPojo(resultSetConverter, options, resultSet, columnTypes, constructorParameters);
   }
 

@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,10 +35,8 @@ final class SetterPojoCreator<T> extends PojoCreator<T> {
 
   @Override
   T loadPojo(ResultSetConverter resultSetConverter, SormOptions options, ResultSet resultSet,
-      ResultSetMetaData metaData, String[] columns) throws SQLException {
-    String objectColumnsStr = getObjectColumnsStr(columns);
-    final Class<?>[] setterTypes = getSetterTypes(columns, objectColumnsStr);
-    final int[] columnTypes = getColumnTypes(resultSet, metaData, columns, objectColumnsStr);
+      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
+    final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     return createPojo(resultSetConverter, options, resultSet, columns, columnTypes, setterTypes);
   }
 
@@ -47,11 +44,9 @@ final class SetterPojoCreator<T> extends PojoCreator<T> {
 
   @Override
   public List<T> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
-      ResultSet resultSet, ResultSetMetaData metaData, String[] columns) throws SQLException {
-    String objectColumnsStr = getObjectColumnsStr(columns);
-    final Class<?>[] setterTypes = getSetterTypes(columns, objectColumnsStr);
-    final int[] columnTypes = getColumnTypes(resultSet, metaData, columns, objectColumnsStr);
-
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
+    final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
