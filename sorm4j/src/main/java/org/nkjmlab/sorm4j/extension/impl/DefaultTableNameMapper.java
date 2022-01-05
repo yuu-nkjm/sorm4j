@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension.impl;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,18 +25,20 @@ public class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public TableName getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
-    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(newString(
-        "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
-        tableName, OrmTable.class.getName(), candidates)));
+    return convertToExactTableName(metaData, candidates)
+        .orElseThrow(() -> new SormException(newString(
+            "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
+            tableName, OrmTable.class.getName(), candidates)));
   }
 
 
   @Override
   public TableName getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
-    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(newString(
-        "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
-        objectClass.getName(), OrmTable.class.getName(), candidates)));
+    return convertToExactTableName(metaData, candidates)
+        .orElseThrow(() -> new SormException(newString(
+            "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
+            objectClass.getName(), OrmTable.class.getName(), candidates)));
   }
 
   /**
@@ -50,7 +52,7 @@ public class DefaultTableNameMapper implements TableNameMapper {
     List<String> annotatedTableName = Optional.ofNullable(objectClass.getAnnotation(OrmTable.class))
         .map(a -> List.of(a.value())).orElse(Collections.emptyList());
 
-    if (annotatedTableName.size() != 0) {
+    if (!annotatedTableName.isEmpty()) {
       return annotatedTableName;
     }
     String className = objectClass.getSimpleName();

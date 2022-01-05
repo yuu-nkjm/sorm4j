@@ -155,7 +155,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   public Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column,
       int columnType, Class<?> toType) throws SQLException {
 
-    if (converters.size() != 0) {
+    if (!converters.isEmpty()) {
       Optional<ColumnValueConverter> conv = converters.stream()
           .filter(co -> co.isApplicable(options, resultSet, column, columnType, toType))
           .findFirst();

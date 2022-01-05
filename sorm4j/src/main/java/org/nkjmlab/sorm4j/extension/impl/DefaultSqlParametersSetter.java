@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +37,7 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
   }
 
   public DefaultSqlParametersSetter(List<ParameterSetter> setters) {
-    this.setters = new ArrayList<>(setters);
+    this.setters = List.copyOf(setters);
   }
 
   public DefaultSqlParametersSetter(ParameterSetter... setters) {
@@ -76,7 +75,7 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
   protected void setParameter(SormOptions options, PreparedStatement stmt, int parameterIndex,
       Object parameter) throws SQLException {
     Class<?> type = parameter.getClass();
-    if (setters.size() != 0) {
+    if (!setters.isEmpty()) {
       Optional<ParameterSetter> setter = setters.stream()
           .filter(co -> co.isApplicable(options, stmt, parameterIndex, type, parameter))
           .findFirst();
