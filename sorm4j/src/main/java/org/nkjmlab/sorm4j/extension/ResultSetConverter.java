@@ -38,8 +38,8 @@ public interface ResultSetConverter {
    * @throws SQLException
    *
    */
-  Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> toType) throws SQLException;
+  <T> T convertColumnValueTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+      Class<T> toType) throws SQLException;
 
   /**
    * Returns the given type could be converted to the native object or not.
@@ -49,7 +49,7 @@ public interface ResultSetConverter {
    *
    * @return
    */
-  boolean isStandardClass(SormOptions options, Class<?> objectClass);
+  boolean isStandardObjectClass(SormOptions options, Class<?> objectClass);
 
   /**
    * Converts the result from database to a map objects. The data of the column is extracted by

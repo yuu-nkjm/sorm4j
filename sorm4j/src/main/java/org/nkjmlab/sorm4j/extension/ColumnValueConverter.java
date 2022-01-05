@@ -6,6 +6,6 @@ public interface ColumnValueConverter {
   boolean isApplicable(SormOptions options, ResultSet resultSet, int column, int columnType,
       Class<?> toType);
 
-  Object convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<?> toType);
+  <T> T convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+      Class<T> toType);
 }

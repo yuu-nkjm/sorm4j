@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.extension.impl;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
@@ -15,9 +16,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.ColumnValueConverter;
 import org.nkjmlab.sorm4j.extension.ResultSetConverter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -29,36 +32,22 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class DefaultResultSetConverter implements ResultSetConverter {
 
-
-  private static final Set<Class<?>> standardObjectClasses = Set.of(boolean.class, Boolean.class,
-      byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
-      Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
-      String.class, BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
-      java.sql.Time.class, java.sql.Timestamp.class, java.time.LocalDate.class,
-      java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
-      java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
-      java.io.InputStream.class, java.io.Reader.class, java.net.URL.class,
-      java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class);
-
-  /**
-   * Returns the given type is enable to convert element object.
-   *
-   * Following classes and Array are regarded as native class.
-   *
-   * boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class, int.class,
-   * Integer.class, long.class, Long.class, float.class, Float.class, double.class, Double.class,
-   * char.class, Character.class, byte[].class, Byte[].class, char[].class, Character[].class,
-   * String.class, BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
-   * java.sql.Time.class, java.sql.Timestamp.class, java.time.LocalDate.class,
-   * java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
-   * java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
-   * java.io.InputStream.class, java.io.Reader.class, java.net.URL.class,
-   * java.net.Inet4Address.class, java.net.Inet6Address.class, Object.class
-   */
-  @Override
-  public boolean isStandardClass(SormOptions options, Class<?> objectClass) {
-    return standardObjectClasses.contains(objectClass) || objectClass.isArray();
+  public enum LetterCaseOfKeyInMap {
+    LOWER_CASE, UPPER_CASE, CANONICAL_CASE, NO_CONVERSION;
   }
+
+  private static final Set<Class<?>> standardObjectClasses =
+      Set.of(boolean.class, Boolean.class, byte.class, Byte.class, short.class, Short.class,
+          int.class, Integer.class, long.class, Long.class, float.class, Float.class, double.class,
+          Double.class, char.class, Character.class, String.class, BigDecimal.class,
+          java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class,
+          java.sql.Timestamp.class, java.time.LocalDate.class, java.time.LocalTime.class,
+          java.time.LocalDateTime.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
+          java.time.ZonedDateTime.class, java.util.Date.class, java.util.UUID.class, Object.class);
+
+
+  @Experimental
+  private final LetterCaseOfKeyInMap letterCaseOfKeyInMap;
 
   private final List<ColumnValueConverter> converters;
 
@@ -71,37 +60,183 @@ public class DefaultResultSetConverter implements ResultSetConverter {
   }
 
   public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap,
-      List<ColumnValueConverter> converters) {
-    this(letterCaseOfKeyInMap, converters.toArray(ColumnValueConverter[]::new));
-  }
-
-  public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap,
       ColumnValueConverter... converters) {
     this.converters = converters.length == 0 ? Collections.emptyList() : Arrays.asList(converters);
     this.letterCaseOfKeyInMap = letterCaseOfKeyInMap;
   }
 
-  @Experimental
-  private final LetterCaseOfKeyInMap letterCaseOfKeyInMap;
+  public DefaultResultSetConverter(LetterCaseOfKeyInMap letterCaseOfKeyInMap,
+      List<ColumnValueConverter> converters) {
+    this(letterCaseOfKeyInMap, converters.toArray(ColumnValueConverter[]::new));
+  }
 
 
-  public enum LetterCaseOfKeyInMap {
-    LOWER_CASE, UPPER_CASE, CANONICAL_CASE, NO_CONVERSION;
+
+  // 2021-03-26 An approach to create converter at once and apply the converter to get result is
+  // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T convertColumnValueTo(SormOptions options, ResultSet resultSet, int column,
+      int columnType, Class<T> toType) throws SQLException {
+    return (T) convertColumnValueToHelper(options, resultSet, column, columnType, toType);
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private Object convertColumnValueToHelper(SormOptions options, ResultSet resultSet, int column,
+      int columnType, Class<?> toType) throws SQLException {
+    if (!converters.isEmpty()) {
+      Optional<ColumnValueConverter> conv = converters.stream()
+          .filter(co -> co.isApplicable(options, resultSet, column, columnType, toType))
+          .findFirst();
+      if (conv.isPresent()) {
+        return conv.get().convertTo(options, resultSet, column, columnType, toType);
+      }
+    }
+
+    final String name = toType.getName();
+    switch (name) {
+      case "boolean":
+        return resultSet.getBoolean(column);
+      case "java.lang.Boolean": {
+        final boolean ret = resultSet.getBoolean(column);
+        return (!ret && resultSet.wasNull()) ? null : ret;
+      }
+      case "byte":
+        return resultSet.getByte(column);
+      case "java.lang.Byte": {
+        final byte ret = resultSet.getByte(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "short":
+        return resultSet.getShort(column);
+      case "java.lang.Short": {
+        final short ret = resultSet.getShort(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "int":
+        return resultSet.getInt(column);
+      case "java.lang.Integer": {
+        final int ret = resultSet.getInt(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "long":
+        return resultSet.getLong(column);
+      case "java.lang.Long": {
+        final long ret = resultSet.getLong(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "float":
+        return resultSet.getFloat(column);
+      case "java.lang.Float": {
+        final float ret = resultSet.getFloat(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "double":
+        return resultSet.getDouble(column);
+      case "java.lang.Double": {
+        final double ret = resultSet.getDouble(column);
+        return (ret == 0 && resultSet.wasNull()) ? null : ret;
+      }
+      case "java.math.BigDecimal":
+        return resultSet.getBigDecimal(column);
+      case "java.lang.String":
+        return resultSet.getString(column);
+      case "java.lang.Character":
+      case "char": {
+        final String str = resultSet.getString(column);
+        return (str == null || str.length() == 0) ? null : str.charAt(0);
+      }
+      case "java.sql.Date":
+        return resultSet.getDate(column);
+      case "java.sql.Time":
+        return resultSet.getTime(column);
+      case "java.sql.Timestamp":
+        return resultSet.getTimestamp(column);
+      case "java.sql.Clob":
+        return resultSet.getClob(column);
+      case "java.sql.Blob":
+        return resultSet.getBlob(column);
+      case "java.time.LocalTime":
+        return Optional.ofNullable(resultSet.getTime(column)).map(t -> t.toLocalTime())
+            .orElse(null);
+      case "java.time.LocalDate":
+        return Optional.ofNullable(resultSet.getDate(column)).map(t -> t.toLocalDate())
+            .orElse(null);
+      case "java.time.LocalDateTime":
+        return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime())
+            .orElse(null);
+      case "java.util.Date":
+        return Optional.ofNullable(resultSet.getTimestamp(column))
+            .map(t -> new java.util.Date(t.getTime())).orElse(null);
+      case "java.util.UUID":
+        return Optional.ofNullable(resultSet.getString(column))
+            .map(s -> java.util.UUID.fromString(s)).orElse(null);
+      case "java.time.OffsetTime":
+        return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime()
+            .atZone(ZoneId.systemDefault()).toOffsetDateTime().toOffsetTime()).orElse(null);
+      case "java.time.OffsetDateTime":
+        return Optional.ofNullable(resultSet.getTimestamp(column))
+            .map(t -> t.toLocalDateTime().atZone(ZoneId.systemDefault()).toOffsetDateTime())
+            .orElse(null);
+      case "java.lang.Object":
+        return resultSet.getObject(column);
+      default:
+        if (toType.isEnum()) {
+          try {
+            return Enum.valueOf((Class<? extends Enum>) toType, resultSet.getString(column));
+          } catch (Exception e) {
+            return null;
+          }
+        } else if (toType.isArray()) {
+          final String compName = toType.getComponentType().getName();
+          switch (compName) {
+            case "byte":
+              return resultSet.getBytes(column);
+            default: {
+              java.sql.Array arry = resultSet.getArray(column);
+              Object srcArry = arry.getArray();
+              final int length = Array.getLength(srcArry);
+              Object destArray = Array.newInstance(componentType(compName), length);
+              for (int i = 0; i < length; i++) {
+                Object v = Array.get(srcArry, i);
+                try {
+                  Array.set(destArray, i, v);
+                } catch (Exception e) {
+                  throw new SormException(ParameterizedStringUtils.newString(
+                      "Could not convert column ({}) to  array ({}[])",
+                      JDBCType.valueOf(columnType).getName(), compName));
+                }
+              }
+              return destArray;
+            }
+          }
+        } else {
+          throw new SormException(ParameterizedStringUtils.newString(
+              "Could not find corresponding converter columnType={}, toType={}. ",
+              JDBCType.valueOf(columnType).getName(), toType));
+        }
+
+    }
+
 
   }
 
-  private String convertKey(String key) {
-    switch (letterCaseOfKeyInMap) {
-      case LOWER_CASE:
-        return toLowerCase(key);
-      case UPPER_CASE:
-        return toUpperCase(key);
-      case CANONICAL_CASE:
-        return toCanonicalCase(key);
-      case NO_CONVERSION:
-      default:
-        return key;
-    }
+  /**
+   * Returns the given type is enable to convert element object.
+   *
+   * Following classes and Array are regarded as native class: boolean.class, Boolean.class,
+   * byte.class, Byte.class, short.class, Short.class, int.class, Integer.class, long.class,
+   * Long.class, float.class, Float.class, double.class, Double.class, char.class, Character.class,
+   * String.class, BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
+   * java.sql.Time.class, java.sql.Timestamp.class, java.time.LocalDate.class,
+   * java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
+   * java.time.OffsetDateTime.class, java.time.ZonedDateTime.class, java.util.Date.class,
+   * java.util.UUID.class, Object.class
+   */
+  @Override
+  public boolean isStandardObjectClass(SormOptions options, Class<?> objectClass) {
+    return standardObjectClasses.contains(objectClass) || objectClass.isArray();
   }
 
   @Override
@@ -110,22 +245,38 @@ public class DefaultResultSetConverter implements ResultSetConverter {
     final int cSize = columns.size();
     final Map<String, Object> ret = new LinkedHashMap<>(cSize);
     for (int i = 1; i <= cSize; i++) {
-      ret.put(convertKey(columns.get(i - 1)),
+      ret.put(convertKey(letterCaseOfKeyInMap, columns.get(i - 1)),
           getColumnValueBySqlType(resultSet, i, columnTypes.get(i - 1)));
     }
     return ret;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int sqlType,
       Class<T> objectClass) throws SQLException {
-    return (T) convertColumnValueTo(options, resultSet, 1, sqlType, objectClass);
+    return convertColumnValueTo(options, resultSet, 1, sqlType, objectClass);
   }
-
 
   private static Class<?> componentType(String name) {
     switch (name) {
+      case "java.lang.Boolean":
+        return Boolean.class;
+      case "java.lang.Character":
+        return Character.class;
+      case "java.lang.Byte":
+        return Byte.class;
+      case "java.lang.Short":
+        return Short.class;
+      case "java.lang.Integer":
+        return Integer.class;
+      case "java.lang.Long":
+        return Long.class;
+      case "java.lang.Float":
+        return Float.class;
+      case "java.lang.Double":
+        return Double.class;
+      case "java.lang.Object":
+        return Object.class;
       case "boolean":
         return boolean.class;
       case "char":
@@ -147,155 +298,17 @@ public class DefaultResultSetConverter implements ResultSetConverter {
     }
   }
 
-
-  // 2021-03-26 An approach to create converter at once and apply the converter to get result is
-  // slower than the current code. https://github.com/yuu-nkjm/sorm4j/issues/25
-
-  @Override
-  public Object convertColumnValueTo(SormOptions options, ResultSet resultSet, int column,
-      int columnType, Class<?> toType) throws SQLException {
-
-    if (!converters.isEmpty()) {
-      Optional<ColumnValueConverter> conv = converters.stream()
-          .filter(co -> co.isApplicable(options, resultSet, column, columnType, toType))
-          .findFirst();
-      if (conv.isPresent()) {
-        return conv.get().convertTo(options, resultSet, column, columnType, toType);
-      }
-    }
-
-    if (toType.isEnum()) {
-      final String v = resultSet.getString(column);
-      return Arrays.stream(toType.getEnumConstants()).filter(o -> o.toString().equals(v)).findAny()
-          .orElse(null);
-    } else if (toType.isArray()) {
-      final String name = toType.getComponentType().getName();
-      switch (name) {
-        case "byte":
-        case "java.lang.Byte":
-          return resultSet.getBytes(column);
-        case "char":
-        case "java.lang.Character": {
-          final String str = resultSet.getString(column);
-          return (str == null) ? null : str.toCharArray();
-        }
-        default: {
-          java.sql.Array arry = resultSet.getArray(column);
-          Object srcArry = arry.getArray();
-          final int length = Array.getLength(srcArry);
-          Object destArray = Array.newInstance(componentType(name), length);
-          for (int i = 0; i < length; i++) {
-            Object v = Array.get(srcArry, i);
-            Array.set(destArray, i, v);
-          }
-          return destArray;
-        }
-      }
-    } else {
-      final String name = toType.getName();
-      switch (name) {
-        case "boolean":
-          return resultSet.getBoolean(column);
-        case "java.lang.Boolean": {
-          final boolean ret = resultSet.getBoolean(column);
-          return (!ret && resultSet.wasNull()) ? null : ret;
-        }
-        case "byte":
-          return resultSet.getByte(column);
-        case "java.lang.Byte": {
-          final byte ret = resultSet.getByte(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "short":
-          return resultSet.getShort(column);
-        case "java.lang.Short": {
-          final short ret = resultSet.getShort(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "int":
-          return resultSet.getInt(column);
-        case "java.lang.Integer": {
-          final int ret = resultSet.getInt(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "long":
-          return resultSet.getLong(column);
-        case "java.lang.Long": {
-          final long ret = resultSet.getLong(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "float":
-          return resultSet.getFloat(column);
-        case "java.lang.Float": {
-          final float ret = resultSet.getFloat(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "double":
-          return resultSet.getDouble(column);
-        case "java.lang.Double": {
-          final double ret = resultSet.getDouble(column);
-          return (ret == 0 && resultSet.wasNull()) ? null : ret;
-        }
-        case "java.math.BigDecimal":
-          return resultSet.getBigDecimal(column);
-        case "java.lang.String":
-          return resultSet.getString(column);
-        case "java.lang.Character":
-        case "char": {
-          final String str = resultSet.getString(column);
-          return (str == null || str.length() == 0) ? null : str.charAt(0);
-        }
-        case "java.sql.Date":
-          return resultSet.getDate(column);
-        case "java.sql.Time":
-          return resultSet.getTime(column);
-        case "java.sql.Timestamp":
-          return resultSet.getTimestamp(column);
-        case "java.io.InputStream":
-          return resultSet.getBinaryStream(column);
-        case "java.io.Reader":
-          return resultSet.getCharacterStream(column);
-        case "java.sql.Clob":
-          return resultSet.getClob(column);
-        case "java.sql.Blob":
-          return resultSet.getBlob(column);
-        case "java.time.LocalTime":
-          return Optional.ofNullable(resultSet.getTime(column)).map(t -> t.toLocalTime())
-              .orElse(null);
-        case "java.time.LocalDate":
-          return Optional.ofNullable(resultSet.getDate(column)).map(t -> t.toLocalDate())
-              .orElse(null);
-        case "java.time.LocalDateTime":
-          return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime())
-              .orElse(null);
-        case "java.util.Date":
-          return Optional.ofNullable(resultSet.getTimestamp(column))
-              .map(t -> new java.util.Date(t.getTime())).orElse(null);
-        case "java.util.UUID":
-          return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> java.util.UUID.fromString(s)).orElse(null);
-        case "java.time.OffsetTime":
-          return Optional.ofNullable(resultSet.getTimestamp(column)).map(t -> t.toLocalDateTime()
-              .atZone(ZoneId.systemDefault()).toOffsetDateTime().toOffsetTime()).orElse(null);
-        case "java.time.OffsetDateTime":
-          return Optional.ofNullable(resultSet.getTimestamp(column))
-              .map(t -> t.toLocalDateTime().atZone(ZoneId.systemDefault()).toOffsetDateTime())
-              .orElse(null);
-        case "java.net.URL":
-          return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrElseNull(() -> new java.net.URL(s))).orElse(null);
-        case "java.net.Inet4Address":
-          return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrElseNull(() -> java.net.Inet4Address.getByName(s))).orElse(null);
-        case "java.net.Inet6Address":
-          return Optional.ofNullable(resultSet.getString(column))
-              .map(s -> Try.getOrElseNull(() -> java.net.Inet6Address.getByName(s))).orElse(null);
-        case "java.lang.Object":
-          return resultSet.getObject(column);
-        default:
-          // Could not find corresponding converter. ResultSet#getObject method will be used.
-          return resultSet.getObject(column);
-      }
+  private static String convertKey(LetterCaseOfKeyInMap letterCaseOfKeyInMap, String key) {
+    switch (letterCaseOfKeyInMap) {
+      case LOWER_CASE:
+        return toLowerCase(key);
+      case UPPER_CASE:
+        return toUpperCase(key);
+      case CANONICAL_CASE:
+        return toCanonicalCase(key);
+      case NO_CONVERSION:
+      default:
+        return key;
     }
   }
 
@@ -314,7 +327,7 @@ public class DefaultResultSetConverter implements ResultSetConverter {
    * @return
    * @throws SQLException
    */
-  protected Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)
+  private static Object getColumnValueBySqlType(ResultSet resultSet, int column, int sqlType)
       throws SQLException {
 
     switch (sqlType) {
@@ -385,6 +398,5 @@ public class DefaultResultSetConverter implements ResultSetConverter {
         return resultSet.getObject(column);
     }
   }
-
 
 }

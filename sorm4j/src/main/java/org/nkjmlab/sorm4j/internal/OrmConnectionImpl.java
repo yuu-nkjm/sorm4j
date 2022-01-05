@@ -536,7 +536,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) {
     try {
-      return getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
+      return getResultSetConverter().isStandardObjectClass(sormContext.getOptions(), objectClass)
           ? getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
               getOneSqlType(objectClass, resultSet), objectClass)
           : loadSinglePojo(objectClass, resultSet);
@@ -809,7 +809,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     try {
-      return getResultSetConverter().isStandardClass(sormContext.getOptions(), objectClass)
+      return getResultSetConverter().isStandardObjectClass(sormContext.getOptions(), objectClass)
           ? loadNativeObjectList(objectClass, resultSet)
           : loadPojoList(objectClass, resultSet);
     } catch (SQLException e) {
