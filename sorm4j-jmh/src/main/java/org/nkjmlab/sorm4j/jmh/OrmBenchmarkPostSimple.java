@@ -751,7 +751,7 @@ public class OrmBenchmarkPostSimple {
 
   public static class Post {
     public static final String CREATE_TABLE_IF_NOT_EXISTS = "CREATE TABLE IF NOT EXISTS post ( "
-        + "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date DATETIME , last_change_date DATETIME , "
+        + "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date TIMESTAMP, last_change_date TIMESTAMP , "
         + "counter1 INT , counter2 DOUBLE);";
 
 

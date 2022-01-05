@@ -3,8 +3,6 @@ package repackage.net.sf.persist.tests.engine.h2;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -54,8 +52,7 @@ public class TestH2 {
     try (Connection conn = connectionPool.getConnection()) {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
-      Class<?>[] binaryTypes =
-          new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};
+      Class<?>[] binaryTypes = new Class<?>[] {Blob.class};
       Class<?>[] otherTypes = new Class<?>[] {Object.class};
 
       BeanMap beanMap = new BeanMap("BinaryTypes")
@@ -153,9 +150,8 @@ public class TestH2 {
     try (Connection conn = connectionPool.getConnection()) {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
-      Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
-      Class<?>[] clobTypes =
-          new Class<?>[] {String.class, char[].class, Character[].class, Reader.class, Clob.class};
+      Class<?>[] stringTypes = new Class<?>[] {String.class};
+      Class<?>[] clobTypes = new Class<?>[] {Clob.class};
 
       // uuid not being tested
       BeanMap beanMap = new BeanMap("StringTypes")

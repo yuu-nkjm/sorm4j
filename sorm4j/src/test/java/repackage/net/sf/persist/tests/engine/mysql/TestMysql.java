@@ -2,7 +2,6 @@
 
 package repackage.net.sf.persist.tests.engine.mysql;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -39,14 +38,14 @@ public class TestMysql {
     try (Connection conn = dataSource.getConnection()) {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
-      Class<?>[] binaryTypes =
-          new Class<?>[] {byte[].class, Byte[].class, InputStream.class, Blob.class};
+      Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Blob.class};
+      Class<?>[] blobTypes = new Class<?>[] {Blob.class};
 
       BeanMap beanMap = new BeanMap("BinaryTypes")
           .addField(new FieldMap("binaryCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("varbinaryCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("tinyblobCol").setTypes(binaryTypes).setSize(255))
-          .addField(new FieldMap("blobCol").setTypes(binaryTypes).setSize(255))
+          .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(255))
           .addField(new FieldMap("mediumblobCol").setTypes(binaryTypes).setSize(255))
           .addField(new FieldMap("longblobCol").setTypes(binaryTypes).setSize(16384));
 
@@ -81,7 +80,7 @@ public class TestMysql {
 
       BeanTest.test(getClass(), ormConn, beanMap, obj -> {
         BeanTest.testInsert(ormConn, obj, beanMap);
-        //BeanTest.testSelectByFields(ormConn, obj, beanMap);
+        // BeanTest.testSelectByFields(ormConn, obj, beanMap);
         BeanTest.testSelectFields(ormConn, obj, beanMap, false);
         BeanTest.testSelectMap(ormConn, obj, beanMap);
       });
@@ -143,10 +142,10 @@ public class TestMysql {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
-      Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
+      Class<?>[] stringTypes = new Class<?>[] {String.class};
       // Class<?>[] clobTypes =
       // new Class<?>[] {String.class, char[].class, Character[].class, Reader.class, Clob.class};
-      Class<?>[] clobTypes = new Class<?>[] {String.class, char[].class, Character[].class};
+      Class<?>[] clobTypes = new Class<?>[] {String.class};
 
       BeanMap beanMap = new BeanMap("StringTypes")
           .addField(new FieldMap("charCol").setTypes(characterTypes).setSize(1))

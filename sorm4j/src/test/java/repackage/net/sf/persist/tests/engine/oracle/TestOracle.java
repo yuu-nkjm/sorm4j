@@ -1,6 +1,6 @@
 package repackage.net.sf.persist.tests.engine.oracle;
 
-import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -21,7 +21,8 @@ public class TestOracle {
 
   @BeforeAll
   static void beforAll() {
-    dataSource = DbEngineTestUtils.getDataSource(TestOracle.class, "jdbc:h2:mem:oracle;MODE=Oracle");
+    dataSource =
+        DbEngineTestUtils.getDataSource(TestOracle.class, "jdbc:h2:mem:oracle;MODE=Oracle");
     DbEngineTestUtils.executeSql(dataSource, TestOracle.class, "schema.sql");
   }
 
@@ -35,8 +36,8 @@ public class TestOracle {
     try (Connection conn = dataSource.getConnection()) {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
-      Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Byte[].class};
-      Class<?>[] blobTypes = new Class<?>[] {byte[].class, Byte[].class, InputStream.class};
+      Class<?>[] binaryTypes = new Class<?>[] {byte[].class};
+      Class<?>[] blobTypes = new Class<?>[] {Blob.class};
 
       // by default, oracle can't bind more than 4000 bytes to lob/long columns in a single
       // statement
@@ -129,7 +130,7 @@ public class TestOracle {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
-      Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
+      Class<?>[] stringTypes = new Class<?>[] {String.class};
       // Class<?>[] clobTypes = new Class<?>[] {String.class, char[].class, Character[].class};
 
       // oracle doesn't support queries by clob, long or nclob
