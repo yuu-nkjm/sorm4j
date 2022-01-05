@@ -74,8 +74,7 @@ public final class SormContext {
   }
 
   public <T> TableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
-    TableName tableName = toTableName(connection, objectClass);
-    return getTableMapping(connection, tableName, objectClass);
+    return getTableMapping(connection, toTableName(connection, objectClass), objectClass);
   }
 
   /**
@@ -92,7 +91,7 @@ public final class SormContext {
       Class<T> objectClass) {
     String key = tableName.getName() + "-" + objectClass.getName();
     @SuppressWarnings("unchecked")
-    TableMapping<T> ret = (TableMapping<T>) tableMappings.computeIfAbsent(key, _key -> {
+    TableMapping<T> ret = (TableMapping<T>) tableMappings.computeIfAbsent(key, _k -> {
       try {
         TableMapping<T> m = createTableMapping(objectClass, tableName.getName(), connection);
         sormConfig.getLoggerContext().createLogPoint(Category.MAPPING, SormContext.class)

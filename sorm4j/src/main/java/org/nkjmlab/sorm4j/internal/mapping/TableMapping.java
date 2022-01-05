@@ -136,16 +136,8 @@ public final class TableMapping<T> extends Mapping<T> {
 
 
   private int executeUpdate(Connection connection, String sql, final Object... parameters) {
-
-    final Optional<LogPoint> lp = loggerContext.createLogPointBeforeSql(
-        LoggerContext.Category.EXECUTE_UPDATE, TableMapping.class, connection, sql, parameters);
-
-    int ret = OrmConnectionImpl.executeUpdateAndClose(loggerContext, options, connection,
+    return OrmConnectionImpl.executeUpdateAndClose(loggerContext, options, connection,
         sqlParametersSetter, sql, parameters);
-
-    lp.ifPresent(_lp -> _lp.logAfterUpdate(ret));
-
-    return ret;
   }
 
   /**
@@ -297,4 +289,5 @@ public final class TableMapping<T> extends Mapping<T> {
   public TableMetaData getTableMetaData() {
     return tableMetaData;
   }
+
 }
