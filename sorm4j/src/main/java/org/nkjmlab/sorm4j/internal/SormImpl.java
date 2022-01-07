@@ -19,7 +19,6 @@ import org.nkjmlab.sorm4j.command.Command;
 import org.nkjmlab.sorm4j.command.NamedParameterCommand;
 import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple3;
@@ -543,31 +542,6 @@ public final class SormImpl implements Sorm {
     R ret = apply(handler);
     sormContext.getLoggerContext().forceLogging = false;
     return ret;
-  }
-
-  @Override
-  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
-    return applyAndClose(conn -> conn.readAllLazy(objectClass));
-  }
-
-  @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.readLazy(objectClass, sql, parameters));
-  }
-
-  @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readLazy(objectClass, sql));
-  }
-
-  @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readMapLazy(sql));
-  }
-
-  @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.readMapLazy(sql, parameters));
   }
 
   @Override

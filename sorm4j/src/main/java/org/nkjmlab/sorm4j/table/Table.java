@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
 import org.nkjmlab.sorm4j.basic.RowMapper;
 import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -95,28 +93,6 @@ public interface Table<T> {
 
   default T readOne(String sql, Object... parameters) {
     return getSorm().readOne(getValueType(), sql, parameters);
-  }
-
-
-  /**
-   * @see Orm#readAllLazy(Class)
-   */
-  default LazyResultSet<T> readAllLazy() {
-    return getSorm().readAllLazy(getValueType());
-  }
-
-  /**
-   * @see Orm#readLazy(Class, ParameterizedSql)
-   */
-  default LazyResultSet<T> readLazy(ParameterizedSql sql) {
-    return getSorm().readLazy(getValueType(), sql);
-  }
-
-  /**
-   * @see Orm#readLazy(Class, String, Object...)
-   */
-  default LazyResultSet<T> readLazy(String sql, Object... parameters) {
-    return getSorm().readLazy(getValueType(), sql, parameters);
   }
 
   default RowMapper<T> getRowMapper() {

@@ -11,12 +11,11 @@ import org.nkjmlab.sorm4j.basic.RowMapper;
 import org.nkjmlab.sorm4j.basic.SqlExecutor;
 import org.nkjmlab.sorm4j.command.CommandExecutor;
 import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -412,14 +411,6 @@ public interface Orm extends CommandExecutor, SqlExecutor {
   <T> List<T> readAll(Class<T> type);
 
 
-  /**
-   * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
-   *
-   * @param <T>
-   * @param type
-   * @return
-   */
-  <T> LazyResultSet<T> readAllLazy(Class<T> type);
 
 
   /**
@@ -453,30 +444,6 @@ public interface Orm extends CommandExecutor, SqlExecutor {
    * @return
    */
   <T> T readFirst(Class<T> type, String sql, Object... parameters);
-
-  /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
-   *
-   * @param <T>
-   * @param type
-   * @param sql
-   * @return
-   */
-  <T> LazyResultSet<T> readLazy(Class<T> type, ParameterizedSql sql);
-
-  /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
-   *
-   * @param <T>
-   * @param type
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  <T> LazyResultSet<T> readLazy(Class<T> type, String sql, Object... parameters);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -522,11 +489,11 @@ public interface Orm extends CommandExecutor, SqlExecutor {
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}.
    * <p>
-   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   * Letter case of the key in the Map depends on {@link ColumnValueToJavaObjectConverters#toSingleMap}
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
@@ -537,30 +504,6 @@ public interface Orm extends CommandExecutor, SqlExecutor {
    */
   Map<String, Object> readMapFirst(String sql, Object... parameters);
 
-  /**
-   * See {@link #readMapLazy(String, Object...)}
-   *
-   * @param sql
-   * @return
-   */
-  LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql);
-
-  /**
-   * Returns an {@link LazyResultSet} instance containing data from the execution of the provided
-   * parametrized SQL and convert it to Stream, List, and so on.
-   * <p>
-   * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
-   *
-   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
-   * @param parameters are ordered parameter.
-   */
-  LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
 
   /**
    * See {@link #readMapList(String, Object...)}
@@ -575,12 +518,12 @@ public interface Orm extends CommandExecutor, SqlExecutor {
    * {@link java.util.Map} containing data from the execution of the provided parameterized SQL.
    *
    * <p>
-   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   * Letter case of the key in the Map depends on {@link ColumnValueToJavaObjectConverters#toSingleMap}
    *
    * <p>
    * Types of value returned from the database will be converted to Java types in the map according
    * with the correspondence defined in
-   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
@@ -604,11 +547,11 @@ public interface Orm extends CommandExecutor, SqlExecutor {
    * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
    * is thrown.
    * <p>
-   * Letter case of the key in the Map depends on {@link ResultSetConverter#toSingleMap}
+   * Letter case of the key in the Map depends on {@link ColumnValueToJavaObjectConverters#toSingleMap}
    * <p>
    * Types of value returned from the database will be converted to Java types in the map according
    * with the correspondence defined in
-   * {@link ResultSetConverter#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormOptions, ResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
