@@ -4,7 +4,7 @@
      -- simple
      c_boolean boolean,
      c_integer integer,
-     c_decimal decimal,
+     c_decimal decimal (3,3),
      c_double double precision,
      c_varchar varchar(100),
      c_text text,
@@ -13,13 +13,13 @@
      -- datetime
      c_date date,
      c_time time,
-     -- c_timetz timetz,
+     c_timetz time with time zone,
      c_timestamp timestamp,
-     -- c_timestamptz timestamptz,
+     c_timestamptz timestamp with time zone,
      -- complex
      -- c_inet_ipv4 inet,
      -- c_inet_ipv6 inet,
-     c_url text,
+     -- c_url url,
      c_integer_array integer ARRAY,
      c_varchar_array varchar ARRAY
  );
@@ -37,13 +37,13 @@
      -- datetime
      c_date,
      c_time,
-     -- c_timetz,
+     c_timetz,
      c_timestamp,
-     -- c_timestamptz,
+     c_timestamptz,
      -- complex
      -- c_inet_ipv4,
      -- c_inet_ipv6,
-     c_url,
+     -- c_url,
      c_integer_array,
      c_varchar_array
  ) values (
@@ -54,18 +54,18 @@
      0.5,
      'varchar',
      'long long text',
-     E'\\xDEADBEEF',
+     x'DEADBEEF',
      '33ee757a-19b3-45dc-be79-f1d65ac5d1a4',
      -- datetime
      '2019-09-27',
-     '13:23',
-     -- '13:23+09:00',
-     '2019-09-27T13:23',
-     -- '2019-09-27T13:23+09:00',
+     '13:23:00',
+     '13:23:00+09:00',
+     '2019-09-27T13:23:00',
+     '2019-09-27T13:23:00+09:00',
      -- complex
      -- inet '192.168.1.1',
      -- inet '::1',
-     'https://example.com',
+     -- 'https://example.com',
      array[1, 2, 3],
      array['A', 'B', 'C']
  );

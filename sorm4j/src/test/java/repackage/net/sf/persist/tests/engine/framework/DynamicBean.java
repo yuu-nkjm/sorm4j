@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class DynamicBean {
     else if (fieldType == java.sql.Date.class)
       value = useNull ? null : new java.sql.Date(randomTimestamp());
     else if (fieldType == java.sql.Time.class)
-      value = useNull ? null : new java.sql.Time(randomTimestamp());
+      value = useNull ? null : Time.valueOf(new java.sql.Time(randomTimestamp()).toLocalTime());
     else if (fieldType == java.sql.Timestamp.class)
       value = useNull ? null : new java.sql.Timestamp(randomTimestamp());
     else if (fieldType == java.sql.Blob.class)
