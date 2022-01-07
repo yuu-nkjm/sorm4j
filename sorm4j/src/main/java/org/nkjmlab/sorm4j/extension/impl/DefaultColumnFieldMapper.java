@@ -40,7 +40,7 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
  *
  */
 
-public class DefaultColumnFieldMapper implements ColumnFieldMapper {
+public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
 
   private final LoggerContext loggerContext;
 

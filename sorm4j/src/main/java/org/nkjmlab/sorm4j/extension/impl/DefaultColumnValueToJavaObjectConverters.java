@@ -51,7 +51,8 @@ public final class DefaultColumnValueToJavaObjectConverters
   @SuppressWarnings({"rawtypes", "unchecked"})
   private Object convertToHelper(SormOptions options, ResultSet resultSet, int column,
       int columnType, Class<?> toType) throws SQLException {
-    ColumnValueToJavaObjectConverter converter = converters.get(toType);
+
+    final ColumnValueToJavaObjectConverter converter = converters.get(toType);
     if (converter != null) {
       return converter.convertTo(options, resultSet, column, columnType, toType);
     }

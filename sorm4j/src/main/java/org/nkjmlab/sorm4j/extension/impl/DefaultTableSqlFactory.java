@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.extension.TableSql;
 import org.nkjmlab.sorm4j.extension.TableSqlFactory;
 
-public class DefaultTableSqlFactory implements TableSqlFactory {
+public final class DefaultTableSqlFactory implements TableSqlFactory {
 
   @Override
   public TableSql create(TableMetaData tableMetaData, Class<?> objectClass, Connection connection) {
