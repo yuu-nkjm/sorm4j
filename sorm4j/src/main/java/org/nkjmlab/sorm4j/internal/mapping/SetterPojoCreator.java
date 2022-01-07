@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -34,28 +34,29 @@ final class SetterPojoCreator<T> extends PojoCreator<T> {
 
 
   @Override
-  T loadPojo(ResultSetConverter resultSetConverter, SormOptions options, ResultSet resultSet,
-      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
+  T loadPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
-    return createPojo(resultSetConverter, options, resultSet, columns, columnTypes, setterTypes);
+    return createPojo(columnValueConverter, options, resultSet, columns, columnTypes, setterTypes);
   }
 
 
 
   @Override
-  public List<T> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
-      throws SQLException {
+  public List<T> loadPojoList(ColumnValueToJavaObjectConverters columnValueConverter,
+      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      String columnsString) throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
-          createPojo(resultSetConverter, options, resultSet, columns, columnTypes, setterTypes));
+          createPojo(columnValueConverter, options, resultSet, columns, columnTypes, setterTypes));
     }
     return ret;
   }
 
-  private T createPojo(ResultSetConverter resultSetConverter, SormOptions options,
+  private T createPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
       ResultSet resultSet, String[] columns, int[] sqlTypes, Class<?>[] setterTypes) {
     try {
       final T ret = constructor.newInstance();
@@ -70,7 +71,7 @@ final class SetterPojoCreator<T> extends PojoCreator<T> {
         }
         final int sqlType = sqlTypes[i - 1];
         final Object value =
-            resultSetConverter.convertColumnValueTo(options, resultSet, i, sqlType, setterType);
+            columnValueConverter.convertTo(options, resultSet, i, sqlType, setterType);
         columnToAccessorMap.setValue(ret, columnName, value);
       }
       return ret;

@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.impl.DefaultResultSetConverter;
+import org.nkjmlab.sorm4j.extension.impl.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
  * Holds mapping data from a given class and a table. The object reads a query result in
- * {@link ResultSet} via {@link DefaultResultSetConverter}.
+ * {@link ResultSet} via {@link DefaultColumnValueToJavaObjectConverters}.
  *
  * @author nkjm
  *
@@ -35,9 +35,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
   private final PojoCreator<T> pojoCreator;
 
-  public ColumnsMapping(SormOptions options, ResultSetConverter resultSetConverter,
+  public ColumnsMapping(SormOptions options, ColumnValueToJavaObjectConverters converter,
       Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
-    super(options, resultSetConverter, objectClass, columnToAccessorMap);
+    super(options, converter, objectClass, columnToAccessorMap);
 
     Constructor<T> ormConstructor = getOrmConstructor(objectClass);
 
@@ -114,7 +114,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return pojoCreator.loadPojoList(resultSetConverter, options, resultSet, columns, columnTypes,
+    return pojoCreator.loadPojoList(columnValueConverter, options, resultSet, columns, columnTypes,
         columnsString);
   }
 
@@ -123,8 +123,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return pojoCreator.loadPojo(resultSetConverter, options, resultSet, columns, columnTypes,
-        columnsString);
+    return pojoCreator.loadPojo(columnValueConverter, options, resultSet, columns, columnTypes, columnsString);
   }
 
   public T loadPojoByPrimaryKey(Class<T> objectClass, ResultSet resultSet) throws SQLException {
@@ -137,8 +136,7 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     });
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, null, columns, columnsString);
-    return pojoCreator.loadPojo(resultSetConverter, options, resultSet, columns, columnTypes,
-        columnsString);
+    return pojoCreator.loadPojo(columnValueConverter, options, resultSet, columns, columnTypes, columnsString);
   }
 
   private String getObjectColumnsString(String[] columns) {

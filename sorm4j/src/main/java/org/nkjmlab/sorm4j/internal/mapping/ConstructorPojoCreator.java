@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -65,7 +65,7 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
    *        parameter, the value is null.
    * @return
    */
-  private S createPojo(ResultSetConverter resultSetConverter, SormOptions options,
+  private S createPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
       ResultSet resultSet, int[] sqlTypes, ConstructorParameter[] constructorParameters) {
     try {
       final Object[] params = new Object[constructorParametersLength];
@@ -75,7 +75,7 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
         if (cp == null) {
           continue;
         }
-        params[cp.getOrder()] = resultSetConverter.convertColumnValueTo(options, resultSet, i + 1,
+        params[cp.getOrder()] = columnValueConverter.convertTo(options, resultSet, i + 1,
             sqlTypes[i], constructorParameters[i].getType());
       }
       return constructor.newInstance(params);
@@ -98,7 +98,7 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
   }
 
   @Override
-  List<S> loadPojoList(ResultSetConverter resultSetConverter, SormOptions options,
+  List<S> loadPojoList(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final ConstructorParameter[] constructorParameters =
@@ -106,18 +106,19 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
-          createPojo(resultSetConverter, options, resultSet, columnTypes, constructorParameters));
+          createPojo(columnValueConverter, options, resultSet, columnTypes, constructorParameters));
     }
     return ret;
   }
 
 
   @Override
-  S loadPojo(ResultSetConverter resultSetConverter, SormOptions options, ResultSet resultSet,
-      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
+  S loadPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
-    return createPojo(resultSetConverter, options, resultSet, columnTypes, constructorParameters);
+    return createPojo(columnValueConverter, options, resultSet, columnTypes, constructorParameters);
   }
 
 

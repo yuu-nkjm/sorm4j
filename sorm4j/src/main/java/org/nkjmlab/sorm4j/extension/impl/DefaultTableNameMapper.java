@@ -20,7 +20,7 @@ import org.nkjmlab.sorm4j.extension.TableNameMapper;
  *
  */
 
-public class DefaultTableNameMapper implements TableNameMapper {
+public final class DefaultTableNameMapper implements TableNameMapper {
 
   @Override
   public TableName getTableName(String tableName, DatabaseMetaData metaData) {
@@ -57,12 +57,12 @@ public class DefaultTableNameMapper implements TableNameMapper {
     }
     String className = objectClass.getSimpleName();
     String cannonicalClassName = toCanonicalCase(className);
-    if (cannonicalClassName.endsWith("Y")) {
-      return List.of(cannonicalClassName, cannonicalClassName + "S",
-          cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES");
-    } else {
-      return List.of(cannonicalClassName, cannonicalClassName + "S");
-    }
+
+    return cannonicalClassName.endsWith("Y")
+        ? List.of(cannonicalClassName, cannonicalClassName + "S",
+            cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES")
+        : List.of(cannonicalClassName, cannonicalClassName + "S");
+
   }
 
 
@@ -81,8 +81,9 @@ public class DefaultTableNameMapper implements TableNameMapper {
     try (
         ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
       while (resultSet.next()) {
+        // 3. TABLE_NAME String => table name
         String tableNameOnDb = resultSet.getString(3);
-        if (isMatch(tableNameCandidates, tableNameOnDb)) {
+        if (containsAsCanonical(tableNameCandidates, tableNameOnDb)) {
           return Optional.of(new TableName(tableNameOnDb));
         }
       }
@@ -90,19 +91,6 @@ public class DefaultTableNameMapper implements TableNameMapper {
     } catch (Exception e) {
       return Optional.empty();
     }
-  }
-
-
-  /**
-   * Returns success or not: the given table name is match the one of the given candidates. That is
-   * ignore case.
-   *
-   * @param candidates
-   * @param exactTableName is the table name on the database
-   * @return
-   */
-  private boolean isMatch(List<String> candidates, String exactTableName) {
-    return containsAsCanonical(candidates, exactTableName);
   }
 
 

@@ -17,7 +17,7 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.common.InsertResult;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableSql;
@@ -45,10 +45,10 @@ public final class TableMapping<T> extends Mapping<T> {
   private final LoggerContext loggerContext;
 
   public TableMapping(LoggerContext loggerContext, SormOptions options,
-      ResultSetConverter resultSetConverter, SqlParametersSetter sqlParametersSetter,
+      ColumnValueToJavaObjectConverters columnValueConverter, SqlParametersSetter sqlParametersSetter,
       MultiRowProcessorFactory multiRowProcessorFactory, Class<T> objectClass,
       ColumnToAccessorMap columnToAccessorMap, TableMetaData tableMetaData, TableSql sql) {
-    super(options, resultSetConverter, objectClass, columnToAccessorMap);
+    super(options, columnValueConverter, objectClass, columnToAccessorMap);
     this.loggerContext = loggerContext;
     this.tableMetaData = tableMetaData;
     this.sql = sql;
@@ -115,7 +115,7 @@ public final class TableMapping<T> extends Mapping<T> {
         int columnType = metaData.getColumnType(1);
         Class<?> classType = getSetterParamType(columnName);
         final Object value =
-            resultSetConverter.convertColumnValueTo(options, resultSet, 1, columnType, classType);
+            columnValueConverter.convertTo(options, resultSet, 1, columnType, classType);
         getColumnToAccessorMap().setValue(object, columnName, value);
         ret.add(value);
       }

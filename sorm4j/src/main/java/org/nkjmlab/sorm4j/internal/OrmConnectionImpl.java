@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +32,8 @@ import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.extension.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
@@ -55,6 +57,9 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  *
  */
 public class OrmConnectionImpl implements OrmConnection {
+
+
+
   private static final Supplier<int[]> EMPTY_INT_SUPPLIER = () -> new int[0];
   private final SormContext sormContext;
   private final Connection connection;
@@ -267,24 +272,25 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  private int getOneSqlType(Class<?> objectClass, ResultSet resultSet) {
-    try {
-      ResultSetMetaData metaData = resultSet.getMetaData();
-      if (metaData.getColumnCount() != 1) {
-        throw new SormException("ResultSet returned [" + metaData.getColumnCount()
-            + "] columns but 1 column was expected to load data into an instance of ["
-            + objectClass.getName() + "]");
-      }
-      return metaData.getColumnType(1);
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
+  private static int getOneSqlType(Class<?> objectClass, ResultSet resultSet) throws SQLException {
+    ResultSetMetaData metaData = resultSet.getMetaData();
+    if (metaData.getColumnCount() != 1) {
+      throw new SormException("ResultSet returned [" + metaData.getColumnCount()
+          + "] columns but 1 column was expected to load data into an instance of ["
+          + objectClass.getName() + "]");
     }
+    return metaData.getColumnType(1);
   }
 
 
-  private ResultSetConverter getResultSetConverter() {
-    return sormContext.getResultSetConverter();
+  private ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
+    return sormContext.getColumnValueToJavaObjectConverter();
   }
+
+  private ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
+    return sormContext.getColumnValueToMapEntryConverter();
+  }
+
 
   @Override
   public ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
@@ -480,8 +486,7 @@ public class OrmConnectionImpl implements OrmConnection {
     final List<T> ret = new ArrayList<>();
     final int sqlType = getOneSqlType(objectClass, resultSet);
     while (resultSet.next()) {
-      ret.add(getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
-          sqlType, objectClass));
+      ret.add(toSingleStandardObject(sormContext.getOptions(), resultSet, sqlType, objectClass));
     }
     return ret;
 
@@ -526,25 +531,67 @@ public class OrmConnectionImpl implements OrmConnection {
   public Map<String, Object> mapRowToMap(ResultSet resultSet) {
     try {
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-      return getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
-          ct.getColumns(), ct.getColumnTypes());
+      return toSingleMap(sormContext.getOptions(), resultSet, ct.getColumns(), ct.getColumnTypes());
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
 
 
-  public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) {
-    try {
-      return getResultSetConverter().isStandardObjectClass(sormContext.getOptions(), objectClass)
-          ? getResultSetConverter().toSingleStandardObject(sormContext.getOptions(), resultSet,
-              getOneSqlType(objectClass, resultSet), objectClass)
-          : loadSinglePojo(objectClass, resultSet);
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
+  public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+    return getColumnValueToJavaObjectConverter()
+        .isSupportedType(sormContext.getOptions(), objectClass)
+            ? toSingleStandardObject(sormContext.getOptions(), resultSet,
+                getOneSqlType(objectClass, resultSet), objectClass)
+            : loadSinglePojo(objectClass, resultSet);
   }
 
+
+  /**
+   * Converts the result from database to a map objects. The data of the column is extracted by
+   * corresponding column types.
+   *
+   * <p>
+   * Keys in the results returned in lower case by default.
+   *
+   * @param options
+   * @param resultSet
+   * @param columns
+   * @param columnTypes SQL types from {@link java.sql.Types}
+   *
+   * @return
+   * @throws SQLException
+   */
+
+  private Map<String, Object> toSingleMap(SormOptions options, ResultSet resultSet,
+      List<String> columns, List<Integer> columnTypes) throws SQLException {
+    final int cSize = columns.size();
+    final Map<String, Object> ret = new LinkedHashMap<>(cSize);
+    for (int i = 1; i <= cSize; i++) {
+      ret.put(getColumnValueToMapEntryConverter().convertToKey(columns.get(i - 1)),
+          getColumnValueToMapEntryConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
+    }
+    return ret;
+  }
+
+  /**
+   * Converts to a single native object of the given object class.
+   *
+   * @param options
+   * @param resultSet
+   * @param columnType
+   * @param objectClass
+   *
+   * @param <T>
+   * @return
+   * @throws SQLException
+   */
+
+  private <T> T toSingleStandardObject(SormOptions options, ResultSet resultSet, int sqlType,
+      Class<T> objectClass) throws SQLException {
+    return getColumnValueToJavaObjectConverter().convertTo(options, resultSet, 1, sqlType,
+        objectClass);
+  }
 
   @Override
   public <T> int[] merge(List<T> objects) {
@@ -662,8 +709,8 @@ public class OrmConnectionImpl implements OrmConnection {
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           if (resultSet.next()) {
-            return getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
-                ct.getColumns(), ct.getColumnTypes());
+            return toSingleMap(sormContext.getOptions(), resultSet, ct.getColumns(),
+                ct.getColumnTypes());
           }
           return null;
         });
@@ -719,8 +766,8 @@ public class OrmConnectionImpl implements OrmConnection {
           ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
           Map<String, Object> ret = null;
           if (resultSet.next()) {
-            ret = getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
-                ct.getColumns(), ct.getColumnTypes());
+            ret = toSingleMap(sormContext.getOptions(), resultSet, ct.getColumns(),
+                ct.getColumnTypes());
           }
           if (resultSet.next()) {
             throw new SormException("Non-unique result returned");
@@ -809,9 +856,9 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     try {
-      return getResultSetConverter().isStandardObjectClass(sormContext.getOptions(), objectClass)
-          ? loadNativeObjectList(objectClass, resultSet)
-          : loadPojoList(objectClass, resultSet);
+      return getColumnValueToJavaObjectConverter().isSupportedType(
+          sormContext.getOptions(), objectClass) ? loadNativeObjectList(objectClass, resultSet)
+              : loadPojoList(objectClass, resultSet);
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
@@ -822,8 +869,8 @@ public class OrmConnectionImpl implements OrmConnection {
       final List<Map<String, Object>> ret = new ArrayList<>();
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       while (resultSet.next()) {
-        ret.add(getResultSetConverter().toSingleMap(sormContext.getOptions(), resultSet,
-            ct.getColumns(), ct.getColumnTypes()));
+        ret.add(
+            toSingleMap(sormContext.getOptions(), resultSet, ct.getColumns(), ct.getColumnTypes()));
       }
       return ret;
     } catch (SQLException e) {

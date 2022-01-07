@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.basic.ConsumerHandler;
 import org.nkjmlab.sorm4j.basic.FunctionHandler;
 import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
@@ -285,8 +285,8 @@ public interface Sorm extends Orm {
     }
 
 
-    public Builder setResultSetConverter(ResultSetConverter resultSetConverter) {
-      contextBuilder.setResultSetConverter(resultSetConverter);
+    public Builder setColumnValueToJavaObjectConverter(ColumnValueToJavaObjectConverters converter) {
+      contextBuilder.setColumnValueToJavaObjectConverter(converter);
       return this;
     }
 

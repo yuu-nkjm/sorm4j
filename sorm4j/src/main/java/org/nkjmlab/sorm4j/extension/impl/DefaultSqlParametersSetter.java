@@ -1,20 +1,19 @@
 package org.nkjmlab.sorm4j.extension.impl;
 
-import java.io.IOException;
+import static org.nkjmlab.sorm4j.internal.util.ArrayUtils.*;
 import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.ParameterSetter;
 import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
 /**
  * Default implementation of {@link SqlParametersSetter}
@@ -23,27 +22,22 @@ import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
  *
  */
 
-public class DefaultSqlParametersSetter implements SqlParametersSetter {
+public final class DefaultSqlParametersSetter implements SqlParametersSetter {
 
-  private final List<ParameterSetter> setters;
+  private final Map<Class<?>, SqlParameterSetter> setters;
 
   public DefaultSqlParametersSetter() {
-    this.setters = Collections.emptyList();
+    this.setters = Collections.emptyMap();
   }
 
-  public DefaultSqlParametersSetter(List<ParameterSetter> setters) {
-    this.setters = List.copyOf(setters);
+  public DefaultSqlParametersSetter(Map<Class<?>, SqlParameterSetter> setters) {
+    this.setters = Map.copyOf(setters);
   }
-
-  public DefaultSqlParametersSetter(ParameterSetter... setters) {
-    this(Arrays.asList(setters));
-  }
-
 
   @Override
   public void setParameters(SormOptions options, PreparedStatement stmt, Object... parameters)
       throws SQLException {
-    if (parameters == null || parameters.length == 0) {
+    if (parameters == null) {
       return;
     }
     for (int i = 1; i <= parameters.length; i++) {
@@ -54,132 +48,141 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
   /**
    * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.
    *
+   * <strong>TIME</strong>
+   * <p>
+   * In JDBC this data type is mapped to java.sql.Time. java.time.LocalTime is also supported and
+   * recommended. See <a href=
+   * "https://www.h2database.com/html/datatypes.html?highlight=datatype&search=DataType#time_type">Data
+   * Types</a>.
+   *
    * @param options
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameter parameters values
    *
    * @throws SQLException
-   * @throws IOException
    *
    */
   private void setParameter(SormOptions options, PreparedStatement stmt, int parameterIndex,
       Object parameter) throws SQLException {
+
     if (parameter == null) {
       stmt.setNull(parameterIndex, java.sql.Types.NULL);
       return;
     }
+
     final Class<?> type = parameter.getClass();
-    if (!setters.isEmpty()) {
-      Optional<ParameterSetter> setter = setters.stream()
-          .filter(_setter -> _setter.isApplicable(options, stmt, parameterIndex, type, parameter))
-          .findFirst();
-      if (setter.isPresent()) {
-        setter.get().setParameter(options, stmt, parameterIndex, type, parameter);
-        return;
-      }
+    final SqlParameterSetter setter = setters.get(type);
+    if (setter != null) {
+      setter.setParameter(options, stmt, parameterIndex, type, parameter);
+      return;
     }
 
-    if (setIfStandardObject(type, stmt, parameterIndex, parameter)) {
-    } else if (type.isEnum()) {
-      stmt.setString(parameterIndex, parameter.toString());
-    } else if (type.isArray()) {
-      procArray(type, stmt, parameterIndex, parameter);
-    } else if (List.class.isAssignableFrom(type)) {
-      procList(stmt, parameterIndex, (List<?>) parameter);
-    } else if (parameter instanceof Clob) {
-      stmt.setClob(parameterIndex, (Clob) parameter);
-    } else if (parameter instanceof Blob) {
-      stmt.setBlob(parameterIndex, (Blob) parameter);
-    } else {
-      stmt.setObject(parameterIndex, parameter);
-    }
-  }
-
-  private boolean setIfStandardObject(Class<?> type, PreparedStatement stmt, int parameterIndex,
-      Object parameter) throws SQLException {
     switch (type.getName()) {
       case "java.lang.Boolean":
       case "boolean":
         stmt.setBoolean(parameterIndex, (Boolean) parameter);
-        return true;
+        return;
       case "java.lang.Byte":
       case "byte":
         stmt.setByte(parameterIndex, (Byte) parameter);
-        return true;
+        return;
       case "java.lang.Short":
       case "short":
         stmt.setShort(parameterIndex, (Short) parameter);
-        return true;
+        return;
       case "java.lang.Integer":
       case "int":
         stmt.setInt(parameterIndex, (Integer) parameter);
-        return true;
+        return;
       case "java.lang.Long":
       case "long":
         stmt.setLong(parameterIndex, (Long) parameter);
-        return true;
+        return;
       case "java.lang.Float":
       case "float":
         stmt.setFloat(parameterIndex, (Float) parameter);
-        return true;
+        return;
       case "java.lang.Double":
       case "double":
         stmt.setDouble(parameterIndex, (Double) parameter);
-        return true;
+        return;
       case "java.lang.Character":
       case "char":
         stmt.setString(parameterIndex, parameter == null ? null : "" + (Character) parameter);
-        return true;
+        return;
       case "java.lang.String":
         stmt.setString(parameterIndex, (String) parameter);
-        return true;
+        return;
       case "java.math.BigDecimal":
         stmt.setBigDecimal(parameterIndex, (BigDecimal) parameter);
-        return true;
+        return;
       case "java.sql.Date":
         stmt.setDate(parameterIndex, (java.sql.Date) parameter);
-        return true;
+        return;
       case "java.sql.Time":
         stmt.setTime(parameterIndex, (java.sql.Time) parameter);
-        return true;
+        return;
       case "java.sql.Timestamp":
         stmt.setTimestamp(parameterIndex, (java.sql.Timestamp) parameter);
-        return true;
+        return;
+      case "java.time.Instant":
+        stmt.setTimestamp(parameterIndex,
+            parameter == null ? null : Timestamp.from((java.time.Instant) parameter));
+        return;
       case "java.time.LocalTime":
         stmt.setTime(parameterIndex,
             parameter == null ? null : java.sql.Time.valueOf((java.time.LocalTime) parameter));
-        return true;
+        return;
       case "java.time.LocalDate":
         stmt.setDate(parameterIndex,
             parameter == null ? null : java.sql.Date.valueOf((java.time.LocalDate) parameter));
-        return true;
+        return;
       case "java.time.LocalDateTime":
         stmt.setTimestamp(parameterIndex,
             parameter == null ? null : Timestamp.valueOf((java.time.LocalDateTime) parameter));
-        return true;
+        return;
       case "java.time.OffsetTime":
-        stmt.setTime(parameterIndex, parameter == null ? null
-            : java.sql.Time.valueOf(((java.time.OffsetTime) parameter).toLocalTime()));
-        return true;
+        stmt.setObject(parameterIndex, parameter);
+        return;
       case "java.time.OffsetDateTime":
-        stmt.setTimestamp(parameterIndex, parameter == null ? null
-            : Timestamp.valueOf(((java.time.OffsetDateTime) parameter).toLocalDateTime()));
-        return true;
-      case "java.time.ZonedDateTime":
-        stmt.setTimestamp(parameterIndex, parameter == null ? null
-            : Timestamp.valueOf(((java.time.ZonedDateTime) parameter).toLocalDateTime()));
-        return true;
+        stmt.setObject(parameterIndex, parameter);
+        return;
       case "java.util.Date":
         stmt.setTimestamp(parameterIndex,
             parameter == null ? null : new Timestamp(((java.util.Date) parameter).getTime()));
-        return true;
+        return;
       case "java.util.UUID":
         stmt.setString(parameterIndex,
             parameter == null ? null : ((java.util.UUID) parameter).toString());
-        return true;
+        return;
       default:
-        return false;
+        if (type.isArray()) {
+          final Class<?> compType = type.getComponentType();
+          procArray(compType, stmt, parameterIndex, parameter);
+        } else if (parameter instanceof List) {
+          List<?> list = (List<?>) parameter;
+          if (list.isEmpty()) {
+            throw new SormException(
+                "Size of parameter which type is List should be at least one. ");
+          }
+          procArray(list.get(0).getClass(), stmt, parameterIndex, list.toArray());
+        } else if (type.isEnum()) {
+          stmt.setString(parameterIndex, parameter.toString());
+        } else if (parameter instanceof java.sql.Blob) {
+          stmt.setBlob(parameterIndex, (java.sql.Blob) parameter);
+        } else if (parameter instanceof java.sql.Clob) {
+          stmt.setClob(parameterIndex, (java.sql.Clob) parameter);
+        } else if (parameter instanceof java.io.InputStream) {
+          final java.io.InputStream is = (java.io.InputStream) parameter;
+          stmt.setBinaryStream(parameterIndex, is);
+        } else if (parameter instanceof java.io.Reader) {
+          final java.io.Reader reader = (java.io.Reader) parameter;
+          stmt.setCharacterStream(parameterIndex, reader);
+        } else {
+          stmt.setObject(parameterIndex, parameter);
+        }
     }
+
   }
 
 
@@ -192,90 +195,64 @@ public class DefaultSqlParametersSetter implements SqlParametersSetter {
    * @param parameter
    * @throws SQLException
    */
-  private void procArray(Class<?> type, PreparedStatement stmt, int parameterIndex,
+  private void procArray(Class<?> compType, PreparedStatement stmt, int parameterIndex,
       Object parameter) throws SQLException {
-    final String compType = type.getComponentType().getName();
-
-    switch (compType) {
-      case "byte": {
-        stmt.setBytes(parameterIndex, (byte[]) parameter);
-        return;
-      }
-      case "java.lang.Boolean": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("boolean", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Short": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("smallint", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Integer": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("integer", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Long": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("bigint", (Object[]) parameter));
-        return;
-      }
-      case "java.math.BigDecimal": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("numeric", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Float": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("real", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Double": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("double precision", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.Character": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("character", (Object[]) parameter));
-        return;
-      }
-      case "java.lang.String": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("varchar", (Object[]) parameter));
-        return;
-      }
-      case "java.sql.Date": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("date", (Object[]) parameter));
-        return;
-      }
-      case "java.sql.Time": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("time", (Object[]) parameter));
-        return;
-      }
-      case "java.sql.Timestamp": {
-        stmt.setArray(parameterIndex,
-            stmt.getConnection().createArrayOf("timestamp", (Object[]) parameter));
-        return;
-      }
-      default: {
-        stmt.setObject(parameterIndex, parameter);
-        return;
-      }
+    String typeName = compType.getName();
+    if (typeName.equals("byte")) {
+      stmt.setBytes(parameterIndex, (byte[]) parameter);
+    } else {
+      stmt.setArray(parameterIndex, toSqlArray(typeName, stmt.getConnection(), parameter));
     }
   }
 
-  private void procList(PreparedStatement stmt, int parameterIndex, List<?> parameter)
+  private java.sql.Array toSqlArray(String typeName, Connection conn, Object parameter)
       throws SQLException {
-    if (parameter.size() == 0) {
-      throw new SormException("Size of parameter which type is List should be at least one. ");
+    switch (typeName) {
+      case "boolean":
+        return conn.createArrayOf("BOOLEAN", toObjectArray((boolean[]) parameter));
+      case "java.lang.Boolean":
+        return conn.createArrayOf("BOOLEAN", (Object[]) parameter);
+      case "java.lang.Byte":
+        return conn.createArrayOf("TINYINT", (Object[]) parameter);
+      case "short":
+        return conn.createArrayOf("SMALLINT", ArrayUtils.toObjectArray((short[]) parameter));
+      case "java.lang.Short":
+        return conn.createArrayOf("SMALLINT", (Object[]) parameter);
+      case "int":
+        return conn.createArrayOf("INTEGER", ArrayUtils.toObjectArray((int[]) parameter));
+      case "java.lang.Integer":
+        return conn.createArrayOf("INTEGER", (Object[]) parameter);
+      case "long":
+        return conn.createArrayOf("BINGINT", ArrayUtils.toObjectArray((long[]) parameter));
+      case "java.lang.Long":
+        return conn.createArrayOf("BIGINT", (Object[]) parameter);
+      case "float":
+        return conn.createArrayOf("REAL", ArrayUtils.toObjectArray((float[]) parameter));
+      case "java.lang.Float":
+        return conn.createArrayOf("REAL", (Object[]) parameter);
+      case "double":
+        return conn.createArrayOf("DOUBLE", ArrayUtils.toObjectArray((double[]) parameter));
+      case "java.lang.Double":
+        return conn.createArrayOf("DOUBLE", (Object[]) parameter);
+      case "char":
+        return conn.createArrayOf("CHARACTER", ArrayUtils.toObjectArray((char[]) parameter));
+      case "java.lang.Character":
+        return conn.createArrayOf("CHARACTER", (Object[]) parameter);
+      case "java.lang.String":
+        return conn.createArrayOf("VARCHAR", (Object[]) parameter);
+      case "java.math.BigDecimal":
+        return conn.createArrayOf("NUMERIC", (Object[]) parameter);
+      case "java.sql.Date":
+        return conn.createArrayOf("DATE", (Object[]) parameter);
+      case "java.sql.Time":
+        return conn.createArrayOf("TIME", (Object[]) parameter);
+      case "java.sql.Timestamp":
+        return conn.createArrayOf("TIMESTAMP", (Object[]) parameter);
+      default:
+        return conn.createArrayOf("JAVA_OBJECT", (Object[]) parameter);
     }
-    procArray(parameter.get(0).getClass(), stmt, parameterIndex, parameter.toArray());
-  }
 
+  }
 
 
 }

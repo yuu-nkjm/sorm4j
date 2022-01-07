@@ -1,19 +1,19 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
+import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 
 abstract class Mapping<T> {
 
   private final Class<T> objectClass;
   final SormOptions options;
-  final ResultSetConverter resultSetConverter;
+  final ColumnValueToJavaObjectConverters columnValueConverter;
   private final ColumnToAccessorMap columnToAccessorMap;
 
-  Mapping(SormOptions options, ResultSetConverter resultSetConverter, Class<T> objectClass,
+  Mapping(SormOptions options, ColumnValueToJavaObjectConverters columnValueConverter, Class<T> objectClass,
       ColumnToAccessorMap columnToAccessorMap) {
     this.options = options;
-    this.resultSetConverter = resultSetConverter;
+    this.columnValueConverter = columnValueConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;
   }
