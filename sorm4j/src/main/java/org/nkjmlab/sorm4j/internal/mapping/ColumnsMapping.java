@@ -33,29 +33,26 @@ public final class ColumnsMapping<T> extends Mapping<T> {
       new ConcurrentHashMap<>();
 
   private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
-  private final PojoCreator<T> pojoCreator;
+  private final ContainerObjectCreator<T> containerObjectCreator;
 
   public ColumnsMapping(SormOptions options, ColumnValueToJavaObjectConverters converter,
       Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
     super(options, converter, objectClass, columnToAccessorMap);
 
     Constructor<T> ormConstructor = getOrmConstructor(objectClass);
-
-    // objectClass.isRecord() ? createRecordPojoCreator(objectClass)
-
     Constructor<T> ormRecordConstructor = getOrmRecordConstructor(objectClass);
-    // objectClass.isRecord() ? createRecordPojoCreator(objectClass)
-    this.pojoCreator =
-        ormRecordConstructor != null ? createRecordPojoCreator(objectClass, ormRecordConstructor)
-            : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
-                : new SetterPojoCreator<>(columnToAccessorMap, getDefaultConstructor(objectClass)));
+    this.containerObjectCreator = ormRecordConstructor != null
+        ? createContainerRecordCreator(objectClass, ormRecordConstructor)
+        : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
+            : new SetterBasedCreator<>(columnToAccessorMap, getDefaultConstructor(objectClass)));
 
   }
 
-  private PojoCreator<T> createRecordPojoCreator(Class<T> objectClass, Constructor<T> constructor) {
+  private ContainerObjectCreator<T> createContainerRecordCreator(Class<T> objectClass,
+      Constructor<T> constructor) {
     String[] parameterNames =
         Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-    return new ConstructorPojoCreator<>(getColumnToAccessorMap(), constructor, parameterNames);
+    return new ConstructorBasedCreator<>(getColumnToAccessorMap(), constructor, parameterNames);
   }
 
   private Constructor<T> getOrmRecordConstructor(Class<T> objectClass) {
@@ -88,10 +85,10 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-  private PojoCreator<T> createOrmConstructorPojoCreator(Class<T> objectClass,
+  private ContainerObjectCreator<T> createOrmConstructorPojoCreator(Class<T> objectClass,
       Constructor<T> constructor) {
     String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
-    return new ConstructorPojoCreator<>(getColumnToAccessorMap(), constructor, _parameters);
+    return new ConstructorBasedCreator<>(getColumnToAccessorMap(), constructor, _parameters);
   }
 
 
@@ -106,27 +103,29 @@ public final class ColumnsMapping<T> extends Mapping<T> {
   public String getFormattedString() {
     return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
         + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator()
-        + "  with [" + pojoCreator + "]";
+        + "  with [" + containerObjectCreator + "]";
   }
 
-  public List<T> loadPojoList(ResultSet resultSet) throws SQLException {
+  public List<T> loadContainerObjectList(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return pojoCreator.loadPojoList(columnValueConverter, options, resultSet, columns, columnTypes,
-        columnsString);
+    return containerObjectCreator.loadContainerObjectList(columnValueConverter, options, resultSet,
+        columns, columnTypes, columnsString);
   }
 
-  public T loadPojo(ResultSet resultSet) throws SQLException {
+  public T loadContainerObject(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return pojoCreator.loadPojo(columnValueConverter, options, resultSet, columns, columnTypes, columnsString);
+    return containerObjectCreator.loadContainerObject(columnValueConverter, options, resultSet,
+        columns, columnTypes, columnsString);
   }
 
-  public T loadPojoByPrimaryKey(Class<T> objectClass, ResultSet resultSet) throws SQLException {
+  public T loadContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
+      throws SQLException {
     String[] columns = primaryKeyColumnLabels.computeIfAbsent(objectClass, key -> {
       try {
         return createColumnLabels(resultSet, resultSet.getMetaData());
@@ -136,7 +135,8 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     });
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, null, columns, columnsString);
-    return pojoCreator.loadPojo(columnValueConverter, options, resultSet, columns, columnTypes, columnsString);
+    return containerObjectCreator.loadContainerObject(columnValueConverter, options, resultSet,
+        columns, columnTypes, columnsString);
   }
 
   private String getObjectColumnsString(String[] columns) {

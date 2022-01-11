@@ -86,7 +86,7 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
     @SuppressWarnings("unchecked")
     List<T> ret = Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS)
         ? (List<T>) Try.getOrElseThrow(() -> ormMapper.traverseAndMapToMapList(resultSet), Try::rethrow)
-        : ormMapper.loadPojoList(objectClass, resultSet), Try::rethrow);
+        : ormMapper.loadContainerObjectList(objectClass, resultSet), Try::rethrow);
     close();
     return ret;
   }

@@ -9,7 +9,7 @@ public interface ColumnValueToJavaObjectConverter {
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
    * instance of the specified Java {@link java.lang.Class} containing the values read.
    *
-   * This method is mainly used for "SEARCH SQL AND READ TO POJO". i.e. Convert from Sql to Java by
+   * This method is mainly used for converting the result of query. i.e. Convert from Sql to Java by
    * the specified class.
    *
    * This method is used while converting {@link java.sql.ResultSet} rows to objects. The class type

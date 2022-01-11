@@ -15,12 +15,12 @@ import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-final class SetterPojoCreator<T> extends PojoCreator<T> {
+final class SetterBasedCreator<T> extends ContainerObjectCreator<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
   // https://github.com/yuu-nkjm/sorm4j/issues/26
   private final Map<String, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
 
-  public SetterPojoCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
+  public SetterBasedCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
     super(columnToAccessorMap, constructor);
   }
 
@@ -34,30 +34,32 @@ final class SetterPojoCreator<T> extends PojoCreator<T> {
 
 
   @Override
-  T loadPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+  T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
-    return createPojo(columnValueConverter, options, resultSet, columns, columnTypes, setterTypes);
+    return createContainerObject(columnValueConverter, options, resultSet, columns, columnTypes,
+        setterTypes);
   }
 
 
 
   @Override
-  public List<T> loadPojoList(ColumnValueToJavaObjectConverters columnValueConverter,
+  public List<T> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
       SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(
-          createPojo(columnValueConverter, options, resultSet, columns, columnTypes, setterTypes));
+      ret.add(createContainerObject(columnValueConverter, options, resultSet, columns, columnTypes,
+          setterTypes));
     }
     return ret;
   }
 
-  private T createPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
-      ResultSet resultSet, String[] columns, int[] sqlTypes, Class<?>[] setterTypes) {
+  private T createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
+      SormOptions options, ResultSet resultSet, String[] columns, int[] sqlTypes,
+      Class<?>[] setterTypes) {
     try {
       final T ret = constructor.newInstance();
       for (int i = 1; i <= columns.length; i++) {

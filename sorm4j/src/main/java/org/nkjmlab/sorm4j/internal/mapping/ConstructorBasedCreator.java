@@ -17,7 +17,7 @@ import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-final class ConstructorPojoCreator<S> extends PojoCreator<S> {
+final class ConstructorBasedCreator<S> extends ContainerObjectCreator<S> {
 
   private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
   private final int constructorParametersLength;
@@ -25,8 +25,8 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
   private final Map<String, ConstructorParameter[]> columnAndConstructorParameterMapping =
       new ConcurrentHashMap<>();
 
-  public ConstructorPojoCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<S> constructor,
-      String[] parameterNames) {
+  public ConstructorBasedCreator(ColumnToAccessorMap columnToAccessorMap,
+      Constructor<S> constructor, String[] parameterNames) {
     super(columnToAccessorMap, constructor);
     String columnAliasPrefix = columnToAccessorMap.getColumnAliasPrefix();
     Parameter[] parameters = constructor.getParameters();
@@ -65,8 +65,9 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
    *        parameter, the value is null.
    * @return
    */
-  private S createPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
-      ResultSet resultSet, int[] sqlTypes, ConstructorParameter[] constructorParameters) {
+  private S createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
+      SormOptions options, ResultSet resultSet, int[] sqlTypes,
+      ConstructorParameter[] constructorParameters) {
     try {
       final Object[] params = new Object[constructorParametersLength];
 
@@ -98,33 +99,34 @@ final class ConstructorPojoCreator<S> extends PojoCreator<S> {
   }
 
   @Override
-  List<S> loadPojoList(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
-      throws SQLException {
+  List<S> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
+      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      String columnsString) throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(
-          createPojo(columnValueConverter, options, resultSet, columnTypes, constructorParameters));
+      ret.add(createContainerObject(columnValueConverter, options, resultSet, columnTypes,
+          constructorParameters));
     }
     return ret;
   }
 
 
   @Override
-  S loadPojo(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
-    return createPojo(columnValueConverter, options, resultSet, columnTypes, constructorParameters);
+    return createContainerObject(columnValueConverter, options, resultSet, columnTypes,
+        constructorParameters);
   }
 
 
   @Override
   public String toString() {
-    return "ConstructorPojoCreator [constructorParametersMap=" + constructorParametersMap + "]";
+    return "ConstructorBasedCreator [constructorParametersMap=" + constructorParametersMap + "]";
   }
 
   final static class ConstructorParameter {

@@ -516,15 +516,15 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  public final <T> List<T> loadPojoList(final Class<T> objectClass, final ResultSet resultSet)
+  public final <T> List<T> loadContainerObjectList(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    return getColumnsMapping(objectClass).loadPojoList(resultSet);
+    return getColumnsMapping(objectClass).loadContainerObjectList(resultSet);
   }
 
 
-  private final <T> T loadSinglePojo(final Class<T> objectClass, final ResultSet resultSet)
+  private final <T> T loadSingleContainerObject(final Class<T> objectClass, final ResultSet resultSet)
       throws SQLException {
-    return getColumnsMapping(objectClass).loadPojo(resultSet);
+    return getColumnsMapping(objectClass).loadContainerObject(resultSet);
   }
 
 
@@ -543,7 +543,7 @@ public class OrmConnectionImpl implements OrmConnection {
         .isSupportedType(sormContext.getOptions(), objectClass)
             ? toSingleStandardObject(sormContext.getOptions(), resultSet,
                 getOneSqlType(objectClass, resultSet), objectClass)
-            : loadSinglePojo(objectClass, resultSet);
+            : loadSingleContainerObject(objectClass, resultSet);
   }
 
 
@@ -643,7 +643,7 @@ public class OrmConnectionImpl implements OrmConnection {
     return executeQueryAndClose(getLoggerConfig(), sormContext.getOptions(), getJdbcConnection(),
         getSqlParametersSetter(), sql, primaryKeyValues, resultSet -> {
           return resultSet.next()
-              ? getColumnsMapping(objectClass).loadPojoByPrimaryKey(objectClass, resultSet)
+              ? getColumnsMapping(objectClass).loadContainerObjectByPrimaryKey(objectClass, resultSet)
               : null;
         });
   }
@@ -809,8 +809,8 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuple.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet),
-                loadSinglePojo(t3, resultSet)));
+            ret1.add(Tuple.of(loadSingleContainerObject(t1, resultSet), loadSingleContainerObject(t2, resultSet),
+                loadSingleContainerObject(t3, resultSet)));
           }
           return ret1;
         });
@@ -830,7 +830,7 @@ public class OrmConnectionImpl implements OrmConnection {
         getJdbcConnection(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuple.of(loadSinglePojo(t1, resultSet), loadSinglePojo(t2, resultSet)));
+            ret1.add(Tuple.of(loadSingleContainerObject(t1, resultSet), loadSingleContainerObject(t2, resultSet)));
           }
           return ret1;
         });
@@ -858,7 +858,7 @@ public class OrmConnectionImpl implements OrmConnection {
     try {
       return getColumnValueToJavaObjectConverter().isSupportedType(
           sormContext.getOptions(), objectClass) ? loadNativeObjectList(objectClass, resultSet)
-              : loadPojoList(objectClass, resultSet);
+              : loadContainerObjectList(objectClass, resultSet);
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
