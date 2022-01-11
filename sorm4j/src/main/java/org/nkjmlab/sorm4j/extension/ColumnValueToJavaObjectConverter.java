@@ -28,7 +28,7 @@ public interface ColumnValueToJavaObjectConverter {
    * @throws SQLException
    *
    */
-  <T> T convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
+  <T> T convertTo(ResultSet resultSet, int column, int columnType,
       Class<T> toType) throws SQLException;
 
 }

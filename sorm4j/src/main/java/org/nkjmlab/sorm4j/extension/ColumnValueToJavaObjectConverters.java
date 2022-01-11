@@ -20,6 +20,6 @@ public interface ColumnValueToJavaObjectConverters extends ColumnValueToJavaObje
    * @return
    */
 
-  boolean isSupportedType(SormOptions options, Class<?> objectClass);
+  boolean isSupportedType(Class<?> objectClass);
 
 }

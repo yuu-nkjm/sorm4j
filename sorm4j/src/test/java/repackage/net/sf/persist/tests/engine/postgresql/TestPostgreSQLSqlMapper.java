@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -27,7 +26,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.SormOptions;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
@@ -42,6 +41,7 @@ public class TestPostgreSQLSqlMapper {
       org.apache.logging.log4j.LogManager.getLogger();
 
   private static DataSource dataSource;
+  private static SqlParametersSetter parametersSetter;
 
   @BeforeAll
   static void beforAll() {
@@ -49,19 +49,14 @@ public class TestPostgreSQLSqlMapper {
         "jdbc:h2:mem:postgre;MODE=PostgreSQL");
     DbEngineTestUtils.executeSql(dataSource, TestPostgreSQLSqlMapper.class, "sql-mapper-test.sql");
 
-    SqlParameterSetter ps = new SqlParameterSetter() {
-      @Override
-      public void setParameter(SormOptions options, PreparedStatement stmt, int parameterIndex,
-          Class<?> parameterClass, Object parameter) throws SQLException {
-        PGobject pg = new PGobject();
-        pg.setType("inet");
-        pg.setValue(((InetAddress) parameter).getHostAddress());
-        stmt.setObject(parameterIndex, pg);
-      }
-    };
-    SqlParametersSetter paramSetter =
-        new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, ps));
-    Sorm.setDefaultContext(builder -> builder.setSqlParametersSetter(paramSetter).build());
+    SqlParameterSetter ps = ((stmt, parameterIndex, parameter) -> {
+      PGobject pg = new PGobject();
+      pg.setType("inet");
+      pg.setValue(((InetAddress) parameter).getHostAddress());
+      stmt.setObject(parameterIndex, pg);
+    });
+    parametersSetter = new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, ps));
+
 
   }
 
@@ -83,7 +78,8 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn);
+      OrmConnection c = Sorm.toOrmConnection(conn,
+          SormContext.builder().setSqlParametersSetter(parametersSetter).build());
       log.info(c.readMapFirst("select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
       doTest(c, "c_integer by int", "c_integer", 1);

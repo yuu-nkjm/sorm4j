@@ -10,14 +10,11 @@ public interface SqlParameterSetter {
 
   /**
    * Sets parameter.
-   *
-   * @param options
    * @param stmt
    * @param parameterIndex
-   * @param parameterClass
    * @param parameter
+   *
    * @throws SQLException
    */
-  void setParameter(SormOptions options, PreparedStatement stmt, int parameterIndex,
-      Class<?> parameterClass, Object parameter) throws SQLException;
+  void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter) throws SQLException;
 }

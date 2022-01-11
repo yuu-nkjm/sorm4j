@@ -14,13 +14,11 @@ public interface SqlParametersSetter {
   /**
    * Sets parameters into the given prepared statement. i.e. Convert from java objects to SQL.
    *
-   * @param options
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameters parameters values
    *
    */
-  void setParameters(SormOptions options, PreparedStatement stmt, Object... parameters)
-      throws SQLException;
+  void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException;
 
 
 }

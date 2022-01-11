@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
+
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreator<S> {
@@ -66,7 +66,7 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
    * @return
    */
   private S createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, int[] sqlTypes,
+      ResultSet resultSet, int[] sqlTypes,
       ConstructorParameter[] constructorParameters) {
     try {
       final Object[] params = new Object[constructorParametersLength];
@@ -76,7 +76,7 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
         if (cp == null) {
           continue;
         }
-        params[cp.getOrder()] = columnValueConverter.convertTo(options, resultSet, i + 1,
+        params[cp.getOrder()] = columnValueConverter.convertTo(resultSet, i + 1,
             sqlTypes[i], constructorParameters[i].getType());
       }
       return constructor.newInstance(params);
@@ -100,13 +100,13 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
   @Override
   List<S> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(createContainerObject(columnValueConverter, options, resultSet, columnTypes,
+      ret.add(createContainerObject(columnValueConverter, resultSet, columnTypes,
           constructorParameters));
     }
     return ret;
@@ -114,12 +114,12 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
 
   @Override
-  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, 
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
-    return createContainerObject(columnValueConverter, options, resultSet, columnTypes,
+    return createContainerObject(columnValueConverter, resultSet, columnTypes,
         constructorParameters);
   }
 

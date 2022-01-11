@@ -2,12 +2,10 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.common.LazyResultSet;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
@@ -98,7 +96,7 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions,PreparedStatement, Object[])}
+   * {@link SqlParametersSetter#setParameters(PreparedStatement,Object[])}
    *
    * @param <T>
    * @param type
@@ -122,10 +120,10 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormOptions, ResultSet, List, List)}.
+   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormResultSet, List, List)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(SormOptions, PreparedStatement, Object... )}
+   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.

@@ -13,7 +13,6 @@ import java.util.Set;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.ClassUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
@@ -43,18 +42,18 @@ public final class DefaultColumnValueToJavaObjectConverters
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T convertTo(SormOptions options, ResultSet resultSet, int column, int columnType,
-      Class<T> toType) throws SQLException {
-    return (T) convertToHelper(options, resultSet, column, columnType, toType);
+  public <T> T convertTo(ResultSet resultSet, int column, int columnType, Class<T> toType)
+      throws SQLException {
+    return (T) convertToHelper(resultSet, column, columnType, toType);
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private Object convertToHelper(SormOptions options, ResultSet resultSet, int column,
-      int columnType, Class<?> toType) throws SQLException {
+  private Object convertToHelper(ResultSet resultSet, int column, int columnType, Class<?> toType)
+      throws SQLException {
 
     final ColumnValueToJavaObjectConverter converter = converters.get(toType);
     if (converter != null) {
-      return converter.convertTo(options, resultSet, column, columnType, toType);
+      return converter.convertTo(resultSet, column, columnType, toType);
     }
 
     final String name = toType.getName();
@@ -200,7 +199,7 @@ public final class DefaultColumnValueToJavaObjectConverters
 
 
   @Override
-  public boolean isSupportedType(SormOptions options, Class<?> objectClass) {
+  public boolean isSupportedType(Class<?> objectClass) {
     return supportedTypes.contains(objectClass) || objectClass.isArray();
   }
 

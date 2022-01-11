@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.extension.SormOptions;
+
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
@@ -16,10 +16,10 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
 
   private final int multiRowSize;
 
-  public MultiRowInOneStatementProcessor(LoggerContext loggerContext, SormOptions options,
+  public MultiRowInOneStatementProcessor(LoggerContext loggerContext, 
       SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize,
       int multiRowSize) {
-    super(loggerContext, options, sqlParametersSetter, tableMapping, batchSize);
+    super(loggerContext, sqlParametersSetter, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
 
   }

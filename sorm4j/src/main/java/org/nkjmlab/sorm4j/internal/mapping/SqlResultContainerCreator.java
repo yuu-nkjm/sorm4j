@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
+
 
 abstract class SqlResultContainerCreator<T> {
   protected final Constructor<T> constructor;
@@ -18,11 +18,11 @@ abstract class SqlResultContainerCreator<T> {
   }
 
   abstract List<T> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException;
 
   abstract T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException;
 
 

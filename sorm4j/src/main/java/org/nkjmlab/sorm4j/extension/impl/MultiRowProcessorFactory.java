@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.extension.impl;
 
-import org.nkjmlab.sorm4j.extension.SormOptions;
+
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
@@ -33,18 +33,18 @@ public final class MultiRowProcessorFactory {
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
   }
 
-  public MultiRowProcessor<?> getMultiRowProcessor(LoggerContext loggerContext, SormOptions options,
+  public MultiRowProcessor<?> getMultiRowProcessor(LoggerContext loggerContext,
       SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<?> tableMapping) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
-        return new SimpleBatchProcessor<>(loggerContext, options, sqlParametersSetter, tableMapping,
+        return new SimpleBatchProcessor<>(loggerContext, sqlParametersSetter, tableMapping,
             batchSize);
       case MULTI_ROW:
-        return new MultiRowInOneStatementProcessor<>(loggerContext, options, sqlParametersSetter,
+        return new MultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
             tableMapping, batchSize, multiRowSize);
       case MULTI_ROW_AND_BATCH:
-        return new BatchOfMultiRowInOneStatementProcessor<>(loggerContext, options,
-            sqlParametersSetter, tableMapping, batchSize, multiRowSize, batchSizeWithMultiRow);
+        return new BatchOfMultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
+            tableMapping, batchSize, multiRowSize, batchSizeWithMultiRow);
       default:
         throw new IllegalStateException(multiRowProcessorType + " is invalid");
     }

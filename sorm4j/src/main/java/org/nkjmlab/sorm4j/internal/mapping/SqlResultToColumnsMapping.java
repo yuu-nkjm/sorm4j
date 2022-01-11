@@ -15,7 +15,6 @@ import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.impl.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -33,16 +32,14 @@ public final class SqlResultToColumnsMapping<T> {
       new ConcurrentHashMap<>();
 
   private final Class<T> objectClass;
-  private final SormOptions options;
   private final ColumnValueToJavaObjectConverters columnValueConverter;
   private final ColumnToAccessorMapping columnToAccessorMap;
 
   private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
   private final SqlResultContainerCreator<T> containerObjectCreator;
 
-  public SqlResultToColumnsMapping(SormOptions options, ColumnValueToJavaObjectConverters converter,
+  public SqlResultToColumnsMapping(ColumnValueToJavaObjectConverters converter,
       Class<T> objectClass, ColumnToAccessorMapping columnToAccessorMap) {
-    this.options = options;
     this.columnValueConverter = converter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;
@@ -122,8 +119,8 @@ public final class SqlResultToColumnsMapping<T> {
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return containerObjectCreator.loadContainerObjectList(columnValueConverter, options, resultSet,
-        columns, columnTypes, columnsString);
+    return containerObjectCreator.loadContainerObjectList(columnValueConverter, resultSet, columns,
+        columnTypes, columnsString);
   }
 
   public T loadContainerObject(ResultSet resultSet) throws SQLException {
@@ -131,8 +128,8 @@ public final class SqlResultToColumnsMapping<T> {
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return containerObjectCreator.loadContainerObject(columnValueConverter, options, resultSet,
-        columns, columnTypes, columnsString);
+    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet, columns,
+        columnTypes, columnsString);
   }
 
   public T loadContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
@@ -146,8 +143,8 @@ public final class SqlResultToColumnsMapping<T> {
     });
     String columnsString = getObjectColumnsString(columns);
     int[] columnTypes = getColumnTypes(resultSet, null, columns, columnsString);
-    return containerObjectCreator.loadContainerObject(columnValueConverter, options, resultSet,
-        columns, columnTypes, columnsString);
+    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet, columns,
+        columnTypes, columnsString);
   }
 
   private String getObjectColumnsString(String[] columns) {

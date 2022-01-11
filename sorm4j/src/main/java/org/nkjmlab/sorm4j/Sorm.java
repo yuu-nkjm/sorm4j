@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -21,16 +20,14 @@ import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 
 /**
- * An interface of executing object-relation mapping.
+ * An interface of executing object-relation mapping. Object-relation mapping functions with an
+ * instant connection. When executing these functions, this object gets a connection and executes
+ * the function, after that closes the connection immediately.
  *
  * @author nkjm
  *
  */
 public interface Sorm extends Orm {
-
-  static class DefaultContext {
-    static volatile SormContext CONTEXT = SormContext.builder().build();
-  }
 
 
   /**
@@ -49,7 +46,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return SormImpl.create(dataSource, DefaultContext.CONTEXT);
+    return SormImpl.create(dataSource, SormContext.DEFAULT_CONTEXT);
   }
 
 
@@ -91,10 +88,6 @@ public interface Sorm extends Orm {
     return create(createDataSource(jdbcUrl, null, null));
   }
 
-  static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
-    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.builder());
-  }
-
   /**
    * Creates a {@link DataSource} which simply wraps {@link DriverManager}
    *
@@ -115,7 +108,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, DefaultContext.CONTEXT);
+    return Sorm.toOrmConnection(connection, SormContext.DEFAULT_CONTEXT);
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {

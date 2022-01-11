@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
@@ -35,13 +34,13 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
   }
 
   @Override
-  public void setParameters(SormOptions options, PreparedStatement stmt, Object... parameters)
+  public void setParameters(PreparedStatement stmt, Object... parameters)
       throws SQLException {
     if (parameters == null) {
       return;
     }
     for (int i = 1; i <= parameters.length; i++) {
-      setParameter(options, stmt, i, parameters[i - 1]);
+      setParameter(stmt, i, parameters[i - 1]);
     }
   }
 
@@ -62,8 +61,8 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
    * @throws SQLException
    *
    */
-  private void setParameter(SormOptions options, PreparedStatement stmt, int parameterIndex,
-      Object parameter) throws SQLException {
+  private void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
+      throws SQLException {
 
     if (parameter == null) {
       stmt.setNull(parameterIndex, java.sql.Types.NULL);
@@ -73,7 +72,7 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
     final Class<?> type = parameter.getClass();
     final SqlParameterSetter setter = setters.get(type);
     if (setter != null) {
-      setter.setParameter(options, stmt, parameterIndex, type, parameter);
+      setter.setParameter(stmt, parameterIndex, parameter);
       return;
     }
 

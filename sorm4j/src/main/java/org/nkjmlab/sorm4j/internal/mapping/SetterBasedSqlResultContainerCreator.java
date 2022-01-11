@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.extension.FieldAccessor;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormOptions;
+
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCreator<T> {
@@ -35,11 +35,11 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
 
 
   @Override
-  T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
+  T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, 
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
-    return createContainerObject(columnValueConverter, options, resultSet, columns, columnTypes,
+    return createContainerObject(columnValueConverter, resultSet, columns, columnTypes,
         setterTypes);
   }
 
@@ -47,19 +47,19 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
 
   @Override
   public List<T> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(createContainerObject(columnValueConverter, options, resultSet, columns, columnTypes,
+      ret.add(createContainerObject(columnValueConverter, resultSet, columns, columnTypes,
           setterTypes));
     }
     return ret;
   }
 
   private T createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      SormOptions options, ResultSet resultSet, String[] columns, int[] sqlTypes,
+      ResultSet resultSet, String[] columns, int[] sqlTypes,
       Class<?>[] setterTypes) {
     try {
       final T ret = constructor.newInstance();
@@ -74,7 +74,7 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
         }
         final int sqlType = sqlTypes[i - 1];
         final Object value =
-            columnValueConverter.convertTo(options, resultSet, i, sqlType, setterType);
+            columnValueConverter.convertTo(resultSet, i, sqlType, setterType);
         columnToAccessorMap.setValue(ret, columnName, value);
       }
       return ret;
