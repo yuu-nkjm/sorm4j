@@ -159,15 +159,6 @@ public final class SormImpl implements Sorm {
     }
   }
 
-  private void acceptAndClose(ConsumerHandler<OrmConnection> handler) {
-    try (OrmConnection conn = openConnection()) {
-      handler.accept(conn);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-
   @Override
   public <T> List<T> readAll(Class<T> objectClass) {
     return applyAndClose(conn -> conn.readAll(objectClass));

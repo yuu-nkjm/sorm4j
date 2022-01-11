@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.extension.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
-public final class ColumnToAccessorMap {
+public final class ColumnToAccessorMapping {
 
-  private final Map<String, Accessor> columnToAccessorMap;
-  private final Map<String, Accessor> aliasColumnToAccessorMap;
+  private final Map<String, FieldAccessor> columnToAccessorMap;
+  private final Map<String, FieldAccessor> aliasColumnToAccessorMap;
   private final String columnAliasPrefix;
 
   /**
@@ -21,8 +21,8 @@ public final class ColumnToAccessorMap {
    *
    * @param columnToAccessorMap
    */
-  public ColumnToAccessorMap(Class<?> objectClass, Map<String, Accessor> columnToAccessorMap,
-      String columnAliasPrefix, Map<String, Accessor> aliasColumnToAccessorMap) {
+  public ColumnToAccessorMapping(Class<?> objectClass, Map<String, FieldAccessor> columnToAccessorMap,
+      String columnAliasPrefix, Map<String, FieldAccessor> aliasColumnToAccessorMap) {
     this.columnToAccessorMap = columnToAccessorMap.entrySet().stream()
         .collect(Collectors.toMap(e -> toCanonicalCase(e.getKey()), e -> e.getValue()));
     this.columnAliasPrefix = columnAliasPrefix;
@@ -31,7 +31,7 @@ public final class ColumnToAccessorMap {
         .collect(Collectors.toMap(e -> toCanonicalCase(e.getKey()), e -> e.getValue()));
   }
 
-  public ColumnToAccessorMap(Class<?> objectClass, Map<String, Accessor> columnToAccessorMap) {
+  public ColumnToAccessorMapping(Class<?> objectClass, Map<String, FieldAccessor> columnToAccessorMap) {
     this(objectClass, columnToAccessorMap, "", Collections.emptyMap());
   }
 
@@ -42,9 +42,9 @@ public final class ColumnToAccessorMap {
    * @param columnName
    * @return
    */
-  public Accessor get(String columnName) {
+  public FieldAccessor get(String columnName) {
     String cn = toCanonicalCase(columnName);
-    Accessor ret = columnToAccessorMap.get(cn);
+    FieldAccessor ret = columnToAccessorMap.get(cn);
     return ret != null ? ret : aliasColumnToAccessorMap.get(cn);
   }
 
@@ -71,7 +71,7 @@ public final class ColumnToAccessorMap {
   }
 
   final void setValue(Object object, String columnName, Object value) {
-    final Accessor acc = get(columnName);
+    final FieldAccessor acc = get(columnName);
     if (acc == null) {
       throw new SormException(ParameterizedStringUtils.newString("Error: setting value [{}]"
           + " of type [{}] in [{}]"
@@ -90,8 +90,8 @@ public final class ColumnToAccessorMap {
     }
   }
 
-  private final Accessor getAccessor(Object object, String columnName) {
-    final Accessor acc = get(columnName);
+  private final FieldAccessor getAccessor(Object object, String columnName) {
+    final FieldAccessor acc = get(columnName);
     if (acc == null) {
       throw new SormException(newString(
           "Error: getting value from [{}] because column [{}] does not have a corresponding getter method or field access. {}",
@@ -101,7 +101,7 @@ public final class ColumnToAccessorMap {
   }
 
   final Object getValue(Object object, String columnName) {
-    Accessor acc = getAccessor(object, columnName);
+    FieldAccessor acc = getAccessor(object, columnName);
     try {
       return acc.get(object);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -110,6 +110,10 @@ public final class ColumnToAccessorMap {
           (object == null ? "null" : object.getClass().getName()), acc.getFormattedString(),
           acc.getFormattedString(), object), e);
     }
+  }
+
+  public Map<String, FieldAccessor> getAccessors() {
+    return columnToAccessorMap;
   }
 
 }

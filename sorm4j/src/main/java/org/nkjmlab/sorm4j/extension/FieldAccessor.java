@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.common.SormException;
  * @author nkjm
  *
  */
-public final class Accessor {
+public final class FieldAccessor {
 
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
   private static final EmptyGetter EMPTY_GETTER = new EmptyGetter();
@@ -21,7 +21,7 @@ public final class Accessor {
   private final String columnName;
 
 
-  public Accessor(String columnName, Field field, Method getter, Method setter) {
+  public FieldAccessor(String columnName, Field field, Method getter, Method setter) {
     this.columnName = columnName;
     this.getter = getter != null ? new GetterMethod(getter)
         : field != null ? new FieldGetter(field) : EMPTY_GETTER;

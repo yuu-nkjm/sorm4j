@@ -10,24 +10,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.Accessor;
+import org.nkjmlab.sorm4j.extension.FieldAccessor;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
-final class SetterBasedCreator<T> extends ContainerObjectCreator<T> {
+final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCreator<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
   // https://github.com/yuu-nkjm/sorm4j/issues/26
   private final Map<String, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
 
-  public SetterBasedCreator(ColumnToAccessorMap columnToAccessorMap, Constructor<T> constructor) {
+  public SetterBasedSqlResultContainerCreator(ColumnToAccessorMapping columnToAccessorMap,
+      Constructor<T> constructor) {
     super(columnToAccessorMap, constructor);
   }
 
   private Class<?>[] getSetterTypes(String[] columns, String objectColumnsStr) {
     return setterTypesMap.computeIfAbsent(objectColumnsStr,
         k -> Arrays.stream(columns).map(columnName -> {
-          Accessor acc = columnToAccessorMap.get(columnName);
+          FieldAccessor acc = columnToAccessorMap.get(columnName);
           return acc != null ? acc.getSetterParameterType() : null;
         }).toArray(Class[]::new));
   }

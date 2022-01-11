@@ -4,11 +4,11 @@ import java.sql.Connection;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 
-final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
+public final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
   public SimpleBatchProcessor(LoggerContext loggerContext, SormOptions options,
-      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize) {
+      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize) {
     super(loggerContext, options, sqlParametersSetter, tableMapping, batchSize);
   }
 

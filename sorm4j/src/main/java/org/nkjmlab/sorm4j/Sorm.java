@@ -8,12 +8,12 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.basic.ConsumerHandler;
 import org.nkjmlab.sorm4j.basic.FunctionHandler;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableNameMapper;
+import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
@@ -273,7 +273,7 @@ public interface Sorm extends Orm {
       return this;
     }
 
-    public Builder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
+    public Builder setColumnFieldMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
       contextBuilder.setColumnFieldMapper(fieldNameMapper);
       return this;
     }
@@ -285,7 +285,8 @@ public interface Sorm extends Orm {
     }
 
 
-    public Builder setColumnValueToJavaObjectConverter(ColumnValueToJavaObjectConverters converter) {
+    public Builder setColumnValueToJavaObjectConverter(
+        ColumnValueToJavaObjectConverters converter) {
       contextBuilder.setColumnValueToJavaObjectConverter(converter);
       return this;
     }
@@ -297,29 +298,10 @@ public interface Sorm extends Orm {
     }
 
 
-    public Builder setMultiRowProcessorType(MultiRowProcessorType multiRowProcessorType) {
-      contextBuilder.setMultiRowProcessorType(multiRowProcessorType);
+    public Builder setMultiRowProcessorFactory(MultiRowProcessorFactory multiRowProcessorFactory) {
+      contextBuilder.setMultiRowProcessorFactory(multiRowProcessorFactory);
       return this;
     }
-
-
-    public Builder setBatchSize(int size) {
-      contextBuilder.setBatchSize(size);
-      return this;
-    }
-
-
-    public Builder setMultiRowSize(int size) {
-      contextBuilder.setMultiRowSize(size);
-      return this;
-    }
-
-
-    public Builder setBatchSizeWithMultiRow(int size) {
-      contextBuilder.setBatchSizeWithMultiRow(size);
-      return this;
-    }
-
 
     public Builder setTransactionIsolationLevel(int level) {
       contextBuilder.setTransactionIsolationLevel(level);

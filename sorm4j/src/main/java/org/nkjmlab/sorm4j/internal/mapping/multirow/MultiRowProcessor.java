@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessor<T> {
@@ -16,12 +16,12 @@ public abstract class MultiRowProcessor<T> {
   private final int batchSize;
   private final SqlParametersSetter sqlParametersSetter;
 
-  final TableMapping<T> tableMapping;
+  final SqlParametersToTableMapping<T> tableMapping;
   final SormOptions options;
   final LoggerContext loggerContext;
 
   MultiRowProcessor(LoggerContext loggerContext, SormOptions options,
-      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize) {
+      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize) {
     this.loggerContext = loggerContext;
     this.options = options;
     this.sqlParametersSetter = sqlParametersSetter;

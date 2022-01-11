@@ -6,7 +6,7 @@ class AccessorTest {
 
   @Test
   void testAccessor() {
-    Accessor ac = new Accessor(null, null, null, null);
+    FieldAccessor ac = new FieldAccessor(null, null, null, null);
     System.out.println(ac.toString());
   }
 

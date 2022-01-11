@@ -27,32 +27,42 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  *
  * @param <T>
  */
-public final class ColumnsMapping<T> extends Mapping<T> {
+public final class SqlResultToColumnsMapping<T> {
 
   private static final ConcurrentMap<Class<?>, String[]> primaryKeyColumnLabels =
       new ConcurrentHashMap<>();
 
-  private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
-  private final ContainerObjectCreator<T> containerObjectCreator;
+  private final Class<T> objectClass;
+  private final SormOptions options;
+  private final ColumnValueToJavaObjectConverters columnValueConverter;
+  private final ColumnToAccessorMapping columnToAccessorMap;
 
-  public ColumnsMapping(SormOptions options, ColumnValueToJavaObjectConverters converter,
-      Class<T> objectClass, ColumnToAccessorMap columnToAccessorMap) {
-    super(options, converter, objectClass, columnToAccessorMap);
+  private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
+  private final SqlResultContainerCreator<T> containerObjectCreator;
+
+  public SqlResultToColumnsMapping(SormOptions options, ColumnValueToJavaObjectConverters converter,
+      Class<T> objectClass, ColumnToAccessorMapping columnToAccessorMap) {
+    this.options = options;
+    this.columnValueConverter = converter;
+    this.objectClass = objectClass;
+    this.columnToAccessorMap = columnToAccessorMap;
 
     Constructor<T> ormConstructor = getOrmConstructor(objectClass);
     Constructor<T> ormRecordConstructor = getOrmRecordConstructor(objectClass);
     this.containerObjectCreator = ormRecordConstructor != null
         ? createContainerRecordCreator(objectClass, ormRecordConstructor)
         : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
-            : new SetterBasedCreator<>(columnToAccessorMap, getDefaultConstructor(objectClass)));
+            : new SetterBasedSqlResultContainerCreator<>(columnToAccessorMap,
+                getDefaultConstructor(objectClass)));
 
   }
 
-  private ContainerObjectCreator<T> createContainerRecordCreator(Class<T> objectClass,
+  private SqlResultContainerCreator<T> createContainerRecordCreator(Class<T> objectClass,
       Constructor<T> constructor) {
     String[] parameterNames =
         Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-    return new ConstructorBasedCreator<>(getColumnToAccessorMap(), constructor, parameterNames);
+    return new ConstructorBasedSqlResultCreator<>(getColumnToAccessorMap(), constructor,
+        parameterNames);
   }
 
   private Constructor<T> getOrmRecordConstructor(Class<T> objectClass) {
@@ -85,10 +95,11 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     }
   }
 
-  private ContainerObjectCreator<T> createOrmConstructorPojoCreator(Class<T> objectClass,
+  private SqlResultContainerCreator<T> createOrmConstructorPojoCreator(Class<T> objectClass,
       Constructor<T> constructor) {
     String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
-    return new ConstructorBasedCreator<>(getColumnToAccessorMap(), constructor, _parameters);
+    return new ConstructorBasedSqlResultCreator<>(getColumnToAccessorMap(), constructor,
+        _parameters);
   }
 
 
@@ -101,9 +112,9 @@ public final class ColumnsMapping<T> extends Mapping<T> {
 
 
   public String getFormattedString() {
-    return "[" + ColumnsMapping.class.getSimpleName() + "] Columns are mappted to a class"
-        + System.lineSeparator() + super.getColumnToAccessorString() + System.lineSeparator()
-        + "  with [" + containerObjectCreator + "]";
+    return "[" + SqlResultToColumnsMapping.class.getSimpleName()
+        + "] Columns are mappted to a class" + System.lineSeparator() + getColumnToAccessorString()
+        + System.lineSeparator() + "  with [" + containerObjectCreator + "]";
   }
 
   public List<T> loadContainerObjectList(ResultSet resultSet) throws SQLException {
@@ -173,6 +184,17 @@ public final class ColumnsMapping<T> extends Mapping<T> {
     return columns;
   }
 
+  Class<T> getObjectClass() {
+    return objectClass;
+  }
+
+  String getColumnToAccessorString() {
+    return "[" + objectClass.getName() + "] is mapped to " + columnToAccessorMap.toString();
+  }
+
+  ColumnToAccessorMapping getColumnToAccessorMap() {
+    return columnToAccessorMap;
+  }
 
 
 }

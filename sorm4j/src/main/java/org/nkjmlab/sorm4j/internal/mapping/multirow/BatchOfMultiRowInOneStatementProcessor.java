@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
@@ -21,13 +21,13 @@ import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
  *
  * @param <T>
  */
-final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
 
   private final int multiRowSize;
   private final int batchSizeWithMultiRow;
 
   public BatchOfMultiRowInOneStatementProcessor(LoggerContext loggerContext, SormOptions options,
-      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize,
+      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize,
       int multiRowSize, int batchSizeWithMultiRow) {
     super(loggerContext, options, sqlParametersSetter, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;

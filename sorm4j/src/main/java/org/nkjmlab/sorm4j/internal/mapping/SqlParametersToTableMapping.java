@@ -21,11 +21,11 @@ import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
 import org.nkjmlab.sorm4j.extension.TableSql;
+import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
-import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
@@ -34,7 +34,12 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 /**
  * Holds mapping data from a given class and a table
  */
-public final class TableMapping<T> extends Mapping<T> {
+public final class SqlParametersToTableMapping<T> {
+
+  private final Class<T> objectClass;
+  private final SormOptions options;
+  private final ColumnValueToJavaObjectConverters columnValueConverter;
+  private final ColumnToAccessorMapping columnToAccessorMap;
 
   private final Map<String, Class<?>> setterParameterTypeMap = new ConcurrentHashMap<>();
   private final SqlParametersSetter sqlParametersSetter;
@@ -44,18 +49,22 @@ public final class TableMapping<T> extends Mapping<T> {
   private final TableSql sql;
   private final LoggerContext loggerContext;
 
-  public TableMapping(LoggerContext loggerContext, SormOptions options,
-      ColumnValueToJavaObjectConverters columnValueConverter, SqlParametersSetter sqlParametersSetter,
-      MultiRowProcessorFactory multiRowProcessorFactory, Class<T> objectClass,
-      ColumnToAccessorMap columnToAccessorMap, TableMetaData tableMetaData, TableSql sql) {
-    super(options, columnValueConverter, objectClass, columnToAccessorMap);
+  public SqlParametersToTableMapping(LoggerContext loggerContext, SormOptions options,
+      ColumnValueToJavaObjectConverters columnValueConverter,
+      SqlParametersSetter sqlParametersSetter, MultiRowProcessorFactory multiRowProcessorFactory,
+      Class<T> objectClass, ColumnToAccessorMapping columnToAccessorMap,
+      TableMetaData tableMetaData, TableSql sql) {
+    this.options = options;
+    this.columnValueConverter = columnValueConverter;
+    this.objectClass = objectClass;
+    this.columnToAccessorMap = columnToAccessorMap;
     this.loggerContext = loggerContext;
     this.tableMetaData = tableMetaData;
     this.sql = sql;
     this.sqlParametersSetter = sqlParametersSetter;
     @SuppressWarnings("unchecked")
-    MultiRowProcessor<T> processor =
-        (MultiRowProcessor<T>) multiRowProcessorFactory.getMultiRowProcessor(this);
+    MultiRowProcessor<T> processor = (MultiRowProcessor<T>) multiRowProcessorFactory
+        .getMultiRowProcessor(loggerContext, options, sqlParametersSetter, this);
     this.multiRowProcessor = processor;
   }
 
@@ -225,7 +234,7 @@ public final class TableMapping<T> extends Mapping<T> {
 
       final Optional<LogPoint> lp =
           loggerContext.createLogPointBeforeSql(LoggerContext.Category.EXECUTE_UPDATE,
-              TableMapping.class, connection, insertSql, parameters);
+              SqlParametersToTableMapping.class, connection, insertSql, parameters);
 
       int rowsModified = stmt.executeUpdate();
 
@@ -279,15 +288,33 @@ public final class TableMapping<T> extends Mapping<T> {
   }
 
   public String getFormattedString() {
-    return "[" + TableMapping.class.getSimpleName() + "] Table [" + tableMetaData.getTableName()
-        + "] is mapped to [" + getObjectClass().getName() + "] class. " + lineSeparator() + "PK="
-        + tableMetaData.getPrimaryKeys() + ",  " + tableMetaData.getColumnsWithMetaData()
-        + lineSeparator() + super.getColumnToAccessorString() + lineSeparator() + "  with ["
-        + multiRowProcessor.getClass().getSimpleName() + "]";
+    return "[" + SqlParametersToTableMapping.class.getSimpleName() + "] Table ["
+        + tableMetaData.getTableName() + "] is mapped to [" + getObjectClass().getName()
+        + "] class. " + lineSeparator() + "PK=" + tableMetaData.getPrimaryKeys() + ",  "
+        + tableMetaData.getColumnsWithMetaData() + lineSeparator() + getColumnToAccessorString()
+        + lineSeparator() + "  with [" + multiRowProcessor.getClass().getSimpleName() + "]";
   }
 
   public TableMetaData getTableMetaData() {
     return tableMetaData;
+  }
+
+  @Override
+  public String toString() {
+    return "Mapping [objectClass=" + objectClass.getName() + ", columnToAccessorMap="
+        + columnToAccessorMap.toString() + "]";
+  }
+
+  Class<T> getObjectClass() {
+    return objectClass;
+  }
+
+  String getColumnToAccessorString() {
+    return "[" + objectClass.getName() + "] is mapped to " + columnToAccessorMap.toString();
+  }
+
+  ColumnToAccessorMapping getColumnToAccessorMap() {
+    return columnToAccessorMap;
   }
 
 }

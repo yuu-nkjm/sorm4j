@@ -26,7 +26,7 @@ class TableMappingTest {
   void testGetValue() {
     try {
       sorm.accept(m -> {
-        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         Guest g = new Guest();
         tm.getValue(g, "hoge");
       });
@@ -36,7 +36,7 @@ class TableMappingTest {
 
     try {
       sorm.accept(m -> {
-        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         String s = new String();
         tm.getValue(s, "id");
       });
@@ -54,7 +54,7 @@ class TableMappingTest {
     try {
       sorm.accept(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        SqlParametersToTableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
       });
     } catch (Exception e) {
@@ -66,7 +66,7 @@ class TableMappingTest {
   void testSetValue() {
     try {
       sorm.accept(m -> {
-        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "hoge", 0);
       });
     } catch (Exception e) {
@@ -74,7 +74,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "id", "String");
       });
     } catch (Exception e) {
@@ -82,7 +82,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        ColumnToAccessorMap tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {
@@ -105,7 +105,7 @@ class TableMappingTest {
     });
   }
 
-  public static <T> TableMapping<T> getTableMapping(OrmConnection conn, Class<T> objectClass) {
+  public static <T> SqlParametersToTableMapping<T> getTableMapping(OrmConnection conn, Class<T> objectClass) {
     return ((OrmConnectionImpl) conn).getTableMapping(objectClass);
   }
 

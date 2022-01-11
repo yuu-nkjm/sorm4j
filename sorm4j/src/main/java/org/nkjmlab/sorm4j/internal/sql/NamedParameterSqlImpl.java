@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
-import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMap;
+import org.nkjmlab.sorm4j.extension.FieldAccessor;
+import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.extension.impl.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -22,8 +22,8 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  *
  */
 public class NamedParameterSqlImpl implements NamedParameterSql {
-  private static final ColumnFieldMapper DEFAULT_COLUMN_FIELD_MAPPER =
-      new DefaultColumnFieldMapper();
+  private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
+      new DefaultColumnToFieldAccessorMapper();
 
   private static final char DEFAULT_PREFIX = ':';
   private static final char DEFAULT_SUFFIX = 0;
@@ -31,12 +31,12 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
   private final String sql;
   private final char prefix;
   private final char suffix;
-  private final ColumnFieldMapper columnFieldMapper;
+  private final ColumnToFieldAccessorMapper columnFieldMapper;
   private final Map<String, Object> parameters;
   private Object bean;
 
   public NamedParameterSqlImpl(String sql, char prefix, char suffix,
-      ColumnFieldMapper columnFieldMapper) {
+      ColumnToFieldAccessorMapper columnFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
@@ -83,7 +83,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
         continue;
       }
       if (bean != null) {
-        Accessor acc = getAccessor(parameterName);
+        FieldAccessor acc = getAccessor(parameterName);
         if (acc != null) {
           orderdParams.put(pos, Try.getOrElseNull(() -> acc.get(bean)));
         }
@@ -130,13 +130,13 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
   }
 
-  private static final Map<Class<?>, ColumnToAccessorMap> columnToAccessorMaps =
+  private static final Map<Class<?>, ColumnToAccessorMapping> columnToAccessorMaps =
       new ConcurrentHashMap<>();
 
-  private Accessor getAccessor(String parameterName) {
+  private FieldAccessor getAccessor(String parameterName) {
     final Class<?> objectClass = bean.getClass();
-    return columnToAccessorMaps.computeIfAbsent(objectClass,
-        k -> new ColumnToAccessorMap(objectClass, columnFieldMapper.createAccessors(objectClass)))
+    return columnToAccessorMaps
+        .computeIfAbsent(objectClass, k -> columnFieldMapper.createMapping(objectClass))
         .get(parameterName);
   }
 

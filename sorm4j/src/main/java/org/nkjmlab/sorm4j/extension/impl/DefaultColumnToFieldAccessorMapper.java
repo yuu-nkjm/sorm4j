@@ -6,9 +6,6 @@ import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,39 +14,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.Accessor;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.ColumnName;
-import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
+import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.extension.FieldAccessor;
+import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 /**
- * Default implementation of {@link ColumnFieldMapper}
+ * Default implementation of {@link ColumnToFieldAccessorMapper}
  *
  * @author nkjm
  *
  */
 
-public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
+public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAccessorMapper {
 
   private final LoggerContext loggerContext;
 
-  public DefaultColumnFieldMapper() {
+  public DefaultColumnToFieldAccessorMapper() {
     this(LoggerContext.builder().build());
   }
 
-  public DefaultColumnFieldMapper(LoggerContext loggerContext) {
+  public DefaultColumnToFieldAccessorMapper(LoggerContext loggerContext) {
     this.loggerContext = loggerContext;
+  }
+
+  @Override
+  public ColumnToAccessorMapping createMapping(Class<?> objectClass) {
+    Map<String, FieldAccessor> accessors = createAccessors(objectClass);
+    String aliasPrefix = SormContext.getColumnAliasPrefix(objectClass);
+    Map<String, FieldAccessor> aliasAccessors = createAliasAccessors(aliasPrefix, accessors);
+    return new ColumnToAccessorMapping(objectClass, accessors, aliasPrefix, aliasAccessors);
   }
 
   private Map<String, Method> extractedMethodStartWith(Class<?> objectClass, String prefix) {
@@ -131,7 +134,7 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     }
     if (getter.getParameterCount() != 0) {
       if (logging) {
-        loggerContext.getLogger(DefaultColumnFieldMapper.class).warn(
+        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).warn(
             "Getter [{}] should not have parameter but has {} params.", getter,
             getter.getParameterCount());
       }
@@ -139,7 +142,7 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     }
     if (getter.getReturnType() == void.class) {
       if (logging) {
-        loggerContext.getLogger(DefaultColumnFieldMapper.class)
+        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class)
             .warn("Getter [{}] must have return a parameter.", getter);
       }
     }
@@ -151,7 +154,7 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
       return null;
     }
     if (setter.getParameterCount() != 1) {
-      loggerContext.getLogger(DefaultColumnFieldMapper.class).warn(
+      loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).warn(
           "Setter [{}] should have a single parameter but has {} params.", setter,
           setter.getParameterCount());
       return null;
@@ -159,8 +162,8 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     return setter;
   }
 
-  @Override
-  public Map<String, Accessor> createAccessors(Class<?> objectClass) {
+
+  private Map<String, FieldAccessor> createAccessors(Class<?> objectClass) {
     Set<String> names = new HashSet<>();
     names.addAll(getAllFields(objectClass).keySet());
     names.addAll(getAllGetters(objectClass).keySet());
@@ -172,8 +175,8 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     return createAccessors(objectClass, new ArrayList<>(names));
   }
 
-  @Override
-  public Map<String, Accessor> createAccessors(Class<?> objectClass, List<String> columnNames) {
+  private Map<String, FieldAccessor> createAccessors(Class<?> objectClass,
+      List<String> columnNames) {
     Map<String, Field> fields = getAllFields(objectClass);
     Map<String, Method> getters = getAllGetters(objectClass);
     Map<String, Method> allMethods = getAllMethods(objectClass);
@@ -182,7 +185,7 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     Map<String, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
     Map<String, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
 
-    Map<String, Accessor> ret = new HashMap<>();
+    Map<String, FieldAccessor> ret = new HashMap<>();
     for (String canonicalColName : columnNames.stream().map(col -> toCanonicalCase(col))
         .toArray(String[]::new)) {
       Field f =
@@ -197,100 +200,23 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
               : setters.get(canonicalColName);
 
       if (f == null && (g == null && s == null)) {
-        loggerContext.getLogger(DefaultColumnFieldMapper.class).debug(
+        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
             canonicalColName);
       } else {
-        ret.put(canonicalColName, new Accessor(canonicalColName, f, g, s));
+        ret.put(canonicalColName, new FieldAccessor(canonicalColName, f, g, s));
       }
     }
     return ret;
   }
 
-
-  @Override
-  public List<ColumnName> getAutoGeneratedColumns(DatabaseMetaData metaData, String tableName)
-      throws SQLException {
-    try (ResultSet resultSet =
-        metaData.getColumns(null, getSchemaPattern(metaData), tableName, "%")) {
-      final List<ColumnName> columnsList = new ArrayList<>();
-      while (resultSet.next()) {
-        String columnName = resultSet.getString(4);
-        String isAutoIncrement = resultSet.getString(23);
-        if (isAutoIncrement.equals("YES")) {
-          columnsList.add(new ColumnName(columnName));
-        }
-      }
-      return columnsList;
-    }
-  }
-
-  @Override
-  public List<ColumnNameWithMetaData> getColumns(DatabaseMetaData metaData, String tableName)
-      throws SQLException {
-    try (ResultSet resultSet =
-        metaData.getColumns(null, getSchemaPattern(metaData), tableName, "%")) {
-      final List<ColumnNameWithMetaData> columnsList = new ArrayList<>();
-      while (resultSet.next()) {
-        String columnName = resultSet.getString(4);
-        int dataType = resultSet.getInt(5);
-        String typeName = resultSet.getString(6);
-        int ordinalPosition = resultSet.getInt(17);
-        String isNullable = resultSet.getString(18);
-        String isAutoIncremented = resultSet.getString(23);
-        String isGenerated = resultSet.getString(24);
-
-        columnsList.add(new ColumnNameWithMetaData(columnName, dataType, typeName, ordinalPosition,
-            isNullable, isAutoIncremented, isGenerated));
-      }
-      return columnsList;
-    }
-  }
-
-
-
-  @Override
-  public List<ColumnName> getPrimaryKeys(DatabaseMetaData metaData, String tableName)
-      throws SQLException {
-    final List<ColumnName> primaryKeysList = new ArrayList<>();
-    try (ResultSet resultSet =
-        metaData.getPrimaryKeys(null, getSchemaPattern(metaData), tableName)) {
-      while (resultSet.next()) {
-        final String columnName = resultSet.getString(4);
-        primaryKeysList.add(new ColumnName(columnName));
-      }
-      return primaryKeysList;
-    }
-  }
-
-  /**
-   * Gets schema pattern for accessing {@link DatabaseMetaData}.
-   *
-   * @param metaData
-   * @return
-   * @throws SQLException
-   */
-  private String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {
-    // oracle expects a pattern such as "%" to work
-    return "Oracle".equalsIgnoreCase(metaData.getDatabaseProductName()) ? "%" : null;
-  }
-
-
-
-  @Override
-  public String getColumnAliasPrefix(Class<?> objectClass) {
-    return Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
-        .map(a -> a.value()).orElse("");
-  }
-
-  @Override
-  public Map<String, Accessor> createAliasAccessors(String prefix,
-      Map<String, Accessor> accessors) {
+  private Map<String, FieldAccessor> createAliasAccessors(String prefix,
+      Map<String, FieldAccessor> accessors) {
     if (prefix.length() == 0) {
       return Collections.emptyMap();
     }
 
-    Map<String, Accessor> ret = new HashMap<>();
+    Map<String, FieldAccessor> ret = new HashMap<>();
 
     for (String key : accessors.keySet()) {
       String aKey = toCanonicalCase(prefix + key);
@@ -303,7 +229,6 @@ public final class DefaultColumnFieldMapper implements ColumnFieldMapper {
     }
     return ret;
   }
-
 
 
 }

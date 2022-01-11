@@ -11,7 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory.MultiRowProcessorType;
 
 class SimpleBatchProcessorTest {
 
@@ -20,7 +21,9 @@ class SimpleBatchProcessorTest {
   @BeforeAll
   static void setUp() {
     sorm = Sorm.builder().setDataSource(jdbcUrl, user, password)
-        .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build();
+        .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder()
+            .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build())
+        .build();
   }
 
 

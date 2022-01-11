@@ -7,11 +7,11 @@ import java.util.List;
 import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.extension.SormOptions;
 
-abstract class ContainerObjectCreator<T> {
+abstract class SqlResultContainerCreator<T> {
   protected final Constructor<T> constructor;
-  protected final ColumnToAccessorMap columnToAccessorMap;
+  protected final ColumnToAccessorMapping columnToAccessorMap;
 
-  public ContainerObjectCreator(ColumnToAccessorMap columnToAccessorMap,
+  public SqlResultContainerCreator(ColumnToAccessorMapping columnToAccessorMap,
       Constructor<T> constructor) {
     this.columnToAccessorMap = columnToAccessorMap;
     this.constructor = constructor;
@@ -21,9 +21,9 @@ abstract class ContainerObjectCreator<T> {
       SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
       String columnsString) throws SQLException;
 
-  abstract T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, SormOptions options,
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
-      throws SQLException;
+  abstract T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
+      SormOptions options, ResultSet resultSet, String[] columns, int[] columnTypes,
+      String columnsString) throws SQLException;
 
 
 }
