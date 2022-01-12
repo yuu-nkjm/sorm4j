@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.FieldAccessor;
 
 class AccessorTest {
 

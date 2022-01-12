@@ -3,13 +3,13 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
-import org.nkjmlab.sorm4j.basic.RowMapper;
-import org.nkjmlab.sorm4j.command.Command;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
+import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
+import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.Command;
 
 public abstract class AbstractCommand implements Command {
 

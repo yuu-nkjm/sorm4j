@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 
 class TableMappingTest {
   private Sorm sorm;

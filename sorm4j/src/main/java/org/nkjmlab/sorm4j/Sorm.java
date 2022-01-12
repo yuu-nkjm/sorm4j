@@ -5,19 +5,19 @@ import java.sql.DriverManager;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.basic.ConsumerHandler;
-import org.nkjmlab.sorm4j.basic.FunctionHandler;
-import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.extension.logger.SormLogger;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.lowlevel_orm.ConsumerHandler;
+import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
+import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.mapping.TableNameMapper;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -112,7 +112,7 @@ public interface Sorm extends Orm {
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
-    return new OrmConnectionImpl(connection, sormContext);
+    return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
   }
 
   /**
@@ -128,15 +128,6 @@ public interface Sorm extends Orm {
 
   @Experimental
   <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler);
-
-
-  /**
-   * Accepts a {@link Connection} handler for a task with object-relation mapping. The connection
-   * will be closed after the process of handler.
-   *
-   * @param handler
-   */
-  void acceptJdbcConnectionHandler(ConsumerHandler<Connection> handler);
 
   /**
    * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
@@ -157,16 +148,6 @@ public interface Sorm extends Orm {
    * @return
    */
   <R> R apply(FunctionHandler<OrmConnection, R> handler);
-
-  /**
-   * Applies a {@link Connection} handler for a task with object-relation mapping and gets the
-   * result. The connection will be closed after the process of handler.
-   *
-   * @param <R>
-   * @param handler
-   * @return
-   */
-  <R> R applyJdbcConnectionHandler(FunctionHandler<Connection, R> handler);
 
 
   /**
@@ -252,7 +233,7 @@ public interface Sorm extends Orm {
     }
 
     public Sorm build() {
-      return new SormImpl(dataSource, contextBuilder.build());
+      return new SormImpl(dataSource, (SormContextImpl) contextBuilder.build());
     }
 
     public Builder setDataSource(DataSource dataSource) {
@@ -300,13 +281,6 @@ public interface Sorm extends Orm {
       contextBuilder.setTransactionIsolationLevel(level);
       return this;
     }
-
-
-    public Builder setOption(String name, Object value) {
-      contextBuilder.setOption(name, value);
-      return this;
-    }
-
 
     public Builder setLoggerOnAll() {
       contextBuilder.setLoggerOnAll();

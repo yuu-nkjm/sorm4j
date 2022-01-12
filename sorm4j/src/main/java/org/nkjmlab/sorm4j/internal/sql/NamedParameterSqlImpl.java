@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.extension.FieldAccessor;
-import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.extension.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.mapping.FieldAccessor;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
@@ -136,7 +136,7 @@ public class NamedParameterSqlImpl implements NamedParameterSql {
   private FieldAccessor getAccessor(String parameterName) {
     final Class<?> objectClass = bean.getClass();
     return columnToAccessorMaps
-        .computeIfAbsent(objectClass, k -> columnFieldMapper.createMapping(objectClass))
+        .computeIfAbsent(objectClass, k -> columnFieldMapper.createMapping(objectClass, ""))
         .get(parameterName);
   }
 

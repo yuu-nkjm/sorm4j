@@ -9,22 +9,22 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.basic.ConsumerHandler;
-import org.nkjmlab.sorm4j.basic.FunctionHandler;
-import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
-import org.nkjmlab.sorm4j.basic.RowMapper;
-import org.nkjmlab.sorm4j.command.BasicCommand;
-import org.nkjmlab.sorm4j.command.Command;
-import org.nkjmlab.sorm4j.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
-import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.lowlevel_orm.ConsumerHandler;
+import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
+import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
+import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.BasicCommand;
+import org.nkjmlab.sorm4j.util.command.Command;
+import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
 /**
  * An entry point of object-relation mapping.
@@ -35,14 +35,14 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
-  private final SormContext sormContext;
+  private final SormContextImpl sormContext;
 
   @Experimental
   public static Sorm create(DataSource dataSource, SormContext context) {
-    return new SormImpl(dataSource, context);
+    return new SormImpl(dataSource, (SormContextImpl) context);
   }
 
-  public SormImpl(DataSource connectionSource, SormContext context) {
+  public SormImpl(DataSource connectionSource, SormContextImpl context) {
     this.sormContext = context;
     this.dataSource = connectionSource;
   }
@@ -74,16 +74,6 @@ public final class SormImpl implements Sorm {
       throw Try.rethrow(e);
     }
   }
-
-  @Override
-  public <R> R applyJdbcConnectionHandler(FunctionHandler<Connection, R> handler) {
-    try (Connection conn = getJdbcConnection()) {
-      return handler.apply(conn);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
 
   @Override
   public String getContextString() {
@@ -130,15 +120,6 @@ public final class SormImpl implements Sorm {
     try (OrmTransaction transaction = openTransaction()) {
       handler.accept(transaction);
       transaction.commit();
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  @Override
-  public void acceptJdbcConnectionHandler(ConsumerHandler<Connection> handler) {
-    try (Connection conn = getJdbcConnection()) {
-      handler.accept(conn);
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -224,6 +205,29 @@ public final class SormImpl implements Sorm {
       Object... parameters) {
     return applyAndClose(conn -> conn.readTupleList(t1, t2, sql, parameters));
   }
+
+  @Override
+  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return applyAndClose(conn -> conn.join(t1, t2, onCondition));
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2,
+      String t1t2OnCondition, Class<T3> t3, String t2t3OnCondition) {
+    return applyAndClose(conn -> conn.join(t1, t2, t1t2OnCondition, t3, t2t3OnCondition));
+  }
+
+  @Override
+  public <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return applyAndClose(conn -> conn.join(t1, t2, onCondition));
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
+      String t1t2OnCondition, Class<T3> t3, String t2t3OnCondition) {
+    return applyAndClose(conn -> conn.leftJoin(t1, t2, t1t2OnCondition, t3, t2t3OnCondition));
+  }
+
 
   @Override
   public <T> RowMapper<T> getRowMapper(Class<T> objectClass) {

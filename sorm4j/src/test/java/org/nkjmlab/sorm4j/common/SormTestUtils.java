@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.common;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext.Category;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
 
 public class SormTestUtils {
   public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";

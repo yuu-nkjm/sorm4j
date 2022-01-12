@@ -3,8 +3,8 @@ package org.nkjmlab.example.sorm4j;
 import java.util.List;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.extension.logger.JulSormLogger;
-import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.util.logger.JulSormLogger;
+import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
 
 public class LoggingExample {
 

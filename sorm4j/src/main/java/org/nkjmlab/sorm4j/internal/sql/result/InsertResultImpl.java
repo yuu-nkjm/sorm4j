@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.sql.result;
 
 import java.util.Collections;
 import java.util.List;
-import org.nkjmlab.sorm4j.common.InsertResult;
+import org.nkjmlab.sorm4j.result.InsertResult;
 
 /**
  * Represents a result from an insert operation with auto-generated keys.

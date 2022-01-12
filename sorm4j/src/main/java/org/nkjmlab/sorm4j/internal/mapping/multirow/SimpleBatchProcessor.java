@@ -1,10 +1,9 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import java.sql.Connection;
-
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
   public SimpleBatchProcessor(LoggerContext loggerContext, 

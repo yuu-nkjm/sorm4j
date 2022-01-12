@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
 public class OrderedParameterCommandImpl extends AbstractCommand
     implements OrderedParameterCommand {

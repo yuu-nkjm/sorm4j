@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.FieldAccessor;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.FieldAccessor;
 
 final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCreator<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.

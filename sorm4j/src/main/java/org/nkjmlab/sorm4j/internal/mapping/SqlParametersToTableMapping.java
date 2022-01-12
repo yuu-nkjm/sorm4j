@@ -14,21 +14,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.TableSql;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.mapping.TableSql;
+import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext.LogPoint;
 
 /**
  * Holds mapping data from a given class and a table

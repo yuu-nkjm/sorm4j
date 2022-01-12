@@ -2,10 +2,12 @@ package org.nkjmlab.sorm4j.internal.mapping;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.extension.ColumnNameWithMetaData;
+import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.result.ColumnNameWithMetaData;
+import org.nkjmlab.sorm4j.result.TableMetaData;
 
 public class TableMetaDataImpl implements TableMetaData {
 
@@ -119,6 +121,11 @@ public class TableMetaDataImpl implements TableMetaData {
   @Override
   public String getColumnAliasPrefix() {
     return columnAliasPrefix;
+  }
+
+  public static Optional<String> getColumnAliasPrefix(Class<?> objectClass) {
+    return Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
+        .map(a -> a.value());
   }
 
 }

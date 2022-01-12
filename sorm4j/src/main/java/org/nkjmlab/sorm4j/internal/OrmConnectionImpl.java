@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal;
 
 import static org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,32 +19,31 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.basic.FunctionHandler;
-import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
-import org.nkjmlab.sorm4j.basic.RowMapper;
-import org.nkjmlab.sorm4j.command.BasicCommand;
-import org.nkjmlab.sorm4j.command.Command;
-import org.nkjmlab.sorm4j.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.command.OrderedParameterCommand;
-import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.common.Tuple;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.ColumnValueToMapEntryConverter;
-import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.LazyResultSetImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
+import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
+import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.result.Tuple;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.BasicCommand;
+import org.nkjmlab.sorm4j.util.command.Command;
+import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext.LogPoint;
 
 /**
  * A database connection with object-relation mapping function. The main class for the ORMapper
@@ -57,10 +57,8 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  */
 public class OrmConnectionImpl implements OrmConnection {
 
-
-
   private static final Supplier<int[]> EMPTY_INT_SUPPLIER = () -> new int[0];
-  private final SormContext sormContext;
+  private final SormContextImpl sormContext;
   private final Connection connection;
   private final List<LazyResultSet<?>> lazyResultSets = new ArrayList<>();
 
@@ -71,7 +69,7 @@ public class OrmConnectionImpl implements OrmConnection {
    * @param connection {@link java.sql.Connection} object to be used
    * @param sormContext
    */
-  public OrmConnectionImpl(Connection connection, SormContext sormContext) {
+  public OrmConnectionImpl(Connection connection, SormContextImpl sormContext) {
     this.connection = connection;
     this.sormContext = sormContext;
   }
@@ -557,7 +555,6 @@ public class OrmConnectionImpl implements OrmConnection {
    * <p>
    * Keys in the results returned in lower case by default.
    *
-   * @param options
    * @param resultSet
    * @param columns
    * @param columnTypes SQL types from {@link java.sql.Types}
@@ -580,7 +577,6 @@ public class OrmConnectionImpl implements OrmConnection {
   /**
    * Converts to a single native object of the given object class.
    *
-   * @param options
    * @param resultSet
    * @param columnType
    * @param objectClass
@@ -838,7 +834,49 @@ public class OrmConnectionImpl implements OrmConnection {
     return ret;
   }
 
+  @Override
+  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return readTupleList(t1, t2, joinHelper(JOIN, t1, t2, onCondition));
+  }
 
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2,
+      String t1T2OnCondition, Class<T3> t3, String t2T3OnCondition) {
+    return readTupleList(t1, t2, t3,
+        joinHelper(JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+  }
+
+  private <T1, T2, T3> String joinHelper(String joinType, Class<T1> t1, Class<T2> t2,
+      String t1T2OnCondition) {
+    TableMetaData t1m = getTableMapping(t1).getTableMetaData();
+    TableMetaData t2m = getTableMapping(t2).getTableMetaData();
+    String sql = SELECT + t1m.getColumnAliases() + ", " + t2m.getColumnAliases() + ", " + FROM
+        + t1m.getTableName() + joinType + t2m.getTableName();
+    return sql;
+  }
+
+  private <T1, T2, T3> String joinHelper(String joinType, Class<T1> t1, Class<T2> t2,
+      String t1T2OnCondition, Class<T3> t3, String t2T3OnCondition) {
+    TableMetaData t1m = getTableMapping(t1).getTableMetaData();
+    TableMetaData t2m = getTableMapping(t2).getTableMetaData();
+    TableMetaData t3m = getTableMapping(t3).getTableMetaData();
+    String sql = SELECT + t1m.getColumnAliases() + ", " + t2m.getColumnAliases() + ", "
+        + t3m.getColumnAliases() + FROM + t1m.getTableName() + joinType + t2m.getTableName() + ON
+        + t1T2OnCondition + joinType + t3m.getTableName() + ON + t2T3OnCondition;
+    return sql;
+  }
+
+  @Override
+  public <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return readTupleList(t1, t2, joinHelper(LEFT + JOIN, t1, t2, onCondition));
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
+      String t1T2OnCondition, Class<T3> t3, String t2T3OnCondition) {
+    return readTupleList(t1, t2, t3,
+        joinHelper(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+  }
 
   @Override
   public void rollback() {

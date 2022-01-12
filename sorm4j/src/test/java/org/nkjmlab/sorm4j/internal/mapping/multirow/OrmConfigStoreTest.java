@@ -2,17 +2,17 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.extension.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.extension.impl.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.impl.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.extension.impl.DefaultTableSqlFactory;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.SormContext;
+import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.mapping.DefaultTableSqlFactory;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.mapping.TableNameMapper;
 
 class OrmConfigStoreTest {
 

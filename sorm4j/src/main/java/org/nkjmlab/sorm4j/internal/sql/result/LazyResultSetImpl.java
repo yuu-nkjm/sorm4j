@@ -13,11 +13,11 @@ import java.util.Spliterators;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
-import org.nkjmlab.sorm4j.basic.RowMapper;
-import org.nkjmlab.sorm4j.common.LazyResultSet;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
+import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.result.LazyResultSet;
 
 /**
  * Represents a result set from database.

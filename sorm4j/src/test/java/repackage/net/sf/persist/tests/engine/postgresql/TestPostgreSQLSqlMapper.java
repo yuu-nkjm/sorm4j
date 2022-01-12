@@ -26,11 +26,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.extension.SqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.impl.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverter;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.mapping.SqlParameterSetter;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
@@ -55,6 +57,14 @@ public class TestPostgreSQLSqlMapper {
       pg.setValue(((InetAddress) parameter).getHostAddress());
       stmt.setObject(parameterIndex, pg);
     });
+
+    ColumnValueToJavaObjectConverter<PGobject> cv =
+        ((resultSet, columnIndex, columnType, toType) -> {
+          return PGobject.class.cast(resultSet.getObject(columnIndex));
+        });
+
+    new DefaultColumnValueToJavaObjectConverters(Map.of(PGobject.class, cv));
+
     parametersSetter = new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, ps));
 
 

@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 

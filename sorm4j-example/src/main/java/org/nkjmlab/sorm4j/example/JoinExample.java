@@ -2,9 +2,9 @@ package org.nkjmlab.sorm4j.example;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Tuple2;
 import org.nkjmlab.sorm4j.example.first.Address;
 import org.nkjmlab.sorm4j.example.first.Customer;
+import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public class JoinExample {
@@ -19,10 +19,17 @@ public class JoinExample {
       conn.executeUpdate(Address.CREATE_TABLE_SQL);
       conn.insert(Address.KYOTO, Address.TOKYO, Address.NARA);
 
-      List<Tuple2<Address, Customer>> result = conn.readTupleList(Address.class, Customer.class,
+      List<Tuple2<Address, Customer>> result =
+          conn.join(Address.class, Customer.class, "address.name=customer.address");
+
+      System.out.println(result);
+
+      result = conn.readTupleList(Address.class, Customer.class,
           "select a.name as aname, a.postal_code as apostal_code, "
               + "c.id as cid, c.name as cname, c.address as caddress "
               + "from address a join customer c on a.name=c.address");
+
+
       System.out.println(result);
 
 

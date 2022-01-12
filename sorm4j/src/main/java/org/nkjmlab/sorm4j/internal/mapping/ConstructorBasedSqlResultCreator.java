@@ -12,10 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 
 final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreator<S> {
 
@@ -114,7 +114,7 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
 
   @Override
-  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, 
+  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
       throws SQLException {
     final ConstructorParameter[] constructorParameters =

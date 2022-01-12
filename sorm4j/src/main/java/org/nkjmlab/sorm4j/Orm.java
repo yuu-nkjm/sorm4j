@@ -6,18 +6,17 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.basic.ResultSetTraverser;
-import org.nkjmlab.sorm4j.basic.RowMapper;
-import org.nkjmlab.sorm4j.basic.SqlExecutor;
-import org.nkjmlab.sorm4j.command.CommandExecutor;
-import org.nkjmlab.sorm4j.common.InsertResult;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
+import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
+import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.lowlevel_orm.SqlExecutor;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.CommandExecutor;
 
 @Experimental
 public interface Orm extends CommandExecutor, SqlExecutor {
@@ -649,7 +648,23 @@ public interface Orm extends CommandExecutor, SqlExecutor {
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters);
 
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
+      Class<T3> t3, String t2T3OnCondition);
+
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
+      Class<T3> t3, String t2T3OnCondition);
+
+
   /**
+   *
    * Updates by objects on the table corresponding to the class of the given objects.
    *
    * @param <T>

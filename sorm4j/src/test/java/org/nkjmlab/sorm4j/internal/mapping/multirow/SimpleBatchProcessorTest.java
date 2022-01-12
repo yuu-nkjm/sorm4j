@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.extension.impl.MultiRowProcessorFactory.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory.MultiRowProcessorType;
 
 class SimpleBatchProcessorTest {
 

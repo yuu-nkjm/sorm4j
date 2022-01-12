@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.ColumnName;
-import org.nkjmlab.sorm4j.extension.TableName;
+import org.nkjmlab.sorm4j.mapping.TableName;
+import org.nkjmlab.sorm4j.result.ColumnName;
 
 class ValuesObjectTest {
 

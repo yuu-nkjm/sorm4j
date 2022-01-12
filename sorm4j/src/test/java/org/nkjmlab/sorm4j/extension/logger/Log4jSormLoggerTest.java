@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension.logger;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
 
 class Log4jSormLoggerTest {
 
