@@ -9,10 +9,10 @@ Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM 
 
 Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and it maps the result to Java objects. It opens a connection to a database and closes it after the execution automatically.
 
-Here is an example with lambda expressions:
+Here is a simple example:
 
 ```java
-// Creates an entry point as javax.sql.DataSource.
+// Creates an entry point.
 Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","username","password");
 
 // insert
@@ -55,14 +55,14 @@ Create an entry point:
 Sorm sorm = Sorm.create("jdbc:h2:mem:sormtest", "sa","");
 ```
 
-Reads matching rows from table:
+Reads matching rows from table and maps to Java object:
 
 ```java
 List<Customer> list =
   sorm.readList(Customer.class, "select * from customer where id>?", 5);
 ```
 
-Inserts a new row:
+Inserts a new row with Java object:
 
 ```java
 sorm.insert(new Customer(1, "Alice", "Tokyo"));
@@ -72,19 +72,18 @@ sorm.insert(new Customer(1, "Alice", "Tokyo"));
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
-|Hand coded (baseline)| 4.0 | 4.8 | 3571 | 22376 
-|Sorm4j| 4.6 (15% slower)| 5.7 (19% slower)| 3613 (1% slower)| 22475 (0% slower)
-|Sql2o| 6.2 (55% slower)| 9.4 (96% slower)| 4114 (15% slower)| 43301 (94% slower)
-|JDBI| 16.9 (323% slower)| 11.7 (144% slower)| 4946 (39% slower)| 37147 (66% slower)
-|JOOQ| 42.2 (955% slower)|  | 14491 (306% slower)| 
-|MyBatis| 9.7 (143% slower)|  | 9976 (179% slower)| 
-|Spring JdbcTemplate| 8.4 (110% slower)|  | | 
-|Apache DbUtils| 5.4 (35% slower)|  | | 
+|Hand coded (baseline)|4.2 |5.2 |3343 |21405 
+|Sorm4j|4.5 (7% slower)|5.7 (10% slower)|3281 (-2% slower)|22067 (3% slower)
+|Sql2o|6.5 (55% slower)|9.6 (85% slower)|4046 (21% slower)|42954 (101% slower)
+|JDBI|16.2 (286% slower)|11.9 (129% slower)|5196 (55% slower)|37186 (74% slower)
+|JOOQ|44.2 (952% slower)| |14273 (327% slower)|
+|MyBatis|10.0 (138% slower)| |10273 (207% slower)|
+|Spring JdbcTemplate|9.1 (117% slower)| ||
 
-- `read`: reads one row from table including 10,240
-- `insert`: inserts one row to table
-- `read multirow`: reads all rows from table including 10,240 row
-- `insert multirow`: inserts the all given 10,240 rows to table
+- `read`: reads one row from table including 10,240 rows.
+- `insert`: inserts one row to table.
+- `read multirow`: reads all rows from table including 10,240 rows.
+- `insert multirow`: inserts the all given 10,240 rows to table.
 
 Sorm4j is evaluated performance with the H2 database. The results show a small overhead to comparing hand-coded JDBC operations. If you need precise information, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page.
 
@@ -93,20 +92,10 @@ Sorm4j is evaluated performance with the H2 database. The results show a small o
 
 - [Quickstart](https://scrapbox.io/sorm4j/Quickstart)
     - To get started, see here.
-- [Basic Usage](https://scrapbox.io/sorm4j/Basic_Usage)
-    - Next to get started, see here.
 - [Examples](https://scrapbox.io/sorm4j/Examples)
-    - If you need more sample codes, please take a look at the [Examples](https://scrapbox.io/sorm4j/Examples) page and the [Sample of Sorm4j](https://github.com/yuu-nkjm/sorm4j-sample) repository.
-- [Features](https://scrapbox.io/sorm4j/Features)
-    - The features of Sorm4j, see here.
+    - If you need more sample codes, please take a look at the [Examples](https://scrapbox.io/sorm4j/Examples) page and the [example codes of Sorm4j](https://github.com/yuu-nkjm/sorm4j/tree/master/sorm4j-example).
 - [Performance](https://scrapbox.io/sorm4j/Performance)
-    - If you need more benchmark results, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [Benchmark of Sorm4j](https://github.com/yuu-nkjm/sorm4j-jmh) repository.
-- [Developer's Guide](https://scrapbox.io/sorm4j/Developer's_Guide)
-    - The detailed manual is here.
-
-## Versioning
-The classes in `org.nkjmlab.sorm4j`, `org.nkjmlab.sorm4j.annotation`, `org.nkjmlab.sorm4j.sql` are regarded as public API. If any methods are going to remove, they will be annotated by `@Deprecated` and announced release note. Experimental elements are annotated by `@Experimental`.
-
+    - If you need more benchmark results, please take a look at the [Performance](https://scrapbox.io/sorm4j/Performance) page and the [JMH benchmark codes of Sorm4j](https://github.com/yuu-nkjm/sorm4j/tree/master/sorm4j-jmh).
 
 ## License
 Sorm4j is distributed under a [Apache License Version 2.0](https://github.com/yuu-nkjm/sorm4j/blob/master/LICENSE).

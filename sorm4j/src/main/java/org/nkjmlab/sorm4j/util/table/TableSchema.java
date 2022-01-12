@@ -7,8 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.lowlevel_orm.SqlExecutor;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 
 /**
@@ -61,24 +61,24 @@ public class TableSchema {
     this.createIndexStatements = builder.getCreateIndexIfNotExistsStatements();
   }
 
-  public void createIndexesIfNotExists(SqlExecutor sqlExecutor) {
-    getCreateIndexIfNotExistsStatements().forEach(s -> sqlExecutor.executeUpdate(s));
+  public void createIndexesIfNotExists(Orm orm) {
+    getCreateIndexIfNotExistsStatements().forEach(s -> orm.executeUpdate(s));
 
   }
 
 
-  public void createTableAndIndexesIfNotExists(SqlExecutor sqlExecutor) {
-    createTableIfNotExists(sqlExecutor);
-    createIndexesIfNotExists(sqlExecutor);
+  public void createTableAndIndexesIfNotExists(Orm orm) {
+    createTableIfNotExists(orm);
+    createIndexesIfNotExists(orm);
 
   }
 
-  public void createTableIfNotExists(SqlExecutor sqlExecutor) {
-    sqlExecutor.executeUpdate(getCreateTableIfNotExistsStatement());
+  public void createTableIfNotExists(Orm orm) {
+    orm.executeUpdate(getCreateTableIfNotExistsStatement());
   }
 
-  public void dropTableIfExists(SqlExecutor sqlExecutor) {
-    sqlExecutor.executeUpdate(getDropTableIfExistsStatement());
+  public void dropTableIfExists(Orm orm) {
+    orm.executeUpdate(getDropTableIfExistsStatement());
   }
 
 
