@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -11,10 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.Guest;
-import org.nkjmlab.sorm4j.common.Location;
-import org.nkjmlab.sorm4j.common.Player;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
@@ -23,6 +19,10 @@ import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.Location;
+import org.nkjmlab.sorm4j.test.common.Player;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class OrmConnectionTest {
 

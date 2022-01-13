@@ -1,13 +1,13 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Guest;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.TableName;
+import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DefaultTableNameMapperTest {
 

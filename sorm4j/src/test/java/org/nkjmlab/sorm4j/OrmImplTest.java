@@ -1,15 +1,15 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Player;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.test.common.Player;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class OrmImplTest {
 

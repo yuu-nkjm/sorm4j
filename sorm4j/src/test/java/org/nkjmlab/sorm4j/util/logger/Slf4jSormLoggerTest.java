@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.extension;
+package org.nkjmlab.sorm4j.util.logger;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.util.logger.Slf4jSormLogger;

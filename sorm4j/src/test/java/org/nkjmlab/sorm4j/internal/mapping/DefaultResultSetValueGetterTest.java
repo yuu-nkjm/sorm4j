@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal;
+package org.nkjmlab.sorm4j.internal.mapping;
 
 import static org.assertj.core.api.Assertions.*;
 import java.time.Instant;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DefaultResultSetValueGetterTest {
 

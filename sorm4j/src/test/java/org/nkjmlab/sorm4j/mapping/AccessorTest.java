@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.extension;
+package org.nkjmlab.sorm4j.mapping;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.mapping.FieldAccessor;

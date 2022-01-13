@@ -1,11 +1,12 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.result;
 
-import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.Player;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.test.common.Player;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class ResultSetStreamTest {
 

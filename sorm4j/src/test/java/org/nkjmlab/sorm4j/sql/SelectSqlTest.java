@@ -5,8 +5,8 @@ import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import static org.nkjmlab.sorm4j.util.sql.SelectSql.as;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Guest;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
 class SelectSqlTest {

@@ -6,7 +6,7 @@ import static org.nkjmlab.sorm4j.util.table.TableSchema.Keyword.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.table.TableSchema;
 
 class TableSchemaTest {

@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.sql;
 
-import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Customer;
+import org.nkjmlab.sorm4j.test.common.Customer;
 
 class OrderedParameterSqlTest {
   private static Sorm sorm = createSormAndDropAndCreateTableAll();

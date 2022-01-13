@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.common;
+package org.nkjmlab.sorm4j.test.common;
 
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 
