@@ -101,12 +101,6 @@ public interface Sorm extends Orm {
    */
   void accept(ConsumerHandler<OrmConnection> handler);
 
-  @Experimental
-  void acceptWithLogging(ConsumerHandler<OrmConnection> handler);
-
-  @Experimental
-  <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler);
-
   /**
    * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
    *
@@ -143,12 +137,12 @@ public interface Sorm extends Orm {
 
 
   /**
-   * Gets the context string of this object.
+   * Gets the context of this object.
    *
    * @return
    */
   @Experimental
-  String getContextString();
+  SormContext getContext();
 
   /**
    * Gets {@link DataSource}.

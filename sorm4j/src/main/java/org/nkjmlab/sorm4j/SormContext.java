@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.util.function.Supplier;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
@@ -28,13 +27,16 @@ import org.nkjmlab.sorm4j.util.logger.SormLogger;
  */
 public interface SormContext {
 
-  public static final SormContext DEFAULT_CONTEXT = SormContext.builder().build();
+  static final SormContext DEFAULT_CONTEXT = SormContext.builder().build();
+
+  LoggerContext getLoggerContext();
+
+  int getTransactionIsolationLevel();
 
   public static Builder builder() {
     return new Builder();
   }
 
-  @Experimental
   public static class Builder {
 
     private static final MultiRowProcessorFactory DEFAULT_MULTI_ROW_PROCESSOR_FACTORY =
@@ -116,13 +118,10 @@ public interface SormContext {
       return this;
     }
 
-
     public Builder setMultiRowProcessorFactory(MultiRowProcessorFactory multiRowProcessorFactory) {
       this.multiRowProcessorFactory = multiRowProcessorFactory;
       return this;
     }
-
-
 
     public Builder setTransactionIsolationLevel(int level) {
       this.transactionIsolationLevel = level;

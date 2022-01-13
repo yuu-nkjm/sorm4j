@@ -8,7 +8,7 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
@@ -610,14 +610,15 @@ public interface Orm {
 
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
+   *
    * {@link java.util.Map}.
    * <p>
    * Letter case of the key in the Map depends on
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap}
+   * {@link ColumnValueToMapEntryConverter#convertToKey(String)}
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
    * correspondence defined in
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormResultSet, List, List)}.
+   * {@link ColumnValueToMapEntryConverter#convertToValue(ResultSet, int, int)}.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
@@ -641,17 +642,7 @@ public interface Orm {
    * Reads a list of objects from the database by mapping the SQL execution results to instances of
    * {@link java.util.Map} containing data from the execution of the provided parameterized SQL.
    *
-   * <p>
-   * Letter case of the key in the Map depends on
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap}
-   *
-   * <p>
-   * Types of value returned from the database will be converted to Java types in the map according
-   * with the correspondence defined in
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormResultSet, List, List)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
+   * @see {{@link #readMapFirst(String, Object...)}}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.
@@ -673,16 +664,8 @@ public interface Orm {
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
    * is thrown.
-   * <p>
-   * Letter case of the key in the Map depends on
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap}
-   * <p>
-   * Types of value returned from the database will be converted to Java types in the map according
-   * with the correspondence defined in
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormResultSet, List, List)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
+   *
+   * @see {{@link Orm#readMapFirst(String, Object...)}}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.

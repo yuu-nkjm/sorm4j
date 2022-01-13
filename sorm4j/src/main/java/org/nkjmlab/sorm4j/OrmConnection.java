@@ -2,9 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -26,7 +24,7 @@ public interface OrmConnection extends Orm, AutoCloseable {
 
   /**
    * Begin transaction. The isolation level is corresponding to
-   * {@link Sorm.Builder#setTransactionIsolationLevel(int)}.
+   * {@link SormContext#getTransactionIsolationLevel()}.
    */
   void begin();
 
@@ -117,13 +115,8 @@ public interface OrmConnection extends Orm, AutoCloseable {
   /**
    * Returns an {@link ResultSetStream} instance containing data from the execution of the provided
    * parameterized SQL and convert it to Stream, List, and so on.
-   * <p>
-   * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ColumnValueToJavaObjectConverters#toSingleMap(SormResultSet, List, List)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
+   *
+   * @see {{@link #readMapFirst(String, Object...)}}
    *
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
    *        parameter) could not be used.

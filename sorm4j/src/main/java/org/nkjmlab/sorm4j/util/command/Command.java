@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.util.command;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.Orm;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -97,7 +98,7 @@ public interface Command {
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link Orm#readMapStream(String, Object...)}
+   * See {@link OrmConnection#readMapStream(String, Object...)}
    *
    * @return
    */

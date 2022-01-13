@@ -235,12 +235,14 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  LoggerContext getLoggerContext() {
+  @Override
+  public LoggerContext getLoggerContext() {
     return sormConfig.getLoggerContext();
   }
 
 
-  int getTransactionIsolationLevel() {
+  @Override
+  public int getTransactionIsolationLevel() {
     return sormConfig.getTransactionIsolationLevel();
   }
 

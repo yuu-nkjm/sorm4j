@@ -72,13 +72,13 @@ sorm.insert(new Customer(1, "Alice", "Tokyo"));
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
-|Hand coded (baseline)|4.2 |5.1 |3349 |20948 |
-|Sorm4j|4.3 (2% slower)|5.5 (8% slower)|3101 (-7% slower)|20982 (0% slower)|
-|Sql2o|6.3 (50% slower)|9.2 (80% slower)|3892 (16% slower)|40654 (94% slower)|
-|JDBI|16.3 (288% slower)|11.8 (131% slower)|5036 (50% slower)|36909 (76% slower)|
-|JOOQ|42.0 (900% slower)| |14005 (318% slower)||
-|MyBatis|9.4 (124% slower)| |10199 (205% slower)||
-|Spring JdbcTemplate|8.6 (105% slower)| |||
+|Hand coded (baseline)|4.2 |5.2 |3405 |21135 |
+|Sorm4j|4.3 (2% slower)|5.7 (10% slower)|3091 (-9% slower)|21259 (1% slower)|
+|Sql2o|6.3 (50% slower)|9.3 (79% slower)|3878 (14% slower)|41126 (95% slower)|
+|JDBI|16.5 (293% slower)|12.1 (133% slower)|5128 (51% slower)|37644 (78% slower)|
+|JOOQ|42.9 (921% slower)| |14123 (315% slower)||
+|MyBatis|9.6 (129% slower)| |10083 (196% slower)||
+|Spring JdbcTemplate|8.7 (107% slower)| |||
 
 - `read`: reads one row from table including 10,240 rows.
 - `insert`: inserts one row to table.

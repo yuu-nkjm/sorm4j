@@ -33,9 +33,8 @@ class BatchOfMultiRowInOneStatementProcessorTest {
         .build();
     sorm = Sorm.create(Sorm.createDataSource(jdbcUrl, user, password), context);
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.getContextString();
 
-    assertThat(s.toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
+    assertThat(sorm.getContext().toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }
 
   @BeforeEach

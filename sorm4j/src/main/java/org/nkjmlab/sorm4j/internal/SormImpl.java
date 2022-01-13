@@ -76,8 +76,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public String getContextString() {
-    return sormContext.toString();
+  public SormContext getContext() {
+    return sormContext;
   }
 
 
@@ -522,21 +522,6 @@ public final class SormImpl implements Sorm {
   @Override
   public int executeUpdate(ParameterizedSql sql) {
     return applyAndClose(conn -> conn.executeUpdate(sql));
-  }
-
-  @Override
-  public void acceptWithLogging(ConsumerHandler<OrmConnection> handler) {
-    sormContext.getLoggerContext().forceLogging = true;
-    accept(handler);
-    sormContext.getLoggerContext().forceLogging = false;
-  }
-
-  @Override
-  public <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler) {
-    sormContext.getLoggerContext().forceLogging = true;
-    R ret = apply(handler);
-    sormContext.getLoggerContext().forceLogging = false;
-    return ret;
   }
 
   @Override
