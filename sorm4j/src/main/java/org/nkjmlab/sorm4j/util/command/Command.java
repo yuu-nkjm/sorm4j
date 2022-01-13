@@ -5,9 +5,9 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 
@@ -58,13 +58,13 @@ public interface Command {
   <T> T readFirst(Class<T> objectClass);
 
   /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
+   * Returns an {@link ResultSetStream}. It is able to convert to Stream, List, and so on.
    *
    * @param <T>
    * @param objectClass
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> objectClass);
+  <T> ResultSetStream<T> readStream(Class<T> objectClass);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -97,11 +97,11 @@ public interface Command {
   Map<String, Object> readMapFirst();
 
   /**
-   * See {@link Orm#readMapLazy(String, Object...)}
+   * See {@link Orm#readMapStream(String, Object...)}
    *
    * @return
    */
-  LazyResultSet<Map<String, Object>> readMapLazy();
+  ResultSetStream<Map<String, Object>> readMapStream();
 
   /**
    * See {@link Orm#readMapList(String, Object...)}

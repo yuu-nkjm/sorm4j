@@ -115,7 +115,7 @@ public final class SqlResultToColumnsMapping<T> {
         + System.lineSeparator() + "  with [" + containerObjectCreator + "]";
   }
 
-  public List<T> loadContainerObjectList(ResultSet resultSet) throws SQLException {
+  public List<T> traverseAndMap(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
@@ -124,7 +124,7 @@ public final class SqlResultToColumnsMapping<T> {
         columnTypes, columnsString);
   }
 
-  public T loadContainerObject(ResultSet resultSet) throws SQLException {
+  public T loadResultContainerObject(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     String[] columns = createColumnLabels(resultSet, metaData);
     String columnsString = getObjectColumnsString(columns);
@@ -133,7 +133,7 @@ public final class SqlResultToColumnsMapping<T> {
         columnTypes, columnsString);
   }
 
-  public T loadContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
+  public T loadResultContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
     String[] columns = primaryKeyColumnLabels.computeIfAbsent(objectClass, key -> {
       try {

@@ -15,16 +15,16 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 
 /**
  * Represents a result set from database.
  *
  * @param <T> element type in result
  */
-public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
+public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
   @SuppressWarnings("rawtypes")
   private static final Class<? extends Map> MAP_CLASS = LinkedHashMap.class;
 
@@ -34,12 +34,12 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   private final PreparedStatement stmt;
 
   @SuppressWarnings("unchecked")
-  public LazyResultSetImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt,
+  public ResultSetStreamImpl(OrmConnectionImpl ormMapper, PreparedStatement stmt,
       ResultSet resultSet) {
     this(ormMapper, (Class<T>) MAP_CLASS, stmt, resultSet);
   }
 
-  public LazyResultSetImpl(OrmConnectionImpl ormMapper, Class<T> objectClass,
+  public ResultSetStreamImpl(OrmConnectionImpl ormMapper, Class<T> objectClass,
       PreparedStatement stmt, ResultSet resultSet) {
     this.ormMapper = ormMapper;
     this.objectClass = objectClass;
@@ -54,11 +54,15 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T one() {
-    @SuppressWarnings("unchecked")
-    T ret = Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
-        : ormMapper.loadOne(objectClass, resultSet), Try::rethrow);
-    close();
-    return ret;
+    try {
+      @SuppressWarnings("unchecked")
+      T ret = objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadOneMap(resultSet)
+          : ormMapper.loadOne(objectClass, resultSet);
+      close();
+      return ret;
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
   /**
@@ -68,12 +72,16 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public T first() {
-    @SuppressWarnings("unchecked")
-    T ret =
-        Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
-            : ormMapper.loadFirst(objectClass, resultSet), Try::rethrow);
-    close();
-    return ret;
+    try {
+      @SuppressWarnings("unchecked")
+      T ret = objectClass.equals(MAP_CLASS) ? (T) ormMapper.loadFirstMap(resultSet)
+          : ormMapper.loadFirst(objectClass, resultSet);
+      close();
+      return ret;
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+
   }
 
   /**
@@ -83,20 +91,30 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public List<T> toList() {
-    @SuppressWarnings("unchecked")
-    List<T> ret = Try.getOrElseThrow(() -> objectClass.equals(MAP_CLASS)
-        ? (List<T>) Try.getOrElseThrow(() -> ormMapper.traverseAndMapToMapList(resultSet), Try::rethrow)
-        : ormMapper.loadContainerObjectList(objectClass, resultSet), Try::rethrow);
-    close();
-    return ret;
+    try {
+      @SuppressWarnings("unchecked")
+      List<T> ret =
+          objectClass.equals(MAP_CLASS)
+              ? (List<T>) Try.getOrElseThrow(() -> ormMapper.traverseAndMapToMapList(resultSet),
+                  Try::rethrow)
+              : ormMapper.loadResultContainerObjectList(objectClass, resultSet);
+      close();
+      return ret;
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
   @Override
   public List<T> toList(RowMapper<T> rowMapper) {
-    List<T> ret = Try.getOrElseThrow(() -> ResultSetTraverser.from(rowMapper).traverseAndMap(resultSet),
-        Try::rethrow);
-    close();
-    return ret;
+    try {
+      List<T> ret = ResultSetTraverser.from(rowMapper).traverseAndMap(resultSet);
+      close();
+      return ret;
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+
   }
 
   /**
@@ -105,7 +123,7 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
    */
   @Override
   public Iterator<T> iterator() {
-    return new LazyResultSetIterator<>(ormMapper, objectClass, stmt, resultSet);
+    return new ResultSetIterator<>(ormMapper, objectClass, stmt, resultSet);
   }
 
   /**
@@ -137,11 +155,11 @@ public final class LazyResultSetImpl<T> implements LazyResultSet<T> {
   }
 
 
-  private final class LazyResultSetIterator<S> implements Iterator<S> {
+  private final class ResultSetIterator<S> implements Iterator<S> {
     private final Supplier<S> nextSupplier;
 
     @SuppressWarnings("unchecked")
-    public LazyResultSetIterator(OrmConnectionImpl ormMapper, Class<S> objectClass,
+    public ResultSetIterator(OrmConnectionImpl ormMapper, Class<S> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.nextSupplier = objectClass.equals(MAP_CLASS)
           ? Try.createSupplierWithThrow(() -> (S) ormMapper.mapRowToMap(resultSet), Try::rethrow)

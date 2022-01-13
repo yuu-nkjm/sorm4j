@@ -7,99 +7,58 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
-import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.command.CommandExecutor;
+import org.nkjmlab.sorm4j.util.command.BasicCommand;
+import org.nkjmlab.sorm4j.util.command.Command;
+import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
+import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
 @Experimental
-public interface Orm extends CommandExecutor {
-
+public interface Orm {
   /**
-   * Executes the query with the given PreparedStatement and applies the given RowMapper. If you
-   * want to set parameters to a PreparedStatement object by yourself, you can use this method. You
-   * can use your {@link ResultSetTraverser} or the object getting by
-   * {@link Orm#getResultSetTraverser(Class)};
-   *
-   * @param <T>
-   * @param statementSupplier
-   * @param traverser
-   * @return
-   */
-  @Experimental
-  <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
-      ResultSetTraverser<T> traverser);
-
-
-  /**
-   * Executes the query with the given PreparedStatement and applies the given RowMapper. If you
-   * want to set parameters to a PreparedStatement object by yourself, you can use this method. You
-   * can use your {@link RowMapper} or the object getting by {@link Orm#getRowMapper(Class)};
-   *
-   * @param <T>
-   * @param statementSupplier
-   * @param rowMapper
-   * @return
-   */
-  @Experimental
-  <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
-      RowMapper<T> rowMapper);
-
-
-  /**
-   * Executes a query and apply the given {@link ResultSetTraverser} to the returned result set.
-   * <p>
-   * This method wraps {@link PreparedStatement#executeQuery(String)}
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
-   *
-   * @param <T>
-   * @param sql SQL code to be executed.
-   * @param traverser
-   * @return
-   */
-  <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> traverser);
-
-
-  /**
-   * Executes a query and apply the given {@link RowMapper} to the each row in returned result set.
-   *
-   * @param <T>
-   * @param sql
-   * @param mapper
-   * @return
-   */
-  <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> mapper);
-
-  /**
-   * Executes an update and returns the number of rows modified.
-   * <p>
-   * This method wraps {@link PreparedStatement#executeUpdate(String)}
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
-   *
-   * @param sql SQL code to be executed.
-   * @param parameters Parameters to be used in the PreparedStatement.
-   */
-  int executeUpdate(String sql, Object... parameters);
-
-
-  /**
-   * {@link #executeUpdate(String, Object...)}
+   * Creates a {@link Command} from SQL string.
    *
    * @param sql
    * @return
    */
-  int executeUpdate(ParameterizedSql sql);
+  Command createCommand(ParameterizedSql sql);
+
+
+  /**
+   * Creates a {@link BasicCommand} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+  BasicCommand createCommand(String sql);
+
+
+  /**
+   * Creates a {@link NamedParameterCommand} from SQL string.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  NamedParameterCommand createCommand(String sql, Map<String, Object> parameters);
+
+  /**
+   * Creates a {@link OrderedParameterCommand} from SQL string.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  OrderedParameterCommand createCommand(String sql, Object... parameters);
 
   /**
    * Deletes objects from the table corresponding to the class of the given objects.
@@ -120,6 +79,7 @@ public interface Orm extends CommandExecutor {
    */
   <T> int delete(T object);
 
+
   /**
    * Deletes objects.
    *
@@ -128,6 +88,7 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   <T> int[] delete(@SuppressWarnings("unchecked") T... objects);
+
 
   /**
    * Deletes all objects on the table corresponding to the given class.
@@ -145,6 +106,7 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   int deleteAllOn(String tableName);
+
 
   /**
    * Deletes objects on the table of the given table name.
@@ -166,6 +128,7 @@ public interface Orm extends CommandExecutor {
    */
   <T> int deleteOn(String tableName, T object);
 
+
   /**
    * Deletes objects on the table of the given table name.
    *
@@ -175,6 +138,81 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects);
+
+  /**
+   * Executes the query with the given PreparedStatement and applies the given
+   * {@link ResultSetTraverser}. If you want to set parameters to a PreparedStatement object by
+   * yourself, you can use this method. You can use your {@link ResultSetTraverser} or the object
+   * getting by {@link Orm#getResultSetTraverser(Class)};
+   *
+   * @param <T>
+   * @param statementSupplier initialize and supplies PreparedStatement
+   * @param traverser
+   * @return
+   */
+  @Experimental
+  <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      ResultSetTraverser<T> traverser);
+
+  /**
+   * Executes the query with the given PreparedStatement and applies the given {@link RowMapper}. If
+   * you want to set parameters to a PreparedStatement object by yourself, you can use this method.
+   * You can use your {@link RowMapper} or the object getting by {@link Orm#getRowMapper(Class)};
+   *
+   * @param <T>
+   * @param statementSupplier
+   * @param rowMapper
+   * @return
+   */
+  @Experimental
+  <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+      RowMapper<T> rowMapper);
+
+  /**
+   * Executes a query and apply the given {@link ResultSetTraverser} to the returned result set.
+   * <p>
+   * This method wraps {@link PreparedStatement#executeQuery(String)}
+   * <p>
+   * Parameters will be set according with the correspondence defined in
+   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
+   *
+   * @param <T>
+   * @param sql SQL code to be executed.
+   * @param traverser
+   * @return
+   */
+  <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> traverser);
+
+  /**
+   * Executes a query and apply the given {@link RowMapper} to the each row in returned result set.
+   *
+   * @param <T>
+   * @param sql
+   * @param mapper
+   * @return
+   */
+  <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> mapper);
+
+  /**
+   * {@link #executeUpdate(String, Object...)}
+   *
+   * @param sql
+   * @return
+   */
+  int executeUpdate(ParameterizedSql sql);
+
+  /**
+   * Executes an update and returns the number of rows modified.
+   * <p>
+   * This method wraps {@link PreparedStatement#executeUpdate(String)}
+   * <p>
+   * Parameters will be set according with the correspondence defined in
+   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
+   *
+   * @param sql SQL code to be executed.
+   * @param parameters Parameters to be used in the PreparedStatement.
+   */
+  int executeUpdate(String sql, Object... parameters);
 
 
   /**
@@ -406,6 +444,20 @@ public interface Orm extends CommandExecutor {
    */
   <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
+      Class<T3> t3, String t2T3OnCondition);
+
+  @Experimental
+  <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
+      Class<T3> t3, String t2T3OnCondition);
+
   /**
    * Merges by objects on the table corresponding to the class of the given objects.
    *
@@ -441,6 +493,8 @@ public interface Orm extends CommandExecutor {
    * @see #merge(Object)
    */
   <T> int[] merge(@SuppressWarnings("unchecked") T... objects);
+
+
 
   /**
    * Merges by objects on the table corresponding to the given table name.
@@ -481,8 +535,6 @@ public interface Orm extends CommandExecutor {
    */
   <T> List<T> readAll(Class<T> type);
 
-
-
   /**
    * Reads an object by its primary keys from the table indicated by object class.
    *
@@ -503,6 +555,7 @@ public interface Orm extends CommandExecutor {
    */
   <T> T readFirst(Class<T> type, ParameterizedSql sql);
 
+
   /**
    * Reads an object from the database.
    *
@@ -514,6 +567,7 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   <T> T readFirst(Class<T> type, String sql, Object... parameters);
+
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
@@ -554,7 +608,6 @@ public interface Orm extends CommandExecutor {
    */
   Map<String, Object> readMapFirst(ParameterizedSql sql);
 
-
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
    * {@link java.util.Map}.
@@ -575,7 +628,6 @@ public interface Orm extends CommandExecutor {
    */
   Map<String, Object> readMapFirst(String sql, Object... parameters);
 
-
   /**
    * See {@link #readMapList(String, Object...)}
    *
@@ -583,6 +635,7 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   List<Map<String, Object>> readMapList(ParameterizedSql sql);
+
 
   /**
    * Reads a list of objects from the database by mapping the SQL execution results to instances of
@@ -606,6 +659,7 @@ public interface Orm extends CommandExecutor {
    */
   List<Map<String, Object>> readMapList(String sql, Object... parameters);
 
+
   /**
    * See {@link #readMapOne(String, Object...)}
    *
@@ -613,6 +667,7 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   Map<String, Object> readMapOne(ParameterizedSql sql);
+
 
   /**
    * Reads a first row from the database by mapping the results of the SQL query into an instance of
@@ -645,7 +700,6 @@ public interface Orm extends CommandExecutor {
    */
   <T> T readOne(Class<T> type, ParameterizedSql sql);
 
-
   /**
    * Reads only one object from the database.
    *
@@ -657,7 +711,6 @@ public interface Orm extends CommandExecutor {
    * @return
    */
   <T> T readOne(Class<T> type, String sql, Object... parameters);
-
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
@@ -676,7 +729,6 @@ public interface Orm extends CommandExecutor {
   @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       ParameterizedSql sql);
-
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
@@ -727,20 +779,6 @@ public interface Orm extends CommandExecutor {
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters);
-
-  @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
-
-  @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
-      Class<T3> t3, String t2T3OnCondition);
-
-  @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
-
-  @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
-      Class<T3> t3, String t2T3OnCondition);
 
 
   /**

@@ -20,19 +20,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.SormException;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
-import org.nkjmlab.sorm4j.internal.sql.result.LazyResultSetImpl;
+import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
-import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.result.Tuple;
 import org.nkjmlab.sorm4j.result.Tuple2;
@@ -60,7 +60,7 @@ public class OrmConnectionImpl implements OrmConnection {
   private static final Supplier<int[]> EMPTY_INT_SUPPLIER = () -> new int[0];
   private final SormContextImpl sormContext;
   private final Connection connection;
-  private final List<LazyResultSet<?>> lazyResultSets = new ArrayList<>();
+  private final List<ResultSetStream<?>> resultSetStreams = new ArrayList<>();
 
   /**
    * Creates a instance that will use the default cache for table-object and column-object
@@ -93,8 +93,8 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public void close() {
     Try.runOrElseThrow(() -> {
-      lazyResultSets.forEach(rs -> rs.close());
-      lazyResultSets.clear();
+      resultSetStreams.forEach(rs -> rs.close());
+      resultSetStreams.clear();
       getJdbcConnection().close();
     }, Try::rethrow);
   }
@@ -311,8 +311,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return (resultSet, rowNum) -> mapRowToObject(objectClass, resultSet);
   }
 
-
-
   @Override
   public RowMapper<Map<String, Object>> getRowToMapMapper() {
     return (resultSet, rowNum) -> mapRowToMap(resultSet);
@@ -484,12 +482,12 @@ public class OrmConnectionImpl implements OrmConnection {
     return resultSet.next() ? mapRowToMap(resultSet) : Collections.emptyMap();
   }
 
-  private final <T> List<T> loadNativeObjectList(Class<T> objectClass, ResultSet resultSet)
+  private final <T> List<T> loadSupportedReturnedTypeList(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
     final List<T> ret = new ArrayList<>();
     final int sqlType = getOneSqlType(objectClass, resultSet);
     while (resultSet.next()) {
-      ret.add(toSingleStandardObject(resultSet, sqlType, objectClass));
+      ret.add(toSupportedReturnedTypeObject(resultSet, sqlType, objectClass));
     }
     return ret;
 
@@ -519,32 +517,29 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  public final <T> List<T> loadContainerObjectList(final Class<T> objectClass,
+  public final <T> List<T> loadResultContainerObjectList(final Class<T> objectClass,
       final ResultSet resultSet) throws SQLException {
-    return getColumnsMapping(objectClass).loadContainerObjectList(resultSet);
+    return getColumnsMapping(objectClass).traverseAndMap(resultSet);
   }
 
 
-  private final <T> T loadSingleContainerObject(final Class<T> objectClass,
+  private final <T> T loadResultContainerObject(final Class<T> objectClass,
       final ResultSet resultSet) throws SQLException {
-    return getColumnsMapping(objectClass).loadContainerObject(resultSet);
+    return getColumnsMapping(objectClass).loadResultContainerObject(resultSet);
   }
 
 
-  public Map<String, Object> mapRowToMap(ResultSet resultSet) {
-    try {
-      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-      return toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
+  public Map<String, Object> mapRowToMap(ResultSet resultSet) throws SQLException {
+    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
+    return toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
   }
 
 
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return getColumnValueToJavaObjectConverter().isSupportedType(objectClass)
-        ? toSingleStandardObject(resultSet, getOneSqlType(objectClass, resultSet), objectClass)
-        : loadSingleContainerObject(objectClass, resultSet);
+    return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
+        ? toSupportedReturnedTypeObject(resultSet, getOneSqlType(objectClass, resultSet),
+            objectClass)
+        : loadResultContainerObject(objectClass, resultSet);
   }
 
 
@@ -586,8 +581,8 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private <T> T toSingleStandardObject(ResultSet resultSet, int sqlType, Class<T> objectClass)
-      throws SQLException {
+  private <T> T toSupportedReturnedTypeObject(ResultSet resultSet, int sqlType,
+      Class<T> objectClass) throws SQLException {
     return getColumnValueToJavaObjectConverter().convertTo(resultSet, 1, sqlType, objectClass);
   }
 
@@ -630,8 +625,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> LazyResultSet<T> readAllLazy(Class<T> objectClass) {
-    return readLazy(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
+  public <T> ResultSetStream<T> readAllStream(Class<T> objectClass) {
+    return readStream(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
   @Override
@@ -642,7 +637,7 @@ public class OrmConnectionImpl implements OrmConnection {
     return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
         sql, primaryKeyValues, resultSet -> {
           return resultSet.next() ? getColumnsMapping(objectClass)
-              .loadContainerObjectByPrimaryKey(objectClass, resultSet) : null;
+              .loadResultContainerObjectByPrimaryKey(objectClass, resultSet) : null;
         });
   }
 
@@ -659,14 +654,14 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, ParameterizedSql sql) {
-    return readLazy(objectClass, sql.getSql(), sql.getParameters());
+  public <T> ResultSetStream<T> readStream(Class<T> objectClass, ParameterizedSql sql) {
+    return readStream(objectClass, sql.getSql(), sql.getParameters());
   }
 
 
 
   @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass, String sql, Object... parameters) {
+  public <T> ResultSetStream<T> readStream(Class<T> objectClass, String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(stmt, parameters);
@@ -675,8 +670,8 @@ public class OrmConnectionImpl implements OrmConnection {
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
-      LazyResultSetImpl<T> ret = new LazyResultSetImpl<T>(this, objectClass, stmt, resultSet);
-      lazyResultSets.add(ret);
+      ResultSetStreamImpl<T> ret = new ResultSetStreamImpl<T>(this, objectClass, stmt, resultSet);
+      resultSetStreams.add(ret);
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);
@@ -713,12 +708,12 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql) {
-    return readMapLazy(sql.getSql(), sql.getParameters());
+  public ResultSetStream<Map<String, Object>> readMapStream(ParameterizedSql sql) {
+    return readMapStream(sql.getSql(), sql.getParameters());
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters) {
+  public ResultSetStream<Map<String, Object>> readMapStream(String sql, Object... parameters) {
     try {
       final PreparedStatement stmt = connection.prepareStatement(sql);
       getSqlParametersSetter().setParameters(stmt, parameters);
@@ -729,8 +724,8 @@ public class OrmConnectionImpl implements OrmConnection {
       final ResultSet resultSet = stmt.executeQuery();
 
       @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-      LazyResultSet<Map<String, Object>> ret =
-          (LazyResultSet<Map<String, Object>>) new LazyResultSetImpl(this, stmt, resultSet);
+      ResultSetStream<Map<String, Object>> ret =
+          (ResultSetStream<Map<String, Object>>) new ResultSetStreamImpl(this, stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);
@@ -804,9 +799,9 @@ public class OrmConnectionImpl implements OrmConnection {
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuple.of(loadSingleContainerObject(t1, resultSet),
-                loadSingleContainerObject(t2, resultSet),
-                loadSingleContainerObject(t3, resultSet)));
+            ret1.add(Tuple.of(loadResultContainerObject(t1, resultSet),
+                loadResultContainerObject(t2, resultSet),
+                loadResultContainerObject(t3, resultSet)));
           }
           return ret1;
         });
@@ -826,8 +821,8 @@ public class OrmConnectionImpl implements OrmConnection {
         getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
-            ret1.add(Tuple.of(loadSingleContainerObject(t1, resultSet),
-                loadSingleContainerObject(t2, resultSet)));
+            ret1.add(Tuple.of(loadResultContainerObject(t1, resultSet),
+                loadResultContainerObject(t2, resultSet)));
           }
           return ret1;
         });
@@ -895,9 +890,9 @@ public class OrmConnectionImpl implements OrmConnection {
 
   public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     try {
-      return getColumnValueToJavaObjectConverter().isSupportedType(objectClass)
-          ? loadNativeObjectList(objectClass, resultSet)
-          : loadContainerObjectList(objectClass, resultSet);
+      return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
+          ? loadSupportedReturnedTypeList(objectClass, resultSet)
+          : loadResultContainerObjectList(objectClass, resultSet);
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }

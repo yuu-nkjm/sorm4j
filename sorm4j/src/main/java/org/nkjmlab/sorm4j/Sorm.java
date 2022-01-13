@@ -5,12 +5,12 @@ import java.sql.DriverManager;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.lowlevel_orm.ConsumerHandler;
-import org.nkjmlab.sorm4j.lowlevel_orm.FunctionHandler;
 import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
@@ -162,6 +162,7 @@ public interface Sorm extends Orm {
    * @return
    */
   <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler);
+
 
   /**
    * Gets the context string of this object.

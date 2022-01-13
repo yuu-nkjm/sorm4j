@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.lowlevel_orm;
+package org.nkjmlab.sorm4j.common;
 
 /**
  * Interface for handling with a return value.

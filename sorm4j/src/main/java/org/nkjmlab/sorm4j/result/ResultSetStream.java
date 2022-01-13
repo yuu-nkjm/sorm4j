@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
 
 
 /**
@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
  *
  * @param <T>
  */
-public interface LazyResultSet<T> extends Iterable<T>, AutoCloseable {
+public interface ResultSetStream<T> extends Iterable<T>, AutoCloseable {
 
   /**
    * Closes this result set. After call this method, operations to this object is invalid.

@@ -1,6 +1,7 @@
-package org.nkjmlab.sorm4j.lowlevel_orm;
+package org.nkjmlab.sorm4j.mapping;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -12,7 +13,6 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  * @param <T>
  */
-@Experimental
 @FunctionalInterface
 public interface ResultSetTraverser<T> {
 
@@ -23,7 +23,7 @@ public interface ResultSetTraverser<T> {
    * @return
    * @throws Exception
    */
-  T traverseAndMap(ResultSet resultSet) throws Exception;
+  T traverseAndMap(ResultSet resultSet) throws SQLException;
 
   /**
    * Converts the given {@link RowMapper} to the {@link ResultSetTraverser}.

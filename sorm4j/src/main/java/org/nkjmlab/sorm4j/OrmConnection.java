@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
@@ -74,26 +74,26 @@ public interface OrmConnection extends Orm, AutoCloseable {
   void setAutoCommit(boolean autoCommit);
 
   /**
-   * Returns {@link LazyResultSet} represents all rows from the table indicated by object class.
+   * Returns {@link ResultSetStream} represents all rows from the table indicated by object class.
    *
    * @param <T>
    * @param type
    * @return
    */
-  <T> LazyResultSet<T> readAllLazy(Class<T> type);
+  <T> ResultSetStream<T> readAllStream(Class<T> type);
 
   /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
+   * Returns an {@link ResultSetStream}. It is able to convert to Stream, List, and so on.
    *
    * @param <T>
    * @param type
    * @param sql
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> type, ParameterizedSql sql);
+  <T> ResultSetStream<T> readStream(Class<T> type, ParameterizedSql sql);
 
   /**
-   * Returns an {@link LazyResultSet}. It is able to convert to Stream, List, and so on.
+   * Returns an {@link ResultSetStream}. It is able to convert to Stream, List, and so on.
    * <p>
    * Parameters will be set according with the correspondence defined in
    * {@link SqlParametersSetter#setParameters(PreparedStatement,Object[])}
@@ -104,18 +104,18 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * @param parameters
    * @return
    */
-  <T> LazyResultSet<T> readLazy(Class<T> type, String sql, Object... parameters);
+  <T> ResultSetStream<T> readStream(Class<T> type, String sql, Object... parameters);
 
   /**
-   * See {@link #readMapLazy(String, Object...)}
+   * See {@link #readMapStream(String, Object...)}
    *
    * @param sql
    * @return
    */
-  LazyResultSet<Map<String, Object>> readMapLazy(ParameterizedSql sql);
+  ResultSetStream<Map<String, Object>> readMapStream(ParameterizedSql sql);
 
   /**
-   * Returns an {@link LazyResultSet} instance containing data from the execution of the provided
+   * Returns an {@link ResultSetStream} instance containing data from the execution of the provided
    * parameterized SQL and convert it to Stream, List, and so on.
    * <p>
    * Types returned from the database will be converted to Java types in the map according with the
@@ -129,6 +129,6 @@ public interface OrmConnection extends Orm, AutoCloseable {
    *        parameter) could not be used.
    * @param parameters are ordered parameter.
    */
-  LazyResultSet<Map<String, Object>> readMapLazy(String sql, Object... parameters);
+  ResultSetStream<Map<String, Object>> readMapStream(String sql, Object... parameters);
 
 }

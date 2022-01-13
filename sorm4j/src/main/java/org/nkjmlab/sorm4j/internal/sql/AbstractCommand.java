@@ -3,9 +3,9 @@ package org.nkjmlab.sorm4j.internal.sql;
 import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.lowlevel_orm.ResultSetTraverser;
-import org.nkjmlab.sorm4j.lowlevel_orm.RowMapper;
-import org.nkjmlab.sorm4j.result.LazyResultSet;
+import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
+import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -47,8 +47,8 @@ public abstract class AbstractCommand implements Command {
   }
 
   @Override
-  public <T> LazyResultSet<T> readLazy(Class<T> objectClass) {
-    return conn.readLazy(objectClass, parse());
+  public <T> ResultSetStream<T> readStream(Class<T> objectClass) {
+    return conn.readStream(objectClass, parse());
   }
 
   @Override
@@ -67,8 +67,8 @@ public abstract class AbstractCommand implements Command {
   }
 
   @Override
-  public LazyResultSet<Map<String, Object>> readMapLazy() {
-    return conn.readMapLazy(parse());
+  public ResultSetStream<Map<String, Object>> readMapStream() {
+    return conn.readMapStream(parse());
   }
 
   @Override

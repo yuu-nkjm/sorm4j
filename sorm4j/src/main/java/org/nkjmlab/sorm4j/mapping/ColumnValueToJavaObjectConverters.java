@@ -45,6 +45,6 @@ public interface ColumnValueToJavaObjectConverters {
    * @return
    */
 
-  boolean isSupportedType(Class<?> objectClass);
+  boolean isSupportedReturnedType(Class<?> objectClass);
 
 }

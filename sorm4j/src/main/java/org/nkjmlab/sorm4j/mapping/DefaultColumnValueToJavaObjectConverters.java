@@ -201,7 +201,7 @@ public final class DefaultColumnValueToJavaObjectConverters
 
 
   @Override
-  public boolean isSupportedType(Class<?> objectClass) {
+  public boolean isSupportedReturnedType(Class<?> objectClass) {
     return supportedTypes.contains(objectClass) || objectClass.isArray();
   }
 
