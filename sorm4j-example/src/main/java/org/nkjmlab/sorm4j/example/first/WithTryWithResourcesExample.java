@@ -29,7 +29,7 @@ public class WithTryWithResourcesExample {
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      List<String> messages = conn.readAllLazy(Customer.class).stream()
+      List<String> messages = conn.readAllStream(Customer.class).stream()
           .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
       System.out.println("messages = " + messages);
 
@@ -55,6 +55,7 @@ public class WithTryWithResourcesExample {
     private static final Customer ALICE = new Customer(1, "Alice", "Kyoto");
     private static final Customer BOB = new Customer(2, "Bob", "Tokyo");
     private static final Customer CAROL = new Customer(3, "Carol", "Kyoto");
+    @SuppressWarnings("unused")
     private static final Customer DAVE = new Customer(4, "Dave", "Nara");
 
 
@@ -66,6 +67,7 @@ public class WithTryWithResourcesExample {
     private String address;
 
     // Require public no arg constructor (default constructor)
+    @SuppressWarnings("unused")
     public Customer() {}
 
     public Customer(int id, String name, String address) {
