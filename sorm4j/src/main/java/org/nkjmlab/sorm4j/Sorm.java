@@ -6,8 +6,6 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 
@@ -78,20 +76,6 @@ public interface Sorm extends Orm {
     return new DriverManagerDataSource(jdbcUrl, username, password);
   }
 
-
-  /**
-   * Create a {@link OrmConnection} wrapping the given JDBC Connection
-   *
-   * @param connection
-   * @return
-   */
-  static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, SormContext.DEFAULT_CONTEXT);
-  }
-
-  static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
-    return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
-  }
 
   /**
    * Accepts a {@link OrmConnection} handler for a task with object-relation mapping. The connection

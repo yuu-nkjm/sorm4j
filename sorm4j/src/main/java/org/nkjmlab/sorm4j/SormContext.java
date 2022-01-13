@@ -27,7 +27,16 @@ import org.nkjmlab.sorm4j.util.logger.SormLogger;
  */
 public interface SormContext {
 
-  static final SormContext DEFAULT_CONTEXT = SormContext.builder().build();
+  /**
+   * for library internal use
+   */
+  static final SormContextImpl DEFAULT_CONTEXT =
+      SormContextImpl.class.cast(SormContext.builder().build());
+
+
+  static SormContext getDefaultContext() {
+    return DEFAULT_CONTEXT;
+  }
 
   LoggerContext getLoggerContext();
 

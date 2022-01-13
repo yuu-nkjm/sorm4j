@@ -19,7 +19,7 @@ public class WithJdbcConnectionExample {
     try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
       // Creates a object-relation mapping connection by wrapping a JDBC connection.
-      OrmConnection conn = Sorm.toOrmConnection(jdbcConn);
+      OrmConnection conn = OrmConnection.from(jdbcConn);
 
       // Creates customer table
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);

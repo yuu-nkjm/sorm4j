@@ -34,7 +34,7 @@ public class TestOracle {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class};
       Class<?>[] blobTypes = new Class<?>[] {Blob.class};
@@ -69,7 +69,7 @@ public class TestOracle {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           // .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class)) // oracle is picky
@@ -98,7 +98,7 @@ public class TestOracle {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] longTypes = new Class<?>[] {Long.class, long.class};
       // Class<?>[] doubleTypes = new Class<?>[] {Double.class, double.class, BigDecimal.class};
@@ -127,7 +127,7 @@ public class TestOracle {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};

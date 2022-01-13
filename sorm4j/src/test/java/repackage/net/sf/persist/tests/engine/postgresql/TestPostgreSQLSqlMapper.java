@@ -93,7 +93,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn, context);
+      OrmConnection c = OrmConnection.of(conn, context);
       log.info(c.readMapFirst("select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
       doTest(c, "c_integer by int", "c_integer", 1);

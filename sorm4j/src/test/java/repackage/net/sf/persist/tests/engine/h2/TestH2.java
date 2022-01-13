@@ -50,7 +50,7 @@ public class TestH2 {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] binaryTypes = new Class<?>[] {Blob.class};
       Class<?>[] otherTypes = new Class<?>[] {Object.class};
@@ -79,7 +79,7 @@ public class TestH2 {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
@@ -106,7 +106,7 @@ public class TestH2 {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -148,7 +148,7 @@ public class TestH2 {
   public void testStringTypes() throws SQLException {
 
     try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+      OrmConnection ormConn = OrmConnection.from(conn);
 
       Class<?>[] stringTypes = new Class<?>[] {String.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};
