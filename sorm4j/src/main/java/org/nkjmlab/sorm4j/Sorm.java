@@ -2,35 +2,24 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.basic.ConsumerHandler;
-import org.nkjmlab.sorm4j.basic.FunctionHandler;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
-import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.ResultSetConverter;
-import org.nkjmlab.sorm4j.extension.SormContext;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.TableNameMapper;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.extension.logger.SormLogger;
+import org.nkjmlab.sorm4j.common.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 
 /**
- * An interface of executing object-relation mapping.
+ * An interface of executing object-relation mapping. Object-relation mapping functions with an
+ * instant connection. When executing these functions, this object gets a connection and executes
+ * the function, after that closes the connection immediately.
  *
  * @author nkjm
  *
  */
 public interface Sorm extends Orm {
-
-  static class DefaultContext {
-    static volatile SormContext CONTEXT = SormContext.builder().build();
-  }
 
 
   /**
@@ -49,7 +38,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return SormImpl.create(dataSource, DefaultContext.CONTEXT);
+    return create(dataSource, SormContext.DEFAULT_CONTEXT);
+  }
+
+  static Sorm create(DataSource dataSource, SormContext context) {
+    return SormImpl.create(dataSource, context);
   }
 
 
@@ -74,28 +67,6 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Create a {@link Sorm} object which uses {@link DriverManager}.
-   *
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * <code>
-   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
-   *</pre></code>
-   *
-   * @param jdbcUrl
-   * @return
-   */
-  static Sorm create(String jdbcUrl) {
-    return create(createDataSource(jdbcUrl, null, null));
-  }
-
-  static void setDefaultContext(Function<SormContext.Builder, SormContext> contextGenerator) {
-    DefaultContext.CONTEXT = contextGenerator.apply(SormContext.builder());
-  }
-
-  /**
    * Creates a {@link DataSource} which simply wraps {@link DriverManager}
    *
    * @param jdbcUrl
@@ -115,11 +86,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static OrmConnection toOrmConnection(Connection connection) {
-    return Sorm.toOrmConnection(connection, DefaultContext.CONTEXT);
+    return Sorm.toOrmConnection(connection, SormContext.DEFAULT_CONTEXT);
   }
 
   static OrmConnection toOrmConnection(Connection connection, SormContext sormContext) {
-    return new OrmConnectionImpl(connection, sormContext);
+    return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
   }
 
   /**
@@ -129,21 +100,6 @@ public interface Sorm extends Orm {
    * @param handler
    */
   void accept(ConsumerHandler<OrmConnection> handler);
-
-  @Experimental
-  void acceptWithLogging(ConsumerHandler<OrmConnection> handler);
-
-  @Experimental
-  <R> R applyWithLogging(FunctionHandler<OrmConnection, R> handler);
-
-
-  /**
-   * Accepts a {@link Connection} handler for a task with object-relation mapping. The connection
-   * will be closed after the process of handler.
-   *
-   * @param handler
-   */
-  void acceptJdbcConnectionHandler(ConsumerHandler<Connection> handler);
 
   /**
    * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
@@ -165,16 +121,6 @@ public interface Sorm extends Orm {
    */
   <R> R apply(FunctionHandler<OrmConnection, R> handler);
 
-  /**
-   * Applies a {@link Connection} handler for a task with object-relation mapping and gets the
-   * result. The connection will be closed after the process of handler.
-   *
-   * @param <R>
-   * @param handler
-   * @return
-   */
-  <R> R applyJdbcConnectionHandler(FunctionHandler<Connection, R> handler);
-
 
   /**
    * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
@@ -189,13 +135,14 @@ public interface Sorm extends Orm {
    */
   <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler);
 
+
   /**
-   * Gets the context string of this object.
+   * Gets the context of this object.
    *
    * @return
    */
   @Experimental
-  String getContextString();
+  SormContext getContext();
 
   /**
    * Gets {@link DataSource}.
@@ -234,132 +181,6 @@ public interface Sorm extends Orm {
    */
   OrmTransaction openTransaction();
 
-  static Builder builder() {
-    return new Builder();
-  }
-
-  static Builder builder(DataSource dataSource) {
-    return new Builder(dataSource);
-  }
-
-  static Builder builder(String jdbcUrl, String user, String password) {
-    return new Builder(createDataSource(jdbcUrl, user, password));
-  }
-
-  @Experimental
-  public static class Builder {
-
-    private DataSource dataSource;
-    private SormContext.Builder contextBuilder = SormContext.builder();
-
-    private Builder() {}
-
-    public Builder(DataSource dataSource) {
-      this.dataSource = dataSource;
-    }
-
-    public Sorm build() {
-      return new SormImpl(dataSource, contextBuilder.build());
-    }
-
-    public Builder setDataSource(DataSource dataSource) {
-      this.dataSource = dataSource;
-      return this;
-    }
-
-
-    public Builder setDataSource(String jdbcUrl, String username, String password) {
-      this.dataSource = Sorm.createDataSource(jdbcUrl, username, password);
-      return this;
-    }
-
-    public Builder setColumnFieldMapper(ColumnFieldMapper fieldNameMapper) {
-      contextBuilder.setColumnFieldMapper(fieldNameMapper);
-      return this;
-    }
-
-
-    public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
-      contextBuilder.setTableNameMapper(tableNameMapper);
-      return this;
-    }
-
-
-    public Builder setResultSetConverter(ResultSetConverter resultSetConverter) {
-      contextBuilder.setResultSetConverter(resultSetConverter);
-      return this;
-    }
-
-
-    public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
-      contextBuilder.setSqlParametersSetter(sqlParametersSetter);
-      return this;
-    }
-
-
-    public Builder setMultiRowProcessorType(MultiRowProcessorType multiRowProcessorType) {
-      contextBuilder.setMultiRowProcessorType(multiRowProcessorType);
-      return this;
-    }
-
-
-    public Builder setBatchSize(int size) {
-      contextBuilder.setBatchSize(size);
-      return this;
-    }
-
-
-    public Builder setMultiRowSize(int size) {
-      contextBuilder.setMultiRowSize(size);
-      return this;
-    }
-
-
-    public Builder setBatchSizeWithMultiRow(int size) {
-      contextBuilder.setBatchSizeWithMultiRow(size);
-      return this;
-    }
-
-
-    public Builder setTransactionIsolationLevel(int level) {
-      contextBuilder.setTransactionIsolationLevel(level);
-      return this;
-    }
-
-
-    public Builder setOption(String name, Object value) {
-      contextBuilder.setOption(name, value);
-      return this;
-    }
-
-
-    public Builder setLoggerOnAll() {
-      contextBuilder.setLoggerOnAll();
-      return this;
-    }
-
-    public Builder setLoggerOffAll() {
-      contextBuilder.setLoggerOffAll();
-      return this;
-    }
-
-    public Builder setLoggerOn(LoggerContext.Category... categories) {
-      contextBuilder.setLoggerOn(categories);
-      return this;
-    }
-
-    public Builder setLoggerOff(LoggerContext.Category... categories) {
-      contextBuilder.setLoggerOff(categories);
-      return this;
-    }
-
-    public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
-      contextBuilder.setLoggerSupplier(loggerSupplier);
-      return this;
-    }
-
-
-  }
 
 
 }

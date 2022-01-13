@@ -3,23 +3,22 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
-final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
 
   private final int multiRowSize;
 
-  public MultiRowInOneStatementProcessor(LoggerContext loggerContext, SormOptions options,
-      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize,
+  public MultiRowInOneStatementProcessor(LoggerContext loggerContext, 
+      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize,
       int multiRowSize) {
-    super(loggerContext, options, sqlParametersSetter, tableMapping, batchSize);
+    super(loggerContext, sqlParametersSetter, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
 
   }

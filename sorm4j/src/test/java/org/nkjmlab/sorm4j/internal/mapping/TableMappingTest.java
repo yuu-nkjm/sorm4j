@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 
 class TableMappingTest {
   private Sorm sorm;
@@ -26,9 +27,9 @@ class TableMappingTest {
   void testGetValue() {
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         Guest g = new Guest();
-        tm.getValue(g, tm.getAccessor(g, "hoge"));
+        tm.getValue(g, "hoge");
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not have a corresponding");
@@ -36,9 +37,9 @@ class TableMappingTest {
 
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         String s = new String();
-        tm.getValue(s, tm.getAccessor(s, "id"));
+        tm.getValue(s, "id");
       });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("Could not get a value");
@@ -54,7 +55,7 @@ class TableMappingTest {
     try {
       sorm.accept(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        SqlParametersToTableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
       });
     } catch (Exception e) {
@@ -66,7 +67,7 @@ class TableMappingTest {
   void testSetValue() {
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "hoge", 0);
       });
     } catch (Exception e) {
@@ -74,7 +75,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        TableMapping<Guest> tm = getTableMapping(m, Guest.class);
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "id", "String");
       });
     } catch (Exception e) {
@@ -82,7 +83,7 @@ class TableMappingTest {
     }
     try {
       sorm.accept(m -> {
-        TableMapping<Player> tm = getTableMapping(m, Player.class);
+        ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {
@@ -105,7 +106,7 @@ class TableMappingTest {
     });
   }
 
-  public static <T> TableMapping<T> getTableMapping(OrmConnection conn, Class<T> objectClass) {
+  public static <T> SqlParametersToTableMapping<T> getTableMapping(OrmConnection conn, Class<T> objectClass) {
     return ((OrmConnectionImpl) conn).getTableMapping(objectClass);
   }
 

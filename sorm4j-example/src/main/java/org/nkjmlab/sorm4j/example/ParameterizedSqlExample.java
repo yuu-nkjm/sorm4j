@@ -19,24 +19,23 @@ public class ParameterizedSqlExample {
 
 
     // Ordered parameter binding and query execution
-    {
-      String sql = "select * from customer where name=? and address=?";
-      ParameterizedSql psql1 = ParameterizedSql.parse(sql, "Alice", "Kyoto");
-      ParameterizedSql psql2 = OrderedParameterSql.from(sql).addParameter("Alice", "Kyoto").parse();
+    String sql = "select * from customer where name=? and address=?";
+    ParameterizedSql psql1 = ParameterizedSql.parse(sql, "Alice", "Kyoto");
+    ParameterizedSql psql2 = OrderedParameterSql.from(sql).addParameter("Alice", "Kyoto").parse();
 
-      List<Customer> customers = sorm.apply(conn -> conn.readList(Customer.class, psql1));
-      System.out.println("customers=" + customers);
+    List<Customer> customers = sorm.apply(conn -> conn.readList(Customer.class, psql1));
+    System.out.println("customers=" + customers);
 
-    }
-    {
-      // Named parameter binding and SQL execution
-      ParameterizedSql psql =
-          ParameterizedSql.parse("insert into customer values(:id,:name,:address)",
-              Map.of("id", 6, "name", "Frank", "address", "Tokyo"));
-      sorm.apply(conn -> conn.executeUpdate(psql));
-      List<Customer> customers = sorm.apply(conn -> conn.readAll(Customer.class));
-      System.out.println("customers=" + customers);
-    }
+    customers = sorm.apply(conn -> conn.readList(Customer.class, psql2));
+    System.out.println("customers=" + customers);
+
+    // Named parameter binding and SQL execution
+    ParameterizedSql psql3 =
+        ParameterizedSql.parse("insert into customer values(:id,:name,:address)",
+            Map.of("id", 6, "name", "Frank", "address", "Tokyo"));
+    sorm.apply(conn -> conn.executeUpdate(psql3));
+    customers = sorm.apply(conn -> conn.readAll(Customer.class));
+    System.out.println("customers=" + customers);
   }
 
 

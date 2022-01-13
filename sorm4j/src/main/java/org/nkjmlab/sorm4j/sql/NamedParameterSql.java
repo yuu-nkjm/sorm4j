@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.ColumnFieldMapper;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
+import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 
 /**
  * A SQL statement with named parameters.
@@ -31,7 +31,7 @@ public interface NamedParameterSql extends ParameterizedSqlParser {
   NamedParameterSql bind(String key, Object value);
 
   /**
-   * Binds a bean. The field names map to keys of parameter by {@link ColumnFieldMapper}.
+   * Binds a bean. The field names map to keys of parameter by {@link ColumnToFieldAccessorMapper}.
    *
    * @param bean
    * @return
@@ -50,7 +50,7 @@ public interface NamedParameterSql extends ParameterizedSqlParser {
    */
   @Experimental
   static NamedParameterSql parse(String sql, char prefix, char suffix,
-      ColumnFieldMapper columnFieldMapper) {
+      ColumnToFieldAccessorMapper columnFieldMapper) {
     return new NamedParameterSqlImpl(sql, prefix, suffix, columnFieldMapper);
   }
 

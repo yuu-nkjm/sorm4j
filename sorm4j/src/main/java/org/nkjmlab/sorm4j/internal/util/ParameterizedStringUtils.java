@@ -21,13 +21,14 @@ public final class ParameterizedStringUtils {
    * Examples
    *
    * <pre>
-   * newString("My name is {}. My score is {}", "Alice",100) => "My name is Alice. My score is 100";
+   * newString("My name is {}. My score is {}", "Alice",100) =&gt; "My name is Alice. My score is
+   * 100";
    *
-   * newString("{}" , 1) => "1";
+   * newString("{}" , 1) =&gt; "1";
    *
-   * newString("{}{}", 1) => "1{}";
+   * newString("{}{}", 1) =&gt; "1{}";
    *
-   * newString("{}", 1, 2) => "1";
+   * newString("{}", 1, 2) =&gt; "1";
    *
    * @param msg including place holders. placeholder is "{}"
    * @param params

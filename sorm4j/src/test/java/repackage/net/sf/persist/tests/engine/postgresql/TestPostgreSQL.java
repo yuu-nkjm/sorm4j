@@ -1,7 +1,6 @@
 package repackage.net.sf.persist.tests.engine.postgresql;
 
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -35,7 +34,7 @@ public class TestPostgreSQL {
       OrmConnection ormConn = Sorm.toOrmConnection(conn);
       conn.setAutoCommit(false);
 
-      Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Byte[].class, InputStream.class};
+      Class<?>[] binaryTypes = new Class<?>[] {byte[].class};
       Class<?>[] blobTypes = new Class<?>[] {Blob.class};
 
       // postgres has a serious bug on returning java.sql.Types.BIGINT type on the ResultSetMetadata
@@ -136,7 +135,7 @@ public class TestPostgreSQL {
       conn.setAutoCommit(false);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
-      Class<?>[] stringTypes = new Class<?>[] {String.class, char[].class, Character[].class};
+      Class<?>[] stringTypes = new Class<?>[] {String.class, Object.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};
 
       // postgres has a serious bug on returning java.sql.Types.BIGINT type on the ResultSetMetadata

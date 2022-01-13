@@ -1,12 +1,13 @@
 package org.nkjmlab.sorm4j.extension;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.mapping.FieldAccessor;
 
 class AccessorTest {
 
   @Test
   void testAccessor() {
-    Accessor ac = new Accessor(null, null, null, null);
+    FieldAccessor ac = new FieldAccessor(null, null, null, null);
     System.out.println(ac.toString());
   }
 

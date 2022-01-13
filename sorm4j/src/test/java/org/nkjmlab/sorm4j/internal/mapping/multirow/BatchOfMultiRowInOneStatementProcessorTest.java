@@ -8,10 +8,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
-import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 
@@ -24,13 +26,15 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.builder().setDataSource(jdbcUrl, user, password)
-        .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).setLoggerOffAll()
-        .setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build();
+    SormContext context = SormContext.builder()
+        .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder()
+            .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).build())
+        .setLoggerOffAll().setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger())
+        .build();
+    sorm = Sorm.create(Sorm.createDataSource(jdbcUrl, user, password), context);
     SormTestUtils.dropAndCreateTableAll(sorm);
-    String s = sorm.getContextString();
 
-    assertThat(s.toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
+    assertThat(sorm.getContext().toString()).contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }
 
   @BeforeEach

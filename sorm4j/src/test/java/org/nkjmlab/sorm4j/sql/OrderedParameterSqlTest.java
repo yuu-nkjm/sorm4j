@@ -1,16 +1,15 @@
 package org.nkjmlab.sorm4j.sql;
 
-import static org.nkjmlab.sorm4j.common.Customer.*;
+import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Customer;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
 
 class OrderedParameterSqlTest {
-  private static Sorm sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+  private static Sorm sorm = createSormAndDropAndCreateTableAll();
   static {
-    sorm.apply(conn -> conn.insert(ALICE, BOB, CAROL, DAVE));
+    sorm.apply(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
   }
 

@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.sql.SqlKeyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

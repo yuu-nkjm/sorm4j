@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.ColumnName;
-import org.nkjmlab.sorm4j.extension.FieldName;
-import org.nkjmlab.sorm4j.extension.TableName;
+import org.nkjmlab.sorm4j.mapping.TableName;
+import org.nkjmlab.sorm4j.result.ColumnName;
 
 class ValuesObjectTest {
 
@@ -25,13 +24,6 @@ class ValuesObjectTest {
     assertThat(v1.equals("test")).isFalse();
     assertThat(v1.hashCode()).isEqualTo(v2.hashCode());
 
-  }
-
-  @Test
-  void testFieldName() {
-    FieldName v1 = new FieldName("test");
-    FieldName v2 = new FieldName("test");
-    verify(v1, v2);
   }
 
   @Test

@@ -12,15 +12,14 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.Guest;
-import org.nkjmlab.sorm4j.common.InsertResult;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
-import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
-import org.nkjmlab.sorm4j.extension.impl.DefaultColumnFieldMapper;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
+import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -111,7 +110,7 @@ class OrmConnectionTest {
     row = sorm.apply(conn -> {
       NamedParameterSql sql =
           NamedParameterSql.parse("insert into players values(`id`, `name`, `address`)", '`', '`',
-              new DefaultColumnFieldMapper());
+              new DefaultColumnToFieldAccessorMapper());
       sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
       return conn.executeUpdate(sql.parse());
     });
@@ -371,7 +370,7 @@ class OrmConnectionTest {
     sorm.accept(m -> {
       m.insert(List.of(a, b));
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
+          m.readMapStream(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
@@ -379,7 +378,7 @@ class OrmConnectionTest {
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      Player p = m.readLazy(Player.class, "select * from players").toList().get(0);
+      Player p = m.readStream(Player.class, "select * from players").toList().get(0);
       assertThat(p).isEqualTo(a);
     });
   }
@@ -392,13 +391,13 @@ class OrmConnectionTest {
     sorm.accept(m -> {
       m.insert(a);
 
-      Map<String, Object> map = m.readMapLazy("select * from players").one();
+      Map<String, Object> map = m.readMapStream("select * from players").one();
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
 
       try {
-        m.readMapLazy("select * from hoge").one();
+        m.readMapStream("select * from hoge").one();
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
@@ -427,21 +426,21 @@ class OrmConnectionTest {
 
 
 
-      assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
+      assertThat(m.readAllStream(Player.class).one()).isEqualTo(a);
       m.insert(b);
 
       try {
-        assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
+        assertThat(m.readAllStream(Player.class).one()).isEqualTo(a);
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
       try {
-        assertThat(m.readMapLazy("select * from players").one()).isEqualTo(a);
+        assertThat(m.readMapStream("select * from players").one()).isEqualTo(a);
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
       try {
-        assertThat(m.readAllLazy(Player.class).one()).isEqualTo(a);
+        assertThat(m.readAllStream(Player.class).one()).isEqualTo(a);
         failBecauseExceptionWasNotThrown(Exception.class);
       } catch (Exception e) {
       }
@@ -462,22 +461,23 @@ class OrmConnectionTest {
       }
 
 
-      assertThat(m.readAllLazy(Player.class).stream().collect(Collectors.toList())).contains(a, b);
-      assertThat(m.readAllLazy(Player.class).toList()).contains(a, b);
-      assertThat(m.readAllLazy(Player.class).first()).isEqualTo(a);
+      assertThat(m.readAllStream(Player.class).stream().collect(Collectors.toList())).contains(a,
+          b);
+      assertThat(m.readAllStream(Player.class).toList()).contains(a, b);
+      assertThat(m.readAllStream(Player.class).first()).isEqualTo(a);
 
-      map = m.readMapLazy("select * from players").first();
+      map = m.readMapStream("select * from players").first();
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
 
-      map = m.readMapLazy("select * from players").toList().get(0);
+      map = m.readMapStream("select * from players").toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
       assertThat(map.get("ADDRESS") != null ? map.get("ADDRESS") : map.get("address"))
           .isEqualTo(a.readAddress());
     });
     sorm.accept(m -> {
-      Map<String, Object> map = m.readMapLazy("select * from players").toList().get(0);
+      Map<String, Object> map = m.readMapStream("select * from players").toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
@@ -499,14 +499,14 @@ class OrmConnectionTest {
     });
     sorm.accept(m -> {
       Map<String, Object> map =
-          m.readMapLazy(ParameterizedSql.of("select * from players")).toList().get(0);
+          m.readMapStream(ParameterizedSql.of("select * from players")).toList().get(0);
       assertThat(map.get("NAME") != null ? map.get("NAME") : map.get("name"))
           .isEqualTo(a.getName());
     });
 
     sorm.accept(m -> {
       try {
-        m.readMapLazy("select * from players").one();
+        m.readMapStream("select * from players").one();
         failBecauseExceptionWasNotThrown(SormException.class);
       } catch (SormException e) {
         assertThat(e.getMessage()).contains("Non-unique");
@@ -590,8 +590,8 @@ class OrmConnectionTest {
 
 
 
-    Sorm orm = Sorm.builder().setDataSource(sorm.getDataSource())
-        .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build();
+    Sorm orm = Sorm.create(sorm.getDataSource(), SormContext.builder()
+        .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build());
 
     orm.acceptTransactionHandler(m -> {
       assertThat(m.getJdbcConnection().getTransactionIsolation())

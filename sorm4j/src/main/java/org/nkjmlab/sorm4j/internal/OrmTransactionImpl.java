@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.internal;
 
 import java.sql.Connection;
 import org.nkjmlab.sorm4j.OrmTransaction;
-import org.nkjmlab.sorm4j.extension.SormContext;
 
 /**
  * An transaction with object relation mapping.
@@ -12,7 +11,7 @@ import org.nkjmlab.sorm4j.extension.SormContext;
  */
 public final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-  public OrmTransactionImpl(Connection connection, SormContext context) {
+  public OrmTransactionImpl(Connection connection, SormContextImpl context) {
     super(connection, context);
     begin(context.getTransactionIsolationLevel());
   }

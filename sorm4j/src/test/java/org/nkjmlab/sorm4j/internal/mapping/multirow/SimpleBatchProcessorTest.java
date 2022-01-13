@@ -5,13 +5,16 @@ import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.extension.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory.MultiRowProcessorType;
 
 class SimpleBatchProcessorTest {
 
@@ -19,8 +22,10 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = Sorm.builder().setDataSource(jdbcUrl, user, password)
-        .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build();
+    DataSource ds = Sorm.createDataSource(jdbcUrl, user, password);
+    SormContext context = SormContext.builder().setMultiRowProcessorFactory(MultiRowProcessorFactory
+        .builder().setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build()).build();
+    sorm = Sorm.create(ds, context);
   }
 
 

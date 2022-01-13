@@ -13,8 +13,8 @@ import org.nkjmlab.sorm4j.common.Guest;
 import org.nkjmlab.sorm4j.common.Location;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
-import org.nkjmlab.sorm4j.common.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple3;
+import org.nkjmlab.sorm4j.result.Tuple2;
+import org.nkjmlab.sorm4j.result.Tuple3;
 
 class CommandTest {
 
@@ -67,8 +67,9 @@ class CommandTest {
   void testExecuteQueryRowMapperOfT() {
     sorm.accept(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      conn.createCommand("select * from players where id=?", 1)
-          .executeQuery((rs, i) -> new Player(rs.getInt(1), rs.getString(2), rs.getString(3)));
+      List<Player> p = conn.createCommand("select * from players where id=?", 1)
+          .executeQuery(conn.getResultSetTraverser(Player.class));
+      assertThat(p.size()).isEqualTo(1);
     });
   }
 
@@ -94,7 +95,8 @@ class CommandTest {
   void testReadLazy() {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Player p = conn.createCommand("select * from players").readLazy(Player.class).toList().get(0);
+      Player p =
+          conn.createCommand("select * from players").readStream(Player.class).toList().get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -131,7 +133,7 @@ class CommandTest {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       Map<String, Object> map =
-          conn.createCommand("select * from players").readMapLazy().toList().get(0);
+          conn.createCommand("select * from players").readMapStream().toList().get(0);
       assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
     });
   }

@@ -25,7 +25,7 @@ public class FirstExample {
     System.out.println("all customers = " + allCustomers);
 
     // Execute select sql and convert result to stream.
-    List<String> messages = sorm.apply(conn -> conn.readAllLazy(Customer.class).stream()
+    List<String> messages = sorm.apply(conn -> conn.readAllStream(Customer.class).stream()
         .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
     System.out.println("messages = " + messages);
 

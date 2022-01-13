@@ -22,7 +22,6 @@ class SormTest {
   @Test
   void testCreate() {
     Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
-    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
   }
 
   @Test
@@ -58,19 +57,8 @@ class SormTest {
     Mockito.when(mock.getConnection()).thenReturn(conMock);
     Sorm sormImpl = Sorm.create(mock);
 
-    try {
-      sormImpl.acceptJdbcConnectionHandler(con -> {
-      });
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-    }
 
     try {
-      sormImpl.applyJdbcConnectionHandler(con -> 1);
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-    }
-    try {
       sormImpl.apply(con -> {
         return 1;
       });
@@ -94,12 +82,6 @@ class SormTest {
     try {
       sormImpl.applyTransactionHandler(con -> {
         return 1;
-      });
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-    }
-    try {
-      sormImpl.acceptJdbcConnectionHandler(con -> {
       });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
@@ -139,28 +121,7 @@ class SormTest {
 
   }
 
-
-  @Test
-  void testRunWithJdbcConnection() {
-
-    sorm.acceptJdbcConnectionHandler(con -> {
-    });
-
-  }
-
-  @Test
-  void testExecuteWithJdbcConnection() {
-    sorm.applyJdbcConnectionHandler(con -> "test");
-  }
-
-  @Test
-  void testRunTransactionConsumerOfOrmTransaction() {
-    sorm.acceptJdbcConnectionHandler(t -> {
-    });
-  }
-
-  Guest a = SormTestUtils.GUEST_ALICE;
-
+  private static Guest a = SormTestUtils.GUEST_ALICE;
 
   @Test
   void testBeginTransaction() {
@@ -168,16 +129,6 @@ class SormTest {
       tr.insert(a);
       // auto-rollback
     }
-    sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(Sorm.toOrmConnection(con).readAll(Guest.class).size()).isEqualTo(0);
-    });
-    try (OrmConnection tr = sorm.openTransaction()) {
-      tr.insert(a);
-      tr.commit();
-    }
-    sorm.acceptJdbcConnectionHandler(con -> {
-      assertThat(Sorm.toOrmConnection(con).readAll(Guest.class).size()).isEqualTo(1);
-    });
   }
 
 }

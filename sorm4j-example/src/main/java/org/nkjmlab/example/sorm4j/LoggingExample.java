@@ -1,24 +1,33 @@
 package org.nkjmlab.example.sorm4j;
 
 import java.util.List;
+import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.extension.logger.JulSormLogger;
-import org.nkjmlab.sorm4j.extension.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.util.logger.JulSormLogger;
+import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
 
 public class LoggingExample {
 
   public static void main(String[] args) {
-    Sorm sorm = Sorm.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
-        .setLoggerSupplier(JulSormLogger::getLogger).setLoggerOnAll().build();
+    DataSource ds =
+        Sorm.createDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password");
+    SormContext context =
+        SormContext.builder().setLoggerSupplier(JulSormLogger::getLogger).setLoggerOnAll().build();
+    Sorm sorm = Sorm.create(ds, context);
+
 
     sorm.accept(conn -> {
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
       conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
     });
 
-    sorm = Sorm.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password")
-        .setLoggerSupplier(Log4jSormLogger::getLogger).setLoggerOnAll().build();
+
+    context = SormContext.builder().setLoggerSupplier(Log4jSormLogger::getLogger).setLoggerOnAll()
+        .build();
+    sorm = Sorm.create(ds, context);
+
     List<Customer> customers =
         sorm.apply(conn -> conn.createCommand("select * from customer where name=? and address=?")
             .addParameter("Alice", "Kyoto").readList(Customer.class));

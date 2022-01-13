@@ -4,26 +4,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.function.Function;
-import org.nkjmlab.sorm4j.extension.SormOptions;
-import org.nkjmlab.sorm4j.extension.SqlParametersSetter;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext;
-import org.nkjmlab.sorm4j.extension.logger.LoggerContext.LogPoint;
-import org.nkjmlab.sorm4j.internal.mapping.TableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext.LogPoint;
 
 public abstract class MultiRowProcessor<T> {
 
   private final int batchSize;
   private final SqlParametersSetter sqlParametersSetter;
 
-  final TableMapping<T> tableMapping;
-  final SormOptions options;
+  final SqlParametersToTableMapping<T> tableMapping;
   final LoggerContext loggerContext;
 
-  MultiRowProcessor(LoggerContext loggerContext, SormOptions options,
-      SqlParametersSetter sqlParametersSetter, TableMapping<T> tableMapping, int batchSize) {
+  MultiRowProcessor(LoggerContext loggerContext, SqlParametersSetter sqlParametersSetter,
+      SqlParametersToTableMapping<T> tableMapping, int batchSize) {
     this.loggerContext = loggerContext;
-    this.options = options;
     this.sqlParametersSetter = sqlParametersSetter;
     this.tableMapping = tableMapping;
     this.batchSize = batchSize;
@@ -54,8 +51,8 @@ public abstract class MultiRowProcessor<T> {
     return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), Try::rethrow).get();
   }
 
-  public final int[] batch(SormOptions options, Connection con, String sql,
-      Function<T, Object[]> parameterCreator, T[] objects) {
+  public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
+      T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects, nonNullObjects -> {
       int[] result = new int[0];
       boolean origAutoCommit = getAutoCommit(con);
@@ -65,7 +62,7 @@ public abstract class MultiRowProcessor<T> {
         final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
         for (int i = 0; i < objects.length; i++) {
           T obj = objects[i];
-          this.sqlParametersSetter.setParameters(options, stmt, parameterCreator.apply(obj));
+          this.sqlParametersSetter.setParameters(stmt, parameterCreator.apply(obj));
           batchHelper.addBatchAndExecuteIfReachedThreshold();
         }
         result = batchHelper.finish();
@@ -91,7 +88,8 @@ public abstract class MultiRowProcessor<T> {
     if (objects == null || objects.length == 0) {
       return new int[0];
     }
-    Optional<LogPoint> lp = loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW);
+    Optional<LogPoint> lp =
+        loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW, MultiRowProcessor.class);
     lp.ifPresent(_lp -> _lp.logBeforeMultiRow(con, objects[0].getClass(), objects.length,
         tableMapping.getTableMetaData().getTableName()));
 

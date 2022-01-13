@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.example.first;
 
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 
 @OrmColumnAliasPrefix("c")
 public class Customer {
@@ -18,15 +19,16 @@ public class Customer {
   private String name;
   private String address;
 
-  // Require public no arg constructor (default constructor)
-  public Customer() {}
-
+  @OrmConstructor({"id", "name", "address"})
   public Customer(int id, String name, String address) {
     this.id = id;
     this.name = name;
     this.address = address;
   }
 
+  public int getId() {
+    return id;
+  }
 
   public String getAddress() {
     return address;
