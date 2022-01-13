@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.Player;
 import org.nkjmlab.sorm4j.common.SormTestUtils;
 
-class LazyResultSetTest {
+class ResultSetStreamTest {
 
   private Sorm sorm;
 
@@ -21,7 +21,7 @@ class LazyResultSetTest {
   void testA() {
     sorm.accept(m -> m.insert(PLAYER_ALICE, PLAYER_BOB));
     sorm.accept(m -> {
-      try (Stream<Player> st = m.readAllLazy(Player.class).stream()) {
+      try (Stream<Player> st = m.readAllStream(Player.class).stream()) {
         st.onClose(() -> System.out.println("close1"));
         st.findAny();
 
@@ -29,7 +29,7 @@ class LazyResultSetTest {
     });
 
     sorm.accept(m -> {
-      Stream<Player> st = m.readAllLazy(Player.class).stream();
+      Stream<Player> st = m.readAllStream(Player.class).stream();
       st.onClose(() -> System.out.println("close2"));
       st.findAny();
     });
