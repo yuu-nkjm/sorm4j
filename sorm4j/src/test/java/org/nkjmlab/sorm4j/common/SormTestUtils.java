@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.common;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
 
 public class SormTestUtils {
@@ -40,7 +41,8 @@ public class SormTestUtils {
   }
 
   public static Sorm createSorm() {
-    Sorm ret = Sorm.builder(jdbcUrl, user, password).setLoggerOn(Category.MAPPING).build();
+    Sorm ret = Sorm.create(Sorm.createDataSource(jdbcUrl, user, password),
+        SormContext.builder().setLoggerOn(Category.MAPPING).build());
     return ret;
   }
 

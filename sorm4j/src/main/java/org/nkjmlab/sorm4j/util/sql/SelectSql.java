@@ -18,6 +18,8 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 @Experimental
 public class SelectSql {
 
+  private SelectSql() {}
+
   /**
    * Creates {@link Builder} object.
    *

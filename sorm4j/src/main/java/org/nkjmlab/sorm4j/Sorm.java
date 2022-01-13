@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -11,13 +10,6 @@ import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
-import org.nkjmlab.sorm4j.mapping.TableNameMapper;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -46,7 +38,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return SormImpl.create(dataSource, SormContext.DEFAULT_CONTEXT);
+    return create(dataSource, SormContext.DEFAULT_CONTEXT);
+  }
+
+  static Sorm create(DataSource dataSource, SormContext context) {
+    return SormImpl.create(dataSource, context);
   }
 
 
@@ -68,24 +64,6 @@ public interface Sorm extends Orm {
    */
   static Sorm create(String jdbcUrl, String user, String password) {
     return create(createDataSource(jdbcUrl, user, password));
-  }
-
-  /**
-   * Create a {@link Sorm} object which uses {@link DriverManager}.
-   *
-   * <p>
-   * For example,
-   *
-   * <pre>
-   * <code>
-   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
-   *</pre></code>
-   *
-   * @param jdbcUrl
-   * @return
-   */
-  static Sorm create(String jdbcUrl) {
-    return create(createDataSource(jdbcUrl, null, null));
   }
 
   /**
@@ -209,107 +187,6 @@ public interface Sorm extends Orm {
    */
   OrmTransaction openTransaction();
 
-  static Builder builder() {
-    return new Builder();
-  }
-
-  static Builder builder(DataSource dataSource) {
-    return new Builder(dataSource);
-  }
-
-  static Builder builder(String jdbcUrl, String user, String password) {
-    return new Builder(createDataSource(jdbcUrl, user, password));
-  }
-
-  @Experimental
-  public static class Builder {
-
-    private DataSource dataSource;
-    private SormContext.Builder contextBuilder = SormContext.builder();
-
-    private Builder() {}
-
-    public Builder(DataSource dataSource) {
-      this.dataSource = dataSource;
-    }
-
-    public Sorm build() {
-      return new SormImpl(dataSource, (SormContextImpl) contextBuilder.build());
-    }
-
-    public Builder setDataSource(DataSource dataSource) {
-      this.dataSource = dataSource;
-      return this;
-    }
-
-
-    public Builder setDataSource(String jdbcUrl, String username, String password) {
-      this.dataSource = Sorm.createDataSource(jdbcUrl, username, password);
-      return this;
-    }
-
-    public Builder setColumnFieldMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
-      contextBuilder.setColumnFieldMapper(fieldNameMapper);
-      return this;
-    }
-
-
-    public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
-      contextBuilder.setTableNameMapper(tableNameMapper);
-      return this;
-    }
-
-
-    public Builder setColumnValueToJavaObjectConverter(
-        ColumnValueToJavaObjectConverters converter) {
-      contextBuilder.setColumnValueToJavaObjectConverter(converter);
-      return this;
-    }
-
-
-    public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
-      contextBuilder.setSqlParametersSetter(sqlParametersSetter);
-      return this;
-    }
-
-
-    public Builder setMultiRowProcessorFactory(MultiRowProcessorFactory multiRowProcessorFactory) {
-      contextBuilder.setMultiRowProcessorFactory(multiRowProcessorFactory);
-      return this;
-    }
-
-    public Builder setTransactionIsolationLevel(int level) {
-      contextBuilder.setTransactionIsolationLevel(level);
-      return this;
-    }
-
-    public Builder setLoggerOnAll() {
-      contextBuilder.setLoggerOnAll();
-      return this;
-    }
-
-    public Builder setLoggerOffAll() {
-      contextBuilder.setLoggerOffAll();
-      return this;
-    }
-
-    public Builder setLoggerOn(LoggerContext.Category... categories) {
-      contextBuilder.setLoggerOn(categories);
-      return this;
-    }
-
-    public Builder setLoggerOff(LoggerContext.Category... categories) {
-      contextBuilder.setLoggerOff(categories);
-      return this;
-    }
-
-    public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
-      contextBuilder.setLoggerSupplier(loggerSupplier);
-      return this;
-    }
-
-
-  }
 
 
 }

@@ -461,7 +461,8 @@ class OrmConnectionTest {
       }
 
 
-      assertThat(m.readAllStream(Player.class).stream().collect(Collectors.toList())).contains(a, b);
+      assertThat(m.readAllStream(Player.class).stream().collect(Collectors.toList())).contains(a,
+          b);
       assertThat(m.readAllStream(Player.class).toList()).contains(a, b);
       assertThat(m.readAllStream(Player.class).first()).isEqualTo(a);
 
@@ -589,8 +590,8 @@ class OrmConnectionTest {
 
 
 
-    Sorm orm = Sorm.builder().setDataSource(sorm.getDataSource())
-        .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build();
+    Sorm orm = Sorm.create(sorm.getDataSource(), SormContext.builder()
+        .setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE).build());
 
     orm.acceptTransactionHandler(m -> {
       assertThat(m.getJdbcConnection().getTransactionIsolation())

@@ -32,7 +32,6 @@ import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.SqlParameterSetter;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
@@ -43,7 +42,7 @@ public class TestPostgreSQLSqlMapper {
       org.apache.logging.log4j.LogManager.getLogger();
 
   private static DataSource dataSource;
-  private static SqlParametersSetter parametersSetter;
+  private static SormContext context;
 
   @BeforeAll
   static void beforAll() {
@@ -51,22 +50,28 @@ public class TestPostgreSQLSqlMapper {
         "jdbc:h2:mem:postgre;MODE=PostgreSQL");
     DbEngineTestUtils.executeSql(dataSource, TestPostgreSQLSqlMapper.class, "sql-mapper-test.sql");
 
-    SqlParameterSetter ps = ((stmt, parameterIndex, parameter) -> {
+
+
+    ColumnValueToJavaObjectConverter<PGobject> columnValueConverter =
+        ((resultSet, columnIndex, columnType, toType) -> {
+          return PGobject.class.cast(resultSet.getObject(columnIndex));
+        });
+
+
+
+    SqlParameterSetter parameterSetter = ((stmt, parameterIndex, parameter) -> {
       PGobject pg = new PGobject();
       pg.setType("inet");
       pg.setValue(((InetAddress) parameter).getHostAddress());
       stmt.setObject(parameterIndex, pg);
     });
 
-    ColumnValueToJavaObjectConverter<PGobject> cv =
-        ((resultSet, columnIndex, columnType, toType) -> {
-          return PGobject.class.cast(resultSet.getObject(columnIndex));
-        });
-
-    new DefaultColumnValueToJavaObjectConverters(Map.of(PGobject.class, cv));
-
-    parametersSetter = new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, ps));
-
+    context = SormContext.builder()
+        .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters(
+            Map.of(PGobject.class, columnValueConverter)))
+        .setSqlParametersSetter(
+            new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, parameterSetter)))
+        .build();
 
   }
 
@@ -88,8 +93,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn,
-          SormContext.builder().setSqlParametersSetter(parametersSetter).build());
+      OrmConnection c = Sorm.toOrmConnection(conn, context);
       log.info(c.readMapFirst("select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
       doTest(c, "c_integer by int", "c_integer", 1);
