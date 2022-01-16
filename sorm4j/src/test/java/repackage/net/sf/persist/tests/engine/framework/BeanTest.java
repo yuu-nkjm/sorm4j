@@ -125,7 +125,7 @@ public class BeanTest {
         String sql = "select * from " + tableName + " where " + columnName + " is null";
         Object ret = persist.readFirst(cls, sql);
         if (ret == null) {
-          System.out.println(persist.readList(cls, "select * from " + tableName));
+          System.err.println(persist.readList(cls, "select * from " + tableName));
           throw new AssertionError(
               "Expected not null value but got null as result of [" + sql + "]");
         }

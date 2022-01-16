@@ -533,7 +533,7 @@ public class OrmBenchmarkPostSimple {
     public Post readOneRow(int input) {
       // return sorm
       // .apply(conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
-      return sorm.apply(conn -> conn.readByPrimaryKey(Post.class, input));
+      return sorm.apply(conn -> conn.findByPrimaryKey(Post.class, input));
     }
   }
 

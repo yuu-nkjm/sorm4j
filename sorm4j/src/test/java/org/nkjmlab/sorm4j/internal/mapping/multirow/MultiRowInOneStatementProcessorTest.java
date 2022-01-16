@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -19,16 +18,9 @@ class MultiRowInOneStatementProcessorTest {
   private static final Player c = SormTestUtils.PLAYER_CAROL;
 
 
-
-  @BeforeAll
-  static void setUp() {
-    sorm = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTableAll(sorm);
-  }
-
   @BeforeEach
   void setUpEach() {
-    SormTestUtils.dropAndCreateTableAll(sorm);
+    sorm = createSormWithNewContextAndTables();
   }
 
 

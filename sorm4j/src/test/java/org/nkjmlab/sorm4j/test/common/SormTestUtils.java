@@ -1,88 +1,153 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import javax.sql.DataSource;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
+import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.util.table.BasicTableWithSchema;
+import org.nkjmlab.sorm4j.util.table.TableSchema;
+import org.nkjmlab.sorm4j.util.table.TableWithSchema;
 
 public class SormTestUtils {
-  public static final String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
-  public static final String user = "sa";
-  public static final String password = "";
+  public static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
+  public static final String USER = "sa";
+  public static final String PASSWORD = "";
+
+
 
   public static final Guest GUEST_ALICE = new Guest("Alice", "Kyoto");
   public static final Guest GUEST_BOB = new Guest("Bob", "Tokyo");
   public static final Guest GUEST_CAROL = new Guest("Carol", "Osaka");
   public static final Guest GUEST_DAVE = new Guest("Dave", "Nara");
 
+
   public static final Player PLAYER_ALICE = new Player(1, "Alice", "Kyoto");
   public static final Player PLAYER_BOB = new Player(2, "Bob", "Tokyo");
   public static final Player PLAYER_CAROL = new Player(3, "Carol", "Osaka");
   public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
 
-  private static final String SQL_CREATE_TABLE_LOCATIONS =
-      "CREATE TABLE IF NOT EXISTS locations (id INT PRIMARY KEY, name VARCHAR)";
 
-  private static final String SQL_CREATE_TABLE_GUESTS =
-      "CREATE TABLE IF NOT EXISTS guests (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR, address VARCHAR)";
-  private static final String SQL_CREATE_TABLE_PLAYERS =
-      "CREATE TABLE IF NOT EXISTS players (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
+  public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
+  public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  private static final String SQL_CREATE_TABLE_PLAYERS1 =
-      "CREATE TABLE IF NOT EXISTS players1 (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
-  public static final Location LOCATION_TOKYO = new Location(1, Location.Place.TOKYO);
-  public static final Location LOCATION_KYOTO = new Location(2, Location.Place.KYOTO);
+  public static final Sorm SORM = createSormWithNewContextAndTables();
 
-  public static Sorm createSormAndDropAndCreateTableAll() {
-    Sorm sorm = createSorm();
-    dropAndCreateTableAll(sorm);
+
+  public static TableWithSchema<Guest> createGuestsTable(Sorm sorm) {
+    TableSchema schema =
+        TableSchema.builder("guests").addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
+            .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
+            .addIndexDefinition("name").addIndexDefinition("name").build();
+
+
+    BasicTableWithSchema<Guest> tbl = new BasicTableWithSchema<>(sorm, Guest.class, schema);
+    tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
+    return tbl;
+  }
+
+  public static TableWithSchema<Player> createPlayersTable(Sorm sorm) {
+    return createPlayersTable(sorm, "players");
+  }
+
+  public static TableWithSchema<Player> createPlayersTable(Sorm sorm, String tableName) {
+
+    TableSchema schema = TableSchema.builder(tableName).addColumnDefinition("id", INT, PRIMARY_KEY)
+        .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
+        .addIndexDefinition("name").addIndexDefinition("name").build();
+
+    TableWithSchema<Player> tbl = new TableWithSchema<>() {
+
+      @Override
+      public TableSchema getTableSchema() {
+        return schema;
+      }
+
+      @Override
+      public Class<Player> getValueType() {
+        return Player.class;
+      }
+
+      @Override
+      public Orm getOrm() {
+        return sorm;
+      }
+
+      @Override
+      public String getTableName() {
+        return schema.getTableName();
+      }
+    };
+    tbl.dropTableIfExists();
+    tbl.createTableIfNotExists().createIndexesIfNotExists();
+    return tbl;
+  }
+
+  public static TableWithSchema<Sport> createSportsTable(Sorm sorm) {
+    TableSchema schema = TableSchema.builder("sports").addColumnDefinition("id", INT, PRIMARY_KEY)
+        .addColumnDefinition("name", VARCHAR).build();
+
+    TableWithSchema<Sport> tbl = new TableWithSchema<>() {
+
+      @Override
+      public TableSchema getTableSchema() {
+        return schema;
+      }
+
+      @Override
+      public Class<Sport> getValueType() {
+        return Sport.class;
+      }
+
+      @Override
+      public Orm getOrm() {
+        return sorm;
+      }
+    };
+    tbl.dropTableIfExists();
+    tbl.createTableIfNotExists().createIndexesIfNotExists();
+    return tbl;
+  }
+
+  public static Sorm createSormWithNewContextAndTables() {
+    Sorm sorm = createNewContextSorm();
+    dropAndCreateSportsTable(sorm);
+    dropAndCreateGuestTable(sorm);
+    dropAndCreatePlayerTable(sorm);
     return sorm;
   }
 
-  public static Sorm createSorm() {
-    Sorm ret = Sorm.create(Sorm.createDataSource(jdbcUrl, user, password),
-        SormContext.builder().setLoggerOn(Category.MAPPING).build());
-    return ret;
+
+  public static Sorm createNewContextSorm() {
+    return Sorm.create(Sorm.createDataSource(JDBC_URL, USER, PASSWORD),
+        SormContext.builder().build());
   }
 
-  public static void dropAndCreateTableAll(Sorm sorm) {
-    dropAndCreateGuestTable(sorm);
-    dropAndCreatePlayerTable(sorm);
-    dropAndCreateLocationTable(sorm);
-    dropAndCreateCustomerTable(sorm);
-  }
+  private static void dropAndCreateSportsTable(Sorm sorm) {
+    createSportsTable(sorm).dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
 
-  private static void dropAndCreateCustomerTable(Sorm sorm) {
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE customer IF EXISTS"));
-    sorm.accept(conn -> conn.executeUpdate(Customer.CREATE_TABLE_SQL));
-  }
-
-  private static void dropAndCreateLocationTable(Sorm sorm) {
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE locations IF EXISTS"));
-    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_LOCATIONS));
   }
 
   private static void dropAndCreateGuestTable(Sorm sorm) {
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE guests IF EXISTS"));
-    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_GUESTS));
+    createGuestsTable(sorm).dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
   }
 
   private static void dropAndCreatePlayerTable(Sorm sorm) {
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE players IF EXISTS"));
-    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS));
-    sorm.accept(conn -> conn.executeUpdate("DROP TABLE players1 IF EXISTS"));
-    sorm.accept(conn -> conn.executeUpdate(SQL_CREATE_TABLE_PLAYERS1));
+    createPlayersTable(sorm, "players").dropTableIfExists().createTableIfNotExists()
+        .createIndexesIfNotExists();
+    createPlayersTable(sorm, "players1").dropTableIfExists().createTableIfNotExists()
+        .createIndexesIfNotExists();
   }
 
-  public static DataSource createDataSourceH2() {
-    return createDataSourceH2(jdbcUrl, user, password);
+  public static JdbcConnectionPool createDataSourceH2() {
+    return JdbcConnectionPool.create(JDBC_URL, USER, PASSWORD);
   }
 
-
-  private static DataSource createDataSourceH2(String url, String user, String password) {
-    return JdbcConnectionPool.create(url, user, password);
+  public static DriverManagerDataSource createDriverManagerDataSource() {
+    return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
   }
+
 
 
 }

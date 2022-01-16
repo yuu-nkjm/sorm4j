@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
@@ -289,6 +290,7 @@ public interface Orm {
    */
   TableMetaData getTableMetaData(String tableName);
 
+  JdbcDatabaseMetaData getJdbcDatabaseMetaData();
 
   /**
    * Gets table name corresponding to the given object class.
@@ -448,8 +450,8 @@ public interface Orm {
   <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
-      Class<T3> t3, String t2T3OnCondition);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1T2OnCondition, String t2T3OnCondition);
 
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
@@ -543,7 +545,8 @@ public interface Orm {
    * @param primaryKeyValues
    * @return
    */
-  <T> T readByPrimaryKey(Class<T> type, Object... primaryKeyValues);
+  <T> T findByPrimaryKey(Class<T> type, Object... primaryKeyValues);
+
 
   /**
    * Reads an object from the database.

@@ -7,8 +7,8 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.LogPoint;
 
 public abstract class MultiRowProcessor<T> {
 

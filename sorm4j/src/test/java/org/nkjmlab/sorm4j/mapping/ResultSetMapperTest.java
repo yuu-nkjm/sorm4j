@@ -14,7 +14,7 @@ class ResultSetMapperTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
     sorm.accept(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
   }
 

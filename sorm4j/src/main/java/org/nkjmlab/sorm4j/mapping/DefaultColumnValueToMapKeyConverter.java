@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.mapping;
 
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToMapEntryConverter.LetterCaseOfKey;
 
 public final class DefaultColumnValueToMapKeyConverter implements ColumnValueToMapKeyConverter {
@@ -27,8 +28,10 @@ public final class DefaultColumnValueToMapKeyConverter implements ColumnValueToM
       case CANONICAL_CASE:
         return toCanonicalCase(columnName);
       case NO_CONVERSION:
-      default:
         return columnName;
+      default:
+        throw new IllegalArgumentException(
+            ParameterizedStringUtils.newString("{} is invalid", letterCaseOfKey));
     }
   }
 

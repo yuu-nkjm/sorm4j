@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 
 public class WithJdbcConnectionExample {
 
@@ -19,7 +18,7 @@ public class WithJdbcConnectionExample {
     try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, user, password)) {
 
       // Creates a object-relation mapping connection by wrapping a JDBC connection.
-      OrmConnection conn = OrmConnection.from(jdbcConn);
+      OrmConnection conn = OrmConnection.of(jdbcConn);
 
       // Creates customer table
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
@@ -46,7 +45,7 @@ public class WithJdbcConnectionExample {
 
 
       // Read object by primary key.
-      Customer customerId2 = conn.readByPrimaryKey(Customer.class, 2);
+      Customer customerId2 = conn.findByPrimaryKey(Customer.class, 2);
       System.out.println("customer of ID 2 = " + customerId2);
 
       // Execute select sql and convert result to pojo list.

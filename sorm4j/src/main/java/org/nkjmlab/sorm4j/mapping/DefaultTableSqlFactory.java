@@ -32,8 +32,8 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
     String selectByPrimaryKeySql =
         selectAllSql + " " + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
 
-    String existsSql = "select 1 from " + tableName
-        + createWhereClauseIdentifyByPrimaryKeys(primaryKeys) + " limit 1";
+    String existsSql =
+        "select 1 from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
 
 
     String updateSql =

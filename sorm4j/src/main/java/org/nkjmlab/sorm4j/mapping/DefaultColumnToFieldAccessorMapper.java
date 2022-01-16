@@ -6,15 +6,14 @@ import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
@@ -32,8 +31,11 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
 
   private final LoggerContext loggerContext;
 
+  private static final Set<String> IGNORE_METHODS =
+      Set.of("NOTIFY", "NOTIFYALL", "WAIT", "TOSTRING", "HASHCODE");
+
   public DefaultColumnToFieldAccessorMapper() {
-    this(LoggerContext.builder().build());
+    this(SormContext.getDefaultContext().getLoggerContext());
   }
 
   public DefaultColumnToFieldAccessorMapper(LoggerContext loggerContext) {
@@ -42,7 +44,8 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
 
   @Override
   public ColumnToAccessorMapping createMapping(Class<?> objectClass, String columnAliasPrefix) {
-    Map<String, FieldAccessor> accessors = createAccessors(objectClass);
+    Map<String, FieldAccessor> accessors =
+        createAccessors(objectClass, createAcceptableColumnNames(objectClass));
     return new ColumnToAccessorMapping(objectClass, accessors, columnAliasPrefix);
   }
 
@@ -74,7 +77,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
 
   private Map<String, Method> getAllMethods(Class<?> objectClass) {
     return extractedMethodStartWith(objectClass, "").entrySet().stream()
-        .filter(e -> nonNull(isValidGetter(e.getValue(), false)))
+        .filter(e -> !e.getKey().startsWith("GET") && nonNull(isValidGetter(e.getValue(), false)))
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
@@ -148,7 +151,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   }
 
 
-  private Map<String, FieldAccessor> createAccessors(Class<?> objectClass) {
+  private Set<String> createAcceptableColumnNames(Class<?> objectClass) {
     Set<String> acceptableColumnNames = new HashSet<>();
     acceptableColumnNames.addAll(getAllFields(objectClass).keySet());
     acceptableColumnNames.addAll(getAllGetters(objectClass).keySet());
@@ -158,11 +161,12 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
     acceptableColumnNames.addAll(getAnnotatedGettersMap(objectClass).keySet());
     acceptableColumnNames.addAll(getAnnotatatedSettersMap(objectClass).keySet());
 
-    return createAccessors(objectClass, new ArrayList<>(acceptableColumnNames));
+    acceptableColumnNames.removeAll(IGNORE_METHODS);
+    return acceptableColumnNames;
   }
 
   private Map<String, FieldAccessor> createAccessors(Class<?> objectClass,
-      List<String> acceptableColumnNames) {
+      Set<String> acceptableColumnNames) {
     Map<String, Field> fields = getAllFields(objectClass);
     Map<String, Method> getters = getAllGetters(objectClass);
     Map<String, Method> allMethods = getAllMethods(objectClass);
@@ -172,25 +176,24 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
     Map<String, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
 
     Map<String, FieldAccessor> ret = new HashMap<>();
-    for (String canonicalColName : acceptableColumnNames.stream().map(col -> toCanonicalCase(col))
-        .toArray(String[]::new)) {
+    for (String acceptableColName : acceptableColumnNames) {
       Field f =
-          nonNull(annotatedFields.get(canonicalColName)) ? annotatedFields.get(canonicalColName)
-              : fields.get(canonicalColName);
+          nonNull(annotatedFields.get(acceptableColName)) ? annotatedFields.get(acceptableColName)
+              : fields.get(acceptableColName);
       Method g =
-          nonNull(annotatedGetters.get(canonicalColName)) ? annotatedGetters.get(canonicalColName)
-              : nonNull(getters.get(canonicalColName)) ? getters.get(canonicalColName)
-                  : allMethods.get(canonicalColName);
+          nonNull(annotatedGetters.get(acceptableColName)) ? annotatedGetters.get(acceptableColName)
+              : nonNull(getters.get(acceptableColName)) ? getters.get(acceptableColName)
+                  : allMethods.get(acceptableColName);
       Method s =
-          nonNull(annotatedSetters.get(canonicalColName)) ? annotatedSetters.get(canonicalColName)
-              : setters.get(canonicalColName);
+          nonNull(annotatedSetters.get(acceptableColName)) ? annotatedSetters.get(acceptableColName)
+              : setters.get(acceptableColName);
 
       if (f == null && (g == null && s == null)) {
         loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).debug(
             "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
-            canonicalColName);
+            acceptableColName);
       } else {
-        ret.put(canonicalColName, new FieldAccessor(canonicalColName, f, g, s));
+        ret.put(acceptableColName, new FieldAccessor(acceptableColName, f, g, s));
       }
     }
     return ret;

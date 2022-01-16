@@ -1,13 +1,14 @@
 package org.nkjmlab.sorm4j.sql;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.test.common.Customer;
 
 class OrderedParameterSqlTest {
-  private static Sorm sorm = createSormAndDropAndCreateTableAll();
+  private static Sorm sorm = createSormWithNewContextAndTables();
   static {
     sorm.apply(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
@@ -15,12 +16,13 @@ class OrderedParameterSqlTest {
 
   @Test
   void testParse() {
-    ParameterizedSql statement = OrderedParameterSql.parse(
-        "select * from customer where name like {?} and address in(<?>) and id=?", "'A%'",
-        List.of("Tokyo", "Kyoto"), 1);
-    List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
-    System.out.println(ret);
-
+    ParameterizedSql statement =
+        OrderedParameterSql.parse("select * from guests where name like {?} and address in(<?>)",
+            "'A%'", List.of(GUEST_ALICE.getAddress(), GUEST_BOB.getAddress()));
+    assertThat(statement.getSql())
+        .isEqualTo("select * from guests where name like 'A%' and address in(?,?)");
+    assertThat(Arrays.asList(statement.getParameters()))
+        .isEqualTo(List.of(GUEST_ALICE.getAddress(), GUEST_BOB.getAddress()));
   }
 
   // @Test

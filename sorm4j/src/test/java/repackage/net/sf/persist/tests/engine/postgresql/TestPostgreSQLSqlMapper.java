@@ -25,7 +25,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverter;

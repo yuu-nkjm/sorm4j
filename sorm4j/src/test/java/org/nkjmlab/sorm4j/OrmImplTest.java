@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -17,7 +16,7 @@ class OrmImplTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
   @BeforeEach
@@ -36,7 +35,7 @@ class OrmImplTest {
   @Test
   void testReadByPrimaryKey() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(sorm.readByPrimaryKey(Player.class, PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
+    assertThat(sorm.findByPrimaryKey(Player.class, PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
   }
 
   @Test

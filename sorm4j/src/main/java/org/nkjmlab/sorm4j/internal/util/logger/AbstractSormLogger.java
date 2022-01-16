@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.logger;
+package org.nkjmlab.sorm4j.internal.util.logger;
 
 import java.sql.Connection;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public abstract class AbstractSormLogger implements SormLogger {
 

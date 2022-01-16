@@ -4,18 +4,21 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 public class StringCache {
 
-  private StringCache() {}
+  private static final ConcurrentMap<String, String> canonicalCaseCaches =
+      new ConcurrentHashMap<>();
 
   private static final ConcurrentMap<String, String> upperCaseCaches = new ConcurrentHashMap<>();
 
   private static final ConcurrentMap<String, String> lowerCaseCaches = new ConcurrentHashMap<>();
 
-  private static final ConcurrentMap<String, String> canonicalCaseCaches =
-      new ConcurrentHashMap<>();
+  public static void clearAllCache() {
+    upperCaseCaches.clear();
+    lowerCaseCaches.clear();
+    canonicalCaseCaches.clear();
+  }
 
   public static String toUpperCase(String str) {
     return upperCaseCaches.computeIfAbsent(str, key -> str.toUpperCase(Locale.ENGLISH));
@@ -63,22 +66,6 @@ public class StringCache {
     return false;
   }
 
-  public static boolean equalsAsCanonical(Collection<String> collection1,
-      Collection<String> collection2) {
-    return collection1.stream().map(s -> toCanonicalCase(s)).collect(Collectors.toSet())
-        .equals(collection2.stream().map(s -> toCanonicalCase(s)).collect(Collectors.toSet()));
+  private StringCache() {}
 
-  }
-
-  public static ConcurrentMap<String, String> getUpperCaseCaches() {
-    return upperCaseCaches;
-  }
-
-  public static ConcurrentMap<String, String> getLowerCaseCaches() {
-    return lowerCaseCaches;
-  }
-
-  public static ConcurrentMap<String, String> getCanonicalCaseCaches() {
-    return canonicalCaseCaches;
-  }
 }

@@ -20,7 +20,7 @@ class TableMappingTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
   @Test

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -15,7 +13,7 @@ class DefaultTableNameMapperTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
 

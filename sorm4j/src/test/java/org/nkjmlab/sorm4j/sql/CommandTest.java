@@ -12,9 +12,9 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.Location;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.Sport;
 
 class CommandTest {
 
@@ -22,7 +22,7 @@ class CommandTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
   @Test
@@ -92,7 +92,7 @@ class CommandTest {
   }
 
   @Test
-  void testReadLazy() {
+  void testReadStream() {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       Player p =
@@ -120,6 +120,16 @@ class CommandTest {
   }
 
   @Test
+  void testReadStreamToList() {
+    sorm.accept(conn -> {
+      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
+      Player p = conn.readStream(Player.class, "select * from players")
+          .toList(conn.getRowMapper(Player.class)).get(0);
+      assertThat(p.getName()).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
+    });
+  }
+
+  @Test
   void testReadMapFirst() {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
@@ -129,7 +139,7 @@ class CommandTest {
   }
 
   @Test
-  void testReadMapLazy() {
+  void testReadMapStream() {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       Map<String, Object> map =
@@ -137,6 +147,7 @@ class CommandTest {
       assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
     });
   }
+
 
   @Test
   void testReadMapList() {
@@ -180,20 +191,20 @@ class CommandTest {
     sorm.accept(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       conn.insert(List.of(GUEST_ALICE, GUEST_BOB));
-      conn.insert(List.of(LOCATION_TOKYO, LOCATION_KYOTO));
+      conn.insert(List.of(SOCCER, TENNIS));
 
       String sql = ParameterizedSql.embedParameter(
           "select {?}, {?}, {?} from players join guests on players.id=guests.id "
-              + " join locations on players.id=locations.id " + " where players.id=?",
+              + " join sports on players.id=sports.id " + " where players.id=?",
           conn.getTableMetaData(Player.class).getColumnAliases(),
           conn.getTableMetaData(Guest.class).getColumnAliases(),
-          conn.getTableMetaData(Location.class).getColumnAliases());
+          conn.getTableMetaData(Sport.class).getColumnAliases());
 
-      List<Tuple3<Player, Guest, Location>> ret = conn.createCommand(sql, PLAYER_ALICE.getId())
-          .readTupleList(Player.class, Guest.class, Location.class);
+      List<Tuple3<Player, Guest, Sport>> ret = conn.createCommand(sql, PLAYER_ALICE.getId())
+          .readTupleList(Player.class, Guest.class, Sport.class);
       assertThat(ret.get(0).getT1().getName()).isEqualTo(PLAYER_ALICE.getName());
       assertThat(ret.get(0).getT2().getName()).isEqualTo(GUEST_ALICE.getName());
-      assertThat(ret.get(0).getT3().getName()).isEqualTo(LOCATION_TOKYO.getName());
+      assertThat(ret.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
 
     });
   }

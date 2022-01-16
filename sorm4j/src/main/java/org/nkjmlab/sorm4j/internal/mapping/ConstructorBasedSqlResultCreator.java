@@ -66,8 +66,7 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
    * @return
    */
   private S createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, int[] sqlTypes,
-      ConstructorParameter[] constructorParameters) {
+      ResultSet resultSet, int[] sqlTypes, ConstructorParameter[] constructorParameters) {
     try {
       final Object[] params = new Object[constructorParametersLength];
 
@@ -76,8 +75,8 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
         if (cp == null) {
           continue;
         }
-        params[cp.getOrder()] = columnValueConverter.convertTo(resultSet, i + 1,
-            sqlTypes[i], constructorParameters[i].getType());
+        params[cp.getOrder()] = columnValueConverter.convertTo(resultSet, i + 1, sqlTypes[i],
+            constructorParameters[i].getType());
       }
       return constructor.newInstance(params);
     } catch (SQLException e) {
@@ -100,8 +99,8 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
   @Override
   List<S> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes,
-      String columnsString) throws SQLException {
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
     final List<S> ret = new ArrayList<>();
@@ -114,9 +113,8 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
 
   @Override
-  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
-      throws SQLException {
+  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, ResultSet resultSet,
+      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
     return createContainerObject(columnValueConverter, resultSet, columnTypes,
@@ -126,8 +124,11 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
 
   @Override
   public String toString() {
-    return "ConstructorBasedCreator [constructorParametersMap=" + constructorParametersMap + "]";
+    return "ConstructorBasedSqlResultCreator [constructorParametersMap=" + constructorParametersMap
+        + ", constructorParametersLength=" + constructorParametersLength
+        + ", columnAndConstructorParameterMapping=" + columnAndConstructorParameterMapping + "]";
   }
+
 
   final static class ConstructorParameter {
     private final String name;

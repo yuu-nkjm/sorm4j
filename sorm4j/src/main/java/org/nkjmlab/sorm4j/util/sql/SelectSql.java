@@ -314,6 +314,10 @@ public class SelectSql {
     return SELECT_STAR + from(tableName);
   }
 
+  public static String selectCountFrom(String tableName) {
+    return SELECT + func(COUNT, STAR) + from(tableName);
+  }
+
   /**
    * <p>
    * Creates AS alias.

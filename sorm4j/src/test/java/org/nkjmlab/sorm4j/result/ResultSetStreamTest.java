@@ -14,7 +14,7 @@ class ResultSetStreamTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
 
@@ -25,7 +25,6 @@ class ResultSetStreamTest {
       try (Stream<Player> st = m.readAllStream(Player.class).stream()) {
         st.onClose(() -> System.out.println("close1"));
         st.findAny();
-
       }
     });
 

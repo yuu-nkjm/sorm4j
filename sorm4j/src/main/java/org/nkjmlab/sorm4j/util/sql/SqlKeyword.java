@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *      Wikipedia</a>
  */
 @Experimental
-public class SqlKeyword {
+public interface SqlKeyword {
 
   public static final String ALL = wrapSpace("all");
   public static final String AND = wrapSpace("and");
@@ -72,8 +72,6 @@ public class SqlKeyword {
   public static final String WHERE = wrapSpace("where");
   public static final String WITH = wrapSpace("with");
 
-  public static final String STAR = wrapSpace("*");
-  public static final String SELECT_STAR = wrapSpace("select *");
   public static final String ASC = wrapSpace("asc");
   public static final String BETWEEN = wrapSpace("between");
   public static final String CAST = wrapSpace("cast");
@@ -89,7 +87,44 @@ public class SqlKeyword {
   public static final String IS_NULL = wrapSpace("is null");
   public static final String IS_NOT_NULL = wrapSpace("is not null");
 
-  private SqlKeyword() {}
+  /** Data type **/
+  public static final String ARRAY = wrapSpace("array");
+  public static final String BIGINT = wrapSpace("bigint");
+  public static final String BOOLEAN = wrapSpace("boolean");
+  public static final String CHAR = wrapSpace("char");
+  public static final String DATE = wrapSpace("date");
+  public static final String DECIMAL = wrapSpace("decimal");
+  public static final String DOUBLE = wrapSpace("double");
+  public static final String IDENTITY = wrapSpace("identity");
+  public static final String INT = wrapSpace("int");
+  public static final String REAL = wrapSpace("real");
+  public static final String SMALLINT = wrapSpace("smallint");
+  public static final String TIME = wrapSpace("time");
+  public static final String TIMESTAMP = wrapSpace("timestamp");
+  public static final String TINYINT = wrapSpace("tinyint");
+  public static final String VARCHAR = wrapSpace("varchar");
+
+  public static final String AUTO_INCREMENT = wrapSpace("auto_increment");
+  public static final String NOT_NULL = wrapSpace("not null");
+  public static final String PRIMARY_KEY = wrapSpace("primary key");
+
+  /** util **/
+  public static final String STAR = wrapSpace("*");
+  public static final String SELECT_STAR = wrapSpace("select *");
+
+
+  public static String chars(int num) {
+    return CHAR + "(" + num + ")";
+  }
+
+  public static String decimal(int precision) {
+    return DECIMAL + "(" + precision + ")";
+  }
+
+  public static String decimal(int precision, int scale) {
+    return DECIMAL + "(" + precision + "," + scale + ")";
+  }
+
 
   private static String wrapSpace(String str) {
     return " " + str + " ";

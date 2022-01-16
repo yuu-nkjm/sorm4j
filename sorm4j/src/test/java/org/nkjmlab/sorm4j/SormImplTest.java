@@ -10,18 +10,19 @@ import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
-class SormTest {
+class SormImplTest {
 
   private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
   @Test
   void testCreate() {
-    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
+    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+    SormContext.getDefaultContext().toString();
   }
 
   @Test

@@ -49,16 +49,20 @@ public final class MultiRowProcessorFactory {
     }
   }
 
-
-
   public static Builder builder() {
     return new Builder();
   }
 
+
+
   @Override
   public String toString() {
-    return "MultiRowProcessorFactory [multiRowProcessorType=" + multiRowProcessorType + "]";
+    return "MultiRowProcessorFactory [multiRowProcessorType=" + multiRowProcessorType
+        + ", batchSize=" + batchSize + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow
+        + ", multiRowSize=" + multiRowSize + "]";
   }
+
+
 
   public static class Builder {
 

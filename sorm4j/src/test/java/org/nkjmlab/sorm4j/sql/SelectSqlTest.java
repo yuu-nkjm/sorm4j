@@ -1,22 +1,21 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import static org.nkjmlab.sorm4j.util.sql.SelectSql.as;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
 class SelectSqlTest {
 
   @Test
   void testBuildSorm() {
-    Sorm sormImpl = SormTestUtils.createSorm();
-    SormTestUtils.dropAndCreateTableAll(sormImpl);
+    Sorm sorm = createSormWithNewContextAndTables();
 
-    sormImpl.accept(con -> {
+    sorm.accept(con -> {
       String sql = SelectSql.builder().from(con.getTableName(Guest.class)).build();
       assertThat(sql).contains("select * from GUESTS");
     });

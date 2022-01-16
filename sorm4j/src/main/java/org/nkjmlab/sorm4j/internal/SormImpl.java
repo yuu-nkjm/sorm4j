@@ -10,12 +10,12 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.result.Tuple2;
@@ -34,10 +34,12 @@ import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
  */
 public final class SormImpl implements Sorm {
 
+  public static final SormContextImpl DEFAULT_CONTEXT =
+      SormContextImpl.class.cast(SormContext.builder().build());
+
   private final DataSource dataSource;
   private final SormContextImpl sormContext;
 
-  @Experimental
   public static Sorm create(DataSource dataSource, SormContext context) {
     return new SormImpl(dataSource, (SormContextImpl) context);
   }
@@ -147,8 +149,8 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public <T> T readByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
-    return applyAndClose(conn -> conn.readByPrimaryKey(objectClass, primaryKeyValues));
+  public <T> T findByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.findByPrimaryKey(objectClass, primaryKeyValues));
   }
 
   @Override
@@ -212,9 +214,9 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2,
-      String t1t2OnCondition, Class<T3> t3, String t2t3OnCondition) {
-    return applyAndClose(conn -> conn.join(t1, t2, t1t2OnCondition, t3, t2t3OnCondition));
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1t2OnCondition, String t2t3OnCondition) {
+    return applyAndClose(conn -> conn.join(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
 
   @Override
@@ -542,6 +544,11 @@ public final class SormImpl implements Sorm {
   @Override
   public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
     return applyAndClose(conn -> conn.createCommand(sql, parameters));
+  }
+
+  @Override
+  public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {
+    return applyAndClose(conn -> conn.getJdbcDatabaseMetaData());
   }
 
 }

@@ -28,8 +28,8 @@ import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.TableSql;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.LogPoint;
 
 /**
  * Holds mapping data from a given class and a table
@@ -229,9 +229,9 @@ public final class SqlParametersToTableMapping<T> {
       final Object[] parameters = getInsertParameters(object);
       sqlParametersSetter.setParameters(stmt, parameters);
 
-      final Optional<LogPoint> lp =
-          loggerContext.createLogPointBeforeSql(LoggerContext.Category.EXECUTE_UPDATE,
-              SqlParametersToTableMapping.class, connection, insertSql, parameters);
+      Optional<LogPoint> lp = loggerContext.createLogPoint(LoggerContext.Category.EXECUTE_UPDATE,
+          SqlParametersToTableMapping.class);
+      lp.ifPresent(_lp -> _lp.logBeforeSql(connection, insertSql, parameters));
 
       int rowsModified = stmt.executeUpdate();
 
@@ -244,6 +244,8 @@ public final class SqlParametersToTableMapping<T> {
       throw Try.rethrow(e);
     }
   }
+
+
 
   @SafeVarargs
   public final int[] insert(Connection con, T... objects) {

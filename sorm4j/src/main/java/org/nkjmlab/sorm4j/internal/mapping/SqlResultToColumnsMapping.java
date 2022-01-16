@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
@@ -109,12 +110,6 @@ public final class SqlResultToColumnsMapping<T> {
 
 
 
-  public String getFormattedString() {
-    return "[" + SqlResultToColumnsMapping.class.getSimpleName()
-        + "] Columns are mappted to a class" + System.lineSeparator() + getColumnToAccessorString()
-        + System.lineSeparator() + "  with [" + containerObjectCreator + "]";
-  }
-
   public List<T> traverseAndMap(ResultSet resultSet) throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     String[] columns = createColumnLabels(resultSet, metaData);
@@ -182,16 +177,25 @@ public final class SqlResultToColumnsMapping<T> {
     return columns;
   }
 
-  Class<T> getObjectClass() {
-    return objectClass;
-  }
-
   String getColumnToAccessorString() {
     return "[" + objectClass.getName() + "] is mapped to " + columnToAccessorMap.toString();
   }
 
   ColumnToAccessorMapping getColumnToAccessorMap() {
     return columnToAccessorMap;
+  }
+
+  public String getFormattedString() {
+    return ParameterizedStringUtils.newString(
+        "[{}] Columns are mappted to a {}" + System.lineSeparator() + "{}" + System.lineSeparator()
+            + " with [{}]",
+        SqlResultToColumnsMapping.class.getSimpleName(), objectClass, getColumnToAccessorString(),
+        containerObjectCreator);
+  }
+
+  @Override
+  public String toString() {
+    return getFormattedString();
   }
 
 

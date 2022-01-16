@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.util.Map;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
+import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -23,8 +24,8 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * @param connection
    * @return
    */
-  static OrmConnection from(Connection connection) {
-    return new OrmConnectionImpl(connection, SormContext.DEFAULT_CONTEXT);
+  static OrmConnection of(Connection connection) {
+    return new OrmConnectionImpl(connection, SormImpl.DEFAULT_CONTEXT);
   }
 
   static OrmConnection of(Connection connection, SormContext sormContext) {

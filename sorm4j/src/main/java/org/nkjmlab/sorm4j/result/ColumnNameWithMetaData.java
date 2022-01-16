@@ -14,6 +14,7 @@ public class ColumnNameWithMetaData extends ColumnName {
 
   private final String msg;
   private final String typeName;
+  private final int dataType;
   private final int ordinalPosition;
   private final String isAutoIncremented;
   private final String isNullable;
@@ -23,13 +24,18 @@ public class ColumnNameWithMetaData extends ColumnName {
       String isNullable, String isAutoIncremented, String isGenerated) {
     super(name);
     this.typeName = typeName;
+    this.dataType = dataType;
     this.ordinalPosition = ordinalPosition;
     this.isNullable = isNullable;
     this.isAutoIncremented = isAutoIncremented;
     this.isGenerated = isGenerated;
-    this.msg =
-        newString("{{}: {} [{}({})] [n={},a={},g={}]}", String.format("%02d", ordinalPosition),
-            name, typeName, dataType, isNullable, isAutoIncremented, isGenerated);
+    this.msg = newString("{{}: {} [{}({})] [n={},a={},g={}]}",
+        String.format("%02d", getOrdinalPosition()), getName(), getTypeName(), getDataType(),
+        getIsNullable(), getIsAutoIncremented(), getIsGenerated());
+  }
+
+  private int getDataType() {
+    return dataType;
   }
 
   public String getTypeName() {

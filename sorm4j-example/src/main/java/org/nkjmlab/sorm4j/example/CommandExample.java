@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.example.first.Customer;
 public class CommandExample {
 
   public static void main(String[] args) {
-    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password");
+    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
     sorm.accept(conn -> {
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
       conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);

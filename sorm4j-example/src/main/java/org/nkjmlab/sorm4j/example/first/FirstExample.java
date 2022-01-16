@@ -9,7 +9,7 @@ public class FirstExample {
   public static void main(String[] args) {
 
     // Creates an entry point
-    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password");
+    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
     // Create customer table
     sorm.apply(conn -> conn.executeUpdate(Customer.CREATE_TABLE_SQL));
@@ -35,7 +35,7 @@ public class FirstExample {
     System.out.println("last customer = " + lastCustomer);
 
     // Read object by primary key.
-    Customer customerId2 = sorm.apply(conn -> conn.readByPrimaryKey(Customer.class, 2));
+    Customer customerId2 = sorm.apply(conn -> conn.findByPrimaryKey(Customer.class, 2));
     System.out.println("customer of ID 2 = " + customerId2);
 
     // Execute select sql and convert result to pojo list.

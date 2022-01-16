@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
@@ -20,17 +22,17 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.Location;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.Sport;
 
 class OrmConnectionTest {
-
+  private static final Logger log = LogManager.getLogger();
   private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormAndDropAndCreateTableAll();
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
   @Test
@@ -39,22 +41,62 @@ class OrmConnectionTest {
       conn.insert(GUEST_ALICE);
       assertThat(conn.exists(GUEST_ALICE)).isTrue();
       assertThat(conn.exists(GUEST_BOB)).isFalse();
+      assertThat(conn.exists("guests", GUEST_ALICE)).isTrue();
+      assertThat(conn.exists("guests", GUEST_BOB)).isFalse();
+      conn.readFirst(Guest.class, "select * from guests");
     });
+    log.trace(sorm.getContext());
 
+    // sorm.accept(conn -> {
+    // conn.insert(GUEST_ALICE);
+    // conn.readFirst(InvalidContainer.class, "select * from guests");
+    // });
 
   }
 
+  private static class InvalidContainer {
+
+    private InvalidContainer() {}
+
+  }
 
   @Test
   void testJoin() {
+    Sorm m = sorm;
+    m.insert(GUEST_ALICE, GUEST_BOB);
+    m.insert(PLAYER_ALICE, PLAYER_BOB);
+    m.insert(SormTestUtils.SOCCER);
+    m.insert(SormTestUtils.TENNIS);
+
+    List<Tuple2<Guest, Player>> result = m.join(Guest.class, Player.class, "guests.id=players.id");
+
+    assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
+    assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
+    assertThat(result.get(0).toString()).contains("Alice");
+
+    List<Tuple3<Guest, Player, Sport>> result1 = m.join(Guest.class, Player.class, Sport.class,
+        "guests.id=players.id", "players.id=sports.id");
+
+    assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
+    assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());
+    assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
+    assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
+    assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
+    assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
+    assertThat(result1.get(0).toString()).contains("Alice");
+
+
+    m.insertMapOn("players", Map.of("id", 99, "name", "Test", "address", "Chiba"));
+
+  }
+
+  @Test
+  void testTupleList() {
     sorm.accept(m -> {
       m.insert(GUEST_ALICE, GUEST_BOB);
       m.insert(PLAYER_ALICE, PLAYER_BOB);
-      m.insert(SormTestUtils.LOCATION_TOKYO);
-      m.insert(SormTestUtils.LOCATION_KYOTO);
-
-      @SuppressWarnings("unused")
-      List<Location> gs = m.readList(Location.class, "select * from players");
+      m.insert(SormTestUtils.SOCCER);
+      m.insert(SormTestUtils.TENNIS);
 
       List<Tuple2<Guest, Player>> result = m.readTupleList(Guest.class, Player.class,
           "select g.id as gid, g.name as gname, g.address as gaddress, p.id as pid, p.name as pname, p.address as paddress from guests g join players p on g.id=p.id");
@@ -63,19 +105,18 @@ class OrmConnectionTest {
       assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
       assertThat(result.get(0).toString()).contains("Alice");
 
-      List<Tuple3<Guest, Player, Location>> result1 =
-          m.readTupleList(Guest.class, Player.class, Location.class,
-              "select g.id as gid, g.name as gname, g.address as gaddress, "
-                  + "p.id as pid, p.name as pname, p.address as paddress, "
-                  + "l.id lid, l.name lname " + "from guests g " + "join players p on g.id=p.id "
-                  + "join locations l on g.id=l.id");
+      List<Tuple3<Guest, Player, Sport>> result1 = m.readTupleList(Guest.class, Player.class,
+          Sport.class,
+          "select g.id as gid, g.name as gname, g.address as gaddress, "
+              + "p.id as pid, p.name as pname, p.address as paddress, " + "s.id sid, s.name sname "
+              + "from guests g " + "join players p on g.id=p.id " + "join sports s on g.id=s.id");
 
       assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
       assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());
       assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
       assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
-      assertThat(result1.get(0).getT3().getClass()).isEqualTo(Location.class);
-      assertThat(result1.get(0).getT3().getName()).isEqualTo(LOCATION_TOKYO.getName());
+      assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
+      assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
       assertThat(result1.get(0).toString()).contains("Alice");
 
 
@@ -359,7 +400,7 @@ class OrmConnectionTest {
       Player c = new Player(a.getId(), "UPDATED", "UPDATED");
       m.merge(c, b);
       assertThat(m.readAll(Player.class).size()).isEqualTo(2);
-      assertThat(m.readByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
+      assertThat(m.findByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
     });
   }
 
@@ -521,7 +562,7 @@ class OrmConnectionTest {
     sorm.accept(m -> {
       Guest a = GUEST_ALICE;
       m.insert(a);
-      Guest g = m.readByPrimaryKey(Guest.class, 1);
+      Guest g = m.findByPrimaryKey(Guest.class, 1);
       assertThat(g.getAddress()).isEqualTo(a.getAddress());
       assertThat(g.getName()).isEqualTo(a.getName());
     });
@@ -615,9 +656,9 @@ class OrmConnectionTest {
           new Player(b.getId(), "UPDATED", "UPDATED"));
       m.updateOn("players", List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED")));
-      Player p = m.readByPrimaryKey(Player.class, a.getId());
+      Player p = m.findByPrimaryKey(Player.class, a.getId());
       assertThat(p.readAddress()).isEqualTo("UPDATED");
-      p = m.readByPrimaryKey(Player.class, b.getId());
+      p = m.findByPrimaryKey(Player.class, b.getId());
       assertThat(p.readAddress()).isEqualTo("UPDATED");
     });
   }
@@ -633,9 +674,9 @@ class OrmConnectionTest {
           new Player(b.getId(), "UPDATED", "UPDATED"));
       m.update(List.of(new Player(a.getId(), "UPDATED", "UPDATED"),
           new Player(b.getId(), "UPDATED", "UPDATED")));
-      Player p = m.readByPrimaryKey(Player.class, a.getId());
+      Player p = m.findByPrimaryKey(Player.class, a.getId());
       assertThat(p.readAddress()).isEqualTo("UPDATED");
-      p = m.readByPrimaryKey(Player.class, b.getId());
+      p = m.findByPrimaryKey(Player.class, b.getId());
       assertThat(p.readAddress()).isEqualTo("UPDATED");
     });
   }

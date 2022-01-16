@@ -3,13 +3,8 @@ package org.nkjmlab.sorm4j.mapping;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
-import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
-import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
-import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class SormContextTest {
 
@@ -18,11 +13,12 @@ class SormContextTest {
     SormContext context =
         SormContext.builder().setColumnFieldMapper(new DefaultColumnToFieldAccessorMapper())
             .setTableNameMapper(new DefaultTableNameMapper())
+            .setColumnValueToMapEntryConverter(new DefaultColumnValueToMapEntryConverter())
             .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters())
             .setSqlParametersSetter(new DefaultSqlParametersSetter())
             .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder().setBatchSize(10)
                 .setBatchSizeWithMultiRow(20).build())
-            .setLoggerOn(Category.MAPPING).setLoggerOff(Category.MAPPING).build();
+            .setLoggerOn(LoggerContext.Category.MAPPING).setLoggerOff(LoggerContext.Category.MAPPING).build();
     Sorm.create(SormTestUtils.createDataSourceH2(), context);
   }
 

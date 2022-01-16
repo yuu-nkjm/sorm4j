@@ -36,7 +36,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(DataSource dataSource) {
-    return create(dataSource, SormContext.DEFAULT_CONTEXT);
+    return create(dataSource, SormImpl.DEFAULT_CONTEXT);
   }
 
   static Sorm create(DataSource dataSource, SormContext context) {
@@ -45,23 +45,24 @@ public interface Sorm extends Orm {
 
 
   /**
-   * Create a {@link Sorm} object which uses {@link DriverManager}.
+   * Create a {@link Sorm} object which uses {@link DriverManagerDataSource}.
+   *
+   * If you want specified more precise configuration of database access, create {@link DataSource}
+   * yourself and use {@link #create(DataSource)} method.
    *
    * <p>
    * For example,
    *
    * <pre>
    * <code>
-   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
    *</pre></code>
    *
    * @param jdbcUrl
-   * @param user
-   * @param password
    * @return
    */
-  static Sorm create(String jdbcUrl, String user, String password) {
-    return create(createDataSource(jdbcUrl, user, password));
+  static Sorm create(String jdbcUrl) {
+    return create(createDataSource(jdbcUrl, null, null));
   }
 
   /**
@@ -72,8 +73,9 @@ public interface Sorm extends Orm {
    * @param password
    * @return
    */
-  static DataSource createDataSource(String jdbcUrl, String username, String password) {
-    return new DriverManagerDataSource(jdbcUrl, username, password);
+  static DriverManagerDataSource createDataSource(String jdbcUrl, String username,
+      String password) {
+    return DriverManagerDataSource.create(jdbcUrl, username, password);
   }
 
 

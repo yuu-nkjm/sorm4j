@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -31,7 +30,7 @@ public class TestPostgreSQL {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.from(conn);
+      OrmConnection ormConn = OrmConnection.of(conn);
       conn.setAutoCommit(false);
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class};
@@ -66,7 +65,7 @@ public class TestPostgreSQL {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.from(conn);
+      OrmConnection ormConn = OrmConnection.of(conn);
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
           .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
@@ -91,7 +90,7 @@ public class TestPostgreSQL {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.from(conn);
+      OrmConnection ormConn = OrmConnection.of(conn);
 
       Class<?>[] shortTypes = new Class<?>[] {Short.class, short.class};
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
@@ -131,7 +130,7 @@ public class TestPostgreSQL {
   @Test
   public void testStringTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.from(conn);
+      OrmConnection ormConn = OrmConnection.of(conn);
       conn.setAutoCommit(false);
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
