@@ -5,6 +5,7 @@ import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.DefaultTableMetaDataParser;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.TableMetaDataParser;
 import org.nkjmlab.sorm4j.mapping.TableNameMapper;
@@ -19,7 +20,7 @@ final class SormConfig {
   private final ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter;
   private final ColumnValueToMapEntryConverter columnValueToMapEntryConverter;
   private final SqlParametersSetter sqlParametersSetter;
-  private final int transactionIsolationLevel;
+  private final PreparedStatementSupplier preparedStatementSupplier;
   private final LoggerContext loggerContext;
   private final TableSqlFactory tableSqlFactory;
   private final TableMetaDataParser tableMetaDataReader = new DefaultTableMetaDataParser();
@@ -28,27 +29,22 @@ final class SormConfig {
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
       ColumnValueToMapEntryConverter columnValueToMapEntryConverter,
-      SqlParametersSetter sqlParametersSetter, TableSqlFactory tableSqlFactory,
-      MultiRowProcessorFactory multiRowProcessorFactory, int transactionIsolationLevel) {
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier preparedStatementSupplier,
+      TableSqlFactory tableSqlFactory, MultiRowProcessorFactory multiRowProcessorFactory) {
     this.loggerContext = loggerContext;
-    this.transactionIsolationLevel = transactionIsolationLevel;
     this.tableNameMapper = tableNameMapper;
     this.columnFieldMapper = columnFieldMapper;
     this.multiRowProcessorFactory = multiRowProcessorFactory;
     this.columnValueToJavaObjectConverter = columnValueToJavaObjectConverter;
     this.columnValueToMapEntryConverter = columnValueToMapEntryConverter;
     this.sqlParametersSetter = sqlParametersSetter;
+    this.preparedStatementSupplier = preparedStatementSupplier;
     this.tableSqlFactory = tableSqlFactory;
   }
 
 
   TableMetaDataParser getTableMetaDataReader() {
     return this.tableMetaDataReader;
-  }
-
-
-  int getTransactionIsolationLevel() {
-    return transactionIsolationLevel;
   }
 
   ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
@@ -62,6 +58,10 @@ final class SormConfig {
 
   SqlParametersSetter getSqlParametersSetter() {
     return sqlParametersSetter;
+  }
+
+  PreparedStatementSupplier getPreparedStatementSupplier() {
+    return preparedStatementSupplier;
   }
 
   LoggerContext getLoggerContext() {
@@ -93,9 +93,10 @@ final class SormConfig {
         + columnFieldMapper + ", multiRowProcessorFactory=" + multiRowProcessorFactory
         + ", columnValueToJavaObjectConverter=" + columnValueToJavaObjectConverter
         + ", columnValueToMapEntryConverter=" + columnValueToMapEntryConverter
-        + ", sqlParametersSetter=" + sqlParametersSetter + ", transactionIsolationLevel="
-        + transactionIsolationLevel + ", loggerContext=" + loggerContext + ", tableSqlFactory="
-        + tableSqlFactory + "]";
+        + ", sqlParametersSetter=" + sqlParametersSetter + ", loggerContext=" + loggerContext
+        + ", tableSqlFactory=" + tableSqlFactory + "]";
   }
+
+
 
 }

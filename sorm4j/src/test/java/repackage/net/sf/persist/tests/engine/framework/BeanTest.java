@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.slf4j.Logger;
 
 
@@ -17,7 +18,7 @@ public class BeanTest {
 
   public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
-    ormConn.deleteAllOn(dbName(beanMap.getClassName()));
+    ormConn.deleteAllIn(dbName(beanMap.getClassName()));
     Object obj =
         DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
     tester.accept(obj);
@@ -26,7 +27,7 @@ public class BeanTest {
 
   public static void testNull(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
       Consumer<Object> tester) {
-    ormConn.deleteAllOn(dbName(beanMap.getClassName()));
+    ormConn.deleteAllIn(dbName(beanMap.getClassName()));
     Object objNull =
         DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
     tester.accept(objNull);
@@ -89,7 +90,7 @@ public class BeanTest {
 
           // check if the result is not null and has the same data as the object being tested
           if (ret == null) {
-            List<? extends Object> all = persist.readAll(obj.getClass());
+            List<? extends Object> all = persist.selectAll(obj.getClass());
             log.error("{}, {}", fieldValueConverted, all);
             throw new AssertionError("Expected not null value but got null as result of [" + sql
                 + "] with parameter [" + fieldValue + "] , converted = [" + fieldValueConverted
@@ -193,7 +194,7 @@ public class BeanTest {
 
     // read list of all data in the table as a map
     String sql = "select * from " + tableName;
-    List<Map<String, Object>> mapList = persist.readMapList(sql);
+    List<RowMap> mapList = persist.readList(RowMap.class, sql);
 
     // asserts there's only one entry (added during the insert test)
     if (mapList.size() != 1) {

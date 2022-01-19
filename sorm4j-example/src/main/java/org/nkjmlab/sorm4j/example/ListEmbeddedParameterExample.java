@@ -10,7 +10,7 @@ public class ListEmbeddedParameterExample {
   public static void main(String[] args) {
     Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
       conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
     });
@@ -24,7 +24,7 @@ public class ListEmbeddedParameterExample {
     System.out.println(psql);
 
     List<Customer> customers =
-        sorm.apply(conn -> conn.createCommand(psql).readList(Customer.class));
+        sorm.applyHandler(conn -> conn.createCommand(psql).readList(Customer.class));
     System.out.println("customers=" + customers);
 
     // try {

@@ -51,7 +51,7 @@ public class TableSchemaExample {
     }
 
     public void createTableAndIndexesIfNotExists() {
-      sorm.accept(conn -> {
+      sorm.acceptHandler(conn -> {
         conn.executeUpdate(schema.getCreateTableIfNotExistsStatement());
         schema.getCreateIndexIfNotExistsStatements()
             .forEach(createIndexStatement -> conn.executeUpdate(createIndexStatement));

@@ -3,17 +3,18 @@ package org.nkjmlab.sorm4j;
 import java.sql.Connection;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
-import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.DefaultTableSqlFactory;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.TableNameMapper;
 import org.nkjmlab.sorm4j.mapping.TableSqlFactory;
@@ -21,9 +22,9 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
- * A context for ORM execution. Instance of this class could be build by {{@link Builder#build()}.
+ * A context for ORM execution. Instance of this class could be built by {{@link Builder#build()}.
  *
- * @author nkjm
+ * @author yuu_nkjm
  *
  */
 public interface SormContext {
@@ -34,17 +35,6 @@ public interface SormContext {
    * @return
    */
   LoggerContext getLoggerContext();
-
-  /**
-   * Returns transaction isolation level.
-   *
-   * @return
-   */
-  int getTransactionIsolationLevel();
-
-  static SormContext getDefaultContext() {
-    return SormImpl.DEFAULT_CONTEXT;
-  }
 
   public static Builder builder() {
     return new Builder();
@@ -57,6 +47,9 @@ public interface SormContext {
 
     private static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
         new DefaultSqlParametersSetter();
+
+    private static final PreparedStatementSupplier DEFAULT_STATEMENT_SUPPLIER =
+        new DefaultPreparedStatementSupplier();
 
     private static final ColumnValueToJavaObjectConverters DEFAULT_RESULT_SET_CONVERTER =
         new DefaultColumnValueToJavaObjectConverters();
@@ -81,8 +74,9 @@ public interface SormContext {
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
 
     private ColumnToFieldAccessorMapper columnFieldMapper;
-    private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
     private LoggerContext.Builder loggerBuilder = LoggerContext.builder();
+
+    private PreparedStatementSupplier preparedStatementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
 
 
@@ -94,7 +88,7 @@ public interface SormContext {
           : new DefaultColumnToFieldAccessorMapper(loggerContext);
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
           columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
-          tableSqlFactory, multiRowProcessorFactory, transactionIsolationLevel);
+          preparedStatementSupplier, tableSqlFactory, multiRowProcessorFactory);
     }
 
 
@@ -126,6 +120,13 @@ public interface SormContext {
       return this;
     }
 
+    public Builder setpreparedStatementSupplier(
+        PreparedStatementSupplier preparedStatementSupplier) {
+      this.preparedStatementSupplier = preparedStatementSupplier;
+      return this;
+    }
+
+
     public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
       this.tableSqlFactory = tableSqlFactory;
       return this;
@@ -133,11 +134,6 @@ public interface SormContext {
 
     public Builder setMultiRowProcessorFactory(MultiRowProcessorFactory multiRowProcessorFactory) {
       this.multiRowProcessorFactory = multiRowProcessorFactory;
-      return this;
-    }
-
-    public Builder setTransactionIsolationLevel(int level) {
-      this.transactionIsolationLevel = level;
       return this;
     }
 

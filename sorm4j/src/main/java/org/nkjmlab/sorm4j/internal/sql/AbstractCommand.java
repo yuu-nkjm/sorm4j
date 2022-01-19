@@ -1,11 +1,9 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
 import java.util.List;
-import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -47,33 +45,8 @@ public abstract class AbstractCommand implements Command {
   }
 
   @Override
-  public <T> ResultSetStream<T> readStream(Class<T> objectClass) {
-    return conn.readStream(objectClass, parse());
-  }
-
-  @Override
   public <T> List<T> readList(Class<T> objectClass) {
     return conn.readList(objectClass, parse());
-  }
-
-  @Override
-  public Map<String, Object> readMapOne() {
-    return conn.readMapOne(parse());
-  }
-
-  @Override
-  public List<Map<String, Object>> readMapList() {
-    return conn.readMapList(parse());
-  }
-
-  @Override
-  public ResultSetStream<Map<String, Object>> readMapStream() {
-    return conn.readMapStream(parse());
-  }
-
-  @Override
-  public Map<String, Object> readMapFirst() {
-    return conn.readMapFirst(parse());
   }
 
   @Override

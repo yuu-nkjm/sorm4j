@@ -21,10 +21,6 @@ public final class LogPoint {
     return System.nanoTime() - startTime;
   }
 
-  public SormLogger getLogger() {
-    return logger;
-  }
-
   public String getTag() {
     return name + ":" + (hashCode() / 10000);
   }

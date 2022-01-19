@@ -47,7 +47,7 @@ public class DbEngineTestUtils {
       String url = properties.getProperty("url");
       String user = properties.getProperty("username");
       String password = properties.getProperty("password");
-      return Sorm.create(url).getDataSource();
+      return Sorm.createDataSource(url, user, password);
     } catch (Exception e) {
       return JdbcConnectionPool.create(defaultJdbcUrl, "sorm", "sorm");
     }

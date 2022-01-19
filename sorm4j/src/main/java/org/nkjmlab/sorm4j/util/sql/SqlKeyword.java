@@ -114,20 +114,20 @@ public interface SqlKeyword {
 
 
   public static String chars(int num) {
-    return CHAR + "(" + num + ")";
+    return wrapSpace("char(" + num + ")");
   }
 
   public static String decimal(int precision) {
-    return DECIMAL + "(" + precision + ")";
+    return wrapSpace("decimal(" + precision + ")");
   }
 
   public static String decimal(int precision, int scale) {
-    return DECIMAL + "(" + precision + "," + scale + ")";
+    return wrapSpace("decimal(" + precision + "," + scale + ")");
   }
 
 
   private static String wrapSpace(String str) {
-    return " " + str + " ";
+    return " " + (str == null ? "null" : str.toString()) + " ";
   }
 
 

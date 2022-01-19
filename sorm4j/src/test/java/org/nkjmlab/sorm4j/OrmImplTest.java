@@ -3,39 +3,37 @@ package org.nkjmlab.sorm4j;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class OrmImplTest {
 
-  private static Sorm sorm;
-
-  @BeforeAll
-  static void setUp() {
-    sorm = SormTestUtils.createSormWithNewContextAndTables();
-  }
+  private Sorm sorm;
 
   @BeforeEach
-  void setUpEach() {
-    sorm.deleteAll(Player.class);
+  void setUp() {
+    sorm = SormTestUtils.createSormWithNewContextAndTables();
   }
 
 
   @Test
   void testReadAll() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(sorm.readAll(Player.class)).contains(PLAYER_ALICE);
+    assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
   }
 
 
   @Test
   void testReadByPrimaryKey() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(sorm.findByPrimaryKey(Player.class, PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
+    assertThat(sorm.selectByPrimaryKey(Player.class, PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -109,11 +107,6 @@ class OrmImplTest {
   }
 
   @Test
-  void testGetResultSetTraverser() {
-    sorm.getResultSetToMapTraverser();
-  }
-
-  @Test
   void testExists() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
@@ -140,19 +133,19 @@ class OrmImplTest {
   @Test
   void testDeleteOnStringListOfT() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.deleteOn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.deleteIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testDeleteOnStringT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.deleteOn("players", PLAYER_ALICE);
+    sorm.deleteIn("players", PLAYER_ALICE);
   }
 
   @Test
   void testDeleteOnStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.deleteOn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.deleteIn("players", PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -162,9 +155,9 @@ class OrmImplTest {
   }
 
   @Test
-  void testDeleteAllOn() {
+  void testDeleteAllIn() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.deleteAllOn("players");
+    sorm.deleteAllIn("players");
   }
 
   @Test
@@ -190,32 +183,32 @@ class OrmImplTest {
 
   @Test
   void testInsertAndGetOnStringListOfT() {
-    sorm.insertAndGetOn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.insertAndGetIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testInsertAndGetOnStringT() {
-    sorm.insertAndGetOn("players", PLAYER_ALICE);
+    sorm.insertAndGetIn("players", PLAYER_ALICE);
   }
 
   @Test
   void testInsertAndGetOnStringTArray() {
-    sorm.insertAndGetOn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertAndGetIn("players", PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
   void testInsertOnStringListOfT() {
-    sorm.insertOn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.insertIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testInsertOnStringT() {
-    sorm.insertOn("players", PLAYER_ALICE);
+    sorm.insertIn("players", PLAYER_ALICE);
   }
 
   @Test
   void testInsertOnStringTArray() {
-    sorm.insertOn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertIn("players", PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -237,21 +230,21 @@ class OrmImplTest {
   }
 
   @Test
-  void testmergeOnStringListOfT() {
+  void testmergeInStringListOfT() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.mergeOn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.mergeIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
-  void testmergeOnStringT() {
+  void testmergeInStringT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.mergeOn("players", PLAYER_ALICE);
+    sorm.mergeIn("players", PLAYER_ALICE);
   }
 
   @Test
-  void testmergeOnStringTArray() {
+  void testmergeInStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.mergeOn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.mergeIn("players", PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -275,19 +268,19 @@ class OrmImplTest {
   @Test
   void testUpdateOnStringListOfT() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateOn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.updateIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testUpdateOnStringT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.updateOn("players", PLAYER_ALICE);
+    sorm.updateIn("players", PLAYER_ALICE);
   }
 
   @Test
   void testUpdateOnStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateOn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.updateIn("players", PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -306,44 +299,22 @@ class OrmImplTest {
   }
 
   @Test
-  void testGetRowToMapMapper() {
-    sorm.getRowToMapMapper();
+  void testOpenMapStream() {
+    sorm.acceptHandler(conn -> {
+      try (Stream<RowMap> stream = conn.openStream(RowMap.class, "select * from players")) {
+        assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
+      }
+    });
   }
 
   @Test
-  void testGetResultSetToMapTraverser() {
-    sorm.getResultSetToMapTraverser();
-  }
-
-  @Test
-  void testReadMapFirstParameterizedSql() {
-    sorm.readMapFirst(ParameterizedSql.parse("select * from players"));
-  }
-
-  @Test
-  void testReadMapFirstStringObjectArray() {
-    sorm.readMapFirst("select * from players");
-  }
-
-
-  @Test
-  void testReadMapListParameterizedSql() {
-    sorm.readMapList(ParameterizedSql.parse("select * from players"));
-  }
-
-  @Test
-  void testReadMapListStringObjectArray() {
-    sorm.readMapList("select * from players");
-  }
-
-  @Test
-  void testReadMapOneParameterizedSql() {
-    sorm.readMapOne(ParameterizedSql.parse("select * from players"));
-  }
-
-  @Test
-  void testReadMapOneStringObjectArray() {
-    sorm.readMapOne("select * from players");
+  void testInsertMapIn() {
+    Map<String, Object> map = Map.of("id", 99, "name", "Test", "address", "Chiba");
+    sorm.insertMapIn("players", map);
+    sorm.deleteAllIn("players");
+    sorm.insertMapIn("players", List.of(map));
+    sorm.deleteAllIn("players");
+    sorm.insertMapIn("players", new Map[] {map});
   }
 
   @Test

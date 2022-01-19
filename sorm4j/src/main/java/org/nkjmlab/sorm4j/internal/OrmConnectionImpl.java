@@ -9,8 +9,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,21 +17,25 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamImpl;
+import org.nkjmlab.sorm4j.internal.sql.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.mapping.ColumnValueToMapKeyConverter;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.result.Tuple;
 import org.nkjmlab.sorm4j.result.Tuple2;
@@ -48,11 +50,10 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
 
 /**
- * A database connection with object-relation mapping function. The main class for the ORMapper
- * engine.
+ * A database connection with object-relation mapping function.
  *
- * This instance wraps a {@link java.sql.Connection} object. OrmMapper instances are not thread
- * safe, in particular because {@link java.sql.Connection} objects are not thread safe.
+ * This instance wraps a {@link java.sql.Connection} object. Instances of this class are not thread
+ * safe.
  *
  * @author nkjm
  *
@@ -62,7 +63,7 @@ public class OrmConnectionImpl implements OrmConnection {
   private static final Supplier<int[]> EMPTY_INT_SUPPLIER = () -> new int[0];
   private final SormContextImpl sormContext;
   private final Connection connection;
-  private final List<ResultSetStream<?>> resultSetStreams = new ArrayList<>();
+  private ResultSetStream<?> resultSetStream;
 
   /**
    * Creates a instance that will use the default cache for table-object and column-object
@@ -81,12 +82,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public void begin() {
-    begin(getTransactionIsolationLevel());
-  }
-
-
-  @Override
   public void begin(int isolationLevel) {
     setAutoCommit(false);
     setTransactionIsolation(isolationLevel);
@@ -94,11 +89,20 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void close() {
-    Try.runOrElseThrow(() -> {
-      resultSetStreams.forEach(rs -> rs.close());
-      resultSetStreams.clear();
+    try {
+      if (resultSetStream != null) {
+        resultSetStream.close();
+      }
+    } catch (Exception e) {
+      sormContext.getLoggerContext().getLogger(OrmConnectionImpl.class)
+          .warn("resultset stream close error");
+    }
+    try {
       getJdbcConnection().close();
-    }, Try::rethrow);
+    } catch (SQLException e) {
+      sormContext.getLoggerContext().getLogger(OrmConnectionImpl.class)
+          .warn("jdbc connection close error");
+    }
   }
 
 
@@ -146,27 +150,27 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> int deleteAll(Class<T> objectClass) {
-    return deleteAllOn(getTableName(objectClass));
+    return deleteAllIn(getTableName(objectClass));
   }
 
   @Override
-  public int deleteAllOn(String tableName) {
+  public int deleteAllIn(String tableName) {
     return executeUpdate("DELETE FROM " + tableName);
   }
 
   @Override
-  public <T> int[] deleteOn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> deleteOn(tableName, array));
+  public <T> int[] deleteIn(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> deleteIn(tableName, array));
   }
 
   @Override
-  public <T> int deleteOn(String tableName, T object) {
+  public <T> int deleteIn(String tableName, T object) {
     return getCastedParameterContainerAndTableMapping(tableName, object.getClass())
         .delete(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.delete(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
@@ -212,8 +216,9 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> resultSetTraverser) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql.getSql(), sql.getParameters(), resultSetTraverser);
+    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql.getSql(), sql.getParameters(),
+        resultSetTraverser);
   }
 
   @Override
@@ -230,7 +235,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public int executeUpdate(String sql, Object... parameters) {
     final int ret = executeUpdateAndClose(getLoggerConfig(), connection, getSqlParametersSetter(),
-        sql, parameters);
+        getPreparedStatementSupplier(), sql, parameters);
     return ret;
   }
 
@@ -295,12 +300,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  @Override
-  public ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
-    return resultSet -> traverseAndMapToMapList(resultSet);
-  }
-
-
 
   @Override
   public <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> objectClass) {
@@ -313,16 +312,13 @@ public class OrmConnectionImpl implements OrmConnection {
     return (resultSet, rowNum) -> mapRowToObject(objectClass, resultSet);
   }
 
-  @Override
-  public RowMapper<Map<String, Object>> getRowToMapMapper() {
-    return (resultSet, rowNum) -> mapRowToMap(resultSet);
-  }
-
-
   private SqlParametersSetter getSqlParametersSetter() {
     return sormContext.getSqlParametersSetter();
   }
 
+  private PreparedStatementSupplier getPreparedStatementSupplier() {
+    return sormContext.getPreparedStatementSupplier();
+  }
 
   /**
    * Gets {@link SqlParametersToTableMapping}. This method is for internal use.
@@ -353,12 +349,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getTableName(connection, objectClass);
   }
 
-
-  private int getTransactionIsolationLevel() {
-    return sormContext.getTransactionIsolationLevel();
-  }
-
-
   @Override
   public <T> int[] insert(List<T> objects) {
     return applytoArray(objects, array -> insert(array));
@@ -377,7 +367,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int insertMapOn(String tableName, Map<String, Object> object) {
+  public int insertMapIn(String tableName, Map<String, Object> object) {
     List<String> cols = new ArrayList<>(object.keySet());
     return executeUpdate(createInsertSql(tableName, cols),
         cols.stream().map(col -> object.get(col)).toArray());
@@ -393,17 +383,17 @@ public class OrmConnectionImpl implements OrmConnection {
 
 
   @Override
-  public int[] insertMapOn(String tableName,
+  public int[] insertMapIn(String tableName,
       @SuppressWarnings("unchecked") Map<String, Object>... objects) {
-    return insertMapOn(tableName, Arrays.asList(objects));
+    return insertMapIn(tableName, Arrays.asList(objects));
   }
 
   @Override
-  public int[] insertMapOn(String tableName, List<Map<String, Object>> objects) {
+  public int[] insertMapIn(String tableName, List<Map<String, Object>> objects) {
     boolean origAutoCommit = getAutoCommit(connection);
     try {
       connection.setAutoCommit(false);
-      int[] ret = objects.stream().mapToInt(o -> insertMapOn(tableName, o)).toArray();
+      int[] ret = objects.stream().mapToInt(o -> insertMapIn(tableName, o)).toArray();
       connection.setAutoCommit(true);
       return ret;
     } catch (Exception e) {
@@ -432,56 +422,50 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
-        () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> null);
   }
 
 
   @Override
-  public <T> InsertResult<T> insertAndGetOn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> insertAndGetOn(tableName, array));
+  public <T> InsertResult<T> insertAndGetIn(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> insertAndGetIn(tableName, array));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetOn(String tableName, T object) {
+  public <T> InsertResult<T> insertAndGetIn(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping =
         getCastedParameterContainerAndTableMapping(tableName, object.getClass());
     return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetOn(String tableName,
+  public <T> InsertResult<T> insertAndGetIn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
-        () -> InsertResultImpl.emptyInsertResult());
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> null);
   }
 
 
   @Override
-  public <T> int[] insertOn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> insertOn(tableName, array));
+  public <T> int[] insertIn(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> insertIn(tableName, array));
   }
 
   @Override
-  public <T> int insertOn(String tableName, T object) {
+  public <T> int insertIn(String tableName, T object) {
     return getCastedParameterContainerAndTableMapping(tableName, object.getClass())
         .insert(getJdbcConnection(), object);
   }
 
 
   @Override
-  public <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.insert(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     return resultSet.next() ? mapRowToObject(objectClass, resultSet) : null;
-  }
-
-  public Map<String, Object> loadFirstMap(ResultSet resultSet) throws SQLException {
-    return resultSet.next() ? mapRowToMap(resultSet) : Collections.emptyMap();
   }
 
   private final <T> List<T> loadSupportedReturnedTypeList(Class<T> objectClass, ResultSet resultSet)
@@ -493,29 +477,6 @@ public class OrmConnectionImpl implements OrmConnection {
     }
     return ret;
 
-  }
-
-  public <T> T loadOne(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    T ret = null;
-    if (resultSet.next()) {
-      ret = mapRowToObject(objectClass, resultSet);
-    }
-    if (resultSet.next()) {
-      throw new SormException("Non-unique result returned");
-    }
-    return ret;
-  }
-
-
-  public Map<String, Object> loadOneMap(ResultSet resultSet) throws SQLException {
-    Map<String, Object> ret = null;
-    if (resultSet.next()) {
-      ret = mapRowToMap(resultSet);
-    }
-    if (resultSet.next()) {
-      throw new SormException("Non-unique result returned");
-    }
-    return ret;
   }
 
 
@@ -531,26 +492,27 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
 
-  public Map<String, Object> mapRowToMap(ResultSet resultSet) throws SQLException {
+  private RowMap mapRowToMap(ResultSet resultSet) throws SQLException {
     ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
     return toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
   }
 
-
+  @SuppressWarnings("unchecked")
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
         ? toSupportedReturnedTypeObject(resultSet, getOneSqlType(objectClass, resultSet),
             objectClass)
-        : loadResultContainerObject(objectClass, resultSet);
+        : (objectClass.equals(RowMap.class) ? (T) mapRowToMap(resultSet)
+            : loadResultContainerObject(objectClass, resultSet));
   }
 
 
   /**
-   * Converts the result from database to a map objects. The data of the column is extracted by
-   * corresponding column types.
+   * Converts the result from database to a {@link RowMap} objects. The data of the column is
+   * extracted by corresponding column types.
    *
    * <p>
-   * Keys in the results returned in lower case by default.
+   * Keys in the results is depending on {@link ColumnValueToMapKeyConverter#convertToKey(String)}.
    *
    * @param resultSet
    * @param columns
@@ -560,11 +522,11 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private Map<String, Object> toSingleMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException {
-    final int cSize = columns.size();
-    final Map<String, Object> ret = new LinkedHashMap<>(cSize);
-    for (int i = 1; i <= cSize; i++) {
+  private RowMap toSingleMap(ResultSet resultSet, List<String> columns, List<Integer> columnTypes)
+      throws SQLException {
+    final int colsNum = columns.size();
+    final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
+    for (int i = 1; i <= colsNum; i++) {
       ret.put(getColumnValueToMapEntryConverter().convertToKey(columns.get(i - 1)),
           getColumnValueToMapEntryConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
     }
@@ -605,39 +567,40 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] mergeOn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> mergeOn(tableName, array));
+  public <T> int[] mergeIn(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> mergeIn(tableName, array));
   }
 
   @Override
-  public <T> int mergeOn(String tableName, T object) {
+  public <T> int mergeIn(String tableName, T object) {
     return getCastedParameterContainerAndTableMapping(tableName, object.getClass())
         .merge(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] mergeIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.merge(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
 
   @Override
-  public final <T> List<T> readAll(Class<T> objectClass) {
+  public final <T> List<T> selectAll(Class<T> objectClass) {
     return readList(objectClass, getCastedTableMapping(objectClass).getSql().getSelectAllSql());
   }
 
   @Override
-  public <T> ResultSetStream<T> readAllStream(Class<T> objectClass) {
-    return readStream(objectClass, getTableMapping(objectClass).getSql().getSelectAllSql());
+  public <T> Stream<T> openStreamAll(Class<T> type) {
+    return openStream(type, getTableMapping(type).getSql().getSelectAllSql());
   }
 
   @Override
-  public <T> T findByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
+  public <T> T selectByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
     final SqlParametersToTableMapping<T> mapping = getTableMapping(objectClass);
     mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, primaryKeyValues, resultSet -> {
+    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, primaryKeyValues,
+        resultSet -> {
           return resultSet.next() ? getColumnsMapping(objectClass)
               .loadResultContainerObjectByPrimaryKey(objectClass, resultSet) : null;
         });
@@ -651,21 +614,21 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> loadFirst(objectClass, resultSet));
+    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
+        resultSet -> loadFirst(objectClass, resultSet));
   }
 
   @Override
-  public <T> ResultSetStream<T> readStream(Class<T> objectClass, ParameterizedSql sql) {
-    return readStream(objectClass, sql.getSql(), sql.getParameters());
+  public <T> Stream<T> openStream(Class<T> objectClass, ParameterizedSql sql) {
+    return openStream(objectClass, sql.getSql(), sql.getParameters());
   }
 
-
-
   @Override
-  public <T> ResultSetStream<T> readStream(Class<T> objectClass, String sql, Object... parameters) {
+  public <T> Stream<T> openStream(Class<T> objectClass, String sql, Object... parameters) {
     try {
-      final PreparedStatement stmt = connection.prepareStatement(sql);
+      final PreparedStatement stmt =
+          getPreparedStatementSupplier().prepareStatement(connection, sql);
       getSqlParametersSetter().setParameters(stmt, parameters);
 
       createLogPointAndLogBeforeSql(getLoggerConfig(), Category.EXECUTE_QUERY,
@@ -673,8 +636,8 @@ public class OrmConnectionImpl implements OrmConnection {
 
       final ResultSet resultSet = stmt.executeQuery();
       ResultSetStreamImpl<T> ret = new ResultSetStreamImpl<T>(this, objectClass, stmt, resultSet);
-      resultSetStreams.add(ret);
-      return ret;
+      this.resultSetStream = ret;
+      return ret.stream();
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
@@ -688,84 +651,9 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> traverseAndMapToList(objectClass, resultSet));
-  }
-
-  @Override
-  public Map<String, Object> readMapFirst(ParameterizedSql sql) {
-    return readMapFirst(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public Map<String, Object> readMapFirst(final String sql, final Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> {
-          ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-          if (resultSet.next()) {
-            return toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
-          }
-          return null;
-        });
-  }
-
-  @Override
-  public ResultSetStream<Map<String, Object>> readMapStream(ParameterizedSql sql) {
-    return readMapStream(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public ResultSetStream<Map<String, Object>> readMapStream(String sql, Object... parameters) {
-    try {
-      final PreparedStatement stmt = connection.prepareStatement(sql);
-      getSqlParametersSetter().setParameters(stmt, parameters);
-
-      createLogPointAndLogBeforeSql(getLoggerConfig(), Category.EXECUTE_QUERY,
-          OrmConnectionImpl.class, connection, sql, parameters);
-
-      final ResultSet resultSet = stmt.executeQuery();
-
-      @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-      ResultSetStream<Map<String, Object>> ret =
-          (ResultSetStream<Map<String, Object>>) new ResultSetStreamImpl(this, stmt, resultSet);
-      return ret;
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  @Override
-  public List<Map<String, Object>> readMapList(ParameterizedSql sql) {
-    return readMapList(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public List<Map<String, Object>> readMapList(final String sql, final Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> traverseAndMapToMapList(resultSet));
-  }
-
-
-
-  @Override
-  public Map<String, Object> readMapOne(ParameterizedSql sql) {
-    return readMapOne(sql.getSql(), sql.getParameters());
-  }
-
-  @Override
-  public Map<String, Object> readMapOne(final String sql, final Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> {
-          ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-          Map<String, Object> ret = null;
-          if (resultSet.next()) {
-            ret = toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
-          }
-          if (resultSet.next()) {
-            throw new SormException("Non-unique result returned");
-          }
-          return ret;
-        });
+    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
+        resultSet -> traverseAndMapToList(objectClass, resultSet));
   }
 
   @Override
@@ -775,11 +663,13 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(), getSqlParametersSetter(),
-        sql, parameters, resultSet -> {
+    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
             ret = mapRowToObject(objectClass, resultSet);
+          } else {
+            throw new SormException("No result returned");
           }
           if (resultSet.next()) {
             throw new SormException("Non-unique result returned");
@@ -798,7 +688,7 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, String sql, Object... parameters) {
     List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
-        getSqlParametersSetter(), sql, parameters, resultSet -> {
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
             ret1.add(Tuple.of(loadResultContainerObject(t1, resultSet),
@@ -820,7 +710,7 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters) {
     List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
-        getSqlParametersSetter(), sql, parameters, resultSet -> {
+        getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
             ret1.add(Tuple.of(loadResultContainerObject(t1, resultSet),
@@ -877,32 +767,47 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void rollback() {
-    Try.runOrElseThrow(() -> getJdbcConnection().rollback(), Try::rethrow);
+    try {
+      getJdbcConnection().rollback();
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+
   }
 
   @Override
   public void setAutoCommit(final boolean autoCommit) {
-    Try.runOrElseThrow(() -> getJdbcConnection().setAutoCommit(autoCommit), Try::rethrow);
+    try {
+      getJdbcConnection().setAutoCommit(autoCommit);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+
   }
 
   private void setTransactionIsolation(int isolationLevel) {
-    Try.runOrElseThrow(() -> getJdbcConnection().setTransactionIsolation(isolationLevel),
-        Try::rethrow);
-  }
-
-  public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     try {
-      return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
-          ? loadSupportedReturnedTypeList(objectClass, resultSet)
-          : loadResultContainerObjectList(objectClass, resultSet);
+      getJdbcConnection().setTransactionIsolation(isolationLevel);
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
 
-  public List<Map<String, Object>> traverseAndMapToMapList(ResultSet resultSet) {
+  @SuppressWarnings("unchecked")
+  public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
     try {
-      final List<Map<String, Object>> ret = new ArrayList<>();
+      return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
+          ? loadSupportedReturnedTypeList(objectClass, resultSet)
+          : (objectClass.equals(RowMap.class) ? (List<T>) traverseAndMapToMapList(resultSet)
+              : loadResultContainerObjectList(objectClass, resultSet));
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  private List<RowMap> traverseAndMapToMapList(ResultSet resultSet) {
+    try {
+      final List<RowMap> ret = new ArrayList<>();
       ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
       while (resultSet.next()) {
         ret.add(toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
@@ -930,18 +835,18 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] updateOn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> updateOn(tableName, array));
+  public <T> int[] updateIn(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> updateIn(tableName, array));
   }
 
   @Override
-  public <T> int updateOn(String tableName, T object) {
+  public <T> int updateIn(String tableName, T object) {
     return getCastedParameterContainerAndTableMapping(tableName, object.getClass())
         .update(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] updateIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
         mapping -> mapping.update(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
@@ -964,11 +869,11 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   static <R> R executeQueryAndClose(LoggerContext loggerContext, Connection connection,
-      SqlParametersSetter sqlParametersSetter, String sql, Object[] parameters,
-      ResultSetTraverser<R> resultSetTraverser) {
+      PreparedStatementSupplier statementSupplier, SqlParametersSetter sqlParametersSetter,
+      String sql, Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
     final Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext,
         Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+    try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       ResultSet resultSet = stmt.executeQuery();
       R ret = resultSetTraverser.traverseAndMap(resultSet);
@@ -989,12 +894,13 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   public static final int executeUpdateAndClose(LoggerContext loggerContext, Connection connection,
-      SqlParametersSetter sqlParametersSetter, String sql, Object[] parameters) {
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
+      String sql, Object[] parameters) {
 
     final Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext,
         Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
 
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+    try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       int ret = stmt.executeUpdate();
       lp.ifPresent(_lp -> _lp.logAfterUpdate(ret));
@@ -1047,5 +953,9 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
+  @Override
+  public SormContext getContext() {
+    return sormContext;
+  }
 
 }

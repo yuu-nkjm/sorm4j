@@ -14,17 +14,17 @@ public interface TableWithSchema<T> extends Table<T> {
 
 
   default TableWithSchema<T> createTableIfNotExists() {
-    getTableSchema().createTableIfNotExists(getOrm());
+    getTableSchema().createTableIfNotExists(getSorm());
     return this;
   }
 
   default TableWithSchema<T> createIndexesIfNotExists() {
-    getTableSchema().createIndexesIfNotExists(getOrm());
+    getTableSchema().createIndexesIfNotExists(getSorm());
     return this;
   }
 
   default TableWithSchema<T> dropTableIfExists() {
-    getTableSchema().dropTableIfExists(getOrm());
+    getTableSchema().dropTableIfExists(getSorm());
     return this;
   }
 

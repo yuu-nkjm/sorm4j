@@ -33,17 +33,18 @@ public final class MultiRowProcessorFactory {
   }
 
   public MultiRowProcessor<?> getMultiRowProcessor(LoggerContext loggerContext,
-      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<?> tableMapping) {
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<?> tableMapping) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
-        return new SimpleBatchProcessor<>(loggerContext, sqlParametersSetter, tableMapping,
-            batchSize);
+        return new SimpleBatchProcessor<>(loggerContext, sqlParametersSetter, statementSupplier,
+            tableMapping, batchSize);
       case MULTI_ROW:
         return new MultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
-            tableMapping, batchSize, multiRowSize);
+            statementSupplier, tableMapping, batchSize, multiRowSize);
       case MULTI_ROW_AND_BATCH:
         return new BatchOfMultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
-            tableMapping, batchSize, multiRowSize, batchSizeWithMultiRow);
+            statementSupplier, tableMapping, batchSize, multiRowSize, batchSizeWithMultiRow);
       default:
         throw new IllegalStateException(multiRowProcessorType + " is invalid");
     }

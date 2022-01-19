@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import static org.nkjmlab.sorm4j.util.sql.SelectSql.as;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -12,10 +13,32 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql;
 class SelectSqlTest {
 
   @Test
+  void test() {
+
+    assertThat(literal(new String[] {"a", "b", null})).isEqualTo("array ['a', 'b', null]");
+    assertThat(literal(List.of("a", "b"))).isEqualTo("'a', 'b'");
+    assertThat(literal(1)).isEqualTo(String.valueOf(1));
+    assertThat(literal(true)).isEqualTo(String.valueOf(true));
+
+    assertThat(literal(null)).isEqualTo("null");
+    assertThat(literal("?")).isEqualTo("?");
+
+    assertThat(joinCommaAndSpace("a", "b")).isEqualTo("a, b");
+    assertThat(joinSpace("a", "b")).isEqualTo("a b");
+
+    assertThat(select("a")).isEqualTo(" select a ");
+    assertThat(select("a", "b")).isEqualTo(" select a, b ");
+
+    assertThat(SelectSql.in("id", List.of("a", 1)).toString()).isEqualTo(" id in ('a', 1) ");
+    assertThat(SelectSql.between("id", 1, 2).toString()).isEqualTo(" id between 1 and 2 ");
+
+  }
+
+  @Test
   void testBuildSorm() {
     Sorm sorm = createSormWithNewContextAndTables();
 
-    sorm.accept(con -> {
+    sorm.acceptHandler(con -> {
       String sql = SelectSql.builder().from(con.getTableName(Guest.class)).build();
       assertThat(sql).contains("select * from GUESTS");
     });

@@ -34,8 +34,8 @@ public class TestSqlserver {
 
   @Test
   public void testStringTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.of(conn, conf);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn, conf);) {
       ormConn.setAutoCommit(false);
       Class<?>[] characterTypes = new Class<?>[] {String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};
@@ -65,8 +65,8 @@ public class TestSqlserver {
 
   @Test
   public void testNumericTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.of(conn, conf);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn, conf);) {
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -107,8 +107,8 @@ public class TestSqlserver {
 
   @Test
   public void testDatetimeTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.of(conn, conf);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn, conf);) {
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("datetimeCol").setTypes(java.sql.Timestamp.class));
@@ -131,8 +131,9 @@ public class TestSqlserver {
 
   @Test
   public void testBinaryTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = OrmConnection.of(conn, conf);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn, conf);) {
+
       ormConn.setAutoCommit(false);
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class};

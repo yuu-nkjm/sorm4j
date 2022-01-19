@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.Sorm;
 class OrderedParameterSqlTest {
   private static Sorm sorm = createSormWithNewContextAndTables();
   static {
-    sorm.apply(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
+    sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
   }
 

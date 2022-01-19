@@ -353,6 +353,5 @@ public class TableSchema {
       this.tableName = tableName;
       return this;
     }
-
   }
 }

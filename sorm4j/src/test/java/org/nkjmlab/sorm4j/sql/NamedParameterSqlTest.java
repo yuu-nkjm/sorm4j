@@ -15,7 +15,7 @@ class NamedParameterSqlTest {
 
   private static Sorm sorm = createSormWithNewContextAndTables();
   static {
-    sorm.apply(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
+    sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
   }
 
@@ -25,13 +25,13 @@ class NamedParameterSqlTest {
       String sql = "select * from guests where id=:id and address=:address";
       ParameterizedSql statement =
           NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").parse();
-      List<Guest> ret = sorm.readList(Guest.class, statement);
+      sorm.readList(Guest.class, statement);
     }
     {
       ParameterizedSql statement = NamedParameterSql.parse(
           "select * from guests where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
-      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
+      sorm.applyHandler(conn -> conn.readList(Customer.class, statement));
     }
   }
 

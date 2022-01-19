@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.SormContext;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
@@ -35,7 +35,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
       Set.of("NOTIFY", "NOTIFYALL", "WAIT", "TOSTRING", "HASHCODE");
 
   public DefaultColumnToFieldAccessorMapper() {
-    this(SormContext.getDefaultContext().getLoggerContext());
+    this(Sorm.getDefaultContext().getLoggerContext());
   }
 
   public DefaultColumnToFieldAccessorMapper(LoggerContext loggerContext) {

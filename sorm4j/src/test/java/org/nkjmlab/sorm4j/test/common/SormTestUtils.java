@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.test.common;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
@@ -70,7 +69,7 @@ public class SormTestUtils {
       }
 
       @Override
-      public Orm getOrm() {
+      public Sorm getSorm() {
         return sorm;
       }
 
@@ -101,7 +100,7 @@ public class SormTestUtils {
       }
 
       @Override
-      public Orm getOrm() {
+      public Sorm getSorm() {
         return sorm;
       }
     };
@@ -110,8 +109,9 @@ public class SormTestUtils {
     return tbl;
   }
 
-  public static Sorm createSormWithNewContextAndTables() {
-    Sorm sorm = createNewContextSorm();
+
+  public static Sorm createSormWithNewContextAndTables(SormContext sormContext) {
+    Sorm sorm = createNewContextSorm(sormContext);
     dropAndCreateSportsTable(sorm);
     dropAndCreateGuestTable(sorm);
     dropAndCreatePlayerTable(sorm);
@@ -119,9 +119,17 @@ public class SormTestUtils {
   }
 
 
+  private static Sorm createNewContextSorm(SormContext sormContext) {
+    return Sorm.create(Sorm.createDataSource(JDBC_URL, USER, PASSWORD), sormContext);
+  }
+
+  public static Sorm createSormWithNewContextAndTables() {
+    return createSormWithNewContextAndTables(Sorm.getDefaultContext());
+  }
+
+
   public static Sorm createNewContextSorm() {
-    return Sorm.create(Sorm.createDataSource(JDBC_URL, USER, PASSWORD),
-        SormContext.builder().build());
+    return createNewContextSorm(SormContext.builder().build());
   }
 
   private static void dropAndCreateSportsTable(Sorm sorm) {
@@ -147,7 +155,5 @@ public class SormTestUtils {
   public static DriverManagerDataSource createDriverManagerDataSource() {
     return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
   }
-
-
 
 }

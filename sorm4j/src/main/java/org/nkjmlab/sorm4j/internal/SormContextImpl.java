@@ -22,6 +22,7 @@ import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.TableName;
 import org.nkjmlab.sorm4j.mapping.TableNameMapper;
@@ -50,15 +51,15 @@ public final class SormContextImpl implements SormContext {
     this.sqlResultToColumnsMappings = new ConcurrentHashMap<>();
   }
 
-  public SormContextImpl(LoggerContext loggerContext,
-      ColumnToFieldAccessorMapper columnFieldMapper, TableNameMapper tableNameMapper,
+  public SormContextImpl(LoggerContext loggerContext, ColumnToFieldAccessorMapper columnFieldMapper,
+      TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
       ColumnValueToMapEntryConverter columnValueToMapEntryConverter,
-      SqlParametersSetter sqlParametersSetter, TableSqlFactory tableSqlFactory,
-      MultiRowProcessorFactory multiRowProcessorFactory, int transactionIsolationLevel) {
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
+      TableSqlFactory tableSqlFactory, MultiRowProcessorFactory multiRowProcessorFactory) {
     this(new SormConfig(loggerContext, columnFieldMapper, tableNameMapper,
         columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
-        tableSqlFactory, multiRowProcessorFactory, transactionIsolationLevel));
+        statementSupplier, tableSqlFactory, multiRowProcessorFactory));
   }
 
   TableMetaData getTableMetaData(Connection connection, String tableName) {
@@ -84,7 +85,7 @@ public final class SormContextImpl implements SormContext {
    * create a mapping and register it.
    *
    */
-  <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, String tableName,
+  public <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, String tableName,
       Class<T> objectClass) {
     return getTableMapping(connection, toTableName(connection, tableName), objectClass);
   }
@@ -100,7 +101,7 @@ public final class SormContextImpl implements SormContext {
                 createTableMapping(objectClass, tableName.getName(), connection);
             sormConfig.getLoggerContext()
                 .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
-                .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
+                .ifPresent(lp -> lp.logMapping(m.toString()));
             return m;
           } catch (SQLException e) {
             throw Try.rethrow(e);
@@ -142,8 +143,8 @@ public final class SormContextImpl implements SormContext {
 
     return new SqlParametersToTableMapping<>(sormConfig.getLoggerContext(),
         sormConfig.getColumnValueToJavaObjectConverter(), sormConfig.getSqlParametersSetter(),
-        sormConfig.getMultiRowProcessorFactory(), objectClass, columnToAccessorMap, tableMetaData,
-        sql);
+        sormConfig.getPreparedStatementSupplier(), sormConfig.getMultiRowProcessorFactory(),
+        objectClass, columnToAccessorMap, tableMetaData, sql);
   }
 
 
@@ -242,12 +243,6 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  @Override
-  public int getTransactionIsolationLevel() {
-    return sormConfig.getTransactionIsolationLevel();
-  }
-
-
   ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
     return sormConfig.getColumnValueToJavaObjectConverter();
   }
@@ -259,6 +254,10 @@ public final class SormContextImpl implements SormContext {
 
   SqlParametersSetter getSqlParametersSetter() {
     return sormConfig.getSqlParametersSetter();
+  }
+
+  PreparedStatementSupplier getPreparedStatementSupplier() {
+    return sormConfig.getPreparedStatementSupplier();
   }
 
 

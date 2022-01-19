@@ -2,10 +2,12 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.function.Function;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
@@ -13,14 +15,17 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 public abstract class MultiRowProcessor<T> {
 
   private final int batchSize;
+  private final PreparedStatementSupplier statementSupplier;
   private final SqlParametersSetter sqlParametersSetter;
 
   final SqlParametersToTableMapping<T> tableMapping;
   final LoggerContext loggerContext;
 
   MultiRowProcessor(LoggerContext loggerContext, SqlParametersSetter sqlParametersSetter,
-      SqlParametersToTableMapping<T> tableMapping, int batchSize) {
+      PreparedStatementSupplier statementSupplier, SqlParametersToTableMapping<T> tableMapping,
+      int batchSize) {
     this.loggerContext = loggerContext;
+    this.statementSupplier = statementSupplier;
     this.sqlParametersSetter = sqlParametersSetter;
     this.tableMapping = tableMapping;
     this.batchSize = batchSize;
@@ -57,7 +62,7 @@ public abstract class MultiRowProcessor<T> {
       int[] result = new int[0];
       boolean origAutoCommit = getAutoCommit(con);
 
-      try (PreparedStatement stmt = con.prepareStatement(sql)) {
+      try (PreparedStatement stmt = statementSupplier.prepareStatement(con, sql)) {
         setAutoCommit(con, false);
         final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
         for (int i = 0; i < objects.length; i++) {
@@ -98,6 +103,10 @@ public abstract class MultiRowProcessor<T> {
 
     lp.ifPresent(_lp -> _lp.logAfterMultiRow(result));
     return result;
+  }
+
+  protected PreparedStatement prepareStatement(Connection con, String sql) throws SQLException {
+    return statementSupplier.prepareStatement(con, sql);
   }
 
 

@@ -8,17 +8,17 @@ class TableSchemaKeywordTest {
 
   @Test
   void testChars() {
-    assertThat(chars(1)).isEqualTo("char(1)");
+    assertThat(chars(1)).isEqualTo(" char(1) ");
   }
 
   @Test
   void testDecimalInt() {
-    assertThat(decimal(1)).isEqualTo("decimal(1)");
+    assertThat(decimal(1)).isEqualTo(" decimal(1) ");
   }
 
   @Test
   void testDecimalIntInt() {
-    assertThat(decimal(1, 2)).isEqualTo("decimal(1,2)");
+    assertThat(decimal(1, 2)).isEqualTo(" decimal(1,2) ");
   }
 
 }

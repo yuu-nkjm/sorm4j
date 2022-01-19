@@ -35,7 +35,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.4.0</version>
+   <version>1.4.1</version>
  </dependency>
 ```
 
@@ -52,7 +52,7 @@ public class Customer {
 Create an entry point:
 
 ```java
-Sorm sorm = Sorm.create("jdbc:h2:mem:sormtest", "sa","");
+Sorm sorm = Sorm.create("jdbc:h2:mem:sormtest;DB_CLOSE_DELAY=-1");
 ```
 
 Reads matching rows from table and maps to Java object:

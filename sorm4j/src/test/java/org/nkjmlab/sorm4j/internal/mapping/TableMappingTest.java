@@ -26,7 +26,7 @@ class TableMappingTest {
   @Test
   void testGetValue() {
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         Guest g = new Guest();
         tm.getValue(g, "hoge");
@@ -36,7 +36,7 @@ class TableMappingTest {
     }
 
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         String s = new String();
         tm.getValue(s, "id");
@@ -53,7 +53,7 @@ class TableMappingTest {
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
         .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         Guest a = SormTestUtils.GUEST_ALICE;
         SqlParametersToTableMapping<Guest> tm = getTableMapping(m, Guest.class);
         tm.insertAndGet(conMock, a);
@@ -66,7 +66,7 @@ class TableMappingTest {
   @Test
   void testSetValue() {
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "hoge", 0);
       });
@@ -74,7 +74,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("does not have a corresponding");
     }
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Guest(), "id", "String");
       });
@@ -82,7 +82,7 @@ class TableMappingTest {
       assertThat(e.getMessage()).contains("Could not set a value");
     }
     try {
-      sorm.accept(m -> {
+      sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
         tm.setValue(new Player(), "name", 1);
       });
@@ -93,15 +93,15 @@ class TableMappingTest {
 
   @Test
   void testCol() {
-    sorm.accept(m -> {
+    sorm.acceptHandler(m -> {
       assertThat(getTableMapping(m, Guest.class).getTableMetaData().getColumns())
           .containsAll(List.of("ID", "NAME", "ADDRESS"));
     });
-    sorm.accept(m -> {
+    sorm.acceptHandler(m -> {
       assertThat(getTableMapping(m, Guest.class).getTableMetaData().getPrimaryKeys())
           .containsAll(List.of("ID"));
     });
-    sorm.accept(m -> {
+    sorm.acceptHandler(m -> {
       assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
     });
   }

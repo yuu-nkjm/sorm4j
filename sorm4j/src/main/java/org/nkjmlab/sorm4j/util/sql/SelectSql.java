@@ -55,7 +55,7 @@ public class SelectSql {
      * @return
      */
     public String build() {
-      return toPrettyString(false);
+      return toString();
     }
 
     /**
@@ -299,23 +299,23 @@ public class SelectSql {
   }
 
   public static String select(String selectClause) {
-    return wrapSpace(SELECT + selectClause);
+    return wrapSpace("select " + selectClause);
   }
 
   public static String select(Object... selectClauses) {
-    return wrapSpace(SELECT + joinCommaAndSpace(selectClauses));
+    return wrapSpace("select " + joinCommaAndSpace(selectClauses));
   }
 
   public static String selectDistinct(Object... selectClauses) {
-    return wrapSpace(SELECT + DISTINCT + joinCommaAndSpace(selectClauses));
+    return wrapSpace("select distinct " + joinCommaAndSpace(selectClauses));
   }
 
   public static String selectStarFrom(String tableName) {
-    return SELECT_STAR + from(tableName);
+    return wrapSpace("select *" + from(tableName));
   }
 
   public static String selectCountFrom(String tableName) {
-    return SELECT + func(COUNT, STAR) + from(tableName);
+    return wrapSpace("select count(*)" + from(tableName));
   }
 
   /**
@@ -346,7 +346,7 @@ public class SelectSql {
    * @return
    */
   public static String castAs(String src, String toType) {
-    return wrapSpace(CAST + wrapParentheses(src + AS + toType));
+    return wrapSpace("cast " + wrapParentheses(src + AS + toType));
   }
 
   public static String column(String tableName, String... colNames) {
@@ -355,15 +355,15 @@ public class SelectSql {
   }
 
   public static String from(String tableName) {
-    return wrapSpace(FROM + tableName);
+    return wrapSpace("from " + tableName);
   }
 
   public static String where() {
-    return wrapSpace(WHERE);
+    return WHERE;
   }
 
   public static String where(String searchCondition) {
-    return wrapSpace(WHERE + searchCondition);
+    return wrapSpace("where " + searchCondition);
   }
 
   public static String where(Condition searchCondition) {
@@ -454,21 +454,21 @@ public class SelectSql {
   }
 
   public static Condition between(Object colName, Object startInclusive, Object endInclusive) {
-    return new Condition(colName + BETWEEN + literal(startInclusive) + AND + literal(endInclusive));
+    return new Condition(
+        wrapSpace(colName + BETWEEN + literal(startInclusive) + AND + literal(endInclusive)));
   }
 
-  public static Condition in(Object colName, Object... values) {
-    return new Condition(colName + IN + wrapParentheses(
-        joinComma(Arrays.stream(values).map(o -> literal(o)).collect(Collectors.toList()))));
+  public static Condition in(Object colName, List<?> values) {
+    return new Condition(wrapSpace(colName + IN + wrapParentheses(literal(values))));
   }
 
 
   public static String groupBy(Object... groups) {
-    return wrapSpace(GROUP_BY + joinCommaAndSpace(groups));
+    return wrapSpace("group by " + joinCommaAndSpace(groups));
   }
 
   public static String limit(Object limit) {
-    return wrapSpace(LIMIT + limit);
+    return wrapSpace("limit " + limit);
   }
 
   /**
@@ -478,19 +478,19 @@ public class SelectSql {
    * @return
    */
   public static String orderBy(Object... order) {
-    return ORDER_BY + joinSpace(order);
+    return wrapSpace("order by " + joinSpace(order));
   }
 
   public static String orderBy(Object column) {
-    return orderBy(column, ASC);
+    return orderBy(column, "asc");
   }
 
   public static String orderByAsc(Object column) {
-    return orderBy(ORDER_BY, ASC);
+    return orderBy(column, "asc");
   }
 
   public static String orderByDesc(Object column) {
-    return orderBy(ORDER_BY, DESC);
+    return orderBy(column, "desc");
   }
 
   /** functions **/
@@ -504,15 +504,15 @@ public class SelectSql {
   }
 
   public static String count(String column) {
-    return func(COUNT, column);
+    return func("count", column);
   }
 
   public static String sum(String column) {
-    return func(SUM, column);
+    return func("sum", column);
   }
 
   public static String avg(String column) {
-    return func(AVG, column);
+    return func("avg", column);
   }
 
 
@@ -532,7 +532,7 @@ public class SelectSql {
       for (int i = 0; i < length; i++) {
         ret.add(literal(Array.get(element, i)));
       }
-      return "[" + String.join(",", ret) + "]";
+      return "array [" + String.join(", ", ret) + "]";
     } else if (element instanceof List) {
       return String.join(", ",
           ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
@@ -564,10 +564,6 @@ public class SelectSql {
     return joinObjects(", ", elements);
   }
 
-  public static String joinComma(Object... elements) {
-    return joinObjects(",", elements);
-  }
-
   public static String joinSpace(Object... elements) {
     return joinObjects(" ", elements);
   }
@@ -585,7 +581,13 @@ public class SelectSql {
     return "'" + str + "'";
   }
 
+  /**
+   * Wrap single space
+   *
+   * @param str
+   * @return
+   */
   public static String wrapSpace(Object str) {
-    return " " + str + " ";
+    return " " + (str == null ? "null" : str.toString().trim()) + " ";
   }
 }

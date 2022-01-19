@@ -2,12 +2,14 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -18,7 +20,6 @@ import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
  *
  */
 public interface Sorm extends Orm {
-
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
@@ -66,7 +67,7 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates a {@link DataSource} which simply wraps {@link DriverManager}
+   * Creates a {@link DriverManagerDataSource} which simply wraps {@link DriverManager}
    *
    * @param jdbcUrl
    * @param username
@@ -80,55 +81,84 @@ public interface Sorm extends Orm {
 
 
   /**
+   * Gets the default {@link SormContext} instance.
+   *
+   * @return
+   */
+  static SormContext getDefaultContext() {
+    return SormImpl.DEFAULT_CONTEXT;
+  }
+
+
+  /**
    * Accepts a {@link OrmConnection} handler for a task with object-relation mapping. The connection
    * will be closed after the process of handler.
    *
    * @param handler
    */
-  void accept(ConsumerHandler<OrmConnection> handler);
+  void acceptHandler(ConsumerHandler<OrmConnection> handler);
 
   /**
    * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
    *
-   * The transaction will be committed and the connection will be closed after the process of
-   * handler. When the transaction throws a exception, the transaction will be rollback.
+   * <p>
+   * Note: The transaction will be closed after the process of handler. The transaction will be
+   * rolled back if the transaction closes before commit. When an exception throws in the
+   * transaction, the transaction will be rollback.
    *
-   * @param handler
+   * @param isolationLevel
+   * @param transactionHandler
    */
-  void acceptTransactionHandler(ConsumerHandler<OrmTransaction> handler);
+  void acceptHandler(int isolationLevel, ConsumerHandler<OrmTransaction> transactionHandler);
+
+  /**
+   *
+   * @param <T>
+   * @param streamGenerator
+   * @param streamHandler
+   */
+  @Experimental
+  <T> void acceptHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+      ConsumerHandler<Stream<T>> streamHandler);
 
   /**
    * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
    * result. The connection will be closed after the process of handler.
    *
    * @param <R>
-   * @param handler
+   * @param connectionHandler
    * @return
    */
-  <R> R apply(FunctionHandler<OrmConnection, R> handler);
+  <R> R applyHandler(FunctionHandler<OrmConnection, R> connectionHandler);
 
 
   /**
    * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
    * result.
+   * <p>
+   * Note: The transaction will be closed after the process of handler. The transaction will be
+   * rolled back if the transaction closes before commit. When an exception throws in the
+   * transaction, the transaction will be rolled back.
    *
-   * The transaction will be committed and the connection will be closed after the process of
-   * handler. When the transaction throws a exception, the transaction will be rollback.
+   * @param isolationLevel
+   * @param transactionHandler
    *
    * @param <R>
-   * @param handler
    * @return
    */
-  <R> R applyTransactionHandler(FunctionHandler<OrmTransaction, R> handler);
-
+  <R> R applyHandler(int isolationLevel, FunctionHandler<OrmTransaction, R> transactionHandler);
 
   /**
-   * Gets the context of this object.
    *
+   * @param <T>
+   * @param <R>
+   * @param streamGenerator
+   * @param streamHandler
    * @return
    */
   @Experimental
-  SormContext getContext();
+  <T, R> R applyHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+      FunctionHandler<Stream<T>, R> streamHandler);
 
   /**
    * Gets {@link DataSource}.
@@ -137,35 +167,40 @@ public interface Sorm extends Orm {
    */
   DataSource getDataSource();
 
-  /**
-   * Gets JDBC {@link Connection}.
-   *
-   * @return
-   */
-  Connection getJdbcConnection();
-
+  @Experimental
+  <T> Table<T> getTable(Class<T> objectClass);
 
 
   /**
-   * Open {@link OrmConnection}. You should always use try-with-resources to ensure the database
-   * connection is released. We recommend using {@link #accept(ConsumerHandler)} or
-   * {@link #apply(FunctionHandler)} .
+   * Open {@link OrmConnection}. You should always use <code>try-with-resources</code> block to
+   * ensure the database connection is released.
+   *
+   * <p>
+   * You cold also use {@link Sorm#acceptHandler(ConsumerHandler)} or
+   * {@link Sorm#applyHandler(FunctionHandler)} .
    *
    * @return
    */
-  OrmConnection openConnection();
+  OrmConnection open();
 
   /**
-   * Open {@link OrmTransaction}. You should always use try-with-resources to ensure the database
-   * connection is released. We recommend using {@link #acceptTransactionHandler(ConsumerHandler)}
-   * or {@link #applyTransactionHandler(FunctionHandler)}. Default transaction level is
-   * {@link Connection#TRANSACTION_READ_COMMITTED}.
+   * Open {@link OrmTransaction}. You should always use try-with-resources block to ensure the
+   * database connection is released.
    *
-   * Note: the transaction is automatically rollback if the transaction is not committed.
+   * <p>
+   * You could also use {@link Sorm#acceptHandler(int, ConsumerHandler)} or
+   * {@link Sorm#applyHandler(int, FunctionHandler)}.
+   *
+   * <p>
+   * <strong>Note:</strong> If you do not explicitly commit in a opened transaction, it will be
+   * rolled back.
+   *
+   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED},
+   *        {@link Connection#TRANSACTION_READ_UNCOMMITTED}, ...,and so on.
    *
    * @return
    */
-  OrmTransaction openTransaction();
+  OrmTransaction open(int isolationLevel);
 
 
 

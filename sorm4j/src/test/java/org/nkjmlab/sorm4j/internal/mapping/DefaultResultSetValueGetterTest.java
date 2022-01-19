@@ -24,28 +24,24 @@ class DefaultResultSetValueGetterTest {
     String sql =
         "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry VARCHAR ARRAY, fl FLOAT)";
     Sorm sormImpl = SormTestUtils.createSormWithNewContextAndTables();
-    sormImpl.accept(con -> con.executeUpdate(sql));
+    sormImpl.acceptHandler(con -> con.executeUpdate(sql));
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
-    sormImpl.accept(con -> con.insert(a));
+    sormImpl.acceptHandler(con -> con.insert(a));
 
-    LocalDateTimeSample r = sormImpl.apply(
+    LocalDateTimeSample r = sormImpl.applyHandler(
         con -> con.readFirst(LocalDateTimeSample.class, "select * from LocalDateTimeSample"));
     assertThat(r).isEqualTo(a);
-    sormImpl.accept(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom())
-        .limit(10000).toArray(LocalDateTimeSample[]::new)));
+    sormImpl
+        .acceptHandler(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom())
+            .limit(10000).toArray(LocalDateTimeSample[]::new)));
 
     try {
-      sormImpl.accept(con -> con.update(a));
+      sormImpl.acceptHandler(con -> con.update(a));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("doesn't have them");
     }
 
-
-    try {
-      sormImpl.apply(con -> con.readMapFirst("select * from LocalDateTimeSample"));
-    } catch (Exception e) {
-    }
 
   }
 

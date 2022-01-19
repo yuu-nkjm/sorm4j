@@ -1,10 +1,15 @@
 package org.nkjmlab.sorm4j.util.logger;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.logger.JulSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Slf4jSormLogger;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class SormLoggerTest {
@@ -12,13 +17,24 @@ class SormLoggerTest {
   private static List<SormLogger> loggers =
       List.of(JulSormLogger.getLogger(), Log4jSormLogger.getLogger(), Slf4jSormLogger.getLogger());
 
+
+
   @Test
   void testLogAfterQuery() {
-    loggers.get(0).logAfterQuery("result", 1L, "obj");
     LoggerContext lc = SormTestUtils.SORM.getContext().getLoggerContext();
     lc.enableForceLogging();
-    // lc.createLogPoint(LoggerContext.Category.EXECUTE_QUERY,
-    // getClass()).get().logAfterQuery("obj");
+    Optional<LogPoint> lp = lc.createLogPoint(LoggerContext.Category.EXECUTE_QUERY, getClass());
+    lp.get().logAfterQuery("obj");
+    lp.get().logAfterMultiRow(new int[] {1});
+    lp.get().logAfterUpdate(1);
+    try (Connection conn = SormTestUtils.SORM.getJdbcConnection()) {
+      lp.get().logBeforeMultiRow(conn, SormLoggerTest.class, 1, "players");
+      lp.get().logBeforeSql(conn, ParameterizedSql.of("select * from players"));
+      lp.get().logBeforeSql(conn, "select * from players where id=1", 1);
+      lp.get().logMapping("mapping info");
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
     lc.disableForceLogging();
 
   }

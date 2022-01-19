@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.mapping;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -15,20 +17,21 @@ class ResultSetMapperTest {
   @BeforeEach
   void setUp() {
     sorm = SormTestUtils.createSormWithNewContextAndTables();
-    sorm.accept(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
+    sorm.acceptHandler(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
   }
 
 
   @Test
   void testMapRowsClassOfTResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
+    sorm.applyHandler(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
         conn.getResultSetTraverser(Player.class)));
   }
 
   @Test
   void testMapRowsResultSet() {
-    sorm.apply(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-        conn.getResultSetToMapTraverser()));
+    assertThat(
+        sorm.applyHandler(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
+            conn.getResultSetTraverser(RowMap.class))).size()).isEqualTo(2);
   }
 
 }

@@ -2,16 +2,16 @@ package org.nkjmlab.sorm4j.util.table;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.result.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
@@ -19,14 +19,12 @@ class TableTest {
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
   private TableWithSchema<Player> playersTable;
-  private TableWithSchema<Guest> guestsTable;
   private TableWithSchema<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
     Sorm sorm = createNewContextSorm();
     playersTable = createPlayersTable(sorm);
-    guestsTable = createGuestsTable(sorm);
     sportsTable = createSportsTable(sorm);
 
   }
@@ -43,7 +41,7 @@ class TableTest {
 
   @Test
   void testGetSorm() {
-    playersTable.getOrm();
+    playersTable.getSorm();
   }
 
   @Test
@@ -54,73 +52,82 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
+    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
   }
 
   @Test
   void testCreateIndexesIfNotExists() {
     playersTable.createTableIfNotExists().createIndexesIfNotExists();
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
+    playersTable.insertIn(PLAYER_ALICE);
+    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
         .contains("INDEX_IN_GUESTS_ON_NAME");
+
+    playersTable.acceptHandler(conn -> conn.openStreamAll(),
+        stream -> stream.collect(Collectors.toList()));
   }
 
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
+    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
   }
 
   @Test
   void testReadAll() {
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(playersTable.readAll().size()).isEqualTo(1);
+    playersTable.insertIn(PLAYER_ALICE);
+    assertThat(playersTable.selectAll().size()).isEqualTo(1);
   }
 
   @Test
   void testReadByPrimaryKey() {
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(playersTable.findByPrimaryKey(PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE.getId());
+    playersTable.insertIn(PLAYER_ALICE);
+    assertThat(playersTable.selectByPrimaryKey(PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
   }
 
   @Test
   void testReadFirstParameterizedSql() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readFirst(SELECT_FROM_PLAYERS_WHERE_ID_PSQL).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadFirstStringObjectArray() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readFirst(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
+        .isEqualTo(PLAYER_ALICE.getId());
+
+    assertThat(playersTable.readOne(SELECT_FROM_PLAYERS_WHERE_ID_PSQL).getId())
+        .isEqualTo(PLAYER_ALICE.getId());
+
+    assertThat(playersTable.readList(SELECT_FROM_PLAYERS_WHERE_ID_PSQL).get(0).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadListParameterizedSql() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readList(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).get(0).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadListStringObjectArray() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readList(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).get(0).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadOneParameterizedSql() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readOne(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadOneStringObjectArray() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.readOne(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
@@ -137,228 +144,97 @@ class TableTest {
 
   @Test
   void testExists() {
-    playersTable.insertOn(PLAYER_ALICE);
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(playersTable.exists(PLAYER_ALICE));
   }
 
   @Test
   void testDeleteListOfT() {
-    playersTable.insertOn(PLAYER_ALICE);
-    playersTable.deleteOn(List.of(PLAYER_ALICE));
-    assertThat(playersTable.getOrm().readOne(Integer.class,
-        SelectSql.selectStarFrom(playersTable.getTableName())));
+    playersTable.insertIn(List.of(PLAYER_ALICE));
+    playersTable.updateIn(List.of(PLAYER_ALICE));
+    playersTable.mergeIn(List.of(PLAYER_ALICE));
+    playersTable.deleteIn(List.of(PLAYER_ALICE));
+    assertThat(
+        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(0);
+    playersTable.insertAndGetIn(List.of(PLAYER_BOB));
   }
 
   @Test
   void testDeleteT() {
-    fail("Not yet implemented");
+    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.updateIn(PLAYER_ALICE);
+    playersTable.mergeIn(PLAYER_ALICE);
+    playersTable.deleteIn(PLAYER_ALICE);
+    assertThat(
+        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(0);
+    playersTable.insertAndGetIn(PLAYER_BOB);
   }
 
   @Test
   void testDeleteTArray() {
-    fail("Not yet implemented");
+    playersTable.insertIn(new Player[] {PLAYER_ALICE});
+    playersTable.updateIn(new Player[] {PLAYER_ALICE});
+    playersTable.mergeIn(new Player[] {PLAYER_ALICE});
+    playersTable.deleteIn(new Player[] {PLAYER_ALICE});
+    assertThat(
+        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(0);
+    playersTable.insertAndGetIn(new Player[] {PLAYER_BOB});
   }
 
   @Test
   void testDeleteAll() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertListOfT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertTArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertAndGetListOfT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertAndGetT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testInsertAndGetTArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testMergeListOfT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testMergeT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testMergeTArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testUpdateListOfT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testUpdateT() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testUpdateTArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testGetRowToMapMapper() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testGetResultSetToMapTraverser() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapFirstParameterizedSql() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapFirstStringObjectArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapListParameterizedSql() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapListStringObjectArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapOneParameterizedSql() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapOneStringObjectArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testGetTableName() {
-    fail("Not yet implemented");
+    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.deleteAllIn();
+    assertThat(
+        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(0);
   }
 
   @Test
   void testGetTableMetaData() {
-    fail("Not yet implemented");
+    assertThat(playersTable.getTableMetaData()).isNotNull();
   }
 
   @Test
-  void testExecuteQueryParameterizedSqlResultSetTraverserOfS() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testExecuteQueryParameterizedSqlRowMapperOfS() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testExecuteUpdateStringObjectArray() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testExecuteUpdateParameterizedSql() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadListAllMatch() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadFirstAllMatch() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadOneAllMatch() {
-    fail("Not yet implemented");
-  }
-
-  @Test
-  void testReadMapListAllMatch() {
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(
-        playersTable.readMapListAllMatch(Tuple.of("name", PLAYER_ALICE.getName())).get(0).get("id"))
-            .isEqualTo(PLAYER_ALICE.getId());
-  }
-
-  @Test
-  void testReadMapOneAllMatch() {
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(playersTable.readMapOneAllMatch(Tuple.of("name", PLAYER_ALICE.getName())).get("id"))
+  void testSelectFirstAllEqual() {
+    playersTable.insertIn(PLAYER_ALICE);
+    assertThat(playersTable.selectFirstAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
-  void testReadMapFirstAllMatch() {
-    playersTable.insertOn(PLAYER_ALICE);
-    assertThat(
-        playersTable.readMapFirstAllMatch(Tuple.of("name", PLAYER_ALICE.getName())).get("id"))
-            .isEqualTo(PLAYER_ALICE.getId());
+  void testSelectOneAllEqual() {
+    playersTable.insertIn(PLAYER_ALICE);
+    assertThat(playersTable.selectOneAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
+        .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
-  void testGetAllMatchSql() {
-    playersTable.insertOn(PLAYER_ALICE);
+  void testSelectListAllEqual() {
+    playersTable.insertIn(PLAYER_ALICE);
     assertThat(
-        playersTable.findListAllMatch(Tuple.of("name", PLAYER_ALICE.getName())).get(0).getId())
+        playersTable.selectListAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).get(0).getId())
             .isEqualTo(PLAYER_ALICE.getId());
   }
+
+
 
   @Test
   void testJoin() {
-    playersTable.insertOn(PLAYER_ALICE);
-    sportsTable.insertOn(TENNIS);
+    playersTable.insertIn(PLAYER_ALICE);
+    sportsTable.insertIn(TENNIS);
     assertThat(playersTable.join(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testLeftJoin() {
-    playersTable.insertOn(PLAYER_ALICE);
-    sportsTable.insertOn(TENNIS);
+    playersTable.insertIn(PLAYER_ALICE);
+    sportsTable.insertIn(TENNIS);
     assertThat(playersTable.leftJoin(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
-
-  @Test
-  void testGetColumnAliases() {
-    assertThat(playersTable.getColumnAliases()).isEqualTo("g");
-  }
-
 }

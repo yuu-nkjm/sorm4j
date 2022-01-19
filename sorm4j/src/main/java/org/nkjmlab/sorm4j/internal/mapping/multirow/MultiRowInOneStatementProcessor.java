@@ -8,6 +8,7 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
@@ -15,10 +16,10 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
 
   private final int multiRowSize;
 
-  public MultiRowInOneStatementProcessor(LoggerContext loggerContext, 
-      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize,
-      int multiRowSize) {
-    super(loggerContext, sqlParametersSetter, tableMapping, batchSize);
+  public MultiRowInOneStatementProcessor(LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<T> tableMapping, int batchSize, int multiRowSize) {
+    super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
 
   }
@@ -28,7 +29,7 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   public final int[] multiRowInsert(Connection con, T... objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> con.prepareStatement(tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> prepareStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
             (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
@@ -37,7 +38,7 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   public final int[] multiRowMerge(Connection con, T... objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> con.prepareStatement(tableMapping.getSql().getMultirowMergeSql(num)),
+            num -> prepareStatement(con, tableMapping.getSql().getMultirowMergeSql(num)),
             (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 

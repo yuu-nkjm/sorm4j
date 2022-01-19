@@ -8,7 +8,6 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
@@ -23,8 +22,30 @@ import org.nkjmlab.sorm4j.util.command.Command;
 import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
 import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
-@Experimental
+
+/**
+ * Main API for object relation mapping.
+ *
+ * @author nkjm
+ *
+ */
 public interface Orm {
+
+  /**
+   * Gets the context of this object.
+   *
+   * @return
+   */
+  @Experimental
+  SormContext getContext();
+
+  /**
+   * Gets JDBC {@link Connection}.
+   *
+   * @return
+   */
+  Connection getJdbcConnection();
+
   /**
    * Creates a {@link Command} from SQL string.
    *
@@ -92,7 +113,7 @@ public interface Orm {
 
 
   /**
-   * Deletes all objects on the table corresponding to the given class.
+   * Deletes all objects in the table corresponding to the given class.
    *
    * @param <T> the type to indicate the unique table.
    * @param type the type to indicate the unique table.
@@ -101,44 +122,44 @@ public interface Orm {
   <T> int deleteAll(Class<T> type);
 
   /**
-   * Deletes all objects on the table corresponding to the given table name.
+   * Deletes all objects in the table corresponding to the given table name.
    *
    * @param tableName
    * @return
    */
-  int deleteAllOn(String tableName);
+  int deleteAllIn(String tableName);
 
 
   /**
-   * Deletes objects on the table of the given table name.
+   * Deletes objects in the table of the given table name.
    *
    * @param <T> the object's element type.
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] deleteOn(String tableName, List<T> objects);
+  <T> int[] deleteIn(String tableName, List<T> objects);
 
   /**
-   * Deletes object on the table of the given table name.
+   * Deletes object in the table of the given table name.
    *
    * @param <T> the object's type.
    * @param tableName
    * @param object
    * @return
    */
-  <T> int deleteOn(String tableName, T object);
+  <T> int deleteIn(String tableName, T object);
 
 
   /**
-   * Deletes objects on the table of the given table name.
+   * Deletes objects in the table of the given table name.
    *
    * @param <T> the object's element type.
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] deleteOn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
    * Executes the query with the given PreparedStatement and applies the given
@@ -235,13 +256,6 @@ public interface Orm {
    */
   <T> boolean exists(T object);
 
-  /**
-   * Gets function which traverses and maps the all the rows in the given resultSet to an object
-   * list.
-   *
-   * @return
-   */
-  ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser();
 
   /**
    * Gets function which traverses and maps the all the rows in the given resultSet to an object
@@ -263,14 +277,6 @@ public interface Orm {
    * @return
    */
   <T> RowMapper<T> getRowMapper(Class<T> type);
-
-  /**
-   * Gets a function which maps one row in the resultSet to an object. The method does not call
-   * {@link ResultSet#next()}.
-   *
-   * @return
-   */
-  RowMapper<Map<String, Object>> getRowToMapMapper();
 
 
 
@@ -301,7 +307,7 @@ public interface Orm {
   String getTableName(Class<?> type);
 
   /**
-   * Inserts objects on the table corresponding to the class of the given objects.
+   * Inserts objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -310,7 +316,7 @@ public interface Orm {
   <T> int[] insert(List<T> objects);
 
   /**
-   * Inserts object on the table corresponding to the class of the given object.
+   * Inserts object in the table corresponding to the class of the given object.
    *
    * @param <T>
    * @param object
@@ -319,7 +325,7 @@ public interface Orm {
   <T> int insert(T object);
 
   /**
-   * Insert objects on the table corresponding to the class of the given objects.
+   * Insert objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -364,7 +370,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGetOn(String tableName, List<T> objects);
+  <T> InsertResult<T> insertAndGetIn(String tableName, List<T> objects);
 
   /**
    * Inserts an object and get the insert result.
@@ -374,7 +380,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> InsertResult<T> insertAndGetOn(String tableName, T object);
+  <T> InsertResult<T> insertAndGetIn(String tableName, T object);
 
   /**
    * Inserts objects and get the last insert result.
@@ -384,7 +390,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGetOn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> InsertResult<T> insertAndGetIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
    * This method is experimental.
@@ -394,7 +400,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int[] insertMapOn(String tableName, List<Map<String, Object>> objects);
+  int[] insertMapIn(String tableName, List<Map<String, Object>> objects);
 
   /**
    *
@@ -403,7 +409,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int insertMapOn(String tableName, Map<String, Object> object);
+  int insertMapIn(String tableName, Map<String, Object> object);
 
   /**
    * This method is experimental.
@@ -413,7 +419,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int[] insertMapOn(String tableName,
+  int[] insertMapIn(String tableName,
       @SuppressWarnings("unchecked") Map<String, Object>... objects);
 
   /**
@@ -424,7 +430,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insertOn(String tableName, List<T> objects);
+  <T> int[] insertIn(String tableName, List<T> objects);
 
   /**
    * Inserts an object and get the insert result.
@@ -434,7 +440,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> int insertOn(String tableName, T object);
+  <T> int insertIn(String tableName, T object);
 
   /**
    * Inserts objects and get the last insert result.
@@ -444,7 +450,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insertOn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
@@ -461,7 +467,7 @@ public interface Orm {
       Class<T3> t3, String t2T3OnCondition);
 
   /**
-   * Merges by objects on the table corresponding to the class of the given objects.
+   * Merges by objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -471,7 +477,7 @@ public interface Orm {
   <T> int[] merge(List<T> objects);
 
   /**
-   * Merges by an object on the table corresponding to the class of the given object.
+   * Merges by an object in the table corresponding to the class of the given object.
    * <p>
    * Merge methods execute a SQL sentence as MERGE INTO of the H2 grammar. This operation may be not
    * working the other database system.
@@ -487,7 +493,7 @@ public interface Orm {
   <T> int merge(T object);
 
   /**
-   * Merges by objects on the table corresponding to the class of the given objects.
+   * Merges by objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -499,54 +505,34 @@ public interface Orm {
 
 
   /**
-   * Merges by objects on the table corresponding to the given table name.
+   * Merges by objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] mergeOn(String tableName, List<T> objects);
+  <T> int[] mergeIn(String tableName, List<T> objects);
 
   /**
-   * Merges by an object on the table corresponding to the given table name.
+   * Merges by an object in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param object
    * @return
    */
-  <T> int mergeOn(String tableName, T object);
+  <T> int mergeIn(String tableName, T object);
 
   /**
-   * Merges by objects on the table corresponding to the given table name.
+   * Merges by objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] mergeOn(String tableName, @SuppressWarnings("unchecked") T... objects);
-
-  /**
-   * Reads all rows from the table indicated by object class.
-   *
-   * @param <T>
-   * @param type
-   * @return
-   */
-  <T> List<T> readAll(Class<T> type);
-
-  /**
-   * Reads an object by its primary keys from the table indicated by object class.
-   *
-   * @param <T>
-   * @param type
-   * @param primaryKeyValues
-   * @return
-   */
-  <T> T findByPrimaryKey(Class<T> type, Object... primaryKeyValues);
-
+  <T> int[] mergeIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
    * Reads an object from the database.
@@ -603,78 +589,7 @@ public interface Orm {
    */
   <T> List<T> readList(Class<T> type, String sql, Object... parameters);
 
-  /**
-   * See {@link #readMapFirst(String, Object...)}
-   *
-   * @param sql
-   * @return
-   */
-  Map<String, Object> readMapFirst(ParameterizedSql sql);
 
-  /**
-   * Reads a first row from the database by mapping the results of the SQL query into an instance of
-   *
-   * {@link java.util.Map}.
-   * <p>
-   * Letter case of the key in the Map depends on
-   * {@link ColumnValueToMapEntryConverter#convertToKey(String)}
-   * <p>
-   * Types returned from the database will be converted to Java types in the map according with the
-   * correspondence defined in
-   * {@link ColumnValueToMapEntryConverter#convertToValue(ResultSet, int, int)}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object... )}
-   *
-   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
-   * @param parameters are ordered parameter.
-   */
-  Map<String, Object> readMapFirst(String sql, Object... parameters);
-
-  /**
-   * See {@link #readMapList(String, Object...)}
-   *
-   * @param sql
-   * @return
-   */
-  List<Map<String, Object>> readMapList(ParameterizedSql sql);
-
-
-  /**
-   * Reads a list of objects from the database by mapping the SQL execution results to instances of
-   * {@link java.util.Map} containing data from the execution of the provided parameterized SQL.
-   *
-   * @see {{@link #readMapFirst(String, Object...)}}
-   *
-   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
-   * @param parameters are ordered parameter.
-   */
-  List<Map<String, Object>> readMapList(String sql, Object... parameters);
-
-
-  /**
-   * See {@link #readMapOne(String, Object...)}
-   *
-   * @param sql
-   * @return
-   */
-  Map<String, Object> readMapOne(ParameterizedSql sql);
-
-
-  /**
-   * Reads a first row from the database by mapping the results of the SQL query into an instance of
-   * {@link java.util.Map}. If the given SQL statement gets non-unique result, {@link SormException}
-   * is thrown.
-   *
-   * @see {{@link Orm#readMapFirst(String, Object...)}}
-   *
-   * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
-   * @param parameters are ordered parameter.
-   */
-  Map<String, Object> readMapOne(String sql, Object... parameters);
 
   /**
    * Reads only one object from the database.
@@ -766,10 +681,28 @@ public interface Orm {
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters);
 
+  /**
+   * Reads all rows from the table indicated by object class.
+   *
+   * @param <T>
+   * @param type
+   * @return
+   */
+  <T> List<T> selectAll(Class<T> type);
+
+  /**
+   * Reads an object by its primary keys from the table indicated by object class.
+   *
+   * @param <T>
+   * @param type
+   * @param primaryKeyValues
+   * @return
+   */
+  <T> T selectByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
    *
-   * Updates by objects on the table corresponding to the class of the given objects.
+   * Updates by objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -778,7 +711,7 @@ public interface Orm {
   <T> int[] update(List<T> objects);
 
   /**
-   * Updates by an object on the table corresponding to the class of the given object.
+   * Updates by an object in the table corresponding to the class of the given object.
    *
    * @param <T>
    * @param object
@@ -787,7 +720,7 @@ public interface Orm {
   <T> int update(T object);
 
   /**
-   * Updates by objects on the table corresponding to the class of the given objects.
+   * Updates by objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -796,34 +729,33 @@ public interface Orm {
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
 
   /**
-   * Updates by objects on the table corresponding to the given table name.
+   * Updates by objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] updateOn(String tableName, List<T> objects);
+  <T> int[] updateIn(String tableName, List<T> objects);
 
   /**
-   * Updates by an object on the table corresponding to the given table name.
+   * Updates by an object in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param object
    * @return
    */
-  <T> int updateOn(String tableName, T object);
+  <T> int updateIn(String tableName, T object);
 
   /**
-   * Updates by objects on the table corresponding to the given table name.
+   * Updates by objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] updateOn(String tableName, @SuppressWarnings("unchecked") T... objects);
-
+  <T> int[] updateIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
 }

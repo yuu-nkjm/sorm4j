@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.example.first;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 
@@ -13,10 +14,10 @@ public class WithTryWithResourcesExample {
     Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
     // Create customer table
-    sorm.accept(conn -> conn.executeUpdate(Customer.CREATE_TABLE_SQL));
+    sorm.acceptHandler(conn -> conn.executeUpdate(Customer.CREATE_TABLE_SQL));
 
     // Open OrmConnection. It will be closed with try-with-resources block.
-    try (OrmConnection conn = sorm.openConnection()) {
+    try (OrmConnection conn = sorm.open()) {
 
       // Insert an object
       conn.insert(Customer.ALICE);
@@ -25,13 +26,15 @@ public class WithTryWithResourcesExample {
       conn.insert(Customer.BOB, Customer.CAROL);
 
       // Execute select sql and convert result to pojo list.
-      List<Customer> allCustomers = conn.readAll(Customer.class);
+      List<Customer> allCustomers = conn.selectAll(Customer.class);
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      List<String> messages = conn.readAllStream(Customer.class).stream()
-          .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
-      System.out.println("messages = " + messages);
+      try (Stream<Customer> stream = conn.openStreamAll(Customer.class)) {
+        List<String> messages = stream.map(c -> c.getName() + " lives in " + c.getAddress())
+            .collect(Collectors.toList());
+        System.out.println("messages = " + messages);
+      }
 
       // Execute select sql and convert result to a pojo object.
       Customer lastCustomer =
@@ -40,7 +43,7 @@ public class WithTryWithResourcesExample {
 
 
       // Read object by primary key.
-      Customer customerId2 = conn.findByPrimaryKey(Customer.class, 2);
+      Customer customerId2 = conn.selectByPrimaryKey(Customer.class, 2);
       System.out.println("customer of ID 2 = " + customerId2);
 
       // Execute select sql and convert result to pojo list.

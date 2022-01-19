@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
+import static java.sql.Connection.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
@@ -36,8 +37,8 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowInsert() {
-    sorm.accept(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
-    sorm.acceptTransactionHandler(tr -> {
+    sorm.acceptHandler(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
+    sorm.acceptHandler(TRANSACTION_READ_COMMITTED, tr -> {
       try {
         tr.insert(PLAYER_ALICE, null);
         failBecauseExceptionWasNotThrown(Exception.class);
@@ -52,12 +53,12 @@ class SimpleBatchProcessorTest {
   @Test
   void testMultiRowInsertMany() {
     List<Guest> t = Stream.generate(() -> GUEST_ALICE).limit(1000).collect(Collectors.toList());
-    sorm.accept(conn -> conn.insert(t));
+    sorm.acceptHandler(conn -> conn.insert(t));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.accept(conn -> conn
+    sorm.acceptHandler(conn -> conn
         .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
 

@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -27,7 +28,7 @@ class CommandTest {
 
   @Test
   void testAcceptPreparedStatementHandler() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       conn.executeQuery(con -> {
         PreparedStatement stmt = con.prepareStatement("select * from guests where id=?");
@@ -39,14 +40,14 @@ class CommandTest {
 
   @Test
   void testApplyPreparedStatementHandler() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
 
       conn.executeQuery(con -> {
         PreparedStatement stmt = con.prepareStatement("select * from guests where id=?");
         stmt.setInt(1, 1);
         return stmt;
-      }, conn.getResultSetToMapTraverser());
+      }, conn.getResultSetTraverser(RowMap.class));
 
       conn.createCommand("select * from guests where id=:id", Map.of("id", 1));
 
@@ -55,7 +56,7 @@ class CommandTest {
 
   @Test
   void testExecuteQueryFunctionHandlerOfResultSetT() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       Player p = conn.createCommand("select * from players where id=?", 1)
           .executeQuery(conn.getResultSetTraverser(Player.class)).get(0);
@@ -65,7 +66,7 @@ class CommandTest {
 
   @Test
   void testExecuteQueryRowMapperOfT() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       List<Player> p = conn.createCommand("select * from players where id=?", 1)
           .executeQuery(conn.getResultSetTraverser(Player.class));
@@ -75,7 +76,7 @@ class CommandTest {
 
   @Test
   void testExecuteUpdate() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       int m = conn.createCommand("insert into players values(?,?,?)", PLAYER_CAROL.getId(),
           PLAYER_CAROL.getName(), PLAYER_CAROL.readAddress()).executeUpdate();
       assertThat(m).isEqualTo(1);
@@ -84,26 +85,17 @@ class CommandTest {
 
   @Test
   void testReadFirst() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       Player p = conn.createCommand("select * from players").readFirst(Player.class);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
 
-  @Test
-  void testReadStream() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Player p =
-          conn.createCommand("select * from players").readStream(Player.class).toList().get(0);
-      assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
-    });
-  }
 
   @Test
   void testReadList() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       Player p = conn.createCommand("select * from players").readList(Player.class).get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
@@ -112,64 +104,17 @@ class CommandTest {
 
   @Test
   void testReadOne() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
       Player p = conn.createCommand("select * from players").readOne(Player.class);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
 
-  @Test
-  void testReadStreamToList() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Player p = conn.readStream(Player.class, "select * from players")
-          .toList(conn.getRowMapper(Player.class)).get(0);
-      assertThat(p.getName()).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
-    });
-  }
-
-  @Test
-  void testReadMapFirst() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Map<String, Object> map = conn.createCommand("select * from players").readMapFirst();
-      assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
-    });
-  }
-
-  @Test
-  void testReadMapStream() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Map<String, Object> map =
-          conn.createCommand("select * from players").readMapStream().toList().get(0);
-      assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
-    });
-  }
-
-
-  @Test
-  void testReadMapList() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Map<String, Object> map = conn.createCommand("select * from players").readMapList().get(0);
-      assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
-    });
-  }
-
-  @Test
-  void testReadMapOne() {
-    sorm.accept(conn -> {
-      conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      Map<String, Object> map = conn.createCommand("select * from players").readMapOne();
-      assertThat(map.get("name")).isEqualTo(SormTestUtils.PLAYER_ALICE.getName());
-    });
-  }
 
   @Test
   void testReadTupleListClassOfT1ClassOfT2() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       conn.insert(List.of(GUEST_ALICE, GUEST_BOB));
 
@@ -188,7 +133,7 @@ class CommandTest {
 
   @Test
   void testReadTupleListClassOfT1ClassOfT2ClassOfT3() {
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       conn.insert(List.of(GUEST_ALICE, GUEST_BOB));
       conn.insert(List.of(SOCCER, TENNIS));
@@ -212,23 +157,23 @@ class CommandTest {
   @Test
   void testOrderedRequest() {
     AtomicInteger id = new AtomicInteger(10);
-    int row = sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
+    int row = sorm.applyHandler(conn -> conn.createCommand("insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet(), "Frank", "Tokyo").executeUpdate());
     assertThat(row).isEqualTo(1);
 
-    List<Player> ret = sorm.apply(conn -> conn
+    List<Player> ret = sorm.applyHandler(conn -> conn
         .createCommand("select * from players where id=? and name=?")
         .addParameter(id.get(), "Frank").executeQuery(conn.getResultSetTraverser(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
 
-    row = sorm.apply(conn -> conn.createCommand("insert into players values(?,?,?)")
+    row = sorm.applyHandler(conn -> conn.createCommand("insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
         .executeUpdate());
     assertThat(row).isEqualTo(1);
 
 
-    ret = sorm.apply(conn -> conn.createCommand("select * from players where id=?")
+    ret = sorm.applyHandler(conn -> conn.createCommand("select * from players where id=?")
         .addParameter(id.get()).executeQuery(conn.getRowMapper(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
@@ -237,16 +182,15 @@ class CommandTest {
   @Test
   void testCommand() {
 
-    sorm.apply(
+    sorm.applyHandler(
         conn -> conn.createCommand(ParameterizedSql.parse("select * from players where id=?", 1))
             .readList(Player.class));
 
-    sorm.apply(conn -> conn
+    sorm.applyHandler(conn -> conn
         .createCommand(
             ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
-    sorm.apply(conn -> conn.getRowToMapMapper());
-    sorm.apply(conn -> conn.getTableMetaData("players"));
+    sorm.applyHandler(conn -> conn.getTableMetaData("players"));
   }
 
 
