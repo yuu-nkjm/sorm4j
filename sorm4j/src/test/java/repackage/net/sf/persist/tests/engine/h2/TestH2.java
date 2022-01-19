@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.FieldMap;
@@ -25,14 +24,14 @@ import repackage.net.sf.persist.tests.engine.framework.FieldMap;
 public class TestH2 {
 
 
-  private static final JdbcConnectionPool connectionPool =
+  private static final JdbcConnectionPool dataSource =
       JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "sa", "");
   // private static final JdbcConnectionPool connectionPool =
   // JdbcConnectionPool.create("jdbc:h2:tcp://localhost/~/db/ormtest", "sa", "");
 
   @BeforeAll
   static void beforAll() {
-    try (Connection conn = connectionPool.getConnection()) {
+    try (Connection conn = dataSource.getConnection()) {
       Statement st = conn.createStatement();
       String sql = String.join(System.lineSeparator(),
           Files.readAllLines(new File(TestH2.class.getResource("h2.sql").toURI()).toPath()));
@@ -49,8 +48,8 @@ public class TestH2 {
 
   @Test
   public void testBinaryTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn);) {
 
       Class<?>[] binaryTypes = new Class<?>[] {Blob.class};
       Class<?>[] otherTypes = new Class<?>[] {Object.class};
@@ -78,8 +77,8 @@ public class TestH2 {
 
   @Test
   public void testDatetimeTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
@@ -105,8 +104,8 @@ public class TestH2 {
 
   @Test
   public void testNumericTypes() throws SQLException {
-    try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -147,8 +146,8 @@ public class TestH2 {
   @Test
   public void testStringTypes() throws SQLException {
 
-    try (Connection conn = connectionPool.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
 
       Class<?>[] stringTypes = new Class<?>[] {String.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};

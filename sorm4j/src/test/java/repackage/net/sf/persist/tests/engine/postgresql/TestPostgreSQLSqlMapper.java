@@ -25,13 +25,13 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.SqlParameterSetter;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
@@ -92,9 +92,10 @@ public class TestPostgreSQLSqlMapper {
 
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection c = Sorm.toOrmConnection(conn, context);
-      log.info(c.readMapFirst("select * from sql_mapper_test"));
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection c = OrmConnection.of(conn, context);) {
+
+      log.info(c.readFirst(RowMap.class, "select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
       doTest(c, "c_integer by int", "c_integer", 1);
       doTest(c, "c_integer by BigDecimal", "c_integer", new BigDecimal("1"));
@@ -197,8 +198,8 @@ public class TestPostgreSQLSqlMapper {
   private void bindToSqlTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "bind: " + column + "(" + param.getClass() + ") ";
     try {
-      Map<String, Object> ret = c
-          .readMapFirst("SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
+      Map<String, Object> ret = c.readFirst(RowMap.class,
+          "SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
       if (ret != null) {
         log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
@@ -221,7 +222,7 @@ public class TestPostgreSQLSqlMapper {
       ParameterizedSql statement = OrderedParameterSql
           .from("SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
           .addParameter(param).parse();
-      Map<String, Object> ret = c.readMapFirst(statement);
+      Map<String, Object> ret = c.readFirst(RowMap.class, statement);
       if (ret != null) {
         log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {

@@ -2,17 +2,17 @@ package org.nkjmlab.sorm4j.sql.schema;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.sql.schema.TableSchemaTest.TempGuestTable.Column.*;
-import static org.nkjmlab.sorm4j.util.table.TableSchema.Keyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.table.TableSchema;
 
 class TableSchemaTest {
 
   private static TempGuestTable tempGuestTable = new TempGuestTable();
-  private static Sorm sorm = SormTestUtils.createSorm();
+  private static Sorm sorm = SormTestUtils.createSormWithNewContextAndTables();
 
   static class TempGuestTable {
 
@@ -23,7 +23,7 @@ class TableSchemaTest {
     private final TableSchema schema;
 
     public TempGuestTable() {
-      this.schema = TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID, INT)
+      this.schema = TableSchema.builder("temp_guests").addColumnDefinition(ID, INT)
           .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
           .addUniqueConstraint(TEL).addIndexDefinition(TEL).setPrimaryKey(ID).build();
     }
@@ -32,7 +32,7 @@ class TableSchemaTest {
 
   @Test
   void testSchemeBuilder() {
-    TableSchema schema1 = TableSchema.builder().setTableName("temp_guests")
+    TableSchema schema1 = TableSchema.builder("temp_guests")
         .addColumnDefinition(ID.name(), INT).addColumnDefinition(NAME.name(), VARCHAR)
         .addColumnDefinition(TEL.name(), VARCHAR).addUniqueConstraint(TEL.name())
         .addIndexDefinition(TEL.name()).setPrimaryKey(ID.name()).build();
@@ -47,7 +47,7 @@ class TableSchemaTest {
 
   @Test
   void testSchemeBuilder2() {
-    TableSchema.builder().setTableName("temp_guests").addColumnDefinition(ID.name(), INT)
+    TableSchema.builder("temp_guests").addColumnDefinition(ID.name(), INT)
         .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
   }
 
@@ -73,7 +73,7 @@ class TableSchemaTest {
   void testGetIndexSchema() {
     assertThat(tempGuestTable.schema.getCreateIndexIfNotExistsStatements().get(0))
         .isEqualToIgnoringCase(
-            "CREATE INDEX IF NOT EXISTS index_temp_guests_tel ON temp_guests(tel)");
+            "CREATE INDEX IF NOT EXISTS index_in_temp_guests_on_tel ON temp_guests(tel)");
   }
 
 
@@ -82,6 +82,7 @@ class TableSchemaTest {
     tempGuestTable.schema.createTableIfNotExists(sorm);
     tempGuestTable.schema.createIndexesIfNotExists(sorm);
     tempGuestTable.schema.dropTableIfExists(sorm);
+    tempGuestTable.schema.createTableIfNotExists(sorm).createIndexesIfNotExists(sorm);
   }
 
 

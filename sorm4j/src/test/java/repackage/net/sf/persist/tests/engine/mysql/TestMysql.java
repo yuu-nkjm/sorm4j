@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -35,8 +34,9 @@ public class TestMysql {
 
   @Test
   public void testBinaryTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
+
 
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Blob.class};
       Class<?>[] blobTypes = new Class<?>[] {Blob.class};
@@ -67,8 +67,8 @@ public class TestMysql {
 
   @Test
   public void testDatetimeTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
@@ -97,8 +97,8 @@ public class TestMysql {
   @Test
   public void testNumericTypes() throws SQLException {
 
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
       Class<?>[] byteTypes = new Class<?>[] {Byte.class, byte.class};
@@ -138,8 +138,8 @@ public class TestMysql {
 
   @Test
   public void testStringTypes() throws SQLException {
-    try (Connection conn = dataSource.getConnection()) {
-      OrmConnection ormConn = Sorm.toOrmConnection(conn);
+    try (Connection conn = dataSource.getConnection();
+        OrmConnection ormConn = OrmConnection.of(conn)) {
 
       Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};

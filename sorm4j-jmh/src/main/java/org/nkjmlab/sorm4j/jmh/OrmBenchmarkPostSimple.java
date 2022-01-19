@@ -515,25 +515,25 @@ public class OrmBenchmarkPostSimple {
 
     @Override
     public int insert(Post input) {
-      return sorm.apply(conn -> conn.insert(input));
+      return sorm.applyHandler(conn -> conn.insert(input));
     }
 
 
     @Override
     public int[] insertMultiRow(Post... inputs) {
-      return sorm.apply(conn -> conn.insert(inputs));
+      return sorm.applyHandler(conn -> conn.insert(inputs));
     }
 
     @Override
     public List<Post> readAll(int input) {
-      return sorm.apply(conn -> conn.readList(Post.class, SELECT_TYPICAL_SQL));
+      return sorm.applyHandler(conn -> conn.readList(Post.class, SELECT_TYPICAL_SQL));
     }
 
     @Override
     public Post readOneRow(int input) {
       // return sorm
       // .apply(conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
-      return sorm.apply(conn -> conn.readByPrimaryKey(Post.class, input));
+      return sorm.applyHandler(conn -> conn.selectByPrimaryKey(Post.class, input));
     }
   }
 
@@ -813,7 +813,7 @@ public class OrmBenchmarkPostSimple {
   public void setup() {
     System.out.println(System.lineSeparator() + "### setup ##################");
     Sorm sorm = Sorm.create(dataSource);
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.executeUpdate(Post.CREATE_TABLE_IF_NOT_EXISTS);
       conn.insert(IntStream.range(0, OrmBenchmarkPostSimple.NUM_OF_ROWS)
           .mapToObj(i -> Post.createRandom(i)).toArray(Post[]::new));

@@ -27,7 +27,6 @@ public interface SormLogger {
 
   void error(int depth, String format, Object... params);
 
-
   void logBeforeSql(String tag, Connection connection, String sql, Object... parameters);
 
   void logBeforeSql(String tag, Connection connection, ParameterizedSql psql);

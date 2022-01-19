@@ -246,7 +246,6 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       default:
         return conn.createArrayOf("JAVA_OBJECT", (Object[]) parameter);
     }
-
   }
 
 

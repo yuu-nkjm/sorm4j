@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.util.table;
 import static java.lang.String.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,6 @@ import org.nkjmlab.sorm4j.result.TableMetaData;
 public class TableSchema {
 
   /**
-   * Creates a new {@link TableSchema.Builder}.
-   *
-   * @return
-   */
-  public static TableSchema.Builder builder() {
-    return new TableSchema.Builder();
-  }
-
-  /**
    * Creates a new {@link TableSchema.Builder} with the given table name.
    *
    * @return
@@ -52,33 +44,30 @@ public class TableSchema {
 
   private final List<String> createIndexStatements;
 
-  private TableSchema(Builder builder) {
-    this.tableName = builder.tableName;
-    this.tableSchema = builder.getTableSchema();
-    this.createTableStatement = "create table if not exists " + tableSchema;
-    this.dropTableStatement = "drop table if exists " + tableName;
-    this.columnNames = builder.getColumunNames();
-    this.createIndexStatements = builder.getCreateIndexIfNotExistsStatements();
+
+  private TableSchema(String tableName, String tableSchema, List<String> columnNames,
+      String createTableStatement, String dropTableStatement, List<String> createIndexStatements) {
+    this.tableName = tableName;
+    this.tableSchema = tableSchema;
+    this.columnNames = columnNames;
+    this.createTableStatement = createTableStatement;
+    this.dropTableStatement = dropTableStatement;
+    this.createIndexStatements = createIndexStatements;
   }
 
-  public void createIndexesIfNotExists(Orm orm) {
+  public TableSchema createIndexesIfNotExists(Orm orm) {
     getCreateIndexIfNotExistsStatements().forEach(s -> orm.executeUpdate(s));
-
+    return this;
   }
 
-
-  public void createTableAndIndexesIfNotExists(Orm orm) {
-    createTableIfNotExists(orm);
-    createIndexesIfNotExists(orm);
-
-  }
-
-  public void createTableIfNotExists(Orm orm) {
+  public TableSchema createTableIfNotExists(Orm orm) {
     orm.executeUpdate(getCreateTableIfNotExistsStatement());
+    return this;
   }
 
-  public void dropTableIfExists(Orm orm) {
+  public TableSchema dropTableIfExists(Orm orm) {
     orm.executeUpdate(getDropTableIfExistsStatement());
+    return this;
   }
 
 
@@ -174,7 +163,9 @@ public class TableSchema {
 
     private static List<String> getColumuns(Map<String, String[]> columnDefinisions) {
       return columnDefinisions.keySet().stream()
-          .map(columnName -> columnName + " " + join(" ", columnDefinisions.get(columnName)))
+          .map(columnName -> columnName + " "
+              + join(" ", Arrays.stream(columnDefinisions.get(columnName)).map(s -> s.trim())
+                  .collect(Collectors.toList())))
           .collect(Collectors.toList());
     }
 
@@ -207,15 +198,12 @@ public class TableSchema {
 
     private final List<String[]> indexColumns;
 
-    private Builder() {
+
+
+    private Builder(String tableName) {
       this.columnDefinitions = new LinkedHashMap<>();
       this.uniqueColumnPairs = new ArrayList<>();
       this.indexColumns = new ArrayList<>();
-    }
-
-
-    public Builder(String tableName) {
-      this();
       this.tableName = tableName;
     }
 
@@ -267,11 +255,11 @@ public class TableSchema {
      *
      * <pre>
      * TableSchema.builder("reports") .addColumnDefinition("score",
-     * INT).addIndexDefinition("score").build();
+     * INT).addIndexDefinition("id","score").build();
      *
      * generates an index name like
      *
-     * "index_reports_score"
+     * "index_in_reports_on_id_score"
      *
      * @param indexColumnPair
      */
@@ -308,7 +296,17 @@ public class TableSchema {
      * @return
      */
     public TableSchema build() {
-      return new TableSchema(this);
+      if (columnDefinitions.isEmpty()) {
+        return new TableSchema(tableName, "", Collections.emptyList(), "", "",
+            Collections.emptyList());
+      } else {
+        String tableSchema =
+            getTableSchema(tableName, columnDefinitions, primaryKeys, uniqueColumnPairs);
+        String createTableStatement = "create table if not exists " + tableSchema;
+        String dropTableStatement = "drop table if exists " + tableName;
+        return new TableSchema(tableName, tableSchema, getColumunNames(), createTableStatement,
+            dropTableStatement, getCreateIndexIfNotExistsStatements());
+      }
     }
 
     private List<String> getColumunNames() {
@@ -317,20 +315,11 @@ public class TableSchema {
 
     private List<String> getCreateIndexIfNotExistsStatements() {
       return indexColumns.stream()
-          .map(columns -> getCreateIndexOnStatement("index_" + tableName + "_" + join("_", columns),
-              tableName, columns))
+          .map(columns -> getCreateIndexOnStatement(
+              "index_in_" + tableName + "_on_" + join("_", columns), tableName, columns))
           .collect(Collectors.toList());
     }
 
-    /**
-     * Gets a table schema.
-     *
-     * @return
-     */
-
-    private String getTableSchema() {
-      return getTableSchema(tableName, columnDefinitions, primaryKeys, uniqueColumnPairs);
-    }
 
     public Builder setPrimaryKey(Enum<?>... attributes) {
       setPrimaryKey(toStringArray(attributes));
@@ -364,47 +353,5 @@ public class TableSchema {
       this.tableName = tableName;
       return this;
     }
-
   }
-  public static class Keyword {
-
-    /** Data type **/
-    public static final String ARRAY = "array";
-    public static final String BIGINT = "bigint";
-    public static final String BOOLEAN = "boolean";
-    public static final String CHAR = "char";
-    public static final String DATE = "date";
-    public static final String DECIMAL = "decimal";
-    public static final String DOUBLE = "double";
-    public static final String IDENTITY = "identity";
-    public static final String INT = "int";
-    public static final String REAL = "real";
-    public static final String SMALLINT = "smallint";
-    public static final String TIME = "time";
-    public static final String TIMESTAMP = "timestamp";
-    public static final String TINYINT = "tinyint";
-    public static final String VARCHAR = "varchar";
-
-    /** Constraint and misc **/
-    public static final String AUTO_INCREMENT = "auto_increment";
-    public static final String NOT_NULL = "not null";
-    public static final String PRIMARY_KEY = "primary key";
-    public static final String UNIQUE = "unique";
-
-    public static String chars(int num) {
-      return CHAR + "(" + num + ")";
-    }
-
-    public static String decimal(int precision) {
-      return DECIMAL + "(" + precision + ")";
-    }
-
-    public static String decimal(int precision, int scale) {
-      return DECIMAL + "(" + precision + "," + scale + ")";
-    }
-
-    private Keyword() {}
-
-  }
-
 }

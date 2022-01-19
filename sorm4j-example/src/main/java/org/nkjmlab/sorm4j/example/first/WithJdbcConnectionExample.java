@@ -5,8 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.Sorm;
 
 public class WithJdbcConnectionExample {
 
@@ -16,10 +16,11 @@ public class WithJdbcConnectionExample {
     String password = "password";
 
 
-    try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, user, password)) {
+    try (Connection jdbcConn = DriverManager.getConnection(jdbcUrl, user, password);
+        OrmConnection conn = OrmConnection.of(jdbcConn);) {
 
       // Creates a object-relation mapping connection by wrapping a JDBC connection.
-      OrmConnection conn = Sorm.toOrmConnection(jdbcConn);
+
 
       // Creates customer table
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
@@ -31,13 +32,15 @@ public class WithJdbcConnectionExample {
       conn.insert(Customer.BOB, Customer.CAROL);
 
       // Execute select sql and convert result to pojo list.
-      List<Customer> allCustomers = conn.readAll(Customer.class);
+      List<Customer> allCustomers = conn.selectAll(Customer.class);
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      List<String> messages = conn.readAllStream(Customer.class).stream()
-          .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
-      System.out.println("messages = " + messages);
+      try (Stream<Customer> stream = conn.openStreamAll(Customer.class)) {
+        List<String> messages = stream.map(c -> c.getName() + " lives in " + c.getAddress())
+            .collect(Collectors.toList());
+        System.out.println("messages = " + messages);
+      }
 
       // Execute select sql and convert result to a pojo object.
       Customer lastCustomer =
@@ -46,7 +49,7 @@ public class WithJdbcConnectionExample {
 
 
       // Read object by primary key.
-      Customer customerId2 = conn.readByPrimaryKey(Customer.class, 2);
+      Customer customerId2 = conn.selectByPrimaryKey(Customer.class, 2);
       System.out.println("customer of ID 2 = " + customerId2);
 
       // Execute select sql and convert result to pojo list.

@@ -9,8 +9,11 @@ package org.nkjmlab.sorm4j;
 public interface OrmTransaction extends OrmConnection {
 
   /**
-   * Closes the {@link java.sql.Connection Connection} associated with this instance.
-   * {@link OrmConnection#rollback()} is called before closing the connection.
+   * Closes the {@link java.sql.Connection} associated with this instance.
+   *
+   * <p>
+   * <strong>Note:</strong> If you do not explicitly commit in a opened transaction, it will be
+   * rolled back.
    *
    * @see java.sql.Connection#close()
    *

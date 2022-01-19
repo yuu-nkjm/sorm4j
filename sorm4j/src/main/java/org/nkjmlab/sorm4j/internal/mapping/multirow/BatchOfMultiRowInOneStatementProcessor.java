@@ -9,6 +9,7 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
@@ -25,10 +26,11 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   private final int multiRowSize;
   private final int batchSizeWithMultiRow;
 
-  public BatchOfMultiRowInOneStatementProcessor(LoggerContext loggerContext, 
-      SqlParametersSetter sqlParametersSetter, SqlParametersToTableMapping<T> tableMapping, int batchSize,
-      int multiRowSize, int batchSizeWithMultiRow) {
-    super(loggerContext, sqlParametersSetter, tableMapping, batchSize);
+  public BatchOfMultiRowInOneStatementProcessor(LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<T> tableMapping, int batchSize, int multiRowSize,
+      int batchSizeWithMultiRow) {
+    super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
   }
@@ -38,7 +40,7 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   public final int[] multiRowInsert(Connection con, T... objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> con.prepareStatement(tableMapping.getSql().getMultirowInsertSql(num)),
+            num -> prepareStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
             (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
@@ -47,7 +49,7 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   public final int[] multiRowMerge(Connection con, T... objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> con.prepareStatement(tableMapping.getSql().getMultirowMergeSql(num)),
+            num -> prepareStatement(con, tableMapping.getSql().getMultirowMergeSql(num)),
             (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 

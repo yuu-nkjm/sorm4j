@@ -9,10 +9,12 @@ import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.mapping.DefaultPreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.DefaultTableSqlFactory;
 import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.TableNameMapper;
 import org.nkjmlab.sorm4j.mapping.TableSqlFactory;
@@ -20,18 +22,19 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
- * A context for ORM execution. Instance of this class could be build by {{@link Builder#build()}.
+ * A context for ORM execution. Instance of this class could be built by {{@link Builder#build()}.
  *
- * @author nkjm
+ * @author yuu_nkjm
  *
  */
 public interface SormContext {
 
-  static final SormContext DEFAULT_CONTEXT = SormContext.builder().build();
-
+  /**
+   * Returns logger context.
+   *
+   * @return
+   */
   LoggerContext getLoggerContext();
-
-  int getTransactionIsolationLevel();
 
   public static Builder builder() {
     return new Builder();
@@ -44,6 +47,9 @@ public interface SormContext {
 
     private static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
         new DefaultSqlParametersSetter();
+
+    private static final PreparedStatementSupplier DEFAULT_STATEMENT_SUPPLIER =
+        new DefaultPreparedStatementSupplier();
 
     private static final ColumnValueToJavaObjectConverters DEFAULT_RESULT_SET_CONVERTER =
         new DefaultColumnValueToJavaObjectConverters();
@@ -68,20 +74,21 @@ public interface SormContext {
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
 
     private ColumnToFieldAccessorMapper columnFieldMapper;
-    private int transactionIsolationLevel = DEFAULT_TRANSACTION_ISOLATION_LEVEL;
-    private LoggerContext.Builder loggerConfigBuilder = LoggerContext.builder();
+    private LoggerContext.Builder loggerBuilder = LoggerContext.builder();
+
+    private PreparedStatementSupplier preparedStatementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
 
 
     private Builder() {}
 
     public SormContext build() {
-      LoggerContext loggerContext = loggerConfigBuilder.build();
+      LoggerContext loggerContext = loggerBuilder.build();
       columnFieldMapper = columnFieldMapper != null ? columnFieldMapper
           : new DefaultColumnToFieldAccessorMapper(loggerContext);
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
           columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
-          tableSqlFactory, multiRowProcessorFactory, transactionIsolationLevel);
+          preparedStatementSupplier, tableSqlFactory, multiRowProcessorFactory);
     }
 
 
@@ -113,6 +120,13 @@ public interface SormContext {
       return this;
     }
 
+    public Builder setpreparedStatementSupplier(
+        PreparedStatementSupplier preparedStatementSupplier) {
+      this.preparedStatementSupplier = preparedStatementSupplier;
+      return this;
+    }
+
+
     public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
       this.tableSqlFactory = tableSqlFactory;
       return this;
@@ -123,33 +137,28 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setTransactionIsolationLevel(int level) {
-      this.transactionIsolationLevel = level;
-      return this;
-    }
-
     public Builder setLoggerOnAll() {
-      this.loggerConfigBuilder.onAll();
+      this.loggerBuilder.onAll();
       return this;
     }
 
     public Builder setLoggerOffAll() {
-      this.loggerConfigBuilder.offAll();
+      this.loggerBuilder.offAll();
       return this;
     }
 
     public Builder setLoggerOn(LoggerContext.Category... categories) {
-      this.loggerConfigBuilder.on(categories);
+      this.loggerBuilder.on(categories);
       return this;
     }
 
     public Builder setLoggerOff(LoggerContext.Category... categories) {
-      this.loggerConfigBuilder.off(categories);
+      this.loggerBuilder.off(categories);
       return this;
     }
 
     public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
-      this.loggerConfigBuilder.setLoggerSupplier(loggerSupplier);
+      this.loggerBuilder.setLoggerSupplier(loggerSupplier);
       return this;
     }
 

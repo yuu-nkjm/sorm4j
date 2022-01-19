@@ -1,38 +1,37 @@
 package org.nkjmlab.sorm4j.sql;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.common.SormTestUtils.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Customer;
+import org.nkjmlab.sorm4j.test.common.Customer;
+import org.nkjmlab.sorm4j.test.common.Guest;
 
 class NamedParameterSqlTest {
   private String sql = "select * from simple where id=:idid and name=:name";
   private Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
 
-  private static Sorm sorm = createSormAndDropAndCreateTableAll();
+  private static Sorm sorm = createSormWithNewContextAndTables();
   static {
-    sorm.apply(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
+    sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
   }
 
   @Test
   void testCustomer() {
     {
-      String sql = "select * from customer where id=:id and address=:address";
+      String sql = "select * from guests where id=:id and address=:address";
       ParameterizedSql statement =
           NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").parse();
-      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
-      System.out.println(ret);
+      sorm.readList(Guest.class, statement);
     }
     {
       ParameterizedSql statement = NamedParameterSql.parse(
-          "select * from customer where name like {:name} and address in(<:address>) and id=:id",
+          "select * from guests where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
-      List<Customer> ret = sorm.apply(conn -> conn.readList(Customer.class, statement));
-      System.out.println(ret);
+      sorm.applyHandler(conn -> conn.readList(Customer.class, statement));
     }
   }
 
@@ -74,8 +73,6 @@ class NamedParameterSqlTest {
 
     ParameterizedSql sp = NamedParameterSql.from("select * from where ID in(<:names>)")
         .bind("names", List.of("foo", "bar")).parse();
-
-    System.out.println(sp);
 
     assertThat(sp.getSql()).contains("?,?");
     assertThat(sp.getParameters()[0]).isEqualTo("foo");

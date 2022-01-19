@@ -21,10 +21,14 @@ public class DriverManagerDataSource implements DataSource {
   private final String username;
   private final String password;
 
-  public DriverManagerDataSource(String jdbcUrl, String username, String password) {
+  private DriverManagerDataSource(String jdbcUrl, String username, String password) {
     this.jdbcUrl = jdbcUrl;
     this.username = username;
     this.password = password;
+  }
+
+  public static DriverManagerDataSource create(String jdbcUrl, String username, String password) {
+    return new DriverManagerDataSource(jdbcUrl, username, password);
   }
 
   @Override
@@ -50,8 +54,7 @@ public class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection(String username, String password) throws SQLException {
-    return Try.getOrElseThrow(() -> DriverManager.getConnection(jdbcUrl, username, password),
-        Try::rethrow);
+    return DriverManager.getConnection(jdbcUrl, username, password);
   }
 
   @Override

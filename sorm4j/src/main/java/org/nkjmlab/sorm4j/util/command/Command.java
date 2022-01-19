@@ -1,14 +1,10 @@
 package org.nkjmlab.sorm4j.util.command;
 
 import java.util.List;
-import java.util.Map;
-import org.nkjmlab.sorm4j.Orm;
-import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
 
@@ -59,15 +55,6 @@ public interface Command {
   <T> T readFirst(Class<T> objectClass);
 
   /**
-   * Returns an {@link ResultSetStream}. It is able to convert to Stream, List, and so on.
-   *
-   * @param <T>
-   * @param objectClass
-   * @return
-   */
-  <T> ResultSetStream<T> readStream(Class<T> objectClass);
-
-  /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
    * into instances of the given object class. Only the columns returned from the SQL query will be
    * set into the object instance.
@@ -88,36 +75,6 @@ public interface Command {
    * @return
    */
   <T> T readOne(Class<T> objectClass);
-
-
-  /**
-   * See {@link Orm#readMapFirst(String, Object...)}
-   *
-   * @return
-   */
-  Map<String, Object> readMapFirst();
-
-  /**
-   * See {@link OrmConnection#readMapStream(String, Object...)}
-   *
-   * @return
-   */
-  ResultSetStream<Map<String, Object>> readMapStream();
-
-  /**
-   * See {@link Orm#readMapList(String, Object...)}
-   *
-   * @return
-   */
-  List<Map<String, Object>> readMapList();
-
-  /**
-   * See {@link Orm#readMapOne(String, Object...)}
-   *
-   * @return
-   */
-  Map<String, Object> readMapOne();
-
 
   /**
    * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.

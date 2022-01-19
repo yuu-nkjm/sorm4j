@@ -5,8 +5,8 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.util.logger.JulSormLogger;
-import org.nkjmlab.sorm4j.util.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.internal.util.logger.JulSormLogger;
+import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
 
 public class LoggingExample {
 
@@ -18,7 +18,7 @@ public class LoggingExample {
     Sorm sorm = Sorm.create(ds, context);
 
 
-    sorm.accept(conn -> {
+    sorm.acceptHandler(conn -> {
       conn.executeUpdate(Customer.CREATE_TABLE_SQL);
       conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
     });
@@ -29,7 +29,7 @@ public class LoggingExample {
     sorm = Sorm.create(ds, context);
 
     List<Customer> customers =
-        sorm.apply(conn -> conn.createCommand("select * from customer where name=? and address=?")
+        sorm.applyHandler(conn -> conn.createCommand("select * from customer where name=? and address=?")
             .addParameter("Alice", "Kyoto").readList(Customer.class));
     System.out.println("customers=" + customers);
 

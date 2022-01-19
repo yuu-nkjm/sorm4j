@@ -1,11 +1,10 @@
 package org.nkjmlab.sorm4j.example;
 
-import static org.nkjmlab.sorm4j.util.table.TableSchema.Keyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.util.table.TableSchema;
-import org.nkjmlab.sorm4j.util.table.TableSchema.Keyword;
 
 public class TableSchemaExample {
 
@@ -37,9 +36,8 @@ public class TableSchemaExample {
 
     public QuizTable(DataSource dataSorce) {
       this.sorm = Sorm.create(dataSorce);
-      this.schema = TableSchema.builder().setTableName(TABLE_NAME)
-          .addColumnDefinition(ID, Keyword.INT, Keyword.AUTO_INCREMENT,
-              Keyword.PRIMARY_KEY)
+      this.schema = TableSchema.builder(TABLE_NAME)
+          .addColumnDefinition(ID, INT, AUTO_INCREMENT, PRIMARY_KEY)
           .addColumnDefinition(BOOK_NAME, VARCHAR).addColumnDefinition(BOOK_NAME, VARCHAR)
           .addColumnDefinition(QUESTION, VARCHAR).addColumnDefinition(ANSWER, VARCHAR).build();
     }
@@ -53,7 +51,7 @@ public class TableSchemaExample {
     }
 
     public void createTableAndIndexesIfNotExists() {
-      sorm.accept(conn -> {
+      sorm.acceptHandler(conn -> {
         conn.executeUpdate(schema.getCreateTableIfNotExistsStatement());
         schema.getCreateIndexIfNotExistsStatements()
             .forEach(createIndexStatement -> conn.executeUpdate(createIndexStatement));

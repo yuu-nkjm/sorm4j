@@ -11,9 +11,9 @@ import org.nkjmlab.sorm4j.OrmTransaction;
  */
 public final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
-  public OrmTransactionImpl(Connection connection, SormContextImpl context) {
+  public OrmTransactionImpl(Connection connection, SormContextImpl context, int isolationLevel) {
     super(connection, context);
-    begin(context.getTransactionIsolationLevel());
+    begin(isolationLevel);
   }
 
   @Override

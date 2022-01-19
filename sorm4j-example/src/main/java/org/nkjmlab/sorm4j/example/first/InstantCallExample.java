@@ -8,7 +8,7 @@ public class InstantCallExample {
   public static void main(String[] args) {
 
     // Creates an entry point
-    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password");
+    Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
     // Create customer table
     sorm.executeUpdate(Customer.CREATE_TABLE_SQL);
@@ -20,7 +20,7 @@ public class InstantCallExample {
     sorm.insert(Customer.BOB, Customer.CAROL);
 
     // Execute select sql and convert result to pojo list.
-    List<Customer> allCustomers = sorm.readAll(Customer.class);
+    List<Customer> allCustomers = sorm.selectAll(Customer.class);
     System.out.println("all customers = " + allCustomers);
 
     // Execute select sql and convert result to a pojo object.
@@ -29,7 +29,7 @@ public class InstantCallExample {
     System.out.println("last customer = " + lastCustomer);
 
     // Read object by primary key.
-    Customer customerId2 = sorm.readByPrimaryKey(Customer.class, 2);
+    Customer customerId2 = sorm.selectByPrimaryKey(Customer.class, 2);
     System.out.println("customer of ID 2 = " + customerId2);
 
     // Execute select sql and convert result to pojo list.

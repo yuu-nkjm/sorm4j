@@ -1,12 +1,14 @@
 package org.nkjmlab.sorm4j.util.table;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
@@ -19,11 +21,11 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql;
 public interface Table<T> {
 
   /**
-   * Gets the table schema.
+   * Gets the table name.
    *
    * @return
    */
-  TableSchema getTableSchema();
+  String getTableName();
 
   /**
    * Gets parameter type <T> as object class.
@@ -39,31 +41,93 @@ public interface Table<T> {
    */
   Sorm getSorm();
 
-  default void createTableAndIndexesIfNotExists() {
-    getTableSchema().createTableAndIndexesIfNotExists(getSorm());
+
+  /**
+   * Accepts a {@link OrmConnection} handler for a task with object-relation mapping. The connection
+   * will be closed after the process of handler.
+   *
+   * @param handler
+   */
+  default void acceptHandler(ConsumerHandler<OrmConnection> handler) {
+    getSorm().acceptHandler(handler);
   }
 
-  default void createTableIfNotExists() {
-    getTableSchema().createTableAndIndexesIfNotExists(getSorm());
+  /**
+   * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
+   *
+   * <p>
+   * Note: The transaction will be closed after the process of handler. The transaction will be
+   * rolled back if the transaction closes before commit. When an exception throws in the
+   * transaction, the transaction will be rollback.
+   *
+   * @param isolationLevel
+   * @param transactionHandler
+   */
+  default void acceptHandler(int isolationLevel,
+      ConsumerHandler<OrmTransaction> transactionHandler) {
+    getSorm().acceptHandler(isolationLevel, transactionHandler);
   }
 
-  default void createIndexesIfNotExists() {
-    getTableSchema().createIndexesIfNotExists(getSorm());
+  /**
+   *
+   * @param streamGenerator
+   * @param streamHandler
+   */
+  @Experimental
+  default void acceptHandler(
+      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      ConsumerHandler<Stream<T>> streamHandler) {
+    getSorm().acceptHandler(
+        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        streamHandler);
   }
 
-  default void dropTableIfExists() {
-    getTableSchema().dropTableIfExists(getSorm());
+
+  /**
+   * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
+   * result. The connection will be closed after the process of handler.
+   *
+   * @param handler
+   * @return
+   */
+  default T applyHandler(FunctionHandler<OrmConnection, T> handler) {
+    return getSorm().applyHandler(handler);
   }
 
-  default List<T> readAll() {
-    return getSorm().readAll(getValueType());
+
+  /**
+   * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
+   * result.
+   * <p>
+   * Note: The transaction will be closed after the process of handler. The transaction will be
+   * rolled back if the transaction closes before commit. When an exception throws in the
+   * transaction, the transaction will be rolled back.
+   *
+   * @param isolationLevel
+   * @param transactionHandler
+   *
+   * @return
+   */
+  default T applyHandler(int isolationLevel,
+      FunctionHandler<OrmTransaction, T> transactionHandler) {
+    return getSorm().applyHandler(isolationLevel, transactionHandler);
   }
 
-
-  default T readByPrimaryKey(Object... primaryKeyValues) {
-    return getSorm().readByPrimaryKey(getValueType(), primaryKeyValues);
+  /**
+   *
+   * @param <R>
+   * @param streamGenerator
+   * @param streamHandler
+   * @return
+   */
+  @Experimental
+  default <R> R applyHandler(
+      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      FunctionHandler<Stream<T>, R> streamHandler) {
+    return getSorm().applyHandler(
+        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        streamHandler);
   }
-
 
   default T readFirst(ParameterizedSql sql) {
     return getSorm().readFirst(getValueType(), sql);
@@ -75,16 +139,13 @@ public interface Table<T> {
   }
 
 
-
   default List<T> readList(ParameterizedSql sql) {
     return getSorm().readList(getValueType(), sql);
   }
 
-
   default List<T> readList(String sql, Object... parameters) {
     return getSorm().readList(getValueType(), sql, parameters);
   }
-
 
   default T readOne(ParameterizedSql sql) {
     return getSorm().readOne(getValueType(), sql);
@@ -105,212 +166,174 @@ public interface Table<T> {
   }
 
 
+  default TableMetaData getTableMetaData() {
+    return getSorm().getTableMetaData(getTableName());
+  }
+
   default boolean exists(T object) {
     return getSorm().exists(object);
   }
 
 
-  default int[] delete(List<T> objects) {
-    return getSorm().deleteOn(getTableName(), objects);
+  default int[] deleteIn(List<T> objects) {
+    return getSorm().deleteIn(getTableName(), objects);
   }
 
 
-  default int delete(T object) {
-    return getSorm().deleteOn(getTableName(), object);
+  default int deleteIn(T object) {
+    return getSorm().deleteIn(getTableName(), object);
   }
 
 
-  default int[] delete(@SuppressWarnings("unchecked") T... objects) {
-    return getSorm().deleteOn(getTableName(), objects);
+  default int[] deleteIn(@SuppressWarnings("unchecked") T... objects) {
+    return getSorm().deleteIn(getTableName(), objects);
   }
 
 
-  default int deleteAll() {
-    return getSorm().deleteAllOn(getTableName());
+  default int deleteAllIn() {
+    return getSorm().deleteAllIn(getTableName());
   }
 
 
-  default int[] insert(List<T> objects) {
-    return getSorm().insert(objects);
+  default int[] insertIn(List<T> objects) {
+    return getSorm().insertIn(getTableName(), objects);
   }
 
 
-  default int insert(T object) {
-    return getSorm().insert(object);
+  default int insertIn(T object) {
+    return getSorm().insertIn(getTableName(), object);
   }
 
 
-  default int[] insert(@SuppressWarnings("unchecked") T... objects) {
-    return getSorm().insert(objects);
+  default int[] insertIn(@SuppressWarnings("unchecked") T... objects) {
+    return getSorm().insertIn(getTableName(), objects);
   }
 
 
-  default InsertResult<T> insertAndGet(List<T> objects) {
-    return getSorm().insertAndGet(objects);
+  default InsertResult<T> insertAndGetIn(List<T> objects) {
+    return getSorm().insertAndGetIn(getTableName(), objects);
   }
 
 
-  default InsertResult<T> insertAndGet(T object) {
-    return getSorm().insertAndGet(object);
+  default InsertResult<T> insertAndGetIn(T object) {
+    return getSorm().insertAndGetIn(getTableName(), object);
   }
 
 
-  default InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
-    return getSorm().insertAndGet(objects);
+  default InsertResult<T> insertAndGetIn(@SuppressWarnings("unchecked") T... objects) {
+    return getSorm().insertAndGetIn(getTableName(), objects);
   }
 
 
-  default int[] merge(List<T> objects) {
-    return getSorm().merge(objects);
+  default int[] mergeIn(List<T> objects) {
+    return getSorm().mergeIn(getTableName(), objects);
   }
 
 
-  default int merge(T object) {
-    return getSorm().merge(object);
+  default int mergeIn(T object) {
+    return getSorm().mergeIn(getTableName(), object);
   }
 
 
-  default int[] merge(@SuppressWarnings("unchecked") T... objects) {
-    return getSorm().merge(objects);
+  default int[] mergeIn(@SuppressWarnings("unchecked") T... objects) {
+    return getSorm().mergeIn(getTableName(), objects);
   }
 
 
-  default int[] update(List<T> objects) {
-    return getSorm().update(objects);
+  default int[] updateIn(List<T> objects) {
+    return getSorm().updateIn(getTableName(), objects);
   }
 
 
-  default int update(T object) {
-    return getSorm().update(object);
+  default int updateIn(T object) {
+    return getSorm().updateIn(getTableName(), object);
   }
 
 
-  default int[] update(@SuppressWarnings("unchecked") T... objects) {
-    return getSorm().update(objects);
+  default int[] updateIn(@SuppressWarnings("unchecked") T... objects) {
+    return getSorm().updateIn(getTableName(), objects);
   }
 
-
-  default RowMapper<Map<String, Object>> getRowToMapMapper() {
-    return getSorm().getRowToMapMapper();
+  default <S> List<Tuple2<T, S>> join(TableWithSchema<S> other, String onCondition) {
+    return getSorm().join(getValueType(), other.getValueType(), onCondition);
   }
 
-
-  default ResultSetTraverser<List<Map<String, Object>>> getResultSetToMapTraverser() {
-    return getSorm().getResultSetToMapTraverser();
+  default <S> List<Tuple2<T, S>> leftJoin(TableWithSchema<S> other, String onCondition) {
+    return getSorm().leftJoin(getValueType(), other.getValueType(), onCondition);
   }
 
-
-  default Map<String, Object> readMapFirst(ParameterizedSql sql) {
-    return getSorm().readMapFirst(sql);
+  default List<T> selectAll() {
+    return getSorm().selectAll(getValueType());
   }
 
-
-  default Map<String, Object> readMapFirst(String sql, Object... parameters) {
-    return getSorm().readMapFirst(sql, parameters);
-  }
-
-
-
-  default List<Map<String, Object>> readMapList(ParameterizedSql sql) {
-    return getSorm().readMapList(sql);
-  }
-
-
-  default List<Map<String, Object>> readMapList(String sql, Object... parameters) {
-    return getSorm().readMapList(sql, parameters);
-  }
-
-
-  default Map<String, Object> readMapOne(ParameterizedSql sql) {
-    return getSorm().readMapOne(sql);
-  }
-
-
-  default Map<String, Object> readMapOne(String sql, Object... parameters) {
-    return getSorm().readMapOne(sql, parameters);
-  }
-
-
-  default String getTableName() {
-    return getTableSchema().getTableName();
-  }
-
-
-  default TableMetaData getTableMetaData() {
-    return getSorm().getTableMetaData(getTableName());
-  }
-
-
-  default <S> S executeQuery(ParameterizedSql sql, ResultSetTraverser<S> traverser) {
-    return getSorm().executeQuery(sql, traverser);
-  }
-
-
-  default <S> List<S> executeQuery(ParameterizedSql sql, RowMapper<S> mapper) {
-    return getSorm().executeQuery(sql, mapper);
-  }
-
-
-  default int executeUpdate(String sql, Object... parameters) {
-    return getSorm().executeUpdate(sql, parameters);
-  }
-
-
-  default int executeUpdate(ParameterizedSql sql) {
-    return getSorm().executeUpdate(sql);
-  }
-
-
-  default List<T> readListAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readList(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default T readFirstAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readFirst(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default T readOneAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readOne(getValueType(), getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default List<Map<String, Object>> readMapListAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readMapList(getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default Map<String, Object> readMapOneAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readMapOne(getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default Map<String, Object> readMapFirstAllMatch(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    return getSorm().readMapOne(getAllMatchSql(tuppleOfNameAndValue));
-  }
-
-  default ParameterizedSql getAllMatchSql(Tuple2<?, ?>... tuppleOfNameAndValue) {
-    List<String> conditions = new ArrayList<>();
-    List<Object> params = new ArrayList<>();
-    Arrays.stream(tuppleOfNameAndValue).forEach(t -> {
-      conditions.add(t.getT1() + "=?");
-      params.add(t.getT2());
-    });
-
-    return ParameterizedSql.of(SelectSql.selectStarFrom(getTableSchema().getTableName()) + WHERE
-        + String.join(AND, conditions), params);
-  }
-
-  default <S> List<Tuple2<T, S>> join(Table<S> other, String onCondition) {
-    return getSorm().readTupleList(getValueType(), other.getValueType(), onCondition);
-  }
-
-  default <S> List<Tuple2<T, S>> leftJoin(Table<S> other, String onCondition) {
-    return getSorm().readTupleList(getValueType(), other.getValueType(), onCondition);
+  default T selectByPrimaryKey(Object... primaryKeyValues) {
+    return getSorm().selectByPrimaryKey(getValueType(), primaryKeyValues);
   }
 
   /**
+   * @see {@link #getAllEqualSql(Tuple2...)}
    *
-   * @see TableMetaData#getColumnAliases()
+   * @param tupplesOfNameAndValue
+   * @return
    */
-  default String getColumnAliases() {
-    return getTableMetaData().getColumnAliases();
+  default List<T> selectListAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+    return getSorm().readList(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
+  }
+
+  /**
+   * @see {@link #getAllEqualSql(Tuple2...)}
+   *
+   * @param tupplesOfNameAndValue
+   * @return
+   */
+  default T selectFirstAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+    return getSorm().readFirst(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
+  }
+
+  /**
+   * @see {@link #getAllEqualSql(Tuple2...)}
+   *
+   * @param tupplesOfNameAndValue
+   * @return
+   */
+  default T selectOneAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+    return getSorm().readOne(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
+  }
+
+  /**
+   * Creates a SQL statement selecting rows which are satisfied all condition corresponding to the
+   * given arguments.
+   *
+   * <strong>Note:</strong> All the rows will be selected, if length of arguments is zero
+   *
+   * Example
+   *
+   * <pre>
+   * getAllEqualSql("address", "Tokyo", "age", 20)
+   * generates
+   * ParameterizedSql("select * from [TABLE_NAME] where address=? and age=?", "Tokyo", 20)
+   * </pre>
+   *
+   * @param tupplesOfNameAndValue
+   * @return
+   */
+  default ParameterizedSql getAllEqualSql(Tuple2<?, ?>... tupplesOfNameAndValue) {
+    int argLength = tupplesOfNameAndValue.length;
+    if (argLength == 0) {
+      return ParameterizedSql.of(SelectSql.selectStarFrom(getTableName()));
+    }
+    String[] conditions = new String[argLength];
+    Object[] parameters = new Object[argLength];
+
+    for (int i = 0; i < argLength; i++) {
+      Tuple2<?, ?> tuple2 = tupplesOfNameAndValue[i];
+      conditions[i] = tuple2.getT1() + "=?";
+      parameters[i] = tuple2.getT2();
+    }
+
+    return ParameterizedSql.of(
+        SelectSql.selectStarFrom(getTableName()) + WHERE + String.join(AND, conditions),
+        parameters);
   }
 
 }
