@@ -58,7 +58,6 @@ public final class SormImpl implements Sorm {
     return new OrmTransactionImpl(getJdbcConnection(), sormContext, isolationLevel);
   }
 
-
   @Override
   public <R> R applyHandler(FunctionHandler<OrmConnection, R> connectionHandler) {
     try (OrmConnection conn = open()) {
@@ -67,8 +66,6 @@ public final class SormImpl implements Sorm {
       throw Try.rethrow(e);
     }
   }
-
-
 
   @Override
   public <R> R applyHandler(int isolationLevel,
@@ -88,7 +85,6 @@ public final class SormImpl implements Sorm {
       ConsumerHandler<OrmTransaction> transactionHandler) {
     try (OrmTransaction transaction = open(isolationLevel)) {
       transactionHandler.accept(transaction);
-      transaction.rollback();
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -99,13 +95,10 @@ public final class SormImpl implements Sorm {
     return sormContext;
   }
 
-
   @Override
   public OrmConnection open() {
     return new OrmConnectionImpl(getJdbcConnection(), sormContext);
   }
-
-
 
   @Override
   public DataSource getDataSource() {

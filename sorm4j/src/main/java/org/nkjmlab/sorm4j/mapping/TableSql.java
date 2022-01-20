@@ -20,7 +20,8 @@ public final class TableSql {
     multiRowSqlMap.clear();
   }
 
-  private final String insertOrMergePlaceholders;
+  private final String insertPlaceholders;
+  private final String mergePlaceholders;
   private final String selectByPrimaryKeySql;
   private final String selectAllSql;
   private final String insertSql;
@@ -31,10 +32,11 @@ public final class TableSql {
   private final String insertSqlPrefix;
   private final String mergeSqlPrefix;
 
-  public TableSql(String insertOrMergePlaceholders, String selectByPrimaryKeySql,
+  public TableSql(String inserPlaceholders, String mergePlaceholders, String selectByPrimaryKeySql,
       String selectAllSql, String insertSql, String updateSql, String deleteSql, String mergeSql,
       String existsSql, String insertSqlPrefix, String mergeSqlPrefix) {
-    this.insertOrMergePlaceholders = insertOrMergePlaceholders;
+    this.insertPlaceholders = inserPlaceholders;
+    this.mergePlaceholders = mergePlaceholders;
     this.selectByPrimaryKeySql = selectByPrimaryKeySql;
     this.selectAllSql = selectAllSql;
     this.insertSql = insertSql;
@@ -45,8 +47,6 @@ public final class TableSql {
     this.insertSqlPrefix = insertSqlPrefix;
     this.mergeSqlPrefix = mergeSqlPrefix;
   }
-
-
 
   public String getDeleteSql() {
     return deleteSql;
@@ -62,18 +62,16 @@ public final class TableSql {
 
 
   public String getMultirowInsertSql(int num) {
-    return getSqlWithMultirowPlaceholders(insertSqlPrefix, num);
+    return getSqlWithMultirowPlaceholders(insertSqlPrefix, insertPlaceholders, num);
   }
 
   public String getMultirowMergeSql(int num) {
-    return getSqlWithMultirowPlaceholders(mergeSqlPrefix, num);
+    return getSqlWithMultirowPlaceholders(mergeSqlPrefix, mergePlaceholders, num);
   }
 
-
-
-  private String getSqlWithMultirowPlaceholders(String sqlPrefix, int num) {
+  private String getSqlWithMultirowPlaceholders(String sqlPrefix, String placeHolders, int num) {
     return multiRowSqlMap.computeIfAbsent(sqlPrefix + num, n -> sqlPrefix + String.join(",",
-        Stream.generate(() -> insertOrMergePlaceholders).limit(num).collect(Collectors.toList())));
+        Stream.generate(() -> placeHolders).limit(num).collect(Collectors.toList())));
   }
 
   public String getSelectAllSql() {

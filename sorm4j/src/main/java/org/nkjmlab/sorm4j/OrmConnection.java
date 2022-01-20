@@ -37,16 +37,6 @@ public interface OrmConnection extends Orm, OrmStreamConnection, AutoCloseable {
     return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
   }
 
-  /**
-   * Begins transaction with the given transaction isolation level.
-   *
-   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED},
-   *        {@link Connection#TRANSACTION_READ_UNCOMMITTED} and so on.
-   *
-   */
-
-  void begin(int isolationLevel);
-
 
   /**
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
@@ -66,7 +56,7 @@ public interface OrmConnection extends Orm, OrmStreamConnection, AutoCloseable {
   void commit();
 
   /**
-   * Rollback the {@link java.sql.Connection Connection} associated with this instance.
+   * Roll back the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#rollback()
    *

@@ -91,10 +91,9 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
         return result;
       }
     } catch (Throwable e) {
-      rollbackIfRequired(con, origAutoCommit);
       throw Try.rethrow(e);
     } finally {
-      commitIfRequired(con, origAutoCommit);
+      commitOrRollback(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);
     }
 

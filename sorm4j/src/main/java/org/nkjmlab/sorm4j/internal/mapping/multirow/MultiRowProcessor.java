@@ -36,24 +36,31 @@ public abstract class MultiRowProcessor<T> {
   public abstract int[] multiRowMerge(Connection con, @SuppressWarnings("unchecked") T... objects);
 
   public static final void setAutoCommit(Connection connection, boolean autoCommit) {
-    Try.runOrElseThrow(() -> connection.setAutoCommit(autoCommit), Try::rethrow);
-  }
-
-  public static final void commitIfRequired(Connection connection, boolean origAutoCommit) {
-    if (origAutoCommit) {
-      Try.runOrElseThrow(() -> connection.commit(), Try::rethrow);
+    try {
+      connection.setAutoCommit(autoCommit);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
     }
   }
 
-
-  public static final void rollbackIfRequired(Connection connection, boolean origAutoCommit) {
-    if (!origAutoCommit) {
-      Try.runOrElseThrow(() -> connection.rollback(), Try::rethrow);
+  public static final void commitOrRollback(Connection connection, boolean origAutoCommit) {
+    try {
+      if (origAutoCommit) {
+        connection.commit();
+      } else {
+        connection.rollback();
+      }
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
     }
   }
 
   public static final boolean getAutoCommit(Connection connection) {
-    return Try.createSupplierWithThrow(() -> connection.getAutoCommit(), Try::rethrow).get();
+    try {
+      return connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
   }
 
   public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
@@ -72,11 +79,10 @@ public abstract class MultiRowProcessor<T> {
         }
         result = batchHelper.finish();
         return result;
-      } catch (Exception e) {
-        rollbackIfRequired(con, origAutoCommit);
+      } catch (SQLException e) {
         throw Try.rethrow(e);
       } finally {
-        commitIfRequired(con, origAutoCommit);
+        commitOrRollback(con, origAutoCommit);
         setAutoCommit(con, origAutoCommit);
       }
     });
