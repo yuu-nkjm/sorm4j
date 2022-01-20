@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal.sql.result;
 
-import java.util.Collections;
 import java.util.List;
 import org.nkjmlab.sorm4j.result.InsertResult;
 
@@ -9,8 +8,6 @@ import org.nkjmlab.sorm4j.result.InsertResult;
  */
 public final class InsertResultImpl<T> implements InsertResult<T> {
 
-  private static final InsertResult<?> EMPTY_INSERT_RESULT =
-      new InsertResultImpl<>(new int[] {0}, null, Collections.emptyList());
   private final int[] rowsModified;
   private final T object;
 

@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j;
 
-import java.sql.Connection;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
@@ -60,9 +59,6 @@ public interface SormContext {
     private static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
 
     private static final TableSqlFactory DEFAULT_TABLE_SQL_FACTORY = new DefaultTableSqlFactory();
-
-    private static final int DEFAULT_TRANSACTION_ISOLATION_LEVEL =
-        Connection.TRANSACTION_READ_COMMITTED;
 
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter =

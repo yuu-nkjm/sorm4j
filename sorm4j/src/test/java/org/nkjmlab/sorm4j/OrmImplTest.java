@@ -307,6 +307,7 @@ class OrmImplTest {
     });
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   void testInsertMapIn() {
     Map<String, Object> map = Map.of("id", 99, "name", "Test", "address", "Chiba");
