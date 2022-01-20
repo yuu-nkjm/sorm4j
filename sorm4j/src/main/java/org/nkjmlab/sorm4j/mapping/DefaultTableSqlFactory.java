@@ -4,12 +4,15 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 
 public final class DefaultTableSqlFactory implements TableSqlFactory {
 
   @Override
   public TableSql create(TableMetaData tableMetaData, Class<?> objectClass, Connection connection) {
+    throwExeptionIfPrimaryKeyIsNotExist(tableMetaData);
+
     String tableName = tableMetaData.getTableName();
     List<String> columns = tableMetaData.getColumns();
     List<String> primaryKeys = tableMetaData.getPrimaryKeys();
@@ -44,6 +47,13 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
 
     return new TableSql(insertOrMergePlaceholders, selectByPrimaryKeySql, selectAllSql, insertSql,
         updateSql, deleteSql, mergeSql, existsSql, insertSqlPrefix, mergeSqlPrefix);
+  }
+
+  private static void throwExeptionIfPrimaryKeyIsNotExist(TableMetaData tableMetaData) {
+    if (!tableMetaData.hasPrimaryKey()) {
+      throw new SormException("This opperation requiers primary keys but Table ["
+          + tableMetaData.getTableName() + "] doesn't have them.");
+    }
   }
 
   private static String toColumList(List<String> columns) {

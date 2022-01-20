@@ -242,12 +242,10 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> boolean exists(T object) {
     final SqlParametersToTableMapping<T> mapping = getCastedTableMapping(object.getClass());
-    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     return existsHelper(mapping, object);
   }
 
   private <T> boolean existsHelper(SqlParametersToTableMapping<T> mapping, T object) {
-    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getExistsSql();
     return readFirst(Integer.class, sql, mapping.getPrimaryKeyParameters(object)) != null;
   }
@@ -257,7 +255,6 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> boolean exists(String tableName, T object) {
     final SqlParametersToTableMapping<T> mapping =
         getCastedParameterContainerAndTableMapping(tableName, object.getClass());
-    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     return existsHelper(mapping, object);
   }
 
@@ -596,7 +593,6 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> T selectByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
     final SqlParametersToTableMapping<T> mapping = getTableMapping(objectClass);
-    mapping.throwExeptionIfPrimaryKeyIsNotExist();
     final String sql = mapping.getSql().getSelectByPrimaryKeySql();
     return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, primaryKeyValues,
@@ -794,28 +790,21 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet) {
-    try {
-      return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
-          ? loadSupportedReturnedTypeList(objectClass, resultSet)
-          : (objectClass.equals(RowMap.class) ? (List<T>) traverseAndMapToMapList(resultSet)
-              : loadResultContainerObjectList(objectClass, resultSet));
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
+  private <T> List<T> traverseAndMapToList(Class<T> objectClass, ResultSet resultSet)
+      throws SQLException {
+    return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
+        ? loadSupportedReturnedTypeList(objectClass, resultSet)
+        : (objectClass.equals(RowMap.class) ? (List<T>) traverseAndMapToMapList(resultSet)
+            : loadResultContainerObjectList(objectClass, resultSet));
   }
 
-  private List<RowMap> traverseAndMapToMapList(ResultSet resultSet) {
-    try {
-      final List<RowMap> ret = new ArrayList<>();
-      ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-      while (resultSet.next()) {
-        ret.add(toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
-      }
-      return ret;
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
+  private List<RowMap> traverseAndMapToMapList(ResultSet resultSet) throws SQLException {
+    final List<RowMap> ret = new ArrayList<>();
+    ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
+    while (resultSet.next()) {
+      ret.add(toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
     }
+    return ret;
   }
 
   @Override
@@ -879,7 +868,7 @@ public class OrmConnectionImpl implements OrmConnection {
       R ret = resultSetTraverser.traverseAndMap(resultSet);
       lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
       return ret;
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }

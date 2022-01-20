@@ -11,16 +11,16 @@ public class RowMapImpl implements RowMap {
 
   private final LinkedHashMap<String, Object> map;
 
+  public RowMapImpl() {
+    this(new LinkedHashMap<>());
+  }
+
   public RowMapImpl(LinkedHashMap<String, Object> map) {
     this.map = map;
   }
 
   public RowMapImpl(int initialCapacity, float loadFactor) {
     this(new LinkedHashMap<>(initialCapacity, loadFactor));
-  }
-
-  public RowMapImpl() {
-    this(new LinkedHashMap<>());
   }
 
   @Override
