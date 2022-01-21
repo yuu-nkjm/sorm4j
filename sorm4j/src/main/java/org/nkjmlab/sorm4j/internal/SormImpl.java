@@ -358,8 +358,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
   }
 
-
-
   @Override
   public <T> int[] insertIn(String tableName, List<T> objects) {
     return applyAndClose(conn -> conn.insertIn(tableName, objects));

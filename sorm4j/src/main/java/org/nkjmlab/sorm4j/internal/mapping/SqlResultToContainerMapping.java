@@ -8,11 +8,11 @@ import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 
 
-abstract class SqlResultContainerCreator<T> {
+abstract class SqlResultToContainerMapping<T> {
   protected final Constructor<T> constructor;
   protected final ColumnToAccessorMapping columnToAccessorMap;
 
-  public SqlResultContainerCreator(ColumnToAccessorMapping columnToAccessorMap,
+  public SqlResultToContainerMapping(ColumnToAccessorMapping columnToAccessorMap,
       Constructor<T> constructor) {
     this.columnToAccessorMap = columnToAccessorMap;
     this.constructor = constructor;

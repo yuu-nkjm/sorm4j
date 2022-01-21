@@ -1,5 +1,5 @@
 
-package org.nkjmlab.sorm4j.internal.sql.result;
+package org.nkjmlab.sorm4j.internal.result;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

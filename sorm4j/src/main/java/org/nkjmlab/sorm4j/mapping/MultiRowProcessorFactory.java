@@ -32,9 +32,9 @@ public final class MultiRowProcessorFactory {
     this.batchSizeWithMultiRow = batchSizeWithMultiRow;
   }
 
-  public MultiRowProcessor<?> getMultiRowProcessor(LoggerContext loggerContext,
+  public <T> MultiRowProcessor<T> getMultiRowProcessor(LoggerContext loggerContext,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<?> tableMapping) {
+      Class<T> objectClass, SqlParametersToTableMapping<T> tableMapping) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
         return new SimpleBatchProcessor<>(loggerContext, sqlParametersSetter, statementSupplier,

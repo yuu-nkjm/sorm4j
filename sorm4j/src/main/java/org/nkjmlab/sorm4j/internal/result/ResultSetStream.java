@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.sql.result;
+package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.Experimental;

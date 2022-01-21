@@ -200,13 +200,15 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
     }
   }
 
-  private java.sql.Array toSqlArray(String typeName, Connection conn, Object parameter)
+  static java.sql.Array toSqlArray(String typeName, Connection conn, Object parameter)
       throws SQLException {
     switch (typeName) {
       case "boolean":
         return conn.createArrayOf("BOOLEAN", toObjectArray((boolean[]) parameter));
       case "java.lang.Boolean":
         return conn.createArrayOf("BOOLEAN", (Object[]) parameter);
+      case "byte":
+        return conn.createArrayOf("TINYINT", toObjectArray((byte[]) parameter));
       case "java.lang.Byte":
         return conn.createArrayOf("TINYINT", (Object[]) parameter);
       case "short":

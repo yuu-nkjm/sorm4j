@@ -17,7 +17,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 
-final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreator<S> {
+final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
 
   private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
   private final int constructorParametersLength;
@@ -25,7 +25,7 @@ final class ConstructorBasedSqlResultCreator<S> extends SqlResultContainerCreato
   private final Map<String, ConstructorParameter[]> columnAndConstructorParameterMapping =
       new ConcurrentHashMap<>();
 
-  public ConstructorBasedSqlResultCreator(ColumnToAccessorMapping columnToAccessorMap,
+  public SqlResultToContainerMappingWithConstructor(ColumnToAccessorMapping columnToAccessorMap,
       Constructor<S> constructor, String[] parameterNames) {
     super(columnToAccessorMap, constructor);
     String columnAliasPrefix = columnToAccessorMap.getColumnAliasPrefix();

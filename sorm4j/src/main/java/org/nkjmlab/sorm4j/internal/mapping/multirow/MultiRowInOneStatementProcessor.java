@@ -25,21 +25,19 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   }
 
   @Override
-  @SafeVarargs
-  public final int[] multiRowInsert(Connection con, T... objects) {
+  public final int[] multiRowInsert(Connection con, T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
-            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+            num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
+            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
   @Override
-  @SafeVarargs
-  public final int[] multiRowMerge(Connection con, T... objects) {
+  public final int[] multiRowMerge(Connection con, T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, tableMapping.getSql().getMultirowMergeSql(num)),
-            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+            num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
+            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
 

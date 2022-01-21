@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.Collections;
 import java.util.List;

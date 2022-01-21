@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.util.sql;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;

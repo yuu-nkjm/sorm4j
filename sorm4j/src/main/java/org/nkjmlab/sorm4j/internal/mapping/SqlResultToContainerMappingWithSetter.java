@@ -15,12 +15,12 @@ import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.mapping.FieldAccessor;
 
-final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCreator<T> {
+final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
   // https://github.com/yuu-nkjm/sorm4j/issues/26
   private final Map<String, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
 
-  public SetterBasedSqlResultContainerCreator(ColumnToAccessorMapping columnToAccessorMap,
+  public SqlResultToContainerMappingWithSetter(ColumnToAccessorMapping columnToAccessorMap,
       Constructor<T> constructor) {
     super(columnToAccessorMap, constructor);
   }
@@ -35,9 +35,8 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
 
 
   @Override
-  T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, 
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
-      throws SQLException {
+  T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, ResultSet resultSet,
+      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     return createContainerObject(columnValueConverter, resultSet, columns, columnTypes,
         setterTypes);
@@ -47,8 +46,8 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
 
   @Override
   public List<T> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes,
-      String columnsString) throws SQLException {
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException {
     final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
@@ -59,8 +58,7 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
   }
 
   private T createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] sqlTypes,
-      Class<?>[] setterTypes) {
+      ResultSet resultSet, String[] columns, int[] sqlTypes, Class<?>[] setterTypes) {
     try {
       final T ret = constructor.newInstance();
       for (int i = 1; i <= columns.length; i++) {
@@ -73,8 +71,7 @@ final class SetterBasedSqlResultContainerCreator<T> extends SqlResultContainerCr
           continue;
         }
         final int sqlType = sqlTypes[i - 1];
-        final Object value =
-            columnValueConverter.convertTo(resultSet, i, sqlType, setterType);
+        final Object value = columnValueConverter.convertTo(resultSet, i, sqlType, setterType);
         columnToAccessorMap.setValue(ret, columnName, value);
       }
       return ret;

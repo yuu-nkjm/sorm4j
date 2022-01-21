@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.sql;
+package org.nkjmlab.sorm4j.internal.util.command;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.OrmConnection;

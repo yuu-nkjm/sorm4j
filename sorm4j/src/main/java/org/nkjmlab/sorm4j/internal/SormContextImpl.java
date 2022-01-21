@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.nkjmlab.sorm4j.internal.mapping.TableMetaDataImpl.*;
+import static org.nkjmlab.sorm4j.internal.result.TableMetaDataImpl.*;
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
@@ -15,7 +15,7 @@ import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.internal.mapping.TableMetaDataImpl;
+import org.nkjmlab.sorm4j.internal.result.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.sql;
+package org.nkjmlab.sorm4j.util.command;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
@@ -12,6 +12,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.result.Tuple3;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
