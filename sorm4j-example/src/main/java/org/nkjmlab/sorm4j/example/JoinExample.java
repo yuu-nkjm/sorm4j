@@ -2,9 +2,9 @@ package org.nkjmlab.sorm4j.example;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.example.first.Address;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public class JoinExample {

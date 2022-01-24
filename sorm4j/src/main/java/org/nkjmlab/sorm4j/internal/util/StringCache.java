@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class StringCache {
+public final class StringCache {
 
   private static final ConcurrentMap<String, String> canonicalCaseCaches =
       new ConcurrentHashMap<>();

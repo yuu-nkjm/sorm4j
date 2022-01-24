@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
 
-public class NamedParameterCommandImpl extends AbstractCommand implements NamedParameterCommand {
+public final class NamedParameterCommandImpl extends AbstractCommand implements NamedParameterCommand {
 
   private final NamedParameterSql sql;
 

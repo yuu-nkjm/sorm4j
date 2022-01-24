@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
-public class OrderedParameterCommandImpl extends AbstractCommand
+public final class OrderedParameterCommandImpl extends AbstractCommand
     implements OrderedParameterCommand {
 
   private final OrderedParameterSql sql;

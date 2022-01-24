@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.sql;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
-import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
 
 /**
  * A SQL statement with named parameters.

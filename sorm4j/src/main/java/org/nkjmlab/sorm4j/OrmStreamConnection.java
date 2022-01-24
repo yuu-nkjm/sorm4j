@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j;
 
 import java.sql.PreparedStatement;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public interface OrmStreamConnection {

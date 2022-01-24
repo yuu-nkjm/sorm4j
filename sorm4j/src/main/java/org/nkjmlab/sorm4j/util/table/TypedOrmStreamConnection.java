@@ -3,10 +3,10 @@ package org.nkjmlab.sorm4j.util.table;
 import java.sql.PreparedStatement;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmStreamConnection;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-public class TypedOrmStreamConnection<T> {
+public final class TypedOrmStreamConnection<T> {
 
   private final Class<T> type;
   private final OrmStreamConnection conn;

@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
-public class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
+public final class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
 
   public static final boolean enableLogger = isEnable();
 
@@ -45,8 +45,7 @@ public class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
 
   private void printf(int depth, Level level, String format, Object... params) {
     this.logger.printf(level,
-        "%n  "
-            + MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
+        "%n  " + MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
             + ParameterizedStringUtils.newString(format, params));
   }
 

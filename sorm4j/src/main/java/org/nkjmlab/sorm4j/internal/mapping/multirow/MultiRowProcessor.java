@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
+import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
-import org.nkjmlab.sorm4j.mapping.TableSql;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 

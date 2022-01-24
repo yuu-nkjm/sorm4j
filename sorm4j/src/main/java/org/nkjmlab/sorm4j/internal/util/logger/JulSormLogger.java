@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
-public class JulSormLogger extends AbstractSormLogger implements SormLogger {
+public final class JulSormLogger extends AbstractSormLogger implements SormLogger {
 
   private final java.util.logging.Logger logger;
   private static java.util.logging.Logger defaultLogger = getDefaultLogger();

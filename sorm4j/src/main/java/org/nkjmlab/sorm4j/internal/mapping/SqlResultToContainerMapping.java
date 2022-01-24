@@ -4,8 +4,7 @@ import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 
 
 abstract class SqlResultToContainerMapping<T> {

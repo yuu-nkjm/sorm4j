@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
-public class JdbcDatabaseMetaData {
+public final class JdbcDatabaseMetaData {
 
   private final String databaseProductName;
   private final String databaseProductVersion;

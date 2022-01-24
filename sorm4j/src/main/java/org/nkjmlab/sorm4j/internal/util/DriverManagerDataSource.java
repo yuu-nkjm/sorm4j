@@ -15,7 +15,7 @@ import javax.sql.DataSource;
  *
  */
 
-public class DriverManagerDataSource implements DataSource {
+public final class DriverManagerDataSource implements DataSource {
 
   private final String jdbcUrl;
   private final String username;

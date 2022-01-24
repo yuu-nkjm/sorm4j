@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.result.TableMetaData;
  *
  */
 @Experimental
-public class TableSchema {
+public final class TableSchema {
 
   /**
    * Creates a new {@link TableSchema.Builder} with the given table name.

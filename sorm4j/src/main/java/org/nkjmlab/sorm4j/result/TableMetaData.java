@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.common.ColumnNameWithMetaData;
 
 /**
  * Except for {@link #getColumnAliases()} and {@link #getColumnAliasPrefix()}, this object is
@@ -42,13 +43,6 @@ public interface TableMetaData {
    */
 
   String getColumnAliases();
-
-  /**
-   * Gets column alias prefix.
-   *
-   * @return
-   */
-  String getColumnAliasPrefix();
 
   List<String> getColumns();
 

@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.util.command.BasicCommand;
 import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
 import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
-public class BasicCommandImpl extends AbstractCommand implements BasicCommand {
+public final class BasicCommandImpl extends AbstractCommand implements BasicCommand {
 
   private final String sql;
 

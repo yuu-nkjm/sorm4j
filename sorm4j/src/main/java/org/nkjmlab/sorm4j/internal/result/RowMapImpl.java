@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.nkjmlab.sorm4j.result.RowMap;
 
-public class RowMapImpl implements RowMap {
+public final class RowMapImpl implements RowMap {
 
   private final LinkedHashMap<String, Object> map;
 

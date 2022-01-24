@@ -1,15 +1,15 @@
 package org.nkjmlab.sorm4j.internal;
 
-import org.nkjmlab.sorm4j.mapping.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToMapEntryConverter;
-import org.nkjmlab.sorm4j.mapping.DefaultTableMetaDataParser;
-import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
-import org.nkjmlab.sorm4j.mapping.TableMetaDataParser;
-import org.nkjmlab.sorm4j.mapping.TableNameMapper;
-import org.nkjmlab.sorm4j.mapping.TableSqlFactory;
+import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.context.ColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.context.DefaultTableMetaDataParser;
+import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.TableMetaDataParser;
+import org.nkjmlab.sorm4j.context.TableNameMapper;
+import org.nkjmlab.sorm4j.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 final class SormConfig {
