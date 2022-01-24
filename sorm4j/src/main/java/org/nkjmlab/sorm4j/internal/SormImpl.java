@@ -23,8 +23,6 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.table.BasicTable;
-import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An entry point of object-relation mapping.
@@ -485,10 +483,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.getJdbcDatabaseMetaData());
   }
 
-  @Override
-  public <T> Table<T> getTable(Class<T> objectClass) {
-    return new BasicTable<>(this, objectClass);
-  }
 
   @Override
   public <T> void acceptHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,

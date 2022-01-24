@@ -1,16 +1,16 @@
 package org.nkjmlab.sorm4j.common;
 
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import java.util.Objects;
 
 /**
  * ColumnName name and data type for message.
  *
- * @author nkjm
+ * @author yuu_nkjm
  *
  */
-@Experimental
-public final class ColumnNameWithMetaData extends ColumnName {
+public final class ColumnMetaData implements Comparable<ColumnMetaData> {
+
 
   private final String msg;
   private final String typeName;
@@ -19,10 +19,12 @@ public final class ColumnNameWithMetaData extends ColumnName {
   private final String isAutoIncremented;
   private final String isNullable;
   private final String isGenerated;
+  private final String name;
 
-  public ColumnNameWithMetaData(String name, int dataType, String typeName, int ordinalPosition,
+
+  public ColumnMetaData(String name, int dataType, String typeName, int ordinalPosition,
       String isNullable, String isAutoIncremented, String isGenerated) {
-    super(name);
+    this.name = name;
     this.typeName = typeName;
     this.dataType = dataType;
     this.ordinalPosition = ordinalPosition;
@@ -62,4 +64,39 @@ public final class ColumnNameWithMetaData extends ColumnName {
   public String toString() {
     return msg;
   }
+
+  @Override
+  public int compareTo(ColumnMetaData o) {
+    return name.compareTo(o.name);
+  }
+
+  /**
+   * Gets name of this object.
+   *
+   * @return
+   */
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(dataType, isAutoIncremented, isGenerated, isNullable, msg, name,
+        ordinalPosition, typeName);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!(obj instanceof ColumnMetaData))
+      return false;
+    ColumnMetaData other = (ColumnMetaData) obj;
+    return dataType == other.dataType && Objects.equals(isAutoIncremented, other.isAutoIncremented)
+        && Objects.equals(isGenerated, other.isGenerated)
+        && Objects.equals(isNullable, other.isNullable) && Objects.equals(msg, other.msg)
+        && Objects.equals(name, other.name) && ordinalPosition == other.ordinalPosition
+        && Objects.equals(typeName, other.typeName);
+  }
+
 }

@@ -30,6 +30,7 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -37,7 +38,6 @@ import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -207,7 +207,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
       RowMapper<T> rowMapper) {
-    return executeQueryAndClose(connection, ResultSetTraverser.from(rowMapper), statementSupplier);
+    return executeQueryAndClose(connection, ResultSetTraverser.of(rowMapper), statementSupplier);
   }
 
   @Override
@@ -219,7 +219,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> executeQuery(ParameterizedSql sql, RowMapper<T> rowMapper) {
-    return executeQuery(sql, ResultSetTraverser.from(rowMapper));
+    return executeQuery(sql, ResultSetTraverser.of(rowMapper));
   }
 
   @Override

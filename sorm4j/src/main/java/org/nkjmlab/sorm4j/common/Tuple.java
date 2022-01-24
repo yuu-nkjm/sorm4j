@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.common;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  * Represents a tuple of objects, which typically represents joined rows.
@@ -9,7 +8,6 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  * @author yuu_nkjm
  *
  */
-@Experimental
 public final class Tuple {
   private Tuple() {}
 

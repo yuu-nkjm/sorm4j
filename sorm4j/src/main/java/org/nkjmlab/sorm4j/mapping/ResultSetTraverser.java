@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  * Traverses {@link ResultSet} and maps to T.
@@ -32,8 +31,7 @@ public interface ResultSetTraverser<T> {
    * @param rowMapper
    * @return
    */
-  @Experimental
-  static <T> ResultSetTraverser<List<T>> from(RowMapper<T> rowMapper) {
+  static <T> ResultSetTraverser<List<T>> of(RowMapper<T> rowMapper) {
     return resultSet -> {
       final List<T> ret = new ArrayList<>();
       int rowNum = 0;

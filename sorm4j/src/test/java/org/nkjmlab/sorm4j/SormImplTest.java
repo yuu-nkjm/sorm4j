@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.table.Table;
 
 class SormImplTest {
 
@@ -33,7 +34,7 @@ class SormImplTest {
   void readMapOne() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
 
-    sorm.getTable(Guest.class);
+    Table.create(sorm, Guest.class);
     try (Connection conn = sorm.getJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("Column");

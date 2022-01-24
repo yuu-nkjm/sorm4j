@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
 
 /**
  * Represents a result set from database.

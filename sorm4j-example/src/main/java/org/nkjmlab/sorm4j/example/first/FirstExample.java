@@ -69,7 +69,7 @@ public class FirstExample {
     System.out.println("customers living in Kyoto = " + customersLivingInKyoto);
 
 
-    Table<Customer> customerTable = sorm.getTable(Customer.class);
+    Table<Customer> customerTable = Table.create(sorm, Customer.class);
     customerTable.applyHandler(conn -> conn.openStreamAll(),
         stream -> stream.collect(Collectors.toList()));
 

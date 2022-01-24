@@ -24,7 +24,6 @@ public interface NamedParameterCommand extends NamedParameterSql, Command {
   NamedParameterCommand bind(String key, Object value);
 
   @Override
-  @Experimental
   NamedParameterCommand bindBean(Object bean);
 
   /**

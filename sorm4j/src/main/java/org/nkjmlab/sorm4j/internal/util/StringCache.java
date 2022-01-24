@@ -14,10 +14,10 @@ public final class StringCache {
 
   private static final ConcurrentMap<String, String> lowerCaseCaches = new ConcurrentHashMap<>();
 
-  public static void clearAllCache() {
+  public static void clearAll() {
+    canonicalCaseCaches.clear();
     upperCaseCaches.clear();
     lowerCaseCaches.clear();
-    canonicalCaseCaches.clear();
   }
 
   public static String toUpperCase(String str) {

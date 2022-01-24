@@ -11,6 +11,7 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
  * @author nkjm
  *
  */
+@Experimental
 public interface NamedParameterSql extends ParameterizedSqlParser {
 
   /**
@@ -36,7 +37,6 @@ public interface NamedParameterSql extends ParameterizedSqlParser {
    * @param bean
    * @return
    */
-  @Experimental
   NamedParameterSql bindBean(Object bean);
 
   /**

@@ -1,13 +1,11 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 
 
 /**
  * @param <T>
  */
-@Experimental
 public interface ResultSetStream<T> extends AutoCloseable {
 
   /**

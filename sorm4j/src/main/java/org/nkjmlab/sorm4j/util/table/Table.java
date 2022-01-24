@@ -336,4 +336,8 @@ public interface Table<T> {
         parameters);
   }
 
+  static <T> Table<T> create(Sorm sorm, Class<T> objectClass) {
+    return new BasicTable<>(sorm, objectClass);
+  }
+
 }
