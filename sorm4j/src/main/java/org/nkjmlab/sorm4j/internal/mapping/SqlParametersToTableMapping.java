@@ -177,10 +177,16 @@ public final class SqlParametersToTableMapping<T> {
       while (resultSet.next()) {
         String columnName = metaData.getColumnName(1);
         int columnType = metaData.getColumnType(1);
-        Class<?> classType = columnToAccessorMap.get(columnName).getSetterParameterType();
-        final Object value = columnValueConverter.convertTo(resultSet, 1, columnType, classType);
-        columnToAccessorMap.setValue(object, columnName, value);
-        ret.add(value);
+        try {
+          Class<?> classType = columnToAccessorMap.get(columnName).getSetterParameterType();
+          final Object value = columnValueConverter.convertTo(resultSet, 1, columnType, classType);
+          columnToAccessorMap.setValue(object, columnName, value);
+          ret.add(value);
+        } catch (Exception e) {
+          throw Try.rethrow(new SormException(ParameterizedStringUtils.newString(
+              "insert an instance of [{}] and get the result has error because [{}] has invalid setter.",
+              object.getClass(), columnName), e));
+        }
       }
       return ret;
     }
