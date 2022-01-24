@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-public class ClassUtils {
+public final class ClassUtils {
   private ClassUtils() {}
 
   public static Class<?> convertToClass(String className) {

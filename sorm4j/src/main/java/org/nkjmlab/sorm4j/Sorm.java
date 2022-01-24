@@ -7,9 +7,9 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -118,7 +118,7 @@ public interface Sorm extends Orm {
    * @param streamHandler
    */
   @Experimental
-  <T> void acceptHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  <T> void acceptHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler);
 
   /**
@@ -157,7 +157,7 @@ public interface Sorm extends Orm {
    * @return
    */
   @Experimental
-  <T, R> R applyHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  <T, R> R applyHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler);
 
   /**
@@ -166,9 +166,6 @@ public interface Sorm extends Orm {
    * @return
    */
   DataSource getDataSource();
-
-  @Experimental
-  <T> Table<T> getTable(Class<T> objectClass);
 
 
   /**

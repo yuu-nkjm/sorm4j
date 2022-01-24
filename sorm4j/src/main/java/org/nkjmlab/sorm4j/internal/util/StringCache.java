@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class StringCache {
+public final class StringCache {
 
   private static final ConcurrentMap<String, String> canonicalCaseCaches =
       new ConcurrentHashMap<>();
@@ -14,10 +14,10 @@ public class StringCache {
 
   private static final ConcurrentMap<String, String> lowerCaseCaches = new ConcurrentHashMap<>();
 
-  public static void clearAllCache() {
+  public static void clearAll() {
+    canonicalCaseCaches.clear();
     upperCaseCaches.clear();
     lowerCaseCaches.clear();
-    canonicalCaseCaches.clear();
   }
 
   public static String toUpperCase(String str) {

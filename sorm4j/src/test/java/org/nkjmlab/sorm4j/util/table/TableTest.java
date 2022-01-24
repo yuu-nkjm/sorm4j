@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.result.Tuple;
+import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
@@ -62,7 +62,7 @@ class TableTest {
     assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
         .contains("INDEX_IN_GUESTS_ON_NAME");
 
-    playersTable.acceptHandler(conn -> conn.openStreamAll(),
+    playersTable.acceptHandler(conn -> conn.streamAll(),
         stream -> stream.collect(Collectors.toList()));
   }
 

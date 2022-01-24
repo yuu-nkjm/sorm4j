@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public final class BatchHelper {
+final class BatchHelper {
 
   private final int batchSize;
   private final PreparedStatement stmt;

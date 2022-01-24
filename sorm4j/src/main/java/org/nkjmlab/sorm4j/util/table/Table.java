@@ -9,11 +9,11 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.TableMetaData;
-import org.nkjmlab.sorm4j.result.Tuple2;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
@@ -75,10 +75,10 @@ public interface Table<T> {
    */
   @Experimental
   default void acceptHandler(
-      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     getSorm().acceptHandler(
-        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
         streamHandler);
   }
 
@@ -122,10 +122,10 @@ public interface Table<T> {
    */
   @Experimental
   default <R> R applyHandler(
-      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     return getSorm().applyHandler(
-        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
         streamHandler);
   }
 
@@ -334,6 +334,10 @@ public interface Table<T> {
     return ParameterizedSql.of(
         SelectSql.selectStarFrom(getTableName()) + WHERE + String.join(AND, conditions),
         parameters);
+  }
+
+  static <T> Table<T> create(Sorm sorm, Class<T> objectClass) {
+    return new BasicTable<>(sorm, objectClass);
   }
 
 }

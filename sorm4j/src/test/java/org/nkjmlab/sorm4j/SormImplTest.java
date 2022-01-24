@@ -4,16 +4,15 @@ import static java.sql.Connection.*;
 import static org.assertj.core.api.Assertions.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.table.Table;
 
 class SormImplTest {
 
@@ -34,14 +33,8 @@ class SormImplTest {
   @Test
   void readMapOne() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
-    ParameterizedSql psql = ParameterizedSql.of("select * from guests");
-    String sql = "select * from guests";
 
-    sorm.createCommand(psql);
-    sorm.createCommand(sql);
-    sorm.createCommand(sql, new Object[] {});
-    sorm.createCommand(sql, Map.of());
-    sorm.getTable(Guest.class);
+    Table.create(sorm, Guest.class);
     try (Connection conn = sorm.getJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("Column");
@@ -51,10 +44,10 @@ class SormImplTest {
     assertThat(sorm.getJdbcDatabaseMetaData().toString()).contains("jdbc");
 
 
-    sorm.acceptHandler(conn -> conn.openStreamAll(Guest.class),
+    sorm.acceptHandler(conn -> conn.streamAll(Guest.class),
         stream -> stream.collect(Collectors.toList()));
 
-    sorm.applyHandler(conn -> conn.openStreamAll(Guest.class),
+    sorm.applyHandler(conn -> conn.streamAll(Guest.class),
         stream -> stream.collect(Collectors.toList()));
 
 

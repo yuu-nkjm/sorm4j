@@ -36,7 +36,7 @@ public class WithJdbcConnectionExample {
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      try (Stream<Customer> stream = conn.openStreamAll(Customer.class)) {
+      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
         List<String> messages = stream.map(c -> c.getName() + " lives in " + c.getAddress())
             .collect(Collectors.toList());
         System.out.println("messages = " + messages);

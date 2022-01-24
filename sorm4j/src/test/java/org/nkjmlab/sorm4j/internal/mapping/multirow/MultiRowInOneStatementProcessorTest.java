@@ -1,14 +1,14 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory.MultiRowProcessorType.*;
+import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormContext;
-import org.nkjmlab.sorm4j.mapping.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 

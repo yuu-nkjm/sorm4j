@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.test.common;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormContext;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.util.table.BasicTableWithSchema;
 import org.nkjmlab.sorm4j.util.table.TableSchema;

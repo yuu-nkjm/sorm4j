@@ -4,6 +4,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.command.Command;
 
 public class ListEmbeddedParameterExample {
 
@@ -24,7 +25,7 @@ public class ListEmbeddedParameterExample {
     System.out.println(psql);
 
     List<Customer> customers =
-        sorm.applyHandler(conn -> conn.createCommand(psql).readList(Customer.class));
+        sorm.applyHandler(conn -> Command.create(conn, psql).readList(Customer.class));
     System.out.println("customers=" + customers);
 
     // try {

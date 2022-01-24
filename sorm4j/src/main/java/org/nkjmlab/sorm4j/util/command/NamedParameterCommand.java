@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.util.command;
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.internal.sql.NamedParameterCommandImpl;
+import org.nkjmlab.sorm4j.internal.util.command.NamedParameterCommandImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSql;
 
 
@@ -24,7 +24,6 @@ public interface NamedParameterCommand extends NamedParameterSql, Command {
   NamedParameterCommand bind(String key, Object value);
 
   @Override
-  @Experimental
   NamedParameterCommand bindBean(Object bean);
 
   /**

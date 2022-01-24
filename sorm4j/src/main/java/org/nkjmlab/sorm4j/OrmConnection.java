@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
@@ -10,7 +11,7 @@ import org.nkjmlab.sorm4j.internal.SormImpl;
  * @author yuu_nkjm
  *
  */
-public interface OrmConnection extends Orm, OrmStreamConnection, AutoCloseable {
+public interface OrmConnection extends Orm, OrmStream, AutoCloseable {
 
   /**
    * Create a {@link OrmConnection} wrapping the given JDBC Connection.
@@ -37,16 +38,6 @@ public interface OrmConnection extends Orm, OrmStreamConnection, AutoCloseable {
     return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
   }
 
-  /**
-   * Begins transaction with the given transaction isolation level.
-   *
-   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED},
-   *        {@link Connection#TRANSACTION_READ_UNCOMMITTED} and so on.
-   *
-   */
-
-  void begin(int isolationLevel);
-
 
   /**
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
@@ -66,7 +57,7 @@ public interface OrmConnection extends Orm, OrmStreamConnection, AutoCloseable {
   void commit();
 
   /**
-   * Rollback the {@link java.sql.Connection Connection} associated with this instance.
+   * Roll back the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#rollback()
    *

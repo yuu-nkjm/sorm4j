@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-example</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.2</version>
   <description>Example of Sorm4j</description>
 
   <properties>
-    <sorm4j-version>1.4.1</sorm4j-version>
+    <sorm4j-version>1.4.2</sorm4j-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <additionalparam>-Xdoclint:none</additionalparam>
     <downloadSources>true</downloadSources>

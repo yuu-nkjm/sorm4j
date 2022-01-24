@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class MethodInvokerInfoUtils {
+public final class MethodInvokerInfoUtils {
 
 
   public static String getInvokerInfo(int depth, StackTraceElement[] stackTraceElements) {

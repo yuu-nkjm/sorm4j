@@ -16,7 +16,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  */
 @Experimental
-public class SelectSql {
+public final class SelectSql {
 
   private SelectSql() {}
 

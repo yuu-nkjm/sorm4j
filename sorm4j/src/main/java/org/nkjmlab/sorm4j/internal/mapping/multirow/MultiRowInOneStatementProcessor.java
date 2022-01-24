@@ -3,13 +3,13 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
-import org.nkjmlab.sorm4j.mapping.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.mapping.SqlParametersSetter;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
@@ -25,21 +25,19 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
   }
 
   @Override
-  @SafeVarargs
-  public final int[] multiRowInsert(Connection con, T... objects) {
+  public final int[] multiRowInsert(Connection con, T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, tableMapping.getSql().getMultirowInsertSql(num)),
-            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+            num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
+            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
   @Override
-  @SafeVarargs
-  public final int[] multiRowMerge(Connection con, T... objects) {
+  public final int[] multiRowMerge(Connection con, T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects,
         nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, tableMapping.getSql().getMultirowMergeSql(num)),
-            (stmt, objs) -> tableMapping.setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+            num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
+            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
   }
 
 
@@ -68,10 +66,9 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
         return result;
       }
     } catch (Throwable e) {
-      rollbackIfRequired(con, origAutoCommit);
       throw Try.rethrow(e);
     } finally {
-      commitIfRequired(con, origAutoCommit);
+      commitOrRollback(con, origAutoCommit);
       setAutoCommit(con, origAutoCommit);
     }
   }

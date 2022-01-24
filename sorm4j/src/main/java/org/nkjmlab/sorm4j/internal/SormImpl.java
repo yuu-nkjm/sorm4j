@@ -8,27 +8,21 @@ import java.util.Map;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmStreamConnection;
+import org.nkjmlab.sorm4j.OrmStream;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormContext;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.TableMetaData;
-import org.nkjmlab.sorm4j.result.Tuple2;
-import org.nkjmlab.sorm4j.result.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.command.BasicCommand;
-import org.nkjmlab.sorm4j.util.command.Command;
-import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
-import org.nkjmlab.sorm4j.util.table.BasicTable;
-import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An entry point of object-relation mapping.
@@ -58,7 +52,6 @@ public final class SormImpl implements Sorm {
     return new OrmTransactionImpl(getJdbcConnection(), sormContext, isolationLevel);
   }
 
-
   @Override
   public <R> R applyHandler(FunctionHandler<OrmConnection, R> connectionHandler) {
     try (OrmConnection conn = open()) {
@@ -67,8 +60,6 @@ public final class SormImpl implements Sorm {
       throw Try.rethrow(e);
     }
   }
-
-
 
   @Override
   public <R> R applyHandler(int isolationLevel,
@@ -88,7 +79,6 @@ public final class SormImpl implements Sorm {
       ConsumerHandler<OrmTransaction> transactionHandler) {
     try (OrmTransaction transaction = open(isolationLevel)) {
       transactionHandler.accept(transaction);
-      transaction.rollback();
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -99,13 +89,10 @@ public final class SormImpl implements Sorm {
     return sormContext;
   }
 
-
   @Override
   public OrmConnection open() {
     return new OrmConnectionImpl(getJdbcConnection(), sormContext);
   }
-
-
 
   @Override
   public DataSource getDataSource() {
@@ -365,8 +352,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
   }
 
-
-
   @Override
   public <T> int[] insertIn(String tableName, List<T> objects) {
     return applyAndClose(conn -> conn.insertIn(tableName, objects));
@@ -492,38 +477,15 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.executeUpdate(sql));
   }
 
-  @Override
-  public Command createCommand(ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public BasicCommand createCommand(String sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
-  }
-
-  @Override
-  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
-  }
 
   @Override
   public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {
     return applyAndClose(conn -> conn.getJdbcDatabaseMetaData());
   }
 
-  @Override
-  public <T> Table<T> getTable(Class<T> objectClass) {
-    return new BasicTable<>(this, objectClass);
-  }
 
   @Override
-  public <T> void acceptHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  public <T> void acceptHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
       streamHandler.accept(stream);
@@ -533,7 +495,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T, R> R applyHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  public <T, R> R applyHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
       return streamHandler.apply(stream);

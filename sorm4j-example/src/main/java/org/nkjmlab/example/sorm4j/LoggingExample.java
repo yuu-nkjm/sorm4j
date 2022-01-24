@@ -3,10 +3,11 @@ package org.nkjmlab.example.sorm4j;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.SormContext;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.example.first.Customer;
 import org.nkjmlab.sorm4j.internal.util.logger.JulSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.util.command.Command;
 
 public class LoggingExample {
 
@@ -28,8 +29,8 @@ public class LoggingExample {
         .build();
     sorm = Sorm.create(ds, context);
 
-    List<Customer> customers =
-        sorm.applyHandler(conn -> conn.createCommand("select * from customer where name=? and address=?")
+    List<Customer> customers = sorm.applyHandler(
+        conn -> Command.create(conn, "select * from customer where name=? and address=?")
             .addParameter("Alice", "Kyoto").readList(Customer.class));
     System.out.println("customers=" + customers);
 

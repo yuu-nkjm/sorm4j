@@ -35,7 +35,6 @@ public interface ParameterizedSql {
    *
    * @return
    */
-  @Experimental
   String getBindedSql();
 
   /**

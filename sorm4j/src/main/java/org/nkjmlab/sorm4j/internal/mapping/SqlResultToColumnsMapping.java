@@ -11,14 +11,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.SormException;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.mapping.ColumnToAccessorMapping;
-import org.nkjmlab.sorm4j.mapping.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.mapping.DefaultColumnValueToJavaObjectConverters;
 
 /**
  * Holds mapping data from a given class and a table. The object reads a query result in
@@ -38,7 +37,7 @@ public final class SqlResultToColumnsMapping<T> {
   private final ColumnToAccessorMapping columnToAccessorMap;
 
   private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
-  private final SqlResultContainerCreator<T> containerObjectCreator;
+  private final SqlResultToContainerMapping<T> containerObjectCreator;
 
   public SqlResultToColumnsMapping(ColumnValueToJavaObjectConverters converter,
       Class<T> objectClass, ColumnToAccessorMapping columnToAccessorMap) {
@@ -51,16 +50,16 @@ public final class SqlResultToColumnsMapping<T> {
     this.containerObjectCreator = ormRecordConstructor != null
         ? createContainerRecordCreator(objectClass, ormRecordConstructor)
         : (ormConstructor != null ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
-            : new SetterBasedSqlResultContainerCreator<>(columnToAccessorMap,
+            : new SqlResultToContainerMappingWithSetter<>(columnToAccessorMap,
                 getDefaultConstructor(objectClass)));
 
   }
 
-  private SqlResultContainerCreator<T> createContainerRecordCreator(Class<T> objectClass,
+  private SqlResultToContainerMapping<T> createContainerRecordCreator(Class<T> objectClass,
       Constructor<T> constructor) {
     String[] parameterNames =
         Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-    return new ConstructorBasedSqlResultCreator<>(getColumnToAccessorMap(), constructor,
+    return new SqlResultToContainerMappingWithConstructor<>(getColumnToAccessorMap(), constructor,
         parameterNames);
   }
 
@@ -94,10 +93,10 @@ public final class SqlResultToColumnsMapping<T> {
     }
   }
 
-  private SqlResultContainerCreator<T> createOrmConstructorPojoCreator(Class<T> objectClass,
+  private SqlResultToContainerMapping<T> createOrmConstructorPojoCreator(Class<T> objectClass,
       Constructor<T> constructor) {
     String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
-    return new ConstructorBasedSqlResultCreator<>(getColumnToAccessorMap(), constructor,
+    return new SqlResultToContainerMappingWithConstructor<>(getColumnToAccessorMap(), constructor,
         _parameters);
   }
 

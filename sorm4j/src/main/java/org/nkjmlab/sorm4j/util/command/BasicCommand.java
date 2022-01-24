@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.command;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.internal.sql.BasicCommandImpl;
+import org.nkjmlab.sorm4j.internal.util.command.BasicCommandImpl;
 
 public interface BasicCommand extends Command {
 
