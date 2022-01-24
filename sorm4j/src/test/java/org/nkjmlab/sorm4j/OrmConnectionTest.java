@@ -26,6 +26,7 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
+import org.nkjmlab.sorm4j.util.command.Command;
 
 class OrmConnectionTest {
   private static final Logger log = LogManager.getLogger();
@@ -111,8 +112,8 @@ class OrmConnectionTest {
 
   @Test
   void testNamedRequest1() {
-    int row = sorm
-        .applyHandler(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+    int row = sorm.applyHandler(
+        conn -> Command.create(conn, "insert into players values(:id, :name, :address)")
             .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
     assertThat(row).isEqualTo(1);
     sorm.applyHandler(conn -> conn.selectAll(Player.class)).get(0);
@@ -123,14 +124,14 @@ class OrmConnectionTest {
     AtomicInteger id = new AtomicInteger(10);
 
 
-    int row = sorm
-        .applyHandler(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+    int row = sorm.applyHandler(
+        conn -> Command.create(conn, "insert into players values(:id, :name, :address)")
             .bindAll(Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
             .executeUpdate());
     assertThat(row).isEqualTo(1);
 
-    row = sorm
-        .applyHandler(conn -> conn.createCommand("insert into players values(:id, :name, :address)")
+    row = sorm.applyHandler(
+        conn -> Command.create(conn, "insert into players values(:id, :name, :address)")
             .bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo")
             .executeUpdate());
     assertThat(row).isEqualTo(1);
@@ -145,7 +146,7 @@ class OrmConnectionTest {
     assertThat(row).isEqualTo(1);
 
 
-    var ret = sorm.applyHandler(conn -> conn.createCommand("select * from players where id=:id")
+    var ret = sorm.applyHandler(conn -> Command.create(conn, "select * from players where id=:id")
         .bind("id", id.get()).executeQuery(conn.getResultSetTraverser(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);

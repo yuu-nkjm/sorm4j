@@ -18,10 +18,6 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.command.BasicCommand;
-import org.nkjmlab.sorm4j.util.command.Command;
-import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 
 
 /**
@@ -46,42 +42,6 @@ public interface Orm {
    * @return
    */
   Connection getJdbcConnection();
-
-  /**
-   * Creates a {@link Command} from SQL string.
-   *
-   * @param sql
-   * @return
-   */
-  Command createCommand(ParameterizedSql sql);
-
-
-  /**
-   * Creates a {@link BasicCommand} from SQL string.
-   *
-   * @param sql
-   * @return
-   */
-  BasicCommand createCommand(String sql);
-
-
-  /**
-   * Creates a {@link NamedParameterCommand} from SQL string.
-   *
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  NamedParameterCommand createCommand(String sql, Map<String, Object> parameters);
-
-  /**
-   * Creates a {@link OrderedParameterCommand} from SQL string.
-   *
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  OrderedParameterCommand createCommand(String sql, Object... parameters);
 
   /**
    * Deletes objects from the table corresponding to the class of the given objects.

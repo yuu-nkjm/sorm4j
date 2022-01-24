@@ -1,12 +1,15 @@
 package org.nkjmlab.sorm4j.util.command;
 
 import java.util.List;
+import java.util.Map;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 
 /**
@@ -17,6 +20,56 @@ import org.nkjmlab.sorm4j.mapping.RowMapper;
  */
 @Experimental
 public interface Command {
+
+
+
+  /**
+   * Creates a {@link Command} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+
+  static Command create(OrmConnection conn, ParameterizedSql sql) {
+    return BasicCommand.from(conn, sql.getSql()).addParameter(sql.getParameters());
+  }
+
+
+  /**
+   * Creates a {@link BasicCommand} from SQL string.
+   *
+   * @param sql
+   * @return
+   */
+
+  static BasicCommand create(OrmConnection conn, String sql) {
+    return BasicCommand.from(conn, sql);
+  }
+
+
+  /**
+   * Creates a {@link NamedParameterCommand} from SQL string.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  static NamedParameterCommand create(OrmConnection conn, String sql,
+      Map<String, Object> parameters) {
+    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+  }
+
+
+  /**
+   * Creates a {@link OrderedParameterCommand} from SQL string.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  static OrderedParameterCommand create(OrmConnection conn, String sql, Object... parameters) {
+    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+  }
 
   /**
    * Executes a query and apply the given handler to the returned result set.

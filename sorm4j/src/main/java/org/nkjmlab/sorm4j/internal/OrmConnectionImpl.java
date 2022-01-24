@@ -41,10 +41,6 @@ import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.command.BasicCommand;
-import org.nkjmlab.sorm4j.util.command.Command;
-import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
@@ -103,25 +99,6 @@ public class OrmConnectionImpl implements OrmConnection {
     Try.runOrElseThrow(() -> getJdbcConnection().commit(), Try::rethrow);
   }
 
-  @Override
-  public Command createCommand(ParameterizedSql sql) {
-    return BasicCommand.from(this, sql.getSql()).addParameter(sql.getParameters());
-  }
-
-  @Override
-  public BasicCommand createCommand(String sql) {
-    return BasicCommand.from(this, sql);
-  }
-
-  @Override
-  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return NamedParameterCommand.from(this, sql).bindAll(parameters);
-  }
-
-  @Override
-  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return OrderedParameterCommand.from(this, sql).addParameter(parameters);
-  }
 
   private String createInsertSql(String tableName, List<String> cols) {
     String ps = String.join(",",

@@ -50,7 +50,7 @@ class CommandTest {
         return stmt;
       }, conn.getResultSetTraverser(RowMap.class));
 
-      conn.createCommand("select * from guests where id=:id", Map.of("id", 1));
+      Command.create(conn, "select * from guests where id=:id", Map.of("id", 1));
 
     });
   }
@@ -59,7 +59,7 @@ class CommandTest {
   void testExecuteQueryFunctionHandlerOfResultSetT() {
     sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      Player p = conn.createCommand("select * from players where id=?", 1)
+      Player p = Command.create(conn, "select * from players where id=?", 1)
           .executeQuery(conn.getResultSetTraverser(Player.class)).get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
@@ -69,7 +69,7 @@ class CommandTest {
   void testExecuteQueryRowMapperOfT() {
     sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      List<Player> p = conn.createCommand("select * from players where id=?", 1)
+      List<Player> p = Command.create(conn, "select * from players where id=?", 1)
           .executeQuery(conn.getResultSetTraverser(Player.class));
       assertThat(p.size()).isEqualTo(1);
     });
@@ -78,7 +78,7 @@ class CommandTest {
   @Test
   void testExecuteUpdate() {
     sorm.acceptHandler(conn -> {
-      int m = conn.createCommand("insert into players values(?,?,?)", PLAYER_CAROL.getId(),
+      int m = Command.create(conn, "insert into players values(?,?,?)", PLAYER_CAROL.getId(),
           PLAYER_CAROL.getName(), PLAYER_CAROL.readAddress()).executeUpdate();
       assertThat(m).isEqualTo(1);
     });
@@ -88,7 +88,7 @@ class CommandTest {
   void testReadFirst() {
     sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Player p = conn.createCommand("select * from players").readFirst(Player.class);
+      Player p = Command.create(conn, "select * from players").readFirst(Player.class);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -98,7 +98,7 @@ class CommandTest {
   void testReadList() {
     sorm.acceptHandler(conn -> {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-      Player p = conn.createCommand("select * from players").readList(Player.class).get(0);
+      Player p = Command.create(conn, "select * from players").readList(Player.class).get(0);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -107,7 +107,7 @@ class CommandTest {
   void testReadOne() {
     sorm.acceptHandler(conn -> {
       conn.insert(List.of(SormTestUtils.PLAYER_ALICE));
-      Player p = conn.createCommand("select * from players").readOne(Player.class);
+      Player p = Command.create(conn, "select * from players").readOne(Player.class);
       assertThat(p).isEqualTo(SormTestUtils.PLAYER_ALICE);
     });
   }
@@ -125,7 +125,7 @@ class CommandTest {
           conn.getTableMetaData(Guest.class).getColumnAliases());
 
       List<Tuple2<Player, Guest>> ret =
-          conn.createCommand(sql, PLAYER_ALICE.getId()).readTupleList(Player.class, Guest.class);
+          Command.create(conn, sql, PLAYER_ALICE.getId()).readTupleList(Player.class, Guest.class);
       assertThat(ret.get(0).getT1().getName()).isEqualTo(PLAYER_ALICE.getName());
       assertThat(ret.get(0).getT2().getName()).isEqualTo(GUEST_ALICE.getName());
 
@@ -146,7 +146,7 @@ class CommandTest {
           conn.getTableMetaData(Guest.class).getColumnAliases(),
           conn.getTableMetaData(Sport.class).getColumnAliases());
 
-      List<Tuple3<Player, Guest, Sport>> ret = conn.createCommand(sql, PLAYER_ALICE.getId())
+      List<Tuple3<Player, Guest, Sport>> ret = Command.create(conn, sql, PLAYER_ALICE.getId())
           .readTupleList(Player.class, Guest.class, Sport.class);
       assertThat(ret.get(0).getT1().getName()).isEqualTo(PLAYER_ALICE.getName());
       assertThat(ret.get(0).getT2().getName()).isEqualTo(GUEST_ALICE.getName());
@@ -158,23 +158,23 @@ class CommandTest {
   @Test
   void testOrderedRequest() {
     AtomicInteger id = new AtomicInteger(10);
-    int row = sorm.applyHandler(conn -> conn.createCommand("insert into players values(?,?,?)")
+    int row = sorm.applyHandler(conn -> Command.create(conn, "insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet(), "Frank", "Tokyo").executeUpdate());
     assertThat(row).isEqualTo(1);
 
-    List<Player> ret = sorm.applyHandler(conn -> conn
-        .createCommand("select * from players where id=? and name=?")
-        .addParameter(id.get(), "Frank").executeQuery(conn.getResultSetTraverser(Player.class)));
+    List<Player> ret = sorm.applyHandler(conn -> Command
+        .create(conn, "select * from players where id=? and name=?").addParameter(id.get(), "Frank")
+        .executeQuery(conn.getResultSetTraverser(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
 
-    row = sorm.applyHandler(conn -> conn.createCommand("insert into players values(?,?,?)")
+    row = sorm.applyHandler(conn -> Command.create(conn, "insert into players values(?,?,?)")
         .addParameter(id.incrementAndGet()).addParameter("Frank").addParameter("Tokyo")
         .executeUpdate());
     assertThat(row).isEqualTo(1);
 
 
-    ret = sorm.applyHandler(conn -> conn.createCommand("select * from players where id=?")
+    ret = sorm.applyHandler(conn -> Command.create(conn, "select * from players where id=?")
         .addParameter(id.get()).executeQuery(conn.getRowMapper(Player.class)));
 
     assertThat(ret.size()).isEqualTo(1);
@@ -184,12 +184,11 @@ class CommandTest {
   void testCommand() {
 
     sorm.applyHandler(
-        conn -> conn.createCommand(ParameterizedSql.parse("select * from players where id=?", 1))
+        conn -> Command.create(conn, ParameterizedSql.parse("select * from players where id=?", 1))
             .readList(Player.class));
 
-    sorm.applyHandler(conn -> conn
-        .createCommand(
-            ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
+    sorm.applyHandler(conn -> Command
+        .create(conn, ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
     sorm.applyHandler(conn -> conn.getTableMetaData("players"));
   }

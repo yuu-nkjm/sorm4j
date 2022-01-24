@@ -23,10 +23,6 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.command.BasicCommand;
-import org.nkjmlab.sorm4j.util.command.Command;
-import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
-import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;
 import org.nkjmlab.sorm4j.util.table.BasicTable;
 import org.nkjmlab.sorm4j.util.table.Table;
 
@@ -483,25 +479,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.executeUpdate(sql));
   }
 
-  @Override
-  public Command createCommand(ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public BasicCommand createCommand(String sql) {
-    return applyAndClose(conn -> conn.createCommand(sql));
-  }
-
-  @Override
-  public OrderedParameterCommand createCommand(String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
-  }
-
-  @Override
-  public NamedParameterCommand createCommand(String sql, Map<String, Object> parameters) {
-    return applyAndClose(conn -> conn.createCommand(sql, parameters));
-  }
 
   @Override
   public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {

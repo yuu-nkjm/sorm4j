@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
+import org.nkjmlab.sorm4j.util.command.Command;
 
 public class CommandExample {
 
@@ -16,29 +17,30 @@ public class CommandExample {
 
 
     // Ordered parameter binding and query execution
-    List<Customer> customers =
-        sorm.applyHandler(conn -> conn.createCommand("select * from customer where name=? and address=?")
+    List<Customer> customers = sorm.applyHandler(
+        conn -> Command.create(conn, "select * from customer where name=? and address=?")
             .addParameter("Alice", "Kyoto").readList(Customer.class));
     System.out.println("customers=" + customers);
 
 
     // Named parameter binding and query execution
     customers = sorm.applyHandler(
-        conn -> conn.createCommand("select * from customer where name=:name and address=:address")
+        conn -> Command.create(conn, "select * from customer where name=:name and address=:address")
             .bind("name", "Alice").bind("address", "Kyoto").readList(Customer.class));
     System.out.println("customers=" + customers);
 
 
     // Ordered parameter binding and SQL execution
-    sorm.applyHandler(conn -> conn.createCommand("insert into customer values(?,?,?)")
+    sorm.applyHandler(conn -> Command.create(conn, "insert into customer values(?,?,?)")
         .addParameter("5", "Eve", "Tokyo").executeUpdate());
     customers = sorm.applyHandler(conn -> conn.selectAll(Customer.class));
     System.out.println("customers=" + customers);
 
 
     // Named parameter binding and SQL execution
-    sorm.applyHandler(conn -> conn.createCommand("insert into customer values(:id,:name,:address)")
-        .bindAll(Map.of("id", 6, "name", "Frank", "address", "Tokyo")).executeUpdate());
+    sorm.applyHandler(
+        conn -> Command.create(conn, "insert into customer values(:id,:name,:address)")
+            .bindAll(Map.of("id", 6, "name", "Frank", "address", "Tokyo")).executeUpdate());
     customers = sorm.applyHandler(conn -> conn.selectAll(Customer.class));
     System.out.println("customers=" + customers);
 
