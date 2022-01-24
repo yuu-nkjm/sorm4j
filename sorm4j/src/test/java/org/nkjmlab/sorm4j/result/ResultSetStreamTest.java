@@ -22,14 +22,14 @@ class ResultSetStreamTest {
   void testA() {
     sorm.acceptHandler(m -> m.insert(PLAYER_ALICE, PLAYER_BOB));
     sorm.acceptHandler(m -> {
-      try (Stream<Player> st = m.openStreamAll(Player.class)) {
+      try (Stream<Player> st = m.streamAll(Player.class)) {
         st.onClose(() -> System.out.println("close1"));
         st.findAny();
       }
     });
 
     sorm.acceptHandler(m -> {
-      try (Stream<Player> st = m.openStreamAll(Player.class)) {
+      try (Stream<Player> st = m.streamAll(Player.class)) {
         st.onClose(() -> System.out.println("close2"));
         st.findAny();
       }

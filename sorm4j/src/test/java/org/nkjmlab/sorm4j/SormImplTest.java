@@ -44,10 +44,10 @@ class SormImplTest {
     assertThat(sorm.getJdbcDatabaseMetaData().toString()).contains("jdbc");
 
 
-    sorm.acceptHandler(conn -> conn.openStreamAll(Guest.class),
+    sorm.acceptHandler(conn -> conn.streamAll(Guest.class),
         stream -> stream.collect(Collectors.toList()));
 
-    sorm.applyHandler(conn -> conn.openStreamAll(Guest.class),
+    sorm.applyHandler(conn -> conn.streamAll(Guest.class),
         stream -> stream.collect(Collectors.toList()));
 
 

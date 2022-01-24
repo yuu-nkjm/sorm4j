@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmStreamConnection;
+import org.nkjmlab.sorm4j.OrmStream;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -485,7 +485,7 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public <T> void acceptHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  public <T> void acceptHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
       streamHandler.accept(stream);
@@ -495,7 +495,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T, R> R applyHandler(FunctionHandler<OrmStreamConnection, Stream<T>> streamGenerator,
+  public <T, R> R applyHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
       return streamHandler.apply(stream);

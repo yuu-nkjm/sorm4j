@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-public interface OrmStreamConnection {
+public interface OrmStream {
 
   /**
    * Returns {@link Stream} represents all rows from the table indicated by object class.
@@ -13,13 +13,15 @@ public interface OrmStreamConnection {
    * <strong>Note: </strong>
    *
    * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
-   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block.
+   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block or
+   * {@link Sorm#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)}
+   * for closing the database resources.
    *
    * @param <T>
    * @param type
    * @return
    */
-  <T> Stream<T> openStreamAll(Class<T> type);
+  <T> Stream<T> streamAll(Class<T> type);
 
   /**
    * Returns an {@link Stream}. It is able to convert to Stream, List, and so on.
@@ -27,14 +29,16 @@ public interface OrmStreamConnection {
    * <strong>Note: </strong>
    *
    * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
-   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block.
+   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block or
+   * {@link Sorm#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)}
+   * for closing the database resources.
    *
    * @param <T>
    * @param type
    * @param sql
    * @return
    */
-  <T> Stream<T> openStream(Class<T> type, ParameterizedSql sql);
+  <T> Stream<T> stream(Class<T> type, ParameterizedSql sql);
 
   /**
    * Returns an {@link Stream}. It is able to convert to Stream, List, and so on.
@@ -45,7 +49,9 @@ public interface OrmStreamConnection {
    * <strong>Note: </strong>
    *
    * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
-   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block.
+   * {@link AutoCloseable} and it is expected that it is used with try-with-resources block or
+   * {@link Sorm#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)};
+   * for closing the database resources.
    *
    * @param <T>
    * @param type
@@ -53,7 +59,7 @@ public interface OrmStreamConnection {
    * @param parameters
    * @return
    */
-  <T> Stream<T> openStream(Class<T> type, String sql, Object... parameters);
+  <T> Stream<T> stream(Class<T> type, String sql, Object... parameters);
 
 
 }

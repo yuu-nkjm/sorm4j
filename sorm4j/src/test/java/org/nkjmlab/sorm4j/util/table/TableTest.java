@@ -62,7 +62,7 @@ class TableTest {
     assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
         .contains("INDEX_IN_GUESTS_ON_NAME");
 
-    playersTable.acceptHandler(conn -> conn.openStreamAll(),
+    playersTable.acceptHandler(conn -> conn.streamAll(),
         stream -> stream.collect(Collectors.toList()));
   }
 

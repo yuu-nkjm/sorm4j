@@ -75,10 +75,10 @@ public interface Table<T> {
    */
   @Experimental
   default void acceptHandler(
-      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     getSorm().acceptHandler(
-        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
         streamHandler);
   }
 
@@ -122,10 +122,10 @@ public interface Table<T> {
    */
   @Experimental
   default <R> R applyHandler(
-      FunctionHandler<TypedOrmStreamConnection<T>, Stream<T>> streamGenerator,
+      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     return getSorm().applyHandler(
-        conn -> streamGenerator.apply(new TypedOrmStreamConnection<T>(getValueType(), conn)),
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
         streamHandler);
   }
 

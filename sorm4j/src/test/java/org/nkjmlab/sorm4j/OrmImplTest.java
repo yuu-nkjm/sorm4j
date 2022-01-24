@@ -301,7 +301,7 @@ class OrmImplTest {
   @Test
   void testOpenMapStream() {
     sorm.acceptHandler(conn -> {
-      try (Stream<RowMap> stream = conn.openStream(RowMap.class, "select * from players")) {
+      try (Stream<RowMap> stream = conn.stream(RowMap.class, "select * from players")) {
         assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
       }
     });

@@ -579,12 +579,12 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> Stream<T> openStream(Class<T> objectClass, ParameterizedSql sql) {
-    return openStream(objectClass, sql.getSql(), sql.getParameters());
+  public <T> Stream<T> stream(Class<T> objectClass, ParameterizedSql sql) {
+    return stream(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
-  public <T> Stream<T> openStream(Class<T> objectClass, String sql, Object... parameters) {
+  public <T> Stream<T> stream(Class<T> objectClass, String sql, Object... parameters) {
     try {
       final PreparedStatement stmt =
           getPreparedStatementSupplier().prepareStatement(connection, sql);
@@ -603,8 +603,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> Stream<T> openStreamAll(Class<T> type) {
-    return openStream(type, getTableMapping(type).getSql().getSelectAllSql());
+  public <T> Stream<T> streamAll(Class<T> type) {
+    return stream(type, getTableMapping(type).getSql().getSelectAllSql());
   }
 
   @Override

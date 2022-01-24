@@ -28,7 +28,7 @@ public class FirstExample {
 
     // Execute select sql and convert result to stream. The stream must be closed.
     sorm.acceptHandler(conn -> {
-      try (Stream<Customer> stream = conn.openStreamAll(Customer.class)) {
+      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
         List<String> msgs = stream.map(c -> c.getName() + " lives in " + c.getAddress())
             .collect(Collectors.toList());
         System.out.println("messages = " + msgs);
@@ -36,21 +36,21 @@ public class FirstExample {
     });
 
     sorm.acceptHandler(conn -> {
-      try (Stream<Customer> stream = conn.openStreamAll(Customer.class)) {
+      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
         List<String> msgs = stream.map(c -> c.getName() + " lives in " + c.getAddress())
             .collect(Collectors.toList());
         System.out.println("messages = " + msgs);
       }
     });
 
-    sorm.acceptHandler(conn -> conn.openStreamAll(Customer.class), stream -> {
+    sorm.acceptHandler(conn -> conn.streamAll(Customer.class), stream -> {
       List<String> msgs =
           stream.map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
       System.out.println("messages = " + msgs);
     });
 
     List<String> tmp =
-        sorm.applyHandler(conn -> conn.openStreamAll(Customer.class), stream -> stream
+        sorm.applyHandler(conn -> conn.streamAll(Customer.class), stream -> stream
             .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
     System.out.println(tmp);
 
@@ -70,7 +70,7 @@ public class FirstExample {
 
 
     Table<Customer> customerTable = Table.create(sorm, Customer.class);
-    customerTable.applyHandler(conn -> conn.openStreamAll(),
+    customerTable.applyHandler(conn -> conn.streamAll(),
         stream -> stream.collect(Collectors.toList()));
 
   }
