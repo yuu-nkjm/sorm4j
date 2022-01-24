@@ -57,7 +57,7 @@ public abstract class MultiRowProcessor<T> {
     sqlParametersSetter.setParameters(stmt, parameters);
   }
 
-  public static final void setAutoCommit(Connection connection, boolean autoCommit) {
+  public static void setAutoCommit(Connection connection, boolean autoCommit) {
     try {
       connection.setAutoCommit(autoCommit);
     } catch (SQLException e) {
@@ -65,7 +65,7 @@ public abstract class MultiRowProcessor<T> {
     }
   }
 
-  public static final void commitOrRollback(Connection connection, boolean origAutoCommit) {
+  public static void commitOrRollback(Connection connection, boolean origAutoCommit) {
     try {
       if (origAutoCommit) {
         connection.commit();
@@ -77,7 +77,7 @@ public abstract class MultiRowProcessor<T> {
     }
   }
 
-  public static final boolean getAutoCommit(Connection connection) {
+  public static boolean getAutoCommit(Connection connection) {
     try {
       return connection.getAutoCommit();
     } catch (SQLException e) {

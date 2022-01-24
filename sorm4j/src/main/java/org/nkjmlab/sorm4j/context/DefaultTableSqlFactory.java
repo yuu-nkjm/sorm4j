@@ -9,8 +9,7 @@ import org.nkjmlab.sorm4j.result.TableMetaData;
 public final class DefaultTableSqlFactory implements TableSqlFactory {
 
   @Override
-  public TableSql create(TableMetaData tableMetaData, Class<?> objectClass,
-      Connection connection) {
+  public TableSql create(TableMetaData tableMetaData, Class<?> objectClass, Connection connection) {
     String tableName = tableMetaData.getTableName();
 
 
@@ -26,7 +25,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
     List<String> primaryKeys = tableMetaData.getPrimaryKeys();
 
     String errorMsg =
-        "This opperation requiers primary keys but Table [" + tableName + "] doesn't have them.";
+        "This opperation requiers primary key but Table [" + tableName + "] doesn't have it.";
 
     String existsSql = !tableMetaData.hasPrimaryKey() ? errorMsg
         : "select 1 from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);

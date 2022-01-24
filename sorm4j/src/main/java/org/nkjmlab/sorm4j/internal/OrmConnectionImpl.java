@@ -867,8 +867,8 @@ public class OrmConnectionImpl implements OrmConnection {
   private static <R> R executeQueryAndClose(LoggerContext loggerContext, Connection connection,
       PreparedStatementSupplier statementSupplier, SqlParametersSetter sqlParametersSetter,
       String sql, Object[] parameters, ResultSetTraverser<R> resultSetTraverser) {
-    final Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext,
-        Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
+    Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext, Category.EXECUTE_QUERY,
+        OrmConnectionImpl.class, connection, sql, parameters);
     try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       ResultSet resultSet = stmt.executeQuery();
@@ -880,13 +880,11 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private static final int executeUpdateAndClose(LoggerContext loggerContext, Connection connection,
+  private static int executeUpdateAndClose(LoggerContext loggerContext, Connection connection,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
       String sql, Object[] parameters) {
-
-    final Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext,
-        Category.EXECUTE_QUERY, OrmConnectionImpl.class, connection, sql, parameters);
-
+    Optional<LogPoint> lp = createLogPointAndLogBeforeSql(loggerContext, Category.EXECUTE_QUERY,
+        OrmConnectionImpl.class, connection, sql, parameters);
     try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       int ret = stmt.executeUpdate();

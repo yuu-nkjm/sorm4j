@@ -23,7 +23,7 @@ class DefaultTableNameMapperTest {
     sorm.acceptHandler(m -> {
       assertThat(
           new DefaultTableNameMapper().getTableName("guests", m.getJdbcConnection().getMetaData()))
-              .isEqualTo(new TableName("GUESTS"));
+              .isEqualTo("GUESTS");
 
     });
     try {
