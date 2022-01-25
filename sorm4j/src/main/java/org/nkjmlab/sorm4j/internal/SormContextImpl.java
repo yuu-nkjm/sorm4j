@@ -84,7 +84,7 @@ public final class SormContextImpl implements SormContext {
    * create a mapping and register it.
    *
    */
-  public <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, String tableName,
+  <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, String tableName,
       Class<T> objectClass) {
     return getTableMapping(connection, toTableName(connection, tableName), objectClass);
   }

@@ -128,8 +128,7 @@ public final class DefaultColumnValueToJavaObjectConverters
       case "java.sql.Clob":
         return resultSet.getClob(columnIndex);
       case "java.time.Instant":
-        return Optional.ofNullable(resultSet.getTimestamp(columnIndex)).map(t -> t.toInstant())
-            .orElse(null);
+        return Optional.ofNullable(resultSet.getObject(columnIndex)).orElse(null);
       case "java.time.LocalTime":
         return Optional.ofNullable(resultSet.getTime(columnIndex)).map(t -> t.toLocalTime())
             .orElse(null);

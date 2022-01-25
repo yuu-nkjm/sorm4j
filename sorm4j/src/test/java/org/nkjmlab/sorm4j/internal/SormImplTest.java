@@ -1,17 +1,24 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.internal;
 
 import static java.sql.Connection.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.table.Table;
 
 class SormImplTest {
@@ -28,6 +35,24 @@ class SormImplTest {
   void testCreate() {
     Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
     Sorm.getDefaultContext().toString();
+  }
+
+  @Test
+  void testJoin() {
+    List<Tuple2<Guest, Player>> ret =
+        sorm.leftJoin(Guest.class, Player.class, "guests.id=players.id");
+    assertThat(ret.size()).isEqualTo(sorm.selectAll(Guest.class).size());
+
+    sorm.insert(PLAYER_ALICE);
+    assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
+
+
+    sorm.readTupleList(Guest.class, Player.class,
+        ParameterizedSql.of("select * from guests join players on guests.id=players.id"));
+
+    sorm.readTupleList(Guest.class, Player.class, Sport.class, ParameterizedSql.of(
+        "select * from guests join players on guests.id=players.id join sports on players.id=sports.id"));
+
   }
 
   @Test
@@ -61,6 +86,9 @@ class SormImplTest {
       tr.insert(a);
       // auto-rollback
     }
+    assertThat(sorm.selectAll(Guest.class).size() == 0);
+
+    sorm.applyHandler(Connection.TRANSACTION_READ_COMMITTED, conn -> conn.insert(a));
     assertThat(sorm.selectAll(Guest.class).size() == 0);
 
   }

@@ -47,7 +47,7 @@ public final class TypedOrmStream<T> {
    * @return
    */
   public Stream<T> stream(ParameterizedSql sql) {
-    return conn.stream(type, sql);
+    return stream(sql.getSql(), sql.getParameters());
   }
 
   /**

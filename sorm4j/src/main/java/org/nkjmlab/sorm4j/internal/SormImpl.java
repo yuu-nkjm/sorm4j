@@ -180,7 +180,7 @@ public final class SormImpl implements Sorm {
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readTupleList(t1, t2, t3, sql));
+    return readTupleList(t1, t2, t3, sql.getSql(), sql.getParameters());
   }
 
   @Override
@@ -192,7 +192,7 @@ public final class SormImpl implements Sorm {
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
       ParameterizedSql sql) {
-    return applyAndClose(conn -> conn.readTupleList(t1, t2, sql));
+    return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 
   @Override

@@ -115,6 +115,7 @@ public interface ParameterizedSql {
     if (parameters == null || parameters.size() == 0) {
       return sql;
     }
+    // Ordered by position in the sentence
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
 
     parameters.keySet().stream().forEach(key -> {
