@@ -214,7 +214,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return applyAndClose(conn -> conn.join(t1, t2, onCondition));
+    return applyAndClose(conn -> conn.leftJoin(t1, t2, onCondition));
   }
 
   @Override
