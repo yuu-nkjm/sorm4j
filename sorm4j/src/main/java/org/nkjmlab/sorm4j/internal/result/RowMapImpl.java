@@ -92,10 +92,10 @@ public final class RowMapImpl implements RowMap {
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (!(obj instanceof RowMapImpl))
+    if (!(obj instanceof Map))
       return false;
-    RowMapImpl other = (RowMapImpl) obj;
-    return Objects.equals(map, other.map);
+    Map<?, ?> other = (Map<?, ?>) obj;
+    return Objects.equals(map, other);
   }
 
   @Override

@@ -146,7 +146,7 @@ public final class FieldAccessor {
     @Override
     public void set(Object object, Object value)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-      throw new IllegalAccessException();
+      throw new SormException("No valid setter for " + object);
     }
 
     @Override
