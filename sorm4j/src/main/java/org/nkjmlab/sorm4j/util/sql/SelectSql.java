@@ -482,7 +482,7 @@ public final class SelectSql {
   }
 
   public static String orderBy(Object column) {
-    return orderBy(column, "asc");
+    return orderBy(column, "");
   }
 
   public static String orderByAsc(Object column) {

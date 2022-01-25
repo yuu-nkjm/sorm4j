@@ -31,6 +31,18 @@ class SelectSqlTest {
     assertThat(SelectSql.in("id", List.of("a", 1)).toString()).isEqualTo(" id in ('a', 1) ");
     assertThat(SelectSql.between("id", 1, 2).toString()).isEqualTo(" id between 1 and 2 ");
 
+    assertThat(SelectSql.groupBy("id, name")).isEqualTo(" group by id, name ");
+    assertThat(SelectSql.orderBy("id, name")).isEqualTo(" order by id, name ");
+    assertThat(SelectSql.limit(1)).isEqualTo(" limit 1 ");
+
+    assertThat(SelectSql.orderByAsc("id")).isEqualTo(" order by id asc ");
+    assertThat(orderByDesc("id")).isEqualTo(" order by id desc ");
+    assertThat(func("count", "*")).isEqualTo(" count(*) ");
+    assertThat(func("atan2", "x", "y")).isEqualTo(" atan2(x, y) ");
+    assertThat(count("*")).isEqualTo(" count(*) ");
+    assertThat(sum("*")).isEqualTo(" sum(*) ");
+    assertThat(avg("*")).isEqualTo(" avg(*) ");
+
   }
 
   @Test
