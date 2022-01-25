@@ -3,10 +3,12 @@ package org.nkjmlab.sorm4j.context;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -31,6 +33,12 @@ class DefaultSqlParametersSetterTest {
 
       setter.setParameters(pstmt, (Object[]) null);
       setter.setParameters(pstmt, new Object[] {});
+
+      setter.setParameters(pstmt, Instant.now());
+      setter.setParameters(pstmt,
+          DefaultSqlParametersSetterTest.class.getResourceAsStream("log4j2.xml"));
+      setter.setParameters(pstmt, new StringReader("a"));
+
 
       assertThat(toSqlArray("boolean", conn, TestUtils.PRIMITIVE_BOOLEAN_ARRAY).getBaseType())
           .isEqualTo(JDBCType.BOOLEAN.getVendorTypeNumber());

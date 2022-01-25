@@ -69,7 +69,7 @@ class TableTest {
 
     playersTable.acceptHandler(conn -> conn.streamAll(),
         stream -> stream.collect(Collectors.toList()));
-    playersTable.acceptHandler(conn -> conn.stream(ParameterizedSql.of("select * from guests")),
+    playersTable.applyHandler(conn -> conn.stream(ParameterizedSql.of("select * from guests")),
         stream -> stream.collect(Collectors.toList()));
   }
 
