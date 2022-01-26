@@ -1,6 +1,8 @@
-package repackage.net.sf.persist.tests.engine.postgresql;
+package org.nkjmlab.sorm4j.engine;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -11,6 +13,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -82,13 +85,13 @@ public class TestPostgreSQLSqlMapper {
    * @throws SQLException
    */
   private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
-  private static final LocalDate localDate = LocalDate.of(2019, 9, 27);
-  private static final LocalTime localTime = LocalTime.of(13, 23);
-  private static final LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-  private static final OffsetTime offsetTime = OffsetTime.of(localTime, JST_OFFSET);
-  private static final OffsetDateTime offsetDateTime =
-      OffsetDateTime.of(localDate, localTime, JST_OFFSET);
-
+  private static final LocalDate LOCAL_DATE = LocalDate.of(2019, 9, 27);
+  private static final LocalTime LOCAL_TIME = LocalTime.of(13, 23);
+  private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(LOCAL_DATE, LOCAL_TIME);
+  private static final OffsetTime OFFSET_TIME = OffsetTime.of(LOCAL_TIME, JST_OFFSET);
+  private static final OffsetDateTime OFFSET_DATE_TIME =
+      OffsetDateTime.of(LOCAL_DATE, LOCAL_TIME, JST_OFFSET);
+  private static final Instant INSTANT = OFFSET_DATE_TIME.toInstant();
 
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
@@ -104,17 +107,21 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "c_double by BigDecimal", "c_double", new BigDecimal("0.5"));
       doTest(c, "testName", "c_varchar", "varchar");
       doTest(c, "testName", "c_text", "long long text");
+      doTest(c, "testName", "c_text", new StringReader("long long text"));
       doTest(c, "c_bytea by byte[]", "c_bytea",
           new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF});
+      doTest(c, "c_bytea by byte[]", "c_bytea", new ByteArrayInputStream(
+          new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF}));
       doTest(c, "testName", "c_uuid", UUID.fromString("33ee757a-19b3-45dc-be79-f1d65ac5d1a4"));
-      doTest(c, "testName", "c_date", localDate);
-      doTest(c, "testName", "c_date", Date.valueOf(localDate));
-      doTest(c, "testName", "c_time", localTime);
-      doTest(c, "testName", "c_time", Time.valueOf(localTime));
-      doTest(c, "c_timez by offsetTime", "c_timetz", offsetTime);
-      doTest(c, "testName", "c_timestamp", localDateTime);
-      doTest(c, "testName", "c_timestamp", Timestamp.valueOf(localDateTime));
-      doTest(c, "c_timestamptz by OffsetDateTime", "c_timestamptz", offsetDateTime);
+      doTest(c, "testName", "c_date", LOCAL_DATE);
+      doTest(c, "testName", "c_date", Date.valueOf(LOCAL_DATE));
+      doTest(c, "testName", "c_time", LOCAL_TIME);
+      doTest(c, "testName", "c_time", Time.valueOf(LOCAL_TIME));
+      doTest(c, "c_timez by offsetTime", "c_timetz", OFFSET_TIME);
+      doTest(c, "testName", "c_timestamp", LOCAL_DATE_TIME);
+      doTest(c, "testName", "c_timestamp", Timestamp.valueOf(LOCAL_DATE_TIME));
+      doTest(c, "c_timestamptz by OffsetDateTime", "c_timestamptz", OFFSET_DATE_TIME);
+      doTest(c, "c_timestamptz by Instant", "c_timestamptz", INSTANT);
       // doTest(c, "testName", "c_inet_ipv4", InetAddress.getByName("192.168.1.1"));
       // doTest(c, "testName","c_inet_ipv6", InetAddress.getByName("::1"));
       // doTest(c, "testName", "c_url", new URL("https://example.com"));

@@ -85,17 +85,17 @@ public final class RowMapImpl implements RowMap {
 
   @Override
   public int hashCode() {
-    return Objects.hash(map);
+    return map.hashCode();
   }
 
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (!(obj instanceof RowMapImpl))
+    if (!(obj instanceof Map))
       return false;
-    RowMapImpl other = (RowMapImpl) obj;
-    return Objects.equals(map, other.map);
+    Map<?, ?> other = (Map<?, ?>) obj;
+    return Objects.equals(map, other);
   }
 
   @Override

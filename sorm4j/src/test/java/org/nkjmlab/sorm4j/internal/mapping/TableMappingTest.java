@@ -86,7 +86,7 @@ class TableMappingTest {
         tm.setValue(new Player(), "name", 1);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("Could not set a value");
+      assertThat(e.getMessage()).contains("No valid setter for");
     }
   }
 
@@ -105,7 +105,8 @@ class TableMappingTest {
     });
   }
 
-  public static <T> SqlParametersToTableMapping<T> getTableMapping(OrmConnection conn, Class<T> objectClass) {
+  public static <T> SqlParametersToTableMapping<T> getTableMapping(OrmConnection conn,
+      Class<T> objectClass) {
     return ((OrmConnectionImpl) conn).getTableMapping(objectClass);
   }
 

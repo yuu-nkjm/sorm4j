@@ -51,10 +51,11 @@ class ParameterizedSqlTest {
 
   @Test
   void testEmbeddedMap() {
-    String sql = "select * from guest where id={:id}";
-    Map<String, Object> params = Map.of("id", 1);
+    String sql = "select * from guest where name={:name} and id={:id}";
+    Map<String, Object> params = Map.of("id", 1, "name", "'a'");
+
     assertThat(ParameterizedSql.embedParameter(sql, params))
-        .contains("select * from guest where id=1");
+        .contains("select * from guest where name='a' and id=1");
   }
 
 }

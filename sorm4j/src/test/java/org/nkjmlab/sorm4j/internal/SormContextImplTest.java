@@ -1,0 +1,50 @@
+package org.nkjmlab.sorm4j.internal;
+
+import static org.assertj.core.api.Assertions.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.context.DefaultColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.context.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
+import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+
+class SormContextImplTest {
+
+  @Test
+  void testBuild() {
+    SormContext context =
+        SormContext.builder().setColumnFieldMapper(new DefaultColumnToFieldAccessorMapper())
+            .setTableNameMapper(new DefaultTableNameMapper())
+            .setColumnValueToMapEntryConverter(new DefaultColumnValueToMapEntryConverter())
+            .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters())
+            .setSqlParametersSetter(new DefaultSqlParametersSetter())
+            .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder().setBatchSize(10)
+                .setBatchSizeWithMultiRow(20).build())
+            .setLoggerOn(LoggerContext.Category.MAPPING)
+            .setLoggerOff(LoggerContext.Category.MAPPING).build();
+    Sorm sorm = Sorm.create(SormTestUtils.createDataSourceH2(), context);
+
+    try (Connection conn = sorm.getJdbcConnection()) {
+      assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Baby.class))
+          .isInstanceOfSatisfying(SormException.class,
+              e -> assertThat(e.getMessage()).contains("BABIES"));
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  public static class Baby {
+
+  }
+
+
+}

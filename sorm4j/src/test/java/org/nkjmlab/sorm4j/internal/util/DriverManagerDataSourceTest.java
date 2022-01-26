@@ -26,10 +26,7 @@ class DriverManagerDataSourceTest {
 
   @Test
   void testGetConnectionStringString() {
-    try {
-      ds.getConnection("", "");
-    } catch (SQLException e) {
-    }
+    assertThrows(SQLException.class, () -> ds.getConnection("sa", "password"));
   }
 
   @Test
@@ -37,6 +34,7 @@ class DriverManagerDataSourceTest {
     try {
       ds.getLogWriter();
     } catch (SQLException e) {
+      fail();
     }
   }
 
@@ -45,6 +43,7 @@ class DriverManagerDataSourceTest {
     try {
       ds.setLogWriter(null);
     } catch (SQLException e) {
+      fail();
     }
   }
 
@@ -53,6 +52,7 @@ class DriverManagerDataSourceTest {
     try {
       ds.setLoginTimeout(0);
     } catch (SQLException e) {
+      fail();
     }
   }
 
@@ -61,6 +61,7 @@ class DriverManagerDataSourceTest {
     try {
       ds.getLoginTimeout();
     } catch (SQLException e) {
+      fail();
     }
   }
 

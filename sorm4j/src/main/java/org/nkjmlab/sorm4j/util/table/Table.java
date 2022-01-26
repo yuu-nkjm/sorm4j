@@ -3,8 +3,6 @@ package org.nkjmlab.sorm4j.util.table;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.List;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -43,74 +41,15 @@ public interface Table<T> {
 
 
   /**
-   * Accepts a {@link OrmConnection} handler for a task with object-relation mapping. The connection
-   * will be closed after the process of handler.
-   *
-   * @param handler
-   */
-  default void acceptHandler(ConsumerHandler<OrmConnection> handler) {
-    getSorm().acceptHandler(handler);
-  }
-
-  /**
-   * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
-   *
-   * <p>
-   * Note: The transaction will be closed after the process of handler. The transaction will be
-   * rolled back if the transaction closes before commit. When an exception throws in the
-   * transaction, the transaction will be rollback.
-   *
-   * @param isolationLevel
-   * @param transactionHandler
-   */
-  default void acceptHandler(int isolationLevel,
-      ConsumerHandler<OrmTransaction> transactionHandler) {
-    getSorm().acceptHandler(isolationLevel, transactionHandler);
-  }
-
-  /**
    *
    * @param streamGenerator
    * @param streamHandler
    */
   @Experimental
-  default void acceptHandler(
-      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
+  default void acceptHandler(FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     getSorm().acceptHandler(
-        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
-        streamHandler);
-  }
-
-
-  /**
-   * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
-   * result. The connection will be closed after the process of handler.
-   *
-   * @param handler
-   * @return
-   */
-  default T applyHandler(FunctionHandler<OrmConnection, T> handler) {
-    return getSorm().applyHandler(handler);
-  }
-
-
-  /**
-   * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
-   * result.
-   * <p>
-   * Note: The transaction will be closed after the process of handler. The transaction will be
-   * rolled back if the transaction closes before commit. When an exception throws in the
-   * transaction, the transaction will be rolled back.
-   *
-   * @param isolationLevel
-   * @param transactionHandler
-   *
-   * @return
-   */
-  default T applyHandler(int isolationLevel,
-      FunctionHandler<OrmTransaction, T> transactionHandler) {
-    return getSorm().applyHandler(isolationLevel, transactionHandler);
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)), streamHandler);
   }
 
   /**
@@ -121,12 +60,10 @@ public interface Table<T> {
    * @return
    */
   @Experimental
-  default <R> R applyHandler(
-      FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
+  default <R> R applyHandler(FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     return getSorm().applyHandler(
-        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)),
-        streamHandler);
+        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)), streamHandler);
   }
 
   default T readFirst(ParameterizedSql sql) {

@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
 
 class TableTest {
@@ -32,6 +34,9 @@ class TableTest {
   @Test
   void testGetTableSchema() {
     playersTable.getTableSchema();
+    BasicTable<Guest> gt = new BasicTable<>(SormTestUtils.SORM, Guest.class);
+    assertThat(gt.getTableName()).isEqualTo("GUESTS");
+    assertThat(gt.getValueType()).isEqualTo(Guest.class);
   }
 
   @Test
@@ -63,6 +68,8 @@ class TableTest {
         .contains("INDEX_IN_GUESTS_ON_NAME");
 
     playersTable.acceptHandler(conn -> conn.streamAll(),
+        stream -> stream.collect(Collectors.toList()));
+    playersTable.applyHandler(conn -> conn.stream(ParameterizedSql.of("select * from guests")),
         stream -> stream.collect(Collectors.toList()));
   }
 

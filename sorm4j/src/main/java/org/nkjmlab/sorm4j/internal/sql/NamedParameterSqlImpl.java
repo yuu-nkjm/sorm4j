@@ -70,6 +70,7 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
 
   @Override
   public ParameterizedSql parse() {
+    // Ordered by position in the sentence
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
     String resultSql = this.sql;
 
