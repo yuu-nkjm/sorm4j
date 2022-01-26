@@ -54,9 +54,6 @@ public class BeanTest {
 
     // check if the bean read is the same as inserted
     if (!obj.equals(read.get(0))) {
-      System.out.println(obj);
-      System.err.println(persist.readList(RowMap.class, sql));
-
       throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
           + DynamicBean.toString(read.get(0)) + "] as result of [" + sql + "]");
     }
