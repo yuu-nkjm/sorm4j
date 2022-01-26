@@ -25,7 +25,9 @@ drop table datetime_types if exists;
 create table if not exists datetime_types (
 	time_col time,
 	date_col date,
-	timestamp_col timestamp
+	timestamp_col timestamp,
+	timez_col TIME WITH TIME ZONE,
+	timestampz_col TIMESTAMP WITH TIME ZONE
 );
 
 drop table binary_types if exists;

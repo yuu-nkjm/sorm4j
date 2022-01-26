@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.context.SormContext;
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.FieldMap;
@@ -49,7 +50,7 @@ public class TestH2 {
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn);) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
       Class<?>[] binaryTypes = new Class<?>[] {Blob.class};
       Class<?>[] otherTypes = new Class<?>[] {Object.class};
@@ -78,13 +79,16 @@ public class TestH2 {
   @Test
   public void testDatetimeTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn)) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
       BeanMap beanMap = new BeanMap("DatetimeTypes")
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
+          .addField(new FieldMap("timezCol").setTypes(java.time.OffsetTime.class))
           .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
-          .addField(new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class,
-              java.util.Date.class));
+          .addField(
+              new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class))
+          .addField(new FieldMap("timestampzCol").setTypes(java.time.OffsetDateTime.class,
+              java.time.Instant.class));
 
       BeanTest.test(getClass(), ormConn, beanMap, obj -> {
         BeanTest.testInsert(ormConn, obj, beanMap);
@@ -105,7 +109,7 @@ public class TestH2 {
   @Test
   public void testNumericTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn)) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
       Class<?>[] integerTypes = new Class<?>[] {Integer.class, int.class};
       Class<?>[] booleanTypes = new Class<?>[] {Boolean.class, boolean.class};
@@ -147,7 +151,7 @@ public class TestH2 {
   public void testStringTypes() throws SQLException {
 
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn)) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
       Class<?>[] stringTypes = new Class<?>[] {String.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};

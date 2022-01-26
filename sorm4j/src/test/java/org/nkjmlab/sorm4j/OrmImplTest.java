@@ -110,6 +110,7 @@ class OrmImplTest {
   void testExists() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
+    assertThat(sorm.exists("guests", PLAYER_ALICE)).isFalse();
   }
 
   @Test
@@ -302,6 +303,12 @@ class OrmImplTest {
   void testOpenMapStream() {
     sorm.acceptHandler(conn -> {
       try (Stream<RowMap> stream = conn.stream(RowMap.class, "select * from players")) {
+        assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
+      }
+    });
+    sorm.acceptHandler(conn -> {
+      try (Stream<RowMap> stream =
+          conn.stream(RowMap.class, ParameterizedSql.of("select * from players"))) {
         assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
       }
     });

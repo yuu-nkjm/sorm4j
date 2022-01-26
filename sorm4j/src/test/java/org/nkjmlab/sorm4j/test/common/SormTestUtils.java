@@ -110,7 +110,7 @@ public class SormTestUtils {
   }
 
 
-  public static Sorm createSormWithNewContextAndTables(SormContext sormContext) {
+  public static Sorm createSormAndTables(SormContext sormContext) {
     Sorm sorm = createNewContextSorm(sormContext);
     dropAndCreateSportsTable(sorm);
     dropAndCreateGuestTable(sorm);
@@ -124,7 +124,7 @@ public class SormTestUtils {
   }
 
   public static Sorm createSormWithNewContextAndTables() {
-    return createSormWithNewContextAndTables(Sorm.getDefaultContext());
+    return createSormAndTables(Sorm.getDefaultContext());
   }
 
 

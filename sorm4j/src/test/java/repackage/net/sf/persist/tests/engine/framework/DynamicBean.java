@@ -11,6 +11,9 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,6 +165,12 @@ public class DynamicBean {
       value = useNull ? null : new BytesBlob(randomByteArray(size));
     else if (fieldType == java.sql.Clob.class)
       value = useNull ? null : new StringClob(randomString(size));
+    else if (fieldType == java.time.OffsetTime.class)
+      value = useNull ? null : OffsetTime.now().truncatedTo(ChronoUnit.SECONDS);
+    else if (fieldType == java.time.OffsetDateTime.class)
+      value = useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    else if (fieldType == java.time.Instant.class)
+      value = useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).toInstant();
     else {
       if (useNull)
         value = null;
@@ -422,7 +431,6 @@ public class DynamicBean {
           return false;
       } else if (!v1.equals(v2))
         return false;
-
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
