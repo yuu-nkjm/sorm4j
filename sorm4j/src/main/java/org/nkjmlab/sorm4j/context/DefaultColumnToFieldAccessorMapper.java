@@ -198,7 +198,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   /**
    * Gets column alias prefix based on {@link OrmColumnAliasPrefix} annotation. If the give object
    * class has no {@link OrmColumnAliasPrefix} annotation, the column alias prefix is
-   * <code>objectClass.getSimpleName().charAt(0) + "DOT"</code>
+   * <code>objectClass.getSimpleName() + "DOT"</code>
    *
    * @param objectClass
    * @return
@@ -206,7 +206,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   @Override
   public String getColumnAliasPrefix(Class<?> objectClass) {
     return Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
-        .map(a -> a.value()).orElse(objectClass.getSimpleName().charAt(0) + "DOT");
+        .map(a -> a.value()).orElse(objectClass.getSimpleName() + "DOT");
   }
 
 

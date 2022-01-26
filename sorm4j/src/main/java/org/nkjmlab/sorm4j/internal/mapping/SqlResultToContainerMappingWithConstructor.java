@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
@@ -82,9 +84,9 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
       throw Try.rethrow(e);
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
-      throw new SormException(
-          "Constructor with parameters of container class for object-relation mapping is not match with columns.",
-          e);
+      throw new SormException(ParameterizedStringUtils.newString(
+          "Constructor with parameters of container class for object-relation mapping is not match with columns. sqltypes={}, param={}",
+          JdbcTypeUtils.convert(sqlTypes), constructorParameters), e);
     }
   }
 
