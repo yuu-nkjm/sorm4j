@@ -2,6 +2,9 @@ package org.nkjmlab.sorm4j.engine;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -20,6 +23,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -154,27 +158,73 @@ public class TestPostgreSQLSqlMapper {
       Object param) {
     String messagePrefix = "map: " + column + "(" + param.getClass() + ") ";
     try {
-      Class<?> clazz =
-          List.class.isAssignableFrom(param.getClass()) ? List.class : param.getClass();
+      Class<?> clazz = toClass(param.getClass());
       Object retFromDb = c.readFirst(clazz, "SELECT " + column + " FROM sql_mapper_test");
       if (equals(retFromDb, param)) {
-        log.debug("[" + testName + "] " + messagePrefix + "success => " + retFromDb);
+        log.debug("[" + testName + "] " + messagePrefix + "success ret =>" + retFromDb);
       } else {
-        log.error("[" + testName + "] " + messagePrefix + "fail => " + retFromDb);
+        log.error("[" + testName + "] " + messagePrefix + "fail ret => " + retFromDb + ", param => "
+            + param);
       }
     } catch (Exception e) {
-      log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
+      log.error("Exception [" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
       log.error(e, e);
     }
   }
 
-  private boolean equals(Object retFromDb, Object param) throws SQLException {
+  private Class<?> toClass(Class<?> clazz) {
+    if (List.class.isAssignableFrom(clazz)) {
+      return List.class;
+    } else if (Reader.class.isAssignableFrom(clazz)) {
+      return Reader.class;
+    } else if (InputStream.class.isAssignableFrom(clazz)) {
+      return InputStream.class;
+    } else {
+      return clazz;
+    }
+  }
+
+  private boolean equals(Object retFromDb, Object param) throws Exception {
 
     if (retFromDb.getClass().isArray() && param.getClass().isArray()) {
       return equalsArray(retFromDb, param);
-
+    } else if (param instanceof Instant) {
+      OffsetDateTime odt = (OffsetDateTime) retFromDb;
+      return odt.toInstant().equals(param);
+    } else if (retFromDb instanceof Reader) {
+      Reader r = (Reader) param;
+      r.reset();
+      return compare((Reader) retFromDb, (Reader) r);
+    } else if (retFromDb instanceof InputStream) {
+      InputStream is = (InputStream) param;
+      is.reset();
+      return compare((InputStream) retFromDb, is);
     } else {
       return param.equals(retFromDb);
+    }
+  }
+
+  private static boolean compare(Reader r1, Reader r2) {
+    char[] buf1 = new char[65535];
+    char[] buf2 = new char[65535];
+    try {
+      int n1 = r1.read(buf1);
+      int n2 = r2.read(buf2);
+      return (n1 == n2 && Arrays.equals(buf1, buf2));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static boolean compare(InputStream i1, InputStream i2) {
+    byte[] buf1 = new byte[65535];
+    byte[] buf2 = new byte[65535];
+    try {
+      int n1 = i1.read(buf1);
+      int n2 = i2.read(buf2);
+      return (n1 == n2 && Arrays.equals(buf1, buf2));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

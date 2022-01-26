@@ -95,7 +95,7 @@ class OrmConnectionTest {
       List<Tuple3<Guest, Player, Sport>> result1 = m.readTupleList(Guest.class, Player.class,
           Sport.class,
           "select g.id as gid, g.name as gname, g.address as gaddress, "
-              + "p.id as pid, p.name as pname, p.address as paddress, " + "s.id sid, s.name sname "
+              + "p.id as pid, p.name as pname, p.address as paddress, " + "s.id sdotid, s.name sdotname "
               + "from guests g " + "join players p on g.id=p.id " + "join sports s on g.id=s.id");
 
       assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
