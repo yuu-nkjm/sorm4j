@@ -424,8 +424,8 @@ public interface Orm {
   <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, String t1T2OnCondition,
-      Class<T3> t3, String t2T3OnCondition);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1T2OnCondition, String t2T3OnCondition);
 
   /**
    * Merges by objects in the table corresponding to the class of the given objects.

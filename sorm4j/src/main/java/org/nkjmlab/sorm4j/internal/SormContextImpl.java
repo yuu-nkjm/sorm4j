@@ -62,18 +62,22 @@ public final class SormContextImpl implements SormContext {
   }
 
   TableMetaData getTableMetaData(Connection connection, String tableName) {
-    return getTableMetaData(connection, toTableName(connection, tableName));
+    return getTableMetaData(connection, tableName, Object.class);
   }
 
-  private TableMetaData getTableMetaData(Connection connection, TableName tableName) {
+  private <T> TableMetaData getTableMetaData(Connection connection, String tableName,
+      Class<T> objectClass) {
+    TableName _tableName = toTableName(connection, tableName);
     TableMetaData ret =
-        tableMetaDataMap.computeIfAbsent(tableName.getName(), Try.createFunctionWithThrow(_key -> {
+        tableMetaDataMap.computeIfAbsent(_tableName.getName(), Try.createFunctionWithThrow(_key -> {
           TableMetaData m =
-              createTableMetaData(Object.class, tableName.getName(), connection.getMetaData());
+              createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
           return m;
         }, Try::rethrow));
     return ret;
   }
+
+
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
     return getTableMapping(connection, toTableName(connection, objectClass), objectClass);
@@ -129,8 +133,7 @@ public final class SormContextImpl implements SormContext {
         sormConfig.getColumnToFieldAccessorMapper().createMapping(objectClass),
         sormConfig.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
-    TableMetaData tableMetaData =
-        createTableMetaData(objectClass, tableName, connection.getMetaData());
+    TableMetaData tableMetaData = getTableMetaData(connection, tableName, objectClass);
 
     validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 
@@ -142,6 +145,7 @@ public final class SormContextImpl implements SormContext {
         sormConfig.getPreparedStatementSupplier(), sormConfig.getMultiRowProcessorFactory(),
         objectClass, columnToAccessorMap, tableMetaData, sql);
   }
+
 
 
   private void validate(Class<?> objectClass, TableMetaData tableMetaData,

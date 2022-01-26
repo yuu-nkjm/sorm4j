@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.common;
 import java.util.Objects;
 
 /**
- * Represents a tuple of objects, which typically represents joined rows.
+ * Represents a tuple of objects
  *
  * @author yuu_nkjm
  *
@@ -65,9 +65,7 @@ public final class Tuple {
   }
 
   /**
-   * Represents a tuple of objects
-   *
-   * @author nkjm
+   * Represents a tuple of two objects
    *
    * @param <T1>
    * @param <T2>
@@ -117,9 +115,9 @@ public final class Tuple {
 
   }
   /**
-   * Represents a tuple of objects
+   * Represents a tuple of three objects
    *
-   * @author nkjm
+   * @author yuu_nkjm
    *
    * @param <T1>
    * @param <T2>

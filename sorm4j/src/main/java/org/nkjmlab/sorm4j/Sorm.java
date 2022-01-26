@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -40,13 +39,20 @@ public interface Sorm extends Orm {
     return create(dataSource, SormImpl.DEFAULT_CONTEXT);
   }
 
+  /**
+   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSource} and the
+   * given {@link SormContext}.
+   *
+   * @param dataSource
+   * @param context
+   * @return
+   */
   static Sorm create(DataSource dataSource, SormContext context) {
     return SormImpl.create(dataSource, context);
   }
 
-
   /**
-   * Create a {@link Sorm} object which uses {@link DriverManagerDataSource}.
+   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSource}.
    *
    * If you want specified more precise configuration of database access, create {@link DataSource}
    * yourself and use {@link #create(DataSource)} method.
@@ -67,7 +73,7 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates a {@link DriverManagerDataSource} which simply wraps {@link DriverManager}
+   * Creates an instance of {@link DriverManagerDataSource}
    *
    * @param jdbcUrl
    * @param username

@@ -39,7 +39,7 @@ public final class DefaultColumnValueToJavaObjectConverters
    */
   public DefaultColumnValueToJavaObjectConverters(
       Map<Class<?>, ColumnValueToJavaObjectConverter<?>> converters) {
-    this.converters = converters;
+    this.converters = Map.copyOf(converters);
   }
 
   @SuppressWarnings("unchecked")

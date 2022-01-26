@@ -22,6 +22,7 @@ public final class JdbcDatabaseMetaData {
   private final String jdbcDriverVersion;
   private final int defaultTransactionIsolation;
   private final int maxConnections;
+  private final String searchStringEscape;
   private final List<JdbcTableMetaData> jdbcTablesMetaData;
   private final Map<String, List<JdbcIndexMetaData>> jdbcIndexesMetaData;
   private final List<String> tableNames;
@@ -29,7 +30,8 @@ public final class JdbcDatabaseMetaData {
   public JdbcDatabaseMetaData(String databaseProductName, String databaseProductVersion,
       String driverName, String driverVersion, String jdbcDriverVersion,
       int defaultTransactionIsolation, int maxConnections, String url, String userName,
-      List<JdbcTableMetaData> tables, Map<String, List<JdbcIndexMetaData>> indexes) {
+      String searchStringEscape, List<JdbcTableMetaData> tables,
+      Map<String, List<JdbcIndexMetaData>> indexes) {
     this.databaseProductName = databaseProductName;
     this.databaseProductVersion = databaseProductVersion;
     this.driverName = driverName;
@@ -39,6 +41,7 @@ public final class JdbcDatabaseMetaData {
     this.maxConnections = maxConnections;
     this.url = url;
     this.userName = userName;
+    this.searchStringEscape = searchStringEscape;
     this.jdbcTablesMetaData = tables;
     this.jdbcIndexesMetaData = indexes;
     this.tableNames = tables.stream().map(t -> t.get("TABLE_NAME")).collect(Collectors.toList());
@@ -62,6 +65,11 @@ public final class JdbcDatabaseMetaData {
 
   public String getDriverVersion() {
     return driverVersion;
+  }
+
+
+  public String getSearchStringEscape() {
+    return searchStringEscape;
   }
 
 
@@ -89,7 +97,6 @@ public final class JdbcDatabaseMetaData {
     return maxConnections;
   }
 
-
   public List<JdbcTableMetaData> getJdbcTablesMetaData() {
     return jdbcTablesMetaData;
   }
@@ -114,31 +121,37 @@ public final class JdbcDatabaseMetaData {
   }
 
   public static JdbcDatabaseMetaData of(DatabaseMetaData metaData) throws SQLException {
-    ResultSet resultSet = metaData.getTables(null, "PUBLIC", null, new String[] {"TABLE", "VIEW"});
+    try (ResultSet resultSet =
+        metaData.getTables(null, "PUBLIC", null, new String[] {"TABLE", "VIEW"})) {
 
-    List<JdbcTableMetaData> tables = mapColumnsInResultSetToMap(resultSet,
-        List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT",
-            "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION")).stream()
-                .map(e -> new JdbcTableMetaData(e)).collect(Collectors.toList());
+      List<JdbcTableMetaData> tables = mapColumnsInResultSetToMap(resultSet,
+          List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT",
+              "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION")).stream()
+                  .map(e -> new JdbcTableMetaData(e)).collect(Collectors.toList());
 
-    Map<String, List<JdbcIndexMetaData>> indexes = new HashMap<>();
-    for (JdbcTableMetaData jdbcTable : tables) {
-      String tableName = jdbcTable.get("TABLE_NAME");
-      resultSet = metaData.getIndexInfo(null, null, tableName, false, false);
-      List<JdbcIndexMetaData> l = mapColumnsInResultSetToMap(resultSet,
-          List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "INDEX_QUALIFIER", "INDEX_NAME", "TYPE",
-              "ORDINAL_POSITION", "COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES",
-              "FILTER_CONDITION")).stream().map(e -> new JdbcIndexMetaData(e))
-                  .collect(Collectors.toList());
-      indexes.put(tableName, l);
+      Map<String, List<JdbcIndexMetaData>> indexes = new HashMap<>();
+      for (JdbcTableMetaData jdbcTable : tables) {
+        String tableName = jdbcTable.get("TABLE_NAME");
+        try (ResultSet indexInfo = metaData.getIndexInfo(null, null, tableName, false, false)) {
+          List<JdbcIndexMetaData> l = mapColumnsInResultSetToMap(indexInfo,
+              List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "INDEX_QUALIFIER", "INDEX_NAME",
+                  "TYPE", "ORDINAL_POSITION", "COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES",
+                  "FILTER_CONDITION")).stream().map(e -> new JdbcIndexMetaData(e))
+                      .collect(Collectors.toList());
+          indexes.put(tableName, l);
+        }
+      }
+
+
+      return new JdbcDatabaseMetaData(metaData.getDatabaseProductName(),
+          metaData.getDatabaseProductVersion(), metaData.getDriverName(),
+          metaData.getDriverVersion(),
+          ParameterizedStringUtils.newString("{}.{}", metaData.getJDBCMajorVersion(),
+              metaData.getJDBCMinorVersion()),
+          metaData.getDefaultTransactionIsolation(), metaData.getMaxConnections(),
+          metaData.getURL(), metaData.getUserName(), metaData.getSearchStringEscape(), tables,
+          indexes);
     }
-
-    return new JdbcDatabaseMetaData(metaData.getDatabaseProductName(),
-        metaData.getDatabaseProductVersion(), metaData.getDriverName(), metaData.getDriverVersion(),
-        ParameterizedStringUtils.newString("{}.{}", metaData.getJDBCMajorVersion(),
-            metaData.getJDBCMinorVersion()),
-        metaData.getDefaultTransactionIsolation(), metaData.getMaxConnections(), metaData.getURL(),
-        metaData.getUserName(), tables, indexes);
   }
 
 

@@ -498,7 +498,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
-      String t1T2OnCondition, Class<T3> t3, String t2T3OnCondition) {
+      Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition) {
     return readTupleList(t1, t2, t3,
         joinHelper(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }

@@ -1,12 +1,14 @@
 package org.nkjmlab.sorm4j.context;
 
 import java.util.function.Supplier;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
- * A context for ORM execution. Instance of this class could be built by {{@link Builder#build()}.
+ * A context for a {@link Sorm} instance. An instance of this class could be built by
+ * {{@link Builder#build()}. The instance of this class should be thread-safe.
  *
  * @author yuu_nkjm
  *
@@ -101,7 +103,7 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setpreparedStatementSupplier(
+    public Builder setPreparedStatementSupplier(
         PreparedStatementSupplier preparedStatementSupplier) {
       this.preparedStatementSupplier = preparedStatementSupplier;
       return this;
