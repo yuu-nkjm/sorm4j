@@ -128,7 +128,8 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   public String toString() {
     List<String> keySet =
         constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
-    return ParameterizedStringUtils.newString("{}" + System.lineSeparator() + "{}", keySet,
+    return ParameterizedStringUtils.newString("constructor=[{}], arguments={}" + System.lineSeparator() + "{}", constructor,
+        keySet,
         String.join(System.lineSeparator(),
             keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
                 .collect(Collectors.toList())));

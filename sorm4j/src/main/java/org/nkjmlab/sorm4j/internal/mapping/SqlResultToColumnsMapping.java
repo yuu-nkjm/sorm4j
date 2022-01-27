@@ -71,10 +71,9 @@ public final class SqlResultToColumnsMapping<T> {
     return Try.getOrElseThrow(
         () -> objectClass.getConstructor(Arrays.stream(objectClass.getDeclaredFields())
             .map(f -> f.getType()).toArray(Class[]::new)),
-        e -> new SormException(
-            newString("The given container class [{}] should have the canonical constructor.",
-                objectClass),
-            e));
+        e -> new SormException(newString(
+            "The given container class [{}] annotated by @{} should have the canonical constructor.",
+            objectClass, OrmRecord.class.getSimpleName()), e));
   }
 
   private Constructor<T> getOrmConstructor(Class<T> objectClass) {
@@ -83,9 +82,9 @@ public final class SqlResultToColumnsMapping<T> {
     if (ormConstructors.isEmpty()) {
       return null;
     } else if (ormConstructors.size() > 1) {
-      throw new SormException(
-          newString("Constructor with parameters annotated by {} should be one or less. ",
-              OrmConstructor.class.getName()));
+      throw new SormException(newString(
+          "The given container class [{}] should have one or less constructor annotated by @{}.",
+          objectClass, OrmConstructor.class.getSimpleName()));
     } else {
       @SuppressWarnings("unchecked")
       Constructor<T> constructor = (Constructor<T>) ormConstructors.get(0);
@@ -185,7 +184,7 @@ public final class SqlResultToColumnsMapping<T> {
   @Override
   public String toString() {
     return ParameterizedStringUtils.newString(
-        "Instance of [{}] which contains SQL result could be created by [{}]"
+        "[{}] instance used as SQL result container will be created by [{}]"
             + System.lineSeparator() + "{}",
         objectClass.getName(), containerObjectCreator.getClass().getSimpleName(),
         containerObjectCreator.toString());

@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
@@ -13,7 +15,10 @@ import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class SormContextImplTest {
@@ -35,9 +40,9 @@ class SormContextImplTest {
     Sorm sorm = SormTestUtils.createSormWithContextAndTables(context);
 
     try (Connection conn = sorm.getJdbcConnection()) {
-      assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Baby.class))
+      assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Temporary.class))
           .isInstanceOfSatisfying(SormException.class,
-              e -> assertThat(e.getMessage()).contains("BABIES"));
+              e -> assertThat(e.getMessage()).contains("TEMPORARIES"));
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -46,12 +51,40 @@ class SormContextImplTest {
     sorm.insert(SormTestUtils.TENNIS);
 
 
+    sorm.selectAll(Guest.class);
+    sorm.selectAll(Player.class);
+    sorm.selectAll(Sport.class);
 
-    assertThat(context.toString()).contains("is mapped");
+    assertThatThrownBy(() -> sorm.readList(Temp.class, "select * from guests"))
+        .isInstanceOfSatisfying(SormException.class, e -> assertThat(e.getMessage()).isEqualTo(
+            "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temp] annotated by @OrmRecord should have the canonical constructor."));
+
+    assertThatThrownBy(() -> sorm.readList(Temporary.class, "select * from guests"))
+        .isInstanceOfSatisfying(SormException.class, e -> assertThat(e.getMessage()).isEqualTo(
+            "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temporary] should have one or less constructor annotated by @OrmConstructor."));
+
+    // assertThat(context.toString()).contains("created by");
+
+    System.out.println(context.toString());
 
   }
 
-  public static class Baby {
+  @OrmRecord
+  public static class Temp {
+    public int id;
+    public String name;
+
+    public Temp() {}
+
+  }
+  public static class Temporary {
+
+
+    @OrmConstructor({""})
+    public Temporary() {}
+
+    @OrmConstructor({"id"})
+    public Temporary(int id) {}
 
   }
 

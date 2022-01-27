@@ -98,7 +98,6 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
 
     @Override
     public void remove() {
-      close();
       throw new UnsupportedOperationException();
     }
 

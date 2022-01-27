@@ -26,6 +26,9 @@ class JdbcDatabaseMetaDataTest {
     assertThat(md.getSearchStringEscape()).isEqualTo("\\");
     assertThat(md.getTableNames().get(0)).isEqualTo("PLAYERS");
     assertThat(md.toString()).contains("H2");
+    assertThat(md.getUrl()).contains("jdbc:h2:mem:test");
+    assertThat(md.getUserName()).isEqualTo("SA");
+    assertThat(md.getJdbcDriverVersion()).isEqualTo("4.2");
   }
 
 }
