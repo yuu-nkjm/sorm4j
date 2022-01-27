@@ -8,7 +8,16 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
 /**
  * A SQL statement with named parameters.
  *
- * @author nkjm
+ * <p>
+ * Following characters could be used for named parameters.
+ *
+ * <pre>
+ * <code>
+ * ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
+ * </code>
+ * </pre>
+ *
+ * @author yuu_nkjm
  *
  */
 @Experimental
