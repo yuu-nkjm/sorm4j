@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
@@ -23,15 +24,15 @@ public final class JdbcDatabaseMetaData {
   private final int defaultTransactionIsolation;
   private final int maxConnections;
   private final String searchStringEscape;
-  private final List<JdbcTableMetaData> jdbcTablesMetaData;
-  private final Map<String, List<JdbcIndexMetaData>> jdbcIndexesMetaData;
+  private final Map<String, JdbcTableMetaData> jdbcTablesMetaData;
+  private final Map<String, Map<String, JdbcIndexMetaData>> jdbcIndexesMetaData;
   private final List<String> tableNames;
 
   public JdbcDatabaseMetaData(String databaseProductName, String databaseProductVersion,
       String driverName, String driverVersion, String jdbcDriverVersion,
       int defaultTransactionIsolation, int maxConnections, String url, String userName,
-      String searchStringEscape, List<JdbcTableMetaData> tables,
-      Map<String, List<JdbcIndexMetaData>> indexes) {
+      String searchStringEscape, Map<String, JdbcTableMetaData> tables,
+      Map<String, Map<String, JdbcIndexMetaData>> indexes) {
     this.databaseProductName = databaseProductName;
     this.databaseProductVersion = databaseProductVersion;
     this.driverName = driverName;
@@ -44,7 +45,7 @@ public final class JdbcDatabaseMetaData {
     this.searchStringEscape = searchStringEscape;
     this.jdbcTablesMetaData = tables;
     this.jdbcIndexesMetaData = indexes;
-    this.tableNames = tables.stream().map(t -> t.get("TABLE_NAME")).collect(Collectors.toList());
+    this.tableNames = tables.keySet().stream().collect(Collectors.toList());
   }
 
 
@@ -97,12 +98,12 @@ public final class JdbcDatabaseMetaData {
     return maxConnections;
   }
 
-  public List<JdbcTableMetaData> getJdbcTablesMetaData() {
+  public Map<String, JdbcTableMetaData> getJdbcTablesMetaData() {
     return jdbcTablesMetaData;
   }
 
 
-  public Map<String, List<JdbcIndexMetaData>> getJdbcIndexesMetaData() {
+  public Map<String, Map<String, JdbcIndexMetaData>> getJdbcIndexesMetaData() {
     return jdbcIndexesMetaData;
   }
 
@@ -124,20 +125,21 @@ public final class JdbcDatabaseMetaData {
     try (ResultSet resultSet =
         metaData.getTables(null, "PUBLIC", null, new String[] {"TABLE", "VIEW"})) {
 
-      List<JdbcTableMetaData> tables = mapColumnsInResultSetToMap(resultSet,
+      Map<String, JdbcTableMetaData> tables = mapColumnsInResultSetToMap(resultSet,
           List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT",
               "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION")).stream()
-                  .map(e -> new JdbcTableMetaData(e)).collect(Collectors.toList());
+                  .map(e -> new JdbcTableMetaData(e))
+                  .collect(Collectors.toMap(m -> m.get("TABLE_NAME"), m -> m));
 
-      Map<String, List<JdbcIndexMetaData>> indexes = new HashMap<>();
-      for (JdbcTableMetaData jdbcTable : tables) {
-        String tableName = jdbcTable.get("TABLE_NAME");
+      Map<String, Map<String, JdbcIndexMetaData>> indexes = new HashMap<>();
+      for (Entry<String, JdbcTableMetaData> jdbcTableEntry : tables.entrySet()) {
+        String tableName = jdbcTableEntry.getKey();
         try (ResultSet indexInfo = metaData.getIndexInfo(null, null, tableName, false, false)) {
-          List<JdbcIndexMetaData> l = mapColumnsInResultSetToMap(indexInfo,
+          Map<String, JdbcIndexMetaData> l = mapColumnsInResultSetToMap(indexInfo,
               List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "INDEX_QUALIFIER", "INDEX_NAME",
                   "TYPE", "ORDINAL_POSITION", "COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES",
                   "FILTER_CONDITION")).stream().map(e -> new JdbcIndexMetaData(e))
-                      .collect(Collectors.toList());
+                      .collect(Collectors.toMap(m -> m.get("INDEX_NAME"), m -> m));
           indexes.put(tableName, l);
         }
       }
