@@ -211,7 +211,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> resultSetTraverser) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql.getSql(), sql.getParameters(),
         resultSetTraverser);
   }
@@ -228,7 +228,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-    final int ret = executeUpdateAndClose(getLoggerConfig(), connection, getSqlParametersSetter(),
+    final int ret = executeUpdateAndClose(getLoggerContext(), connection, getSqlParametersSetter(),
         getPreparedStatementSupplier(), sql, parameters);
     return ret;
   }
@@ -300,7 +300,7 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private LoggerContext getLoggerConfig() {
+  private LoggerContext getLoggerContext() {
     return sormContext.getLoggerContext();
   }
 
@@ -589,7 +589,7 @@ public class OrmConnectionImpl implements OrmConnection {
           getPreparedStatementSupplier().prepareStatement(connection, sql);
       getSqlParametersSetter().setParameters(stmt, parameters);
 
-      createLogPointAndLogBeforeSql(getLoggerConfig(), Category.EXECUTE_QUERY,
+      createLogPointAndLogBeforeSql(getLoggerContext(), Category.EXECUTE_QUERY,
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
@@ -613,7 +613,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
         resultSet -> loadFirst(objectClass, resultSet));
   }
@@ -625,7 +625,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
         resultSet -> traverseAndMapToList(objectClass, resultSet));
   }
@@ -637,7 +637,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
@@ -661,7 +661,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, String sql, Object... parameters) {
-    List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -683,7 +683,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters) {
-    List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -713,7 +713,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> T selectByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
     final String sql = getTableMapping(objectClass).getSql().getSelectByPrimaryKeySql();
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, primaryKeyValues,
         resultSet -> {
           return resultSet.next() ? getColumnsMapping(objectClass)

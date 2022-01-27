@@ -237,7 +237,6 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  @Override
   public LoggerContext getLoggerContext() {
     return sormConfig.getLoggerContext();
   }

@@ -13,13 +13,6 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  */
 public interface SormContext {
 
-  /**
-   * Returns logger context.
-   *
-   * @return
-   */
-  LoggerContext getLoggerContext();
-
   public static Builder builder() {
     return new Builder();
   }
@@ -47,6 +40,9 @@ public interface SormContext {
 
     private static final LoggerContext DEFAULT_LOGGER_CONTEXT = LoggerContext.builder().build();
 
+    private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_TO_FIELD_ACCESSOR_MAPPAER =
+        new DefaultColumnToFieldAccessorMapper();
+
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter =
         DEFAULT_RESULT_SET_CONVERTER;
@@ -56,7 +52,8 @@ public interface SormContext {
     private MultiRowProcessorFactory multiRowProcessorFactory = DEFAULT_MULTI_ROW_PROCESSOR_FACTORY;
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
 
-    private ColumnToFieldAccessorMapper columnFieldMapper;
+    private ColumnToFieldAccessorMapper columnFieldMapper =
+        DEFAULT_COLUMN_TO_FIELD_ACCESSOR_MAPPAER;
     private LoggerContext loggerContext = DEFAULT_LOGGER_CONTEXT;
 
     private PreparedStatementSupplier preparedStatementSupplier = DEFAULT_STATEMENT_SUPPLIER;
@@ -66,8 +63,6 @@ public interface SormContext {
     private Builder() {}
 
     public SormContext build() {
-      columnFieldMapper = columnFieldMapper != null ? columnFieldMapper
-          : new DefaultColumnToFieldAccessorMapper(loggerContext);
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
           columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
           preparedStatementSupplier, tableSqlFactory, multiRowProcessorFactory);

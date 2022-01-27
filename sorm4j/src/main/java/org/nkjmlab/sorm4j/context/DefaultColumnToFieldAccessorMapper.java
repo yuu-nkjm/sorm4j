@@ -14,13 +14,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /**
  * Default implementation of {@link ColumnToFieldAccessorMapper}
@@ -31,18 +29,9 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAccessorMapper {
 
-  private final LoggerContext loggerContext;
 
   private static final Set<String> IGNORE_METHODS =
       Set.of("NOTIFY", "NOTIFYALL", "WAIT", "TOSTRING", "HASHCODE");
-
-  public DefaultColumnToFieldAccessorMapper() {
-    this(Sorm.getDefaultContext().getLoggerContext());
-  }
-
-  public DefaultColumnToFieldAccessorMapper(LoggerContext loggerContext) {
-    this.loggerContext = loggerContext;
-  }
 
   @Override
   public Map<String, FieldAccessor> createMapping(Class<?> objectClass) {
@@ -69,9 +58,6 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
               : setters.get(acceptableColName);
 
       if (f == null && (g == null && s == null)) {
-        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).debug(
-            "Skip matching with ColumnName [{}] to field because could not found corresponding field.",
-            acceptableColName);
       } else {
         ret.put(acceptableColName, new FieldAccessor(acceptableColName, f, g, s));
       }
@@ -107,7 +93,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
 
   private Map<String, Method> getAllMethods(Class<?> objectClass) {
     return extractedMethodStartWith(objectClass, "").entrySet().stream()
-        .filter(e -> !e.getKey().startsWith("GET") && nonNull(isValidGetter(e.getValue(), false)))
+        .filter(e -> !e.getKey().startsWith("GET") && nonNull(isValidGetter(e.getValue())))
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
@@ -139,45 +125,12 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   }
 
   private Method isValidGetter(Method getter) {
-    return isValidGetter(getter, true);
-  }
-
-  private Method isValidGetter(Method getter, boolean logging) {
-    if (getter == null) {
-      return null;
-    }
-
-    if (getter.getName().equals("getClass")) {
-      return null;
-    }
-    if (getter.getParameterCount() != 0) {
-      if (logging) {
-        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).warn(
-            "Getter [{}] should not have parameter but has {} params.", getter,
-            getter.getParameterCount());
-      }
-      return null;
-    }
-    if (getter.getReturnType() == void.class) {
-      if (logging) {
-        loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class)
-            .warn("Getter [{}] must have return a parameter.", getter);
-      }
-    }
-    return getter;
+    return (getter == null || getter.getName().equals("getClass") || getter.getParameterCount() != 0
+        || getter.getReturnType() == void.class) ? null : getter;
   }
 
   private Method isValidSetter(Method setter) {
-    if (setter == null) {
-      return null;
-    }
-    if (setter.getParameterCount() != 1) {
-      loggerContext.getLogger(DefaultColumnToFieldAccessorMapper.class).warn(
-          "Setter [{}] should have a single parameter but has {} params.", setter,
-          setter.getParameterCount());
-      return null;
-    }
-    return setter;
+    return (setter == null || setter.getParameterCount() != 1) ? null : setter;
   }
 
 
