@@ -9,6 +9,7 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
@@ -57,42 +58,14 @@ public abstract class MultiRowProcessor<T> {
     sqlParametersSetter.setParameters(stmt, parameters);
   }
 
-  public static void setAutoCommit(Connection connection, boolean autoCommit) {
-    try {
-      connection.setAutoCommit(autoCommit);
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  public static void commitOrRollback(Connection connection, boolean origAutoCommit) {
-    try {
-      if (origAutoCommit) {
-        connection.commit();
-      } else {
-        connection.rollback();
-      }
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  public static boolean getAutoCommit(Connection connection) {
-    try {
-      return connection.getAutoCommit();
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-  }
-
   public final int[] batch(Connection con, String sql, Function<T, Object[]> parameterCreator,
       T[] objects) {
     return execMultiRowProcIfValidObjects(con, objects, nonNullObjects -> {
       int[] result = new int[0];
-      boolean origAutoCommit = getAutoCommit(con);
+      boolean origAutoCommit = OrmConnectionImpl.getAutoCommit(con);
 
       try (PreparedStatement stmt = statementSupplier.prepareStatement(con, sql)) {
-        setAutoCommit(con, false);
+        OrmConnectionImpl.setAutoCommit(con, false);
         final BatchHelper batchHelper = new BatchHelper(batchSize, stmt);
         for (int i = 0; i < objects.length; i++) {
           T obj = objects[i];
@@ -104,8 +77,8 @@ public abstract class MultiRowProcessor<T> {
       } catch (SQLException e) {
         throw Try.rethrow(e);
       } finally {
-        commitOrRollback(con, origAutoCommit);
-        setAutoCommit(con, origAutoCommit);
+        OrmConnectionImpl.commitOrRollback(con, origAutoCommit);
+        OrmConnectionImpl.setAutoCommit(con, origAutoCommit);
       }
     });
   }

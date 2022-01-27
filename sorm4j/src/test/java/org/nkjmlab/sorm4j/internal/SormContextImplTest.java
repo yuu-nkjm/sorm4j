@@ -13,11 +13,7 @@ import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class SormContextImplTest {
@@ -47,12 +43,11 @@ class SormContextImplTest {
     }
     sorm.insert(SormTestUtils.GUEST_ALICE);
     sorm.insert(SormTestUtils.PLAYER_ALICE);
+    sorm.insert(SormTestUtils.TENNIS);
 
-    SormContextImpl ctx = (SormContextImpl) context;
-    SqlResultToColumnsMapping<Player> pm = ctx.getColumnsMapping(Player.class);
-    ctx.getColumnsMapping(Guest.class);
-    ctx.getColumnsMapping(Sport.class);
-    assertThat(pm.toString()).contains("created by");
+
+
+    assertThat(context.toString()).contains("is mapped");
 
   }
 

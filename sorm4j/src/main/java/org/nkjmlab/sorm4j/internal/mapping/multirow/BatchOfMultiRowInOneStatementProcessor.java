@@ -6,6 +6,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -65,10 +66,10 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
 
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);
     final int[] result = new int[objsPartitions.size()];
-    final boolean origAutoCommit = getAutoCommit(con);
+    final boolean origAutoCommit = OrmConnectionImpl.getAutoCommit(con);
 
     try {
-      setAutoCommit(con, false);
+      OrmConnectionImpl.setAutoCommit(con, false);
       try (PreparedStatement stmt = multiRowStatementCreator.apply(multiRowSize)) {
         final BatchHelper helper = new BatchHelper(batchSizeWithMultiRow, stmt);
         for (int partitionNum = 0; partitionNum < objsPartitions.size() - 1; partitionNum++) {
@@ -91,8 +92,8 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
     } catch (Throwable e) {
       throw Try.rethrow(e);
     } finally {
-      commitOrRollback(con, origAutoCommit);
-      setAutoCommit(con, origAutoCommit);
+      OrmConnectionImpl.commitOrRollback(con, origAutoCommit);
+      OrmConnectionImpl.setAutoCommit(con, origAutoCommit);
     }
 
   }

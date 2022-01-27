@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor.*;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -433,9 +432,9 @@ public class OrmConnectionImpl implements OrmConnection {
   public int[] insertMapIn(String tableName, List<Map<String, Object>> objects) {
     boolean origAutoCommit = getAutoCommit(connection);
     try {
-      connection.setAutoCommit(false);
+      setAutoCommit(connection, false);
       int[] ret = objects.stream().mapToInt(o -> insertMapIn(tableName, o)).toArray();
-      connection.setAutoCommit(true);
+      setAutoCommit(connection, true);
       return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
@@ -497,8 +496,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1T2OnCondition, String t2T3OnCondition) {
     return readTupleList(t1, t2, t3,
         joinHelper(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
@@ -905,6 +904,33 @@ public class OrmConnectionImpl implements OrmConnection {
     return metaData.getColumnType(1);
   }
 
+  public static boolean getAutoCommit(Connection connection) {
+    try {
+      return connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  public static void commitOrRollback(Connection connection, boolean origAutoCommit) {
+    try {
+      if (origAutoCommit) {
+        connection.commit();
+      } else {
+        connection.rollback();
+      }
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  public static void setAutoCommit(Connection connection, boolean autoCommit) {
+    try {
+      connection.setAutoCommit(autoCommit);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
 
   private static class ColumnsAndTypes {
 
