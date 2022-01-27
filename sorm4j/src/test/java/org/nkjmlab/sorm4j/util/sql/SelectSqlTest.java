@@ -42,6 +42,12 @@ class SelectSqlTest {
     assertThat(count("*")).isEqualTo(" count(*) ");
     assertThat(sum("*")).isEqualTo(" sum(*) ");
     assertThat(avg("*")).isEqualTo(" avg(*) ");
+    assertThat(castAs("id", "double")).isEqualTo(" cast(id as double) ");
+    assertThat(columnWithTableName("guest", "id", "name")).isEqualTo(" guest.id , guest.name ");
+    assertThat(selectDistinct("id")).isEqualTo(" select distinct id ");
+    assertThat(where()).isEqualTo(" where ");
+    assertThat(where("id=?")).isEqualTo(" where id=? ");
+    assertThat(where(and("id=?", "name=?", "address=?"))).isEqualTo(" where (id=? and name=? and address=?) ");
 
   }
 

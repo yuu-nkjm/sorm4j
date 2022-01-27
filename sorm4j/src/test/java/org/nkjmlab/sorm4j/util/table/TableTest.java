@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
-import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
 
 class TableTest {
@@ -21,20 +20,24 @@ class TableTest {
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
   private TableWithSchema<Player> playersTable;
+  private TableWithSchema<Guest> guestsTable;
   private TableWithSchema<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
-    Sorm sorm = createNewContextSorm();
+    Sorm sorm = createSormWithNewContext();
     playersTable = createPlayersTable(sorm);
+    guestsTable = createGuestsTable(sorm);
     sportsTable = createSportsTable(sorm);
 
   }
 
   @Test
   void testGetTableSchema() {
+    Sorm sorm = createSormWithNewContextAndTables();
     playersTable.getTableSchema();
-    BasicTable<Guest> gt = new BasicTable<>(SormTestUtils.SORM, Guest.class);
+
+    BasicTable<Guest> gt = new BasicTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
     assertThat(gt.getValueType()).isEqualTo(Guest.class);
   }
@@ -57,7 +60,8 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
+    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames())
+        .contains("PLAYERS");
   }
 
   @Test
@@ -76,7 +80,8 @@ class TableTest {
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames()).contains("GUESTS");
+    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames())
+        .contains("PLAYERS");
   }
 
   @Test

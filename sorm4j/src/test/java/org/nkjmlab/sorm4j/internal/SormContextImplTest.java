@@ -30,7 +30,7 @@ class SormContextImplTest {
                 .setBatchSizeWithMultiRow(20).build())
             .setLoggerOn(LoggerContext.Category.MAPPING)
             .setLoggerOff(LoggerContext.Category.MAPPING).build();
-    Sorm sorm = Sorm.create(SormTestUtils.createDataSourceH2(), context);
+    Sorm sorm = Sorm.create(SormTestUtils.createDataSource(), context);
 
     try (Connection conn = sorm.getJdbcConnection()) {
       assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Baby.class))

@@ -155,7 +155,7 @@ class SormImplTest {
   void testToString() {
     assertThat(sorm.toString()).contains("Sorm");
 
-    Sorm.create(SormTestUtils.createDataSourceH2()).getDataSource();
+    Sorm.create(SormTestUtils.createDataSource()).getDataSource();
 
   }
 

@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DriverManagerDataSourceTest {
 
-  private static DriverManagerDataSource ds = SormTestUtils.createDriverManagerDataSource();
+  private static DriverManagerDataSource ds = SormTestUtils.createDataSource();
 
   @Test
   void testGetParentLogger() {
@@ -26,7 +26,11 @@ class DriverManagerDataSourceTest {
 
   @Test
   void testGetConnectionStringString() {
-    assertThrows(SQLException.class, () -> ds.getConnection("sa", "password"));
+    try {
+      ds.getConnection("sa", "password");
+    } catch (SQLException e) {
+      fail();
+    }
   }
 
   @Test

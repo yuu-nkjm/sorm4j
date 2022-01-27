@@ -20,7 +20,7 @@ class MultiRowInOneStatementProcessorTest {
 
 
   private static List<Sorm> sorms = List.of(SIMPLE_BATCH, MULTI_ROW, MULTI_ROW_AND_BATCH).stream()
-      .map(type -> SormTestUtils.createSormAndTables(SormContext.builder()
+      .map(type -> SormTestUtils.createSormWithContextAndTables(SormContext.builder()
           .setMultiRowProcessorFactory(
               MultiRowProcessorFactory.builder().setMultiRowProcessorType(type).build())
           .build()))

@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.TestUtils;
@@ -18,17 +19,19 @@ class DefaultSqlParametersSetterTest {
 
   @Test
   void testSetParameters() {
-    SORM.executeUpdate(
+    Sorm sorm = createSormWithNewContextAndTables();
+
+    sorm.executeUpdate(
         "CREATE TABLE TA (id int auto_increment primary key, arry " + "INTEGER" + " ARRAY[10])");
 
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", new boolean[] {true, false});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?",
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", new boolean[] {true, false});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?",
         (Object) new Boolean[] {true, false});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", new double[] {0.1d});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", new double[] {0.1d});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
 
     DefaultSqlParametersSetter setter = new DefaultSqlParametersSetter();
-    try (Connection conn = SormTestUtils.createDataSourceH2().getConnection();
+    try (Connection conn = SormTestUtils.createDataSource().getConnection();
         PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
 
       setter.setParameters(pstmt, (Object[]) null);

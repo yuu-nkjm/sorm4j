@@ -31,7 +31,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
             .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).build())
         .setLoggerOffAll().setLoggerOnAll().setLoggerSupplier(() -> Log4jSormLogger.getLogger())
         .build();
-    sorm = Sorm.create(Sorm.createDataSource(JDBC_URL, USER, PASSWORD), context);
+    sorm = SormTestUtils.createSormWithContextAndTables(context);
     assertThat(sorm.getContext().toString())
         .contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }

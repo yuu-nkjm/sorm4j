@@ -44,7 +44,7 @@ class DefaultColumnValueToJavaObjectConvertersTest {
             new DefaultSqlParametersSetter(Map.of(java.net.Inet4Address.class, parameterSetter)))
         .setPreparedStatementSupplier(supplier).build();
 
-    Sorm sorm = SormTestUtils.createSormAndTables(context);
+    Sorm sorm = SormTestUtils.createSormWithContextAndTables(context);
 
     sorm.insert(SormTestUtils.GUEST_ALICE);
     sorm.selectAll(Guest.class);
