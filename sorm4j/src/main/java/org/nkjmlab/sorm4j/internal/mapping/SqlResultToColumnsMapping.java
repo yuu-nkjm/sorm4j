@@ -176,25 +176,19 @@ public final class SqlResultToColumnsMapping<T> {
     return columns;
   }
 
-  String getColumnToAccessorString() {
-    return "[" + objectClass.getName() + "] is mapped to " + columnToAccessorMap.toString();
-  }
 
   ColumnToAccessorMapping getColumnToAccessorMap() {
     return columnToAccessorMap;
   }
 
-  public String getFormattedString() {
-    return ParameterizedStringUtils.newString(
-        "[{}] Columns are mappted to a {}" + System.lineSeparator() + "{}" + System.lineSeparator()
-            + " with [{}]",
-        SqlResultToColumnsMapping.class.getSimpleName(), objectClass, getColumnToAccessorString(),
-        containerObjectCreator);
-  }
 
   @Override
   public String toString() {
-    return getFormattedString();
+    return ParameterizedStringUtils.newString(
+        "Instance of [{}] which contains SQL result could be created by [{}]"
+            + System.lineSeparator() + "{}",
+        objectClass.getName(), containerObjectCreator.getClass().getSimpleName(),
+        containerObjectCreator.toString());
   }
 
 

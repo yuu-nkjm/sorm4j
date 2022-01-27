@@ -18,12 +18,17 @@ abstract class SqlResultToContainerMapping<T> {
   }
 
   abstract List<T> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes,
-      String columnsString) throws SQLException;
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException;
 
   abstract T loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes,
-      String columnsString) throws SQLException;
+      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+      throws SQLException;
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " [constructor=" + constructor + ", columnToAccessorMap="
+        + columnToAccessorMap + "]";
+  }
 
 }

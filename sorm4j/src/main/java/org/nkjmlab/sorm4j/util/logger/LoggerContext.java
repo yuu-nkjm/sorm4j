@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.logger.JulSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Slf4jSormLogger;
@@ -34,20 +33,17 @@ public final class LoggerContext {
     return new Builder();
   }
 
-
-  private final Set<LoggerContext.Category> onCategories;
+  private final Set<LoggerContext.Category> enabledCategories;
 
   private final Supplier<SormLogger> loggerSupplier;
-
-  private volatile boolean forceLogging = false;
 
   private final Map<Class<?>, SormLogger> loggers = new ConcurrentHashMap<>();
 
   private LoggerContext(Supplier<SormLogger> loggerSupplier,
-      Set<LoggerContext.Category> onCategories) {
+      Set<LoggerContext.Category> enabledCategories) {
     this.loggerSupplier = loggerSupplier;
-    this.onCategories =
-        onCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(onCategories);
+    this.enabledCategories =
+        enabledCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(enabledCategories);
   }
 
   public Optional<LogPoint> createLogPoint(LoggerContext.Category category, Class<?> callerClass) {
@@ -55,28 +51,18 @@ public final class LoggerContext {
         : Optional.empty();
   }
 
-  @Experimental
-  public void disableForceLogging() {
-    this.forceLogging = false;
-  }
-
-  @Experimental
-  public void enableForceLogging() {
-    this.forceLogging = true;
-  }
-
   public SormLogger getLogger(Class<?> clazz) {
     return loggers.computeIfAbsent(clazz, k -> loggerSupplier.get());
   }
 
   public boolean isEnable(LoggerContext.Category category) {
-    return forceLogging || onCategories.contains(category);
+    return enabledCategories.contains(category);
   }
 
   @Override
   public String toString() {
-    return "LoggerContextImpl [onCategories=" + onCategories + ", logger="
-        + getLogger(LoggerContext.class) + ", forceLogging=" + forceLogging + "]";
+    return "LoggerContext [enabledCategories=" + enabledCategories + ", logger="
+        + getLogger(LoggerContext.class) + "]";
   }
 
   public static class Builder {
@@ -102,15 +88,17 @@ public final class LoggerContext {
      *
      * @param categories
      */
-    public void off(LoggerContext.Category... categories) {
+    public Builder disable(LoggerContext.Category... categories) {
       Arrays.stream(categories).forEach(name -> onCategories.remove(name));
+      return this;
     }
 
     /**
      * Disables logging all categories. See {@link LoggerContext.Category}.
      */
-    public void offAll() {
-      off(LoggerContext.Category.values());
+    public Builder disableAll() {
+      disable(LoggerContext.Category.values());
+      return this;
     }
 
     /**
@@ -118,19 +106,22 @@ public final class LoggerContext {
      *
      * @param categories are in {@link LoggerContext.Category}
      */
-    public void on(LoggerContext.Category... categories) {
+    public Builder enable(LoggerContext.Category... categories) {
       Arrays.stream(categories).forEach(name -> onCategories.add(name));
+      return this;
     }
 
     /**
      * Enables logging all categories. See {@link LoggerContext.Category}.
      */
-    public void onAll() {
-      on(LoggerContext.Category.values());
+    public Builder enableAll() {
+      enable(LoggerContext.Category.values());
+      return this;
     }
 
-    public void setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
+    public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
       this.loggerSupplier = loggerSupplier;
+      return this;
     }
   }
 

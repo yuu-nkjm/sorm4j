@@ -123,7 +123,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public String toString() {
-    return "Sorm [dataSource=" + dataSource + ", sormConfig=" + sormContext + "]";
+    return "Sorm [dataSource=" + dataSource + ", sormContext=" + sormContext + "]";
   }
 
 
@@ -218,8 +218,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, String t1t2OnCondition, String t2t3OnCondition) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1t2OnCondition, String t2t3OnCondition) {
     return applyAndClose(conn -> conn.leftJoin(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
 

@@ -101,7 +101,7 @@ class TableMappingTest {
           .containsAll(List.of("ID"));
     });
     sorm.acceptHandler(m -> {
-      assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
+      assertThat(getTableMapping(m, Guest.class).toString()).contains("mapped");
     });
   }
 

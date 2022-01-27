@@ -74,7 +74,6 @@ class ParameterizedSqlTest {
   void testEmbeddedMapFail() {
 
     String sql = "select * from guest where name={:name} and id={:id}";
-    Map<String, Object> params = Map.of("id", 1, "name", "'a'");
 
 
     assertThatThrownBy(() -> ParameterizedSql.embedParameter(sql, Map.of("name1", 1)))

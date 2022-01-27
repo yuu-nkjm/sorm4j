@@ -1,11 +1,13 @@
 package org.nkjmlab.sorm4j.internal;
 
+import static java.lang.System.*;
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -95,7 +97,7 @@ public final class SormContextImpl implements SormContext {
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, TableName tableName,
       Class<T> objectClass) {
-    String key = tableName.getName() + "-" + objectClass.getName();
+    String key = objectClass.getName() + "-" + tableName.getName();
     @SuppressWarnings("unchecked")
     SqlParametersToTableMapping<T> ret =
         (SqlParametersToTableMapping<T>) sqlParametersToTableMappings.computeIfAbsent(key, _k -> {
@@ -202,8 +204,7 @@ public final class SormContextImpl implements SormContext {
           SqlResultToColumnsMapping<T> m = createColumnsMapping(objectClass);
           sormConfig.getLoggerContext()
               .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
-              .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
-
+              .ifPresent(lp -> lp.logMapping(m.toString()));
           return m;
         });
     return ret;
@@ -260,13 +261,33 @@ public final class SormContextImpl implements SormContext {
   }
 
 
+
+  /**
+   * Returns string of this context. This is for debugging.
+   */
   @Override
   public String toString() {
-    return "SormContext [tableMappings=" + sqlParametersToTableMappings + ", columnsMappings="
-        + sqlResultToColumnsMappings + ", classNameToValidTableNameMap="
-        + classNameToValidTableNameMap + ", tableNameToValidTableNameMap="
-        + tableNameToValidTableNameMap + ", sormConfig=" + sormConfig + "]";
+    return "SormContext {" + lineSeparator() + "[Table metadata]" + lineSeparator()
+        + convertMapToString(tableMetaDataMap) + lineSeparator() + "[SqlParameterToTableMappings]"
+        + lineSeparator() + convertMapToString(sqlParametersToTableMappings) + lineSeparator()
+        + "[SqlResultToColumnsMapping]" + lineSeparator()
+        + convertClassMapToString(sqlResultToColumnsMappings) + lineSeparator()
+        + "[classNameToValidTableNameMap]" + lineSeparator()
+        + convertClassMapToString(classNameToValidTableNameMap) + lineSeparator()
+        + "[tableNameToValidTableNameMap]" + lineSeparator()
+        + convertMapToString(tableNameToValidTableNameMap) + lineSeparator() + "[SormConfig]"
+        + lineSeparator() + sormConfig + lineSeparator() + "}";
   }
 
+  private String convertClassMapToString(Map<Class<?>, ? extends Object> map) {
+    return convertMapToString(map.entrySet().stream()
+        .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue())));
+  }
+
+  private String convertMapToString(Map<String, ? extends Object> map) {
+    List<String> keySet = map.keySet().stream().sorted().collect(Collectors.toList());
+    return String.join(lineSeparator(),
+        keySet.stream().map(e -> e + " => " + map.get(e).toString()).collect(Collectors.toList()));
+  }
 
 }

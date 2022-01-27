@@ -210,11 +210,9 @@ public final class SqlParametersToTableMapping<T> {
 
   @Override
   public String toString() {
-    return "[" + SqlParametersToTableMapping.class.getSimpleName() + "] Table ["
-        + tableMetaData.getTableName() + "] is mapped to [" + objectClass.getName() + "] class. "
-        + lineSeparator() + "PK=" + tableMetaData.getPrimaryKeys() + ",  "
-        + tableMetaData.getColumnsWithMetaData() + lineSeparator() + "[" + objectClass.getName()
-        + "] is mapped to " + columnToAccessorMap.toString() + lineSeparator() + "  with ["
+    return "[" + objectClass.getName() + "] class is mapped to [" + tableMetaData.getTableName()
+        + "] Table. [" + objectClass.getName() + "] could set/get values for following columns."
+        + lineSeparator() + columnToAccessorMap.toString() + lineSeparator() + "  with ["
         + multiRowProcessor.getClass().getSimpleName() + "]";
   }
 

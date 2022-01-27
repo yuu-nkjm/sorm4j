@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.context;
 
-import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 /**
  * A context for a {@link Sorm} instance. An instance of this class could be built by
@@ -47,6 +45,8 @@ public interface SormContext {
 
     private static final TableSqlFactory DEFAULT_TABLE_SQL_FACTORY = new DefaultTableSqlFactory();
 
+    private static final LoggerContext DEFAULT_LOGGER_CONTEXT = LoggerContext.builder().build();
+
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter =
         DEFAULT_RESULT_SET_CONVERTER;
@@ -57,7 +57,7 @@ public interface SormContext {
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
 
     private ColumnToFieldAccessorMapper columnFieldMapper;
-    private LoggerContext.Builder loggerBuilder = LoggerContext.builder();
+    private LoggerContext loggerContext = DEFAULT_LOGGER_CONTEXT;
 
     private PreparedStatementSupplier preparedStatementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
@@ -66,7 +66,6 @@ public interface SormContext {
     private Builder() {}
 
     public SormContext build() {
-      LoggerContext loggerContext = loggerBuilder.build();
       columnFieldMapper = columnFieldMapper != null ? columnFieldMapper
           : new DefaultColumnToFieldAccessorMapper(loggerContext);
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
@@ -120,31 +119,13 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setLoggerOnAll() {
-      this.loggerBuilder.onAll();
-      return this;
-    }
 
-    public Builder setLoggerOffAll() {
-      this.loggerBuilder.offAll();
-      return this;
-    }
-
-    public Builder setLoggerOn(LoggerContext.Category... categories) {
-      this.loggerBuilder.on(categories);
-      return this;
-    }
-
-    public Builder setLoggerOff(LoggerContext.Category... categories) {
-      this.loggerBuilder.off(categories);
-      return this;
-    }
-
-    public Builder setLoggerSupplier(Supplier<SormLogger> loggerSupplier) {
-      this.loggerBuilder.setLoggerSupplier(loggerSupplier);
+    public Builder setLoggerContext(LoggerContext loggerContext) {
+      this.loggerContext = loggerContext;
       return this;
     }
 
   }
+
 
 }

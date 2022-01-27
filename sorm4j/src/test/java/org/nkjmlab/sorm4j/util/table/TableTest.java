@@ -20,15 +20,14 @@ class TableTest {
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
   private TableWithSchema<Player> playersTable;
-  private TableWithSchema<Guest> guestsTable;
   private TableWithSchema<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
     Sorm sorm = createSormWithNewContext();
     playersTable = createPlayersTable(sorm);
-    guestsTable = createGuestsTable(sorm);
     sportsTable = createSportsTable(sorm);
+    createGuestsTable(sorm);
 
   }
 

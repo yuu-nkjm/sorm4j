@@ -5,6 +5,7 @@ import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,16 +54,17 @@ public final class ColumnToAccessorMapping {
 
   @Override
   public String toString() {
-    String keySetString =
-        columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList()).toString();
-    return "columns " + keySetString + System.lineSeparator()
-        + String.join(System.lineSeparator(), columnToAccessorMap.keySet().stream()
-            .map(e -> "  Column " + e + " => " + columnToAccessorMap.get(e).getFormattedString())
+    List<String> keySet =
+        columnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList());
+    List<String> aliasKeySet =
+        aliasColumnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList());
+    return "columns " + keySet + System.lineSeparator() + String.join(System.lineSeparator(),
+        keySet.stream()
+            .map(e -> "  Column " + e + " <=> " + columnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()))
-        + System.lineSeparator() + "  OrmColumnAliasPrefix is [" + columnAliasPrefix + "]"
-        + (columnAliasPrefix.length() == 0 ? "" : System.lineSeparator())
-        + String.join(System.lineSeparator(), aliasColumnToAccessorMap.keySet().stream().map(
-            e -> "  Column " + e + " => " + aliasColumnToAccessorMap.get(e).getFormattedString())
+        + System.lineSeparator() + "column aliases " + aliasKeySet + System.lineSeparator()
+        + String.join(System.lineSeparator(), aliasKeySet.stream().map(
+            e -> "  Column " + e + " <=> " + aliasColumnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()));
 
   }

@@ -111,6 +111,12 @@ public final class FieldAccessor {
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
       throw new SormException("No valid getter for " + object);
     }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName();
+    }
+
   }
 
   private static final class FieldGetter implements GetterAccessor {
@@ -139,6 +145,7 @@ public final class FieldAccessor {
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 
     Class<?> getParameterType();
+
   }
 
   private static final class EmptySetter implements SetterAccessor {
@@ -153,6 +160,12 @@ public final class FieldAccessor {
     public Class<?> getParameterType() {
       throw new SormException("No valid setter");
     }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName();
+    }
+
   }
 
   private static final class SetterMethod implements SetterAccessor {

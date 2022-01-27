@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
@@ -125,9 +126,13 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
   @Override
   public String toString() {
-    return "ConstructorBasedSqlResultCreator [constructorParametersMap=" + constructorParametersMap
-        + ", constructorParametersLength=" + constructorParametersLength
-        + ", columnAndConstructorParameterMapping=" + columnAndConstructorParameterMapping + "]";
+    List<String> keySet =
+        constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
+    return ParameterizedStringUtils.newString("{}" + System.lineSeparator() + "{}", keySet,
+        String.join(System.lineSeparator(),
+            keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
+                .collect(Collectors.toList())));
+
   }
 
 
@@ -155,7 +160,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
     @Override
     public String toString() {
-      return "ConstructorParameter [name=" + name + ", order=" + order + ", type=" + type + "]";
+      return "[name=" + name + ", order=" + order + ", type=" + type + "]";
     }
 
   }

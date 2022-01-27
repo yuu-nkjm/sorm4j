@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.logger.JulSormLogger;
 import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
@@ -22,10 +23,10 @@ class SormLoggerTest {
 
   @Test
   void testLogAfterQuery() {
-    Sorm sorm = createSormWithNewContextAndTables();
+    LoggerContext lc = LoggerContext.builder().enableAll().build();
+    Sorm sorm = createSormWithContextAndTables(SormContext.builder().setLoggerContext(lc).build());
 
-    LoggerContext lc = sorm.getContext().getLoggerContext();
-    lc.enableForceLogging();
+
     Optional<LogPoint> lp = lc.createLogPoint(LoggerContext.Category.EXECUTE_QUERY, getClass());
     lp.get().logAfterQuery("obj");
     lp.get().logAfterMultiRow(new int[] {1});
@@ -38,7 +39,6 @@ class SormLoggerTest {
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
-    lc.disableForceLogging();
 
   }
 
