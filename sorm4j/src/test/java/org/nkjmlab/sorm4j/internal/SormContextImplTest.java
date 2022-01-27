@@ -50,9 +50,8 @@ class SormContextImplTest {
 
     SormContextImpl ctx = (SormContextImpl) context;
     SqlResultToColumnsMapping<Player> pm = ctx.getColumnsMapping(Player.class);
-    SqlResultToColumnsMapping<Guest> gm = ctx.getColumnsMapping(Guest.class);
-    SqlResultToColumnsMapping<Sport> sm = ctx.getColumnsMapping(Sport.class);
-    System.out.println(context.toString());
+    ctx.getColumnsMapping(Guest.class);
+    ctx.getColumnsMapping(Sport.class);
     assertThat(pm.toString()).contains("created by");
 
   }
