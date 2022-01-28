@@ -5,6 +5,7 @@ import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +21,15 @@ import org.nkjmlab.sorm4j.common.SormException;
 
 public final class DefaultTableNameMapper implements TableNameMapper {
 
+  private static final String ERROR_MESSAGE =
+      "[{}] does not match any existing table in the database. Use @{} annotation or rename the class. Table name candidates were {}";
+
+
   @Override
   public String getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
-    return convertToExactTableName(metaData, candidates)
-        .orElseThrow(() -> new SormException(newString(
-            "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
-            tableName, OrmTable.class.getName(), candidates)));
+    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(
+        newString(ERROR_MESSAGE, tableName, OrmTable.class.getSimpleName(), candidates)));
   }
 
 
@@ -34,9 +37,8 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   public String getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
     return convertToExactTableName(metaData, candidates)
-        .orElseThrow(() -> new SormException(newString(
-            "[{}] does not match any existing table in the database. Use [{}] annotation correctly. Table Name candidates are {}",
-            objectClass.getName(), OrmTable.class.getName(), candidates)));
+        .orElseThrow(() -> new SormException(newString(ERROR_MESSAGE, objectClass.getName(),
+            OrmTable.class.getSimpleName(), candidates)));
   }
 
   /**
@@ -56,10 +58,13 @@ public final class DefaultTableNameMapper implements TableNameMapper {
     String className = objectClass.getSimpleName();
     String cannonicalClassName = toCanonicalCase(className);
 
-    return cannonicalClassName.endsWith("Y")
-        ? List.of(cannonicalClassName, cannonicalClassName + "S",
-            cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES")
-        : List.of(cannonicalClassName, cannonicalClassName + "S");
+    List<String> candidates = new ArrayList<>(List.of(cannonicalClassName,
+        toCanonicalCase(cannonicalClassName + "S"), toCanonicalCase(cannonicalClassName + "ES")));
+    if (cannonicalClassName.endsWith("Y")) {
+      candidates.add(toCanonicalCase(
+          cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES"));
+    }
+    return candidates;
 
   }
 
