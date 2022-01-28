@@ -6,11 +6,11 @@ import java.util.Map;
 
 public final class StringCache {
 
-  private static final Map<String, String> canonicalCaseCaches = new ConcurrentLruCache<>(1024);
+  private static final Map<String, String> canonicalCaseCaches = new ConcurrentCache<>(1024);
 
-  private static final Map<String, String> upperCaseCaches = new ConcurrentLruCache<>(256);
+  private static final Map<String, String> upperCaseCaches = new ConcurrentCache<>(256);
 
-  private static final Map<String, String> lowerCaseCaches = new ConcurrentLruCache<>(256);
+  private static final Map<String, String> lowerCaseCaches = new ConcurrentCache<>(256);
 
   public static String toUpperCase(String str) {
     return upperCaseCaches.computeIfAbsent(str, key -> str.toUpperCase(Locale.ENGLISH));

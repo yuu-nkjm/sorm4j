@@ -19,6 +19,7 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.result.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -39,7 +40,7 @@ public final class SqlParametersToTableMapping<T> {
   private final SqlParametersSetter sqlParametersSetter;
   private final MultiRowProcessor<T> multiRowProcessor;
 
-  private final TableMetaData tableMetaData;
+  private final TableMetaDataImpl tableMetaData;
   private final TableSql sql;
   private final LoggerContext loggerContext;
 
@@ -47,7 +48,7 @@ public final class SqlParametersToTableMapping<T> {
       ColumnValueToJavaObjectConverters columnValueConverter,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
       MultiRowProcessorFactory multiRowProcessorFactory, Class<T> objectClass,
-      ColumnToAccessorMapping columnToAccessorMap, TableMetaData tableMetaData, TableSql sql) {
+      ColumnToAccessorMapping columnToAccessorMap, TableMetaDataImpl tableMetaData, TableSql sql) {
     this.columnValueConverter = columnValueConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;

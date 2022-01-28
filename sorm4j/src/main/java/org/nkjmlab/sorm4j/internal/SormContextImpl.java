@@ -35,7 +35,7 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SormContextImpl implements SormContext {
 
-  private final ConcurrentMap<String, TableMetaData> tableMetaDataMap;
+  private final ConcurrentMap<String, TableMetaDataImpl> tableMetaDataMap;
   private final ConcurrentMap<String, TableSql> tableSqlMap;
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
@@ -69,10 +69,10 @@ public final class SormContextImpl implements SormContext {
     return getTableMetaData(connection, tableName, Object.class);
   }
 
-  private <T> TableMetaData getTableMetaData(Connection connection, String tableName,
+  private <T> TableMetaDataImpl getTableMetaData(Connection connection, String tableName,
       Class<T> objectClass) {
     TableName _tableName = toTableName(connection, tableName);
-    TableMetaData ret = tableMetaDataMap.computeIfAbsent(_tableName.getName(), _key -> {
+    TableMetaDataImpl ret = tableMetaDataMap.computeIfAbsent(_tableName.getName(), _key -> {
       try {
         return createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
       } catch (SQLException e) {
@@ -142,7 +142,7 @@ public final class SormContextImpl implements SormContext {
         config.getColumnToFieldAccessorMapper().createMapping(objectClass),
         config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
-    TableMetaData tableMetaData = getTableMetaData(connection, tableName, objectClass);
+    TableMetaDataImpl tableMetaData = getTableMetaData(connection, tableName, objectClass);
     TableSql sql = getTableSql(tableMetaData);
 
     validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
@@ -174,7 +174,7 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  private <T> TableMetaData createTableMetaData(Class<T> objectClass, String tableName,
+  private <T> TableMetaDataImpl createTableMetaData(Class<T> objectClass, String tableName,
       DatabaseMetaData metaData) throws SQLException {
 
     List<ColumnMetaData> columns =
