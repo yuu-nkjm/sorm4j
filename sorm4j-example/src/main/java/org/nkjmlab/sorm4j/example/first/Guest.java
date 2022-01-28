@@ -11,7 +11,7 @@ public class Guest {
 
 
   public static final String CREATE_TABLE_SQL =
-      "CREATE TABLE IF NOT EXISTS guest (id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR, address VARCHAR)";
+      "CREATE TABLE IF NOT EXISTS guests (id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR, address VARCHAR)";
 
   private int id;
   private String name;
@@ -46,7 +46,7 @@ public class Guest {
 
   @Override
   public String toString() {
-    return "Customer [id=" + id + ", address=" + address + ", name=" + name + "]";
+    return "Guest [id=" + id + ", address=" + address + ", name=" + name + "]";
   }
 
 
