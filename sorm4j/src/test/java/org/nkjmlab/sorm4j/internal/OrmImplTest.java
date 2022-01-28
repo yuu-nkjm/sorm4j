@@ -9,10 +9,12 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class OrmImplTest {
 
@@ -26,8 +28,10 @@ class OrmImplTest {
 
   @Test
   void testReadAll() {
-    sorm.insert(PLAYER_ALICE);
-    assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
+    Sorm logSorm = Sorm.create(sorm.getDataSource(), SormContext.builder(sorm.getContext())
+        .setLoggerContext(LoggerContext.builder().enableAll().build()).build());
+    logSorm.insert(PLAYER_ALICE);
+    assertThat(logSorm.selectAll(Player.class)).contains(PLAYER_ALICE);
   }
 
 

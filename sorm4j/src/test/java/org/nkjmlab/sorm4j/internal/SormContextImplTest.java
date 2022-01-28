@@ -26,7 +26,7 @@ class SormContextImplTest {
   @Test
   void testBuild() {
     SormContext context =
-        SormContext.builder().setColumnFieldMapper(new DefaultColumnToFieldAccessorMapper())
+        SormContext.builder().setColumnToFieldAccessorMapper(new DefaultColumnToFieldAccessorMapper())
             .setTableNameMapper(new DefaultTableNameMapper())
             .setColumnValueToMapEntryConverter(new DefaultColumnValueToMapEntryConverter())
             .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters())
