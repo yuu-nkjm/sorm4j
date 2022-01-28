@@ -2,23 +2,15 @@ package org.nkjmlab.sorm4j.internal.util;
 
 import java.util.Collection;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 public final class StringCache {
 
-  private static final ConcurrentMap<String, String> canonicalCaseCaches =
-      new ConcurrentHashMap<>();
+  private static final Map<String, String> canonicalCaseCaches = new ConcurrentLruCache<>(1024);
 
-  private static final ConcurrentMap<String, String> upperCaseCaches = new ConcurrentHashMap<>();
+  private static final Map<String, String> upperCaseCaches = new ConcurrentLruCache<>(256);
 
-  private static final ConcurrentMap<String, String> lowerCaseCaches = new ConcurrentHashMap<>();
-
-  public static void clearAll() {
-    canonicalCaseCaches.clear();
-    upperCaseCaches.clear();
-    lowerCaseCaches.clear();
-  }
+  private static final Map<String, String> lowerCaseCaches = new ConcurrentLruCache<>(256);
 
   public static String toUpperCase(String str) {
     return upperCaseCaches.computeIfAbsent(str, key -> str.toUpperCase(Locale.ENGLISH));

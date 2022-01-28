@@ -77,6 +77,7 @@ public final class ResultSetStream<T> implements AutoCloseable {
 
   private class ResultSetIterator<S> implements Iterator<S> {
 
+    @Override
     public boolean hasNext() {
       try {
         boolean hasNext = resultSet.next();

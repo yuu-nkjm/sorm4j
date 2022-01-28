@@ -111,6 +111,7 @@ public final class JdbcDatabaseMetaData {
     return tableNames;
   }
 
+  @Override
   public String toString() {
     return "DatabaseMetaDataImpl [databaseProductName=" + databaseProductName
         + ", databaseProductVersion=" + databaseProductVersion + ", driverName=" + driverName

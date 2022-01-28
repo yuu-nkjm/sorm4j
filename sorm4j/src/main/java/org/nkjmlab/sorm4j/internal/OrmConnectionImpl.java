@@ -27,9 +27,9 @@ import org.nkjmlab.sorm4j.context.ColumnValueToMapKeyConverter;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -333,6 +333,14 @@ public class OrmConnectionImpl implements OrmConnection {
    */
   public <T> SqlParametersToTableMapping<T> getTableMapping(Class<T> objectClass) {
     return sormContext.getTableMapping(connection, objectClass);
+  }
+
+  public TableSql getTableSql(Class<?> objectClass) {
+    return getTableMapping(objectClass).getSql();
+  }
+
+  public TableSql getTableSql(String tableName) {
+    return sormContext.getTableSql(getTableMetaData(tableName));
   }
 
   @Override

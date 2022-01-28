@@ -36,6 +36,7 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 public final class SormContextImpl implements SormContext {
 
   private final ConcurrentMap<String, TableMetaData> tableMetaDataMap;
+  private final ConcurrentMap<String, TableSql> tableSqlMap;
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
   private final ConcurrentMap<String, SqlParametersToTableMapping<?>> sqlParametersToTableMappings;
@@ -46,6 +47,7 @@ public final class SormContextImpl implements SormContext {
   private SormContextImpl(SormConfig sormConfig) {
     this.sormConfig = sormConfig;
     this.tableMetaDataMap = new ConcurrentHashMap<>();
+    this.tableSqlMap = new ConcurrentHashMap<>();
     this.classNameToValidTableNameMap = new ConcurrentHashMap<>();
     this.tableNameToValidTableNameMap = new ConcurrentHashMap<>();
     this.sqlParametersToTableMappings = new ConcurrentHashMap<>();
@@ -70,15 +72,20 @@ public final class SormContextImpl implements SormContext {
   private <T> TableMetaData getTableMetaData(Connection connection, String tableName,
       Class<T> objectClass) {
     TableName _tableName = toTableName(connection, tableName);
-    TableMetaData ret =
-        tableMetaDataMap.computeIfAbsent(_tableName.getName(), Try.createFunctionWithThrow(_key -> {
-          TableMetaData m =
-              createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
-          return m;
-        }, Try::rethrow));
+    TableMetaData ret = tableMetaDataMap.computeIfAbsent(_tableName.getName(), _key -> {
+      try {
+        return createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
     return ret;
   }
 
+  public <T> TableSql getTableSql(TableMetaData tableMetaData) {
+    return tableSqlMap.computeIfAbsent(tableMetaData.getTableName(),
+        _key -> sormConfig.getTableSqlFactory().create(tableMetaData));
+  }
 
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
@@ -136,11 +143,10 @@ public final class SormContextImpl implements SormContext {
         sormConfig.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
     TableMetaData tableMetaData = getTableMetaData(connection, tableName, objectClass);
+    TableSql sql = getTableSql(tableMetaData);
 
     validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 
-
-    TableSql sql = sormConfig.getTableSqlFactory().create(tableMetaData, objectClass, connection);
 
     return new SqlParametersToTableMapping<>(sormConfig.getLoggerContext(),
         sormConfig.getColumnValueToJavaObjectConverter(), sormConfig.getSqlParametersSetter(),

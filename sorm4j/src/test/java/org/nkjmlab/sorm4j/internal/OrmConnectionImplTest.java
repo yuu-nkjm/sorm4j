@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -30,7 +28,6 @@ import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.command.Command;
 
 class OrmConnectionImplTest {
-  private static final Logger log = LogManager.getLogger();
   private Sorm sorm;
 
   @BeforeEach
