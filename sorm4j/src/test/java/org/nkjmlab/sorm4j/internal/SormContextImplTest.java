@@ -37,7 +37,7 @@ class SormContextImplTest {
                 .disable(LoggerContext.Category.MAPPING).build())
             .build();
 
-    Sorm sorm = SormTestUtils.createSormWithContextAndTables(context);
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
 
     try (Connection conn = sorm.getJdbcConnection()) {
       assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Temporary.class))

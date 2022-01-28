@@ -23,7 +23,7 @@ class DefaultResultSetValueGetterTest {
   void testGetValueBySetterType() {
     String sql =
         "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry VARCHAR ARRAY, fl FLOAT)";
-    Sorm sormImpl = SormTestUtils.createSormWithNewContextAndTables();
+    Sorm sormImpl = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     sormImpl.acceptHandler(con -> con.executeUpdate(sql));
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
     sormImpl.acceptHandler(con -> con.insert(a));

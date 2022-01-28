@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DriverManagerDataSourceTest {
 
-  private static DriverManagerDataSource ds = SormTestUtils.createDataSource();
+  private static DriverManagerDataSource ds = SormTestUtils.createNewDatabaseDataSource();
 
   @Test
   void testGetParentLogger() {

@@ -14,7 +14,7 @@ class DefaultTableNameMapperTest {
 
   @BeforeAll
   static void setUp() {
-    sorm = SormTestUtils.createSormWithNewContextAndTables();
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
 
 

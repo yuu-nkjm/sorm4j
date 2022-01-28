@@ -19,7 +19,7 @@ class DefaultSqlParametersSetterTest {
 
   @Test
   void testArray() {
-    Sorm sorm = createSormWithNewContextAndTables();
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     try (Connection conn = sorm.getJdbcConnection();
         PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
 
@@ -121,7 +121,7 @@ class DefaultSqlParametersSetterTest {
 
   @Test
   void testSetParameters() {
-    Sorm sorm = createSormWithNewContextAndTables();
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
 
     sorm.executeUpdate(
         "CREATE TABLE TA (id int auto_increment primary key, arry " + "INTEGER" + " ARRAY[10])");

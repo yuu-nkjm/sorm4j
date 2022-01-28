@@ -6,7 +6,6 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class SormImplTest {
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormWithNewContextAndTables();
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
 
   @Test
@@ -73,14 +72,6 @@ class SormImplTest {
     }
 
     assertThat(sorm.getJdbcDatabaseMetaData().toString()).contains("jdbc");
-
-
-    sorm.acceptHandler(conn -> conn.streamAll(Guest.class),
-        stream -> stream.collect(Collectors.toList()));
-
-    sorm.applyHandler(conn -> conn.streamAll(Guest.class),
-        stream -> stream.collect(Collectors.toList()));
-
 
   }
 
@@ -155,7 +146,7 @@ class SormImplTest {
   void testToString() {
     assertThat(sorm.toString()).contains("Sorm");
 
-    Sorm.create(SormTestUtils.createDataSource()).getDataSource();
+    Sorm.create(SormTestUtils.createNewDatabaseDataSource()).getDataSource();
 
   }
 

@@ -11,17 +11,39 @@ import org.nkjmlab.sorm4j.util.table.TableWithSchema;
 
 public class SormTestUtils {
 
-
-
+  /**
+   * <code>Guest("Alice", "Kyoto")</code>
+   */
   public static final Guest GUEST_ALICE = new Guest("Alice", "Kyoto");
+  /**
+   * <code>Guest("Bob", "Tokyo")</code>
+   */
   public static final Guest GUEST_BOB = new Guest("Bob", "Tokyo");
+  /**
+   * <code>Guest("Carol", "Osaka")</code>
+   */
   public static final Guest GUEST_CAROL = new Guest("Carol", "Osaka");
+  /**
+   * <code>Guest("Dave", "Nara")</code>
+   */
   public static final Guest GUEST_DAVE = new Guest("Dave", "Nara");
 
 
+  /**
+   * <code>Player(1, "Alice", "Kyoto")</code>
+   */
   public static final Player PLAYER_ALICE = new Player(1, "Alice", "Kyoto");
+  /**
+   * <code>Player(2, "Bob", "Tokyo")</code>
+   */
   public static final Player PLAYER_BOB = new Player(2, "Bob", "Tokyo");
+  /**
+   * <code>Player(3, "Carol", "Osaka")</code>
+   */
   public static final Player PLAYER_CAROL = new Player(3, "Carol", "Osaka");
+  /**
+   * <code>Player(4, "Dave", "Nara")</code>
+   */
   public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
 
 
@@ -104,8 +126,8 @@ public class SormTestUtils {
   }
 
 
-  public static Sorm createSormWithContextAndTables(SormContext sormContext) {
-    Sorm sorm = createSormWithContext(sormContext);
+  public static Sorm createSormWithNewDatabaseAndCreateTables(SormContext sormContext) {
+    Sorm sorm = createSormWithNewDatabase(sormContext);
     dropAndCreateSportsTable(sorm);
     dropAndCreateGuestTable(sorm);
     dropAndCreatePlayerTable(sorm);
@@ -113,17 +135,17 @@ public class SormTestUtils {
   }
 
 
-  public static Sorm createSormWithNewContextAndTables() {
-    return createSormWithContextAndTables(SormContext.builder().build());
+  public static Sorm createSormWithNewDatabaseAndCreateTables() {
+    return createSormWithNewDatabaseAndCreateTables(SormContext.builder().build());
   }
 
   public static Sorm createSormWithNewContext() {
-    return createSormWithContext(SormContext.builder().build());
+    return createSormWithNewDatabase(SormContext.builder().build());
   }
 
   private static AtomicInteger urlSuffuix = new AtomicInteger();
 
-  public static DriverManagerDataSource createDataSource() {
+  public static DriverManagerDataSource createNewDatabaseDataSource() {
     final String JDBC_URL =
         "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1;";
     final String USER = "sa";
@@ -131,8 +153,8 @@ public class SormTestUtils {
     return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
   }
 
-  private static Sorm createSormWithContext(SormContext sormContext) {
-    return Sorm.create(createDataSource(), sormContext);
+  private static Sorm createSormWithNewDatabase(SormContext sormContext) {
+    return Sorm.create(createNewDatabaseDataSource(), sormContext);
   }
 
   private static void dropAndCreateSportsTable(Sorm sorm) {

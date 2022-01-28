@@ -14,7 +14,7 @@ class NamedParameterSqlTest {
   private String sql = "select * from simple where id=:idid and name=:name";
   private Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
 
-  private static Sorm sorm = createSormWithNewContextAndTables();
+  private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
   static {
     sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 

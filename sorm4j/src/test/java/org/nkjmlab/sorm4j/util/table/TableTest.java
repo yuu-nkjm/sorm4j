@@ -33,7 +33,7 @@ class TableTest {
 
   @Test
   void testGetTableSchema() {
-    Sorm sorm = createSormWithNewContextAndTables();
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     playersTable.getTableSchema();
 
     BasicTable<Guest> gt = new BasicTable<>(sorm, Guest.class);

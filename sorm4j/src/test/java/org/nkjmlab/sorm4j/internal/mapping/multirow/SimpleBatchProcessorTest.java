@@ -23,7 +23,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeAll
   static void setUp() {
-    DataSource ds = SormTestUtils.createDataSource();
+    DataSource ds = SormTestUtils.createNewDatabaseDataSource();
     SormContext context = SormContext.builder().setMultiRowProcessorFactory(MultiRowProcessorFactory
         .builder().setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build()).build();
     sorm = Sorm.create(ds, context);
@@ -32,7 +32,7 @@ class SimpleBatchProcessorTest {
 
   @BeforeEach
   void setUpEach() {
-    sorm = createSormWithNewContextAndTables();
+    sorm = createSormWithNewDatabaseAndCreateTables();
   }
 
 

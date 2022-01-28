@@ -33,14 +33,14 @@ class BatchOfMultiRowInOneStatementProcessorTest {
         .setLoggerContext(LoggerContext.builder().disableAll().enableAll()
             .setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build())
         .build();
-    sorm = SormTestUtils.createSormWithContextAndTables(context);
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
     assertThat(sorm.getContext().toString())
         .contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
   }
 
   @BeforeEach
   void setUpEach() {
-    sorm = createSormWithNewContextAndTables();
+    sorm = createSormWithNewDatabaseAndCreateTables();
   }
 
 

@@ -24,7 +24,7 @@ class SormLoggerTest {
   @Test
   void testLogAfterQuery() {
     LoggerContext lc = LoggerContext.builder().enableAll().build();
-    Sorm sorm = createSormWithContextAndTables(SormContext.builder().setLoggerContext(lc).build());
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables(SormContext.builder().setLoggerContext(lc).build());
 
 
     Optional<LogPoint> lp = lc.createLogPoint(LoggerContext.Category.EXECUTE_QUERY, getClass());

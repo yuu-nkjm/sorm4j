@@ -12,7 +12,7 @@ class ColumnMetaDataTest {
 
   @Test
   void testCompareTo() {
-    Sorm sorm = SormTestUtils.createSormWithNewContextAndTables();
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     List<ColumnMetaData> t1 = sorm.getTableMetaData(Guest.class).getColumnsWithMetaData();
     ColumnMetaData c1 = t1.get(0);
     ColumnMetaData c2 = t1.get(0);

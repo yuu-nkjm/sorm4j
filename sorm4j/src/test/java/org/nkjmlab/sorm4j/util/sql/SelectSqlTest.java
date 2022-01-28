@@ -47,30 +47,21 @@ class SelectSqlTest {
     assertThat(selectDistinct("id")).isEqualTo(" select distinct id ");
     assertThat(where()).isEqualTo(" where ");
     assertThat(where("id=?")).isEqualTo(" where id=? ");
-    assertThat(where(and("id=?", "name=?", "address=?"))).isEqualTo(" where (id=? and name=? and address=?) ");
+    assertThat(where(and("id=?", "name=?", "address=?")))
+        .isEqualTo(" where (id=? and name=? and address=?) ");
+    assertThat(op(op("A", "/", "B"), "+", op("C", "/", "D"))).isEqualTo("((A / B) + (C / D))");
 
   }
 
-  @Test
-  void testBuildSorm() {
-    Sorm sorm = createSormWithNewContextAndTables();
 
+  @Test
+  void testBuild1() {
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     sorm.acceptHandler(con -> {
       String sql = SelectSql.builder().from(con.getTableName(Guest.class)).build();
       assertThat(sql).contains("select * from GUESTS");
     });
 
-  }
-
-  @Test
-  void testBuild() {
-
-    assertThat(op(op("A", "/", "B"), "+", op("C", "/", "D"))).isEqualTo("((A / B) + (C / D))");
-
-  }
-
-  @Test
-  void testBuild1() {
     SelectSql.Builder builder = SelectSql.builder();
     builder.distinct();
     builder.select(as("avg(AGE)", "AVERAGE_AGE"), "TEAM");
