@@ -38,6 +38,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
    <version>1.4.3</version>
  </dependency>
 ```
+We assume the follwing customer table in example: `create table customer (id int primary key, name varchar, address varchar)`
 
 Create a class with public fields and default constructor matching a table name. For example:
 
@@ -47,6 +48,13 @@ public class Customer {
   public String name;
   public String address;
 }
+```
+
+If you use after Java 16, you could also use record class. For example:
+
+```java
+ @OrmRecord
+ public record Customer (int id, String name, String address){}
 ```
 
 Create an entry point:

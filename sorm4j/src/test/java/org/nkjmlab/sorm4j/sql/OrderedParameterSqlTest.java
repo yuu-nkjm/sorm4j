@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 
 class OrderedParameterSqlTest {
-  private static Sorm sorm = createSormWithNewContextAndTables();
+  private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
   static {
     sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 

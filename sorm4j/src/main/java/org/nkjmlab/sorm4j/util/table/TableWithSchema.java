@@ -28,6 +28,7 @@ public interface TableWithSchema<T> extends Table<T> {
     return this;
   }
 
+  @Override
   default String getTableName() {
     return getTableSchema().getTableName();
   }

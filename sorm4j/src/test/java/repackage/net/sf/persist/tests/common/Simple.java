@@ -1,5 +1,7 @@
 package repackage.net.sf.persist.tests.common;
 
+import java.util.Objects;
+
 public class Simple {
 
   private long id;
@@ -35,6 +37,11 @@ public class Simple {
 
   public void setLongCol(long intCol) {
     this.longCol = intCol;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, longCol, stringCol);
   }
 
   @Override

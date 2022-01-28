@@ -727,7 +727,7 @@ public class OrmBenchmarkPostSimple {
 
 
   @Benchmark
-  public Object handCodedInsert() {
+  public Object handCodedInsertOne() {
     return handCodedBench.insert(Post.post);
   }
 
@@ -747,7 +747,7 @@ public class OrmBenchmarkPostSimple {
   }
 
   @Benchmark
-  public Object jDBIInsert() {
+  public Object jDBIInsertOne() {
     return jdbiBench.insert(Post.post);
   }
 
@@ -768,7 +768,7 @@ public class OrmBenchmarkPostSimple {
   }
 
   @Benchmark
-  public Object jOOQInsert() {
+  public Object jOOQInsertOne() {
     return jooqBench.insert(Post.post);
   }
 
@@ -789,7 +789,7 @@ public class OrmBenchmarkPostSimple {
   }
 
   @Benchmark
-  public Object myBatisInsert() {
+  public Object myBatisInsertOne() {
     return myBatisBench.insert(Post.post);
   }
 
@@ -822,7 +822,7 @@ public class OrmBenchmarkPostSimple {
 
 
   @Benchmark
-  public Object sormInsert() {
+  public Object sormInsertOne() {
     return sormBench.insert(Post.post);
   }
 
@@ -849,7 +849,7 @@ public class OrmBenchmarkPostSimple {
   }
 
   @Benchmark
-  public Object sql2oInsert() {
+  public Object sql2oInsertOne() {
     return sql2oBench.insert(Post.post);
   }
 

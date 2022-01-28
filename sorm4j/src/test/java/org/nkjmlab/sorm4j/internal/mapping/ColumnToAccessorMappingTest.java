@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal.mapping;
 import static org.assertj.core.api.Assertions.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,16 +13,19 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
-class TableMappingTest {
+class ColumnToAccessorMappingTest {
+
   private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormWithNewContextAndTables();
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
+
 
   @Test
   void testGetValue() {
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     try {
       sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
@@ -48,6 +50,7 @@ class TableMappingTest {
 
   @Test
   void testInsertAndGetEx() throws SQLException {
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     Connection conMock = Mockito.spy(Connection.class);
     Mockito.doThrow(new SQLException("Mock exception")).when(conMock)
         .prepareStatement(Mockito.anyString(), Mockito.any(String[].class));
@@ -64,6 +67,7 @@ class TableMappingTest {
 
   @Test
   void testSetValue() {
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     try {
       sorm.acceptHandler(m -> {
         ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
@@ -92,16 +96,10 @@ class TableMappingTest {
 
   @Test
   void testCol() {
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+
     sorm.acceptHandler(m -> {
-      assertThat(getTableMapping(m, Guest.class).getTableMetaData().getColumns())
-          .containsAll(List.of("ID", "NAME", "ADDRESS"));
-    });
-    sorm.acceptHandler(m -> {
-      assertThat(getTableMapping(m, Guest.class).getTableMetaData().getPrimaryKeys())
-          .containsAll(List.of("ID"));
-    });
-    sorm.acceptHandler(m -> {
-      assertThat(getTableMapping(m, Guest.class).toString()).contains("Mapping");
+      assertThat(getTableMapping(m, Guest.class).toString()).contains("mapped");
     });
   }
 

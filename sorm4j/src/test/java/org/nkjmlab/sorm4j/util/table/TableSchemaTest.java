@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 class TableSchemaTest {
 
   private static TempGuestTable tempGuestTable = new TempGuestTable();
-  private static Sorm sorm = SormTestUtils.createSormWithNewContextAndTables();
+  private static Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
 
   static class TempGuestTable {
 

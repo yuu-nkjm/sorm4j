@@ -5,6 +5,7 @@ import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.common.SormException;
 
 class ParameterizedSqlTest {
 
@@ -47,6 +48,8 @@ class ParameterizedSqlTest {
     Object[] params = {1};
     assertThat(ParameterizedSql.embedParameter(sql, params))
         .contains("select * from guest where id=1");
+
+
   }
 
   @Test
@@ -56,6 +59,27 @@ class ParameterizedSqlTest {
 
     assertThat(ParameterizedSql.embedParameter(sql, params))
         .contains("select * from guest where name='a' and id=1");
+  }
+
+  @Test
+  void testEmbeddedOrderFail() {
+    String sql = "select * from guest where id={?}";
+
+    assertThatThrownBy(() -> ParameterizedSql.embedParameter(sql)).isInstanceOfSatisfying(
+        SormException.class,
+        e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
+  }
+
+  @Test
+  void testEmbeddedMapFail() {
+
+    String sql = "select * from guest where name={:name} and id={:id}";
+
+
+    assertThatThrownBy(() -> ParameterizedSql.embedParameter(sql, Map.of("name1", 1)))
+        .isInstanceOfSatisfying(SormException.class,
+            e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
+
   }
 
 }

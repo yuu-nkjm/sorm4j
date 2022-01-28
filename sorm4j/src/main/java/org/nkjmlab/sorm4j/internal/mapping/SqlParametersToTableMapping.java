@@ -19,6 +19,7 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
+import org.nkjmlab.sorm4j.internal.result.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -39,7 +40,7 @@ public final class SqlParametersToTableMapping<T> {
   private final SqlParametersSetter sqlParametersSetter;
   private final MultiRowProcessor<T> multiRowProcessor;
 
-  private final TableMetaData tableMetaData;
+  private final TableMetaDataImpl tableMetaData;
   private final TableSql sql;
   private final LoggerContext loggerContext;
 
@@ -47,7 +48,7 @@ public final class SqlParametersToTableMapping<T> {
       ColumnValueToJavaObjectConverters columnValueConverter,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
       MultiRowProcessorFactory multiRowProcessorFactory, Class<T> objectClass,
-      ColumnToAccessorMapping columnToAccessorMap, TableMetaData tableMetaData, TableSql sql) {
+      ColumnToAccessorMapping columnToAccessorMap, TableMetaDataImpl tableMetaData, TableSql sql) {
     this.columnValueConverter = columnValueConverter;
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;
@@ -210,11 +211,9 @@ public final class SqlParametersToTableMapping<T> {
 
   @Override
   public String toString() {
-    return "[" + SqlParametersToTableMapping.class.getSimpleName() + "] Table ["
-        + tableMetaData.getTableName() + "] is mapped to [" + objectClass.getName() + "] class. "
-        + lineSeparator() + "PK=" + tableMetaData.getPrimaryKeys() + ",  "
-        + tableMetaData.getColumnsWithMetaData() + lineSeparator() + "[" + objectClass.getName()
-        + "] is mapped to " + columnToAccessorMap.toString() + lineSeparator() + "  with ["
+    return "[" + objectClass.getName() + "] class is mapped to [" + tableMetaData.getTableName()
+        + "] Table. [" + objectClass.getName() + "] could set/get values for following columns."
+        + lineSeparator() + columnToAccessorMap.toString() + lineSeparator() + "  with ["
         + multiRowProcessor.getClass().getSimpleName() + "]";
   }
 

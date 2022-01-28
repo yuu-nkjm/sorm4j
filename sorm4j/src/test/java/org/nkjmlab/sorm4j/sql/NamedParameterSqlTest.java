@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.test.common.Customer;
 import org.nkjmlab.sorm4j.test.common.Guest;
 
@@ -13,7 +14,7 @@ class NamedParameterSqlTest {
   private String sql = "select * from simple where id=:idid and name=:name";
   private Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
 
-  private static Sorm sorm = createSormWithNewContextAndTables();
+  private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
   static {
     sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
 
@@ -71,14 +72,21 @@ class NamedParameterSqlTest {
   @Test
   void testBindList() {
 
-    ParameterizedSql sp = NamedParameterSql.from("select * from where ID in(<:names>)")
-        .bind("names", List.of("foo", "bar")).parse();
+    ParameterizedSql sp = NamedParameterSql.from("select * from where ID in(<:player_names_1>)")
+        .bind("player_names_1", List.of("foo", "bar")).parse();
 
     assertThat(sp.getSql()).contains("?,?");
     assertThat(sp.getParameters()[0]).isEqualTo("foo");
     assertThat(sp.getParameters()[1]).isEqualTo("bar");
 
+  }
 
+  @Test
+  void testBindListFail() {
+    assertThatThrownBy(() -> NamedParameterSql.from("select * from where ID in(<:names>)")
+        .bind("names", "foo").parse()).isInstanceOfSatisfying(SormException.class,
+            e -> assertThat(e.getMessage())
+                .isEqualTo("<?> parameter should be bind Collection or Array"));
   }
 
 }

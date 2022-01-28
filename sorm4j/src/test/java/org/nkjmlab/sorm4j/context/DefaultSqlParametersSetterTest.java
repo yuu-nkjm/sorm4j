@@ -10,35 +10,18 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.TestUtils;
 
 class DefaultSqlParametersSetterTest {
 
   @Test
-  void testSetParameters() {
-    SORM.executeUpdate(
-        "CREATE TABLE TA (id int auto_increment primary key, arry " + "INTEGER" + " ARRAY[10])");
-
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", new boolean[] {true, false});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?",
-        (Object) new Boolean[] {true, false});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", new double[] {0.1d});
-    SORM.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
-
-    DefaultSqlParametersSetter setter = new DefaultSqlParametersSetter();
-    try (Connection conn = SormTestUtils.createDataSourceH2().getConnection();
+  void testArray() {
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
+    try (Connection conn = sorm.getJdbcConnection();
         PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
-
-      setter.setParameters(pstmt, (Object[]) null);
-      setter.setParameters(pstmt, new Object[] {});
-
-      setter.setParameters(pstmt, Instant.now());
-      setter.setParameters(pstmt,
-          DefaultSqlParametersSetterTest.class.getResourceAsStream("log4j2.xml"));
-      setter.setParameters(pstmt, new StringReader("a"));
-
 
       assertThat(toSqlArray("boolean", conn, TestUtils.PRIMITIVE_BOOLEAN_ARRAY).getBaseType())
           .isEqualTo(JDBCType.BOOLEAN.getVendorTypeNumber());
@@ -48,6 +31,7 @@ class DefaultSqlParametersSetterTest {
 
       assertThat(toSqlArray("char", conn, TestUtils.PRIMITIVE_CHAR_ARRAY).getBaseType())
           .isEqualTo(JDBCType.CHAR.getVendorTypeNumber());
+
       assertThat(toSqlArray("java.lang.Character", conn, TestUtils.CHARRACTER_ARRAY).getBaseType())
           .isEqualTo(JDBCType.CHAR.getVendorTypeNumber());
 
@@ -131,6 +115,37 @@ class DefaultSqlParametersSetterTest {
 
 
     } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  @Test
+  void testSetParameters() {
+    Sorm sorm = createSormWithNewDatabaseAndCreateTables();
+
+    sorm.executeUpdate(
+        "CREATE TABLE TA (id int auto_increment primary key, arry " + "INTEGER" + " ARRAY[10])");
+
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", new boolean[] {true, false});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?",
+        (Object) new Boolean[] {true, false});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", new double[] {0.1d});
+    sorm.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
+
+    DefaultSqlParametersSetter setter = new DefaultSqlParametersSetter();
+    try (Connection conn = sorm.getJdbcConnection();
+        PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
+
+      setter.setParameters(pstmt, (Object[]) null);
+      setter.setParameters(pstmt, new Object[] {});
+
+      setter.setParameters(pstmt, Instant.now());
+      setter.setParameters(pstmt,
+          DefaultSqlParametersSetterTest.class.getResourceAsStream("log4j2.xml"));
+      setter.setParameters(pstmt, new StringReader("a"));
+
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
     }
   }
 }

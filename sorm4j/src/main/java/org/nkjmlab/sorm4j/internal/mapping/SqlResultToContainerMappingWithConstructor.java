@@ -12,8 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
@@ -82,9 +85,9 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
       throw Try.rethrow(e);
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
-      throw new SormException(
-          "Constructor with parameters of container class for object-relation mapping is not match with columns.",
-          e);
+      throw new SormException(ParameterizedStringUtils.newString(
+          "Constructor with parameters of container class for object-relation mapping is not match with columns. sqltypes={}, param={}",
+          JdbcTypeUtils.convert(sqlTypes), constructorParameters), e);
     }
   }
 
@@ -123,9 +126,14 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
   @Override
   public String toString() {
-    return "ConstructorBasedSqlResultCreator [constructorParametersMap=" + constructorParametersMap
-        + ", constructorParametersLength=" + constructorParametersLength
-        + ", columnAndConstructorParameterMapping=" + columnAndConstructorParameterMapping + "]";
+    List<String> keySet =
+        constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
+    return ParameterizedStringUtils.newString("constructor=[{}], arguments={}" + System.lineSeparator() + "{}", constructor,
+        keySet,
+        String.join(System.lineSeparator(),
+            keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
+                .collect(Collectors.toList())));
+
   }
 
 
@@ -153,7 +161,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
     @Override
     public String toString() {
-      return "ConstructorParameter [name=" + name + ", order=" + order + ", type=" + type + "]";
+      return "[name=" + name + ", order=" + order + ", type=" + type + "]";
     }
 
   }

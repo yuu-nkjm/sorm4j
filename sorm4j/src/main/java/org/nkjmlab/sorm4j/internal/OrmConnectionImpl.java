@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor.*;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,10 +27,10 @@ import org.nkjmlab.sorm4j.context.ColumnValueToMapKeyConverter;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -212,7 +211,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T executeQuery(ParameterizedSql sql, ResultSetTraverser<T> resultSetTraverser) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql.getSql(), sql.getParameters(),
         resultSetTraverser);
   }
@@ -229,7 +228,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public int executeUpdate(String sql, Object... parameters) {
-    final int ret = executeUpdateAndClose(getLoggerConfig(), connection, getSqlParametersSetter(),
+    final int ret = executeUpdateAndClose(getLoggerContext(), connection, getSqlParametersSetter(),
         getPreparedStatementSupplier(), sql, parameters);
     return ret;
   }
@@ -301,7 +300,7 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private LoggerContext getLoggerConfig() {
+  private LoggerContext getLoggerContext() {
     return sormContext.getLoggerContext();
   }
 
@@ -337,6 +336,16 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public TableSql getTableSql(Class<?> objectClass) {
+    return getTableMapping(objectClass).getSql();
+  }
+
+  @Override
+  public TableSql getTableSql(String tableName) {
+    return sormContext.getTableSql(getTableMetaData(tableName));
+  }
+
+  @Override
   public TableMetaData getTableMetaData(Class<?> objectClass) {
     return getTableMapping(objectClass).getTableMetaData();
   }
@@ -345,7 +354,6 @@ public class OrmConnectionImpl implements OrmConnection {
   public TableMetaData getTableMetaData(String tableName) {
     return sormContext.getTableMetaData(connection, tableName);
   }
-
 
   @Override
   public String getTableName(Class<?> objectClass) {
@@ -433,9 +441,9 @@ public class OrmConnectionImpl implements OrmConnection {
   public int[] insertMapIn(String tableName, List<Map<String, Object>> objects) {
     boolean origAutoCommit = getAutoCommit(connection);
     try {
-      connection.setAutoCommit(false);
+      setAutoCommit(connection, false);
       int[] ret = objects.stream().mapToInt(o -> insertMapIn(tableName, o)).toArray();
-      connection.setAutoCommit(true);
+      setAutoCommit(connection, true);
       return ret;
     } catch (Exception e) {
       throw Try.rethrow(e);
@@ -497,8 +505,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1T2OnCondition, String t2T3OnCondition) {
     return readTupleList(t1, t2, t3,
         joinHelper(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
@@ -590,11 +598,11 @@ public class OrmConnectionImpl implements OrmConnection {
           getPreparedStatementSupplier().prepareStatement(connection, sql);
       getSqlParametersSetter().setParameters(stmt, parameters);
 
-      createLogPointAndLogBeforeSql(getLoggerConfig(), Category.EXECUTE_QUERY,
+      createLogPointAndLogBeforeSql(getLoggerContext(), Category.EXECUTE_QUERY,
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
-      ResultSetStreamImpl<T> ret = new ResultSetStreamImpl<T>(this, objectClass, stmt, resultSet);
+      ResultSetStream<T> ret = new ResultSetStream<T>(this, objectClass, stmt, resultSet);
       this.resultSetStream = ret;
       return ret.stream();
     } catch (SQLException e) {
@@ -614,7 +622,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
         resultSet -> loadFirst(objectClass, resultSet));
   }
@@ -626,7 +634,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters,
         resultSet -> traverseAndMapToList(objectClass, resultSet));
   }
@@ -638,7 +646,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T> T readOne(Class<T> objectClass, String sql, Object... parameters) {
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           T ret = null;
           if (resultSet.next()) {
@@ -662,7 +670,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
       Class<T3> t3, String sql, Object... parameters) {
-    List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    List<Tuple3<T1, T2, T3>> ret = executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple3<T1, T2, T3>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -684,7 +692,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
       Object... parameters) {
-    List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    List<Tuple2<T1, T2>> ret = executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, parameters, resultSet -> {
           final List<Tuple2<T1, T2>> ret1 = new ArrayList<>();
           while (resultSet.next()) {
@@ -714,7 +722,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> T selectByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
     final String sql = getTableMapping(objectClass).getSql().getSelectByPrimaryKeySql();
-    return executeQueryAndClose(getLoggerConfig(), getJdbcConnection(),
+    return executeQueryAndClose(getLoggerContext(), getJdbcConnection(),
         getPreparedStatementSupplier(), getSqlParametersSetter(), sql, primaryKeyValues,
         resultSet -> {
           return resultSet.next() ? getColumnsMapping(objectClass)
@@ -905,6 +913,33 @@ public class OrmConnectionImpl implements OrmConnection {
     return metaData.getColumnType(1);
   }
 
+  public static boolean getAutoCommit(Connection connection) {
+    try {
+      return connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  public static void commitOrRollback(Connection connection, boolean origAutoCommit) {
+    try {
+      if (origAutoCommit) {
+        connection.commit();
+      } else {
+        connection.rollback();
+      }
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  public static void setAutoCommit(Connection connection, boolean autoCommit) {
+    try {
+      connection.setAutoCommit(autoCommit);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
 
   private static class ColumnsAndTypes {
 

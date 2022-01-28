@@ -46,10 +46,11 @@ public interface Table<T> {
    * @param streamHandler
    */
   @Experimental
-  default void acceptHandler(FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
+  default void acceptHandler(FunctionHandler<TypedOrmStreamGenerator<T>, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler) {
     getSorm().acceptHandler(
-        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)), streamHandler);
+        conn -> streamGenerator.apply(new TypedOrmStreamGenerator<T>(getValueType(), conn)),
+        streamHandler);
   }
 
   /**
@@ -60,10 +61,11 @@ public interface Table<T> {
    * @return
    */
   @Experimental
-  default <R> R applyHandler(FunctionHandler<TypedOrmStream<T>, Stream<T>> streamGenerator,
+  default <R> R applyHandler(FunctionHandler<TypedOrmStreamGenerator<T>, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler) {
     return getSorm().applyHandler(
-        conn -> streamGenerator.apply(new TypedOrmStream<T>(getValueType(), conn)), streamHandler);
+        conn -> streamGenerator.apply(new TypedOrmStreamGenerator<T>(getValueType(), conn)),
+        streamHandler);
   }
 
   default T readFirst(ParameterizedSql sql) {

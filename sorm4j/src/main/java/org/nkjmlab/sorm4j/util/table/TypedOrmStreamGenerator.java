@@ -2,18 +2,18 @@ package org.nkjmlab.sorm4j.util.table;
 
 import java.sql.PreparedStatement;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.OrmStream;
+import org.nkjmlab.sorm4j.OrmStreamGenerator;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-public final class TypedOrmStream<T> {
+public final class TypedOrmStreamGenerator<T> {
 
   private final Class<T> type;
-  private final OrmStream conn;
+  private final OrmStreamGenerator generator;
 
-  public TypedOrmStream(Class<T> type, OrmStream conn) {
+  public TypedOrmStreamGenerator(Class<T> type, OrmStreamGenerator generator) {
     this.type = type;
-    this.conn = conn;
+    this.generator = generator;
   }
 
   /**
@@ -30,7 +30,7 @@ public final class TypedOrmStream<T> {
    */
 
   public Stream<T> streamAll() {
-    return conn.streamAll(type);
+    return generator.streamAll(type);
   }
 
   /**
@@ -68,7 +68,7 @@ public final class TypedOrmStream<T> {
    * @return
    */
   public Stream<T> stream(String sql, Object... parameters) {
-    return conn.stream(type, sql, parameters);
+    return generator.stream(type, sql, parameters);
   }
 
 }

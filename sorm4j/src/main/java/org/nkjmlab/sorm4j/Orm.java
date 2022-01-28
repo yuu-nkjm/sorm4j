@@ -12,6 +12,7 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
@@ -250,13 +251,35 @@ public interface Orm {
   TableMetaData getTableMetaData(Class<?> type);
 
   /**
-   * Gets table metadata to the given object class and the table name.
+   * Gets table metadata to the table name.
    *
    * @param tableName
    * @return
    */
   TableMetaData getTableMetaData(String tableName);
 
+
+  /**
+   * Gets table metadata corresponding to the given object class.
+   *
+   * @param type
+   * @return
+   */
+  TableSql getTableSql(Class<?> type);
+
+  /**
+   * Gets table SQL to the given table name.
+   *
+   * @param tableName
+   * @return
+   */
+  TableSql getTableSql(String tableName);
+
+  /**
+   * Gets JDBC database metadata.
+   *
+   * @return
+   */
   JdbcDatabaseMetaData getJdbcDatabaseMetaData();
 
   /**

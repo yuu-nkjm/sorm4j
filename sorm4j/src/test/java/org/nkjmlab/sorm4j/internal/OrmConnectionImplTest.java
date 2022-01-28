@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.internal;
 
 import static java.sql.Connection.*;
 import static org.assertj.core.api.Assertions.*;
@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
@@ -28,13 +27,12 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.command.Command;
 
-class OrmConnectionTest {
-  private static final Logger log = LogManager.getLogger();
+class OrmConnectionImplTest {
   private Sorm sorm;
 
   @BeforeEach
   void setUp() {
-    sorm = SormTestUtils.createSormWithNewContextAndTables();
+    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
 
   @Test
@@ -47,24 +45,23 @@ class OrmConnectionTest {
       assertThat(conn.exists("guests", GUEST_BOB)).isFalse();
       conn.readFirst(Guest.class, "select * from guests");
     });
-    log.trace(sorm.getContext());
   }
 
   @Test
   void testJoin() {
-    Sorm m = sorm;
-    m.insert(GUEST_ALICE, GUEST_BOB);
-    m.insert(PLAYER_ALICE, PLAYER_BOB);
-    m.insert(SormTestUtils.SOCCER);
-    m.insert(SormTestUtils.TENNIS);
+    sorm.insert(GUEST_ALICE, GUEST_BOB);
+    sorm.insert(PLAYER_ALICE, PLAYER_BOB);
+    sorm.insert(SormTestUtils.SOCCER);
+    sorm.insert(SormTestUtils.TENNIS);
 
-    List<Tuple2<Guest, Player>> result = m.join(Guest.class, Player.class, "guests.id=players.id");
+    List<Tuple2<Guest, Player>> result =
+        sorm.join(Guest.class, Player.class, "guests.id=players.id");
 
     assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
     assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result.get(0).toString()).contains("Alice");
 
-    List<Tuple3<Guest, Player, Sport>> result1 = m.join(Guest.class, Player.class, Sport.class,
+    List<Tuple3<Guest, Player, Sport>> result1 = sorm.join(Guest.class, Player.class, Sport.class,
         "guests.id=players.id", "players.id=sports.id");
 
     assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
@@ -92,11 +89,12 @@ class OrmConnectionTest {
       assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
       assertThat(result.get(0).toString()).contains("Alice");
 
-      List<Tuple3<Guest, Player, Sport>> result1 = m.readTupleList(Guest.class, Player.class,
-          Sport.class,
-          "select g.id as gid, g.name as gname, g.address as gaddress, "
-              + "p.id as pid, p.name as pname, p.address as paddress, " + "s.id sid, s.name sname "
-              + "from guests g " + "join players p on g.id=p.id " + "join sports s on g.id=s.id");
+      List<Tuple3<Guest, Player, Sport>> result1 =
+          m.readTupleList(Guest.class, Player.class, Sport.class,
+              "select g.id as gid, g.name as gname, g.address as gaddress, "
+                  + "p.id as pid, p.name as pname, p.address as paddress, "
+                  + "s.id sportdotid, s.name sportdotname " + "from guests g "
+                  + "join players p on g.id=p.id " + "join sports s on g.id=s.id");
 
       assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
       assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());
@@ -116,8 +114,8 @@ class OrmConnectionTest {
         conn -> Command.create(conn, "insert into players values(:id, :name, :address)")
             .bindBean(new Player(1, "Frank", "Tokyo")).executeUpdate());
     assertThat(row).isEqualTo(1);
-    sorm.applyHandler(conn -> conn.selectAll(Player.class)).get(0);
   }
+
 
   @Test
   void testNamedRequest() {
@@ -167,21 +165,20 @@ class OrmConnectionTest {
 
   @Test
   void testCommint() {
-    Guest a = GUEST_ALICE;
     sorm.acceptHandler(TRANSACTION_READ_COMMITTED, m -> {
-      m.insert(a);
-      Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
-      assertThat(g.getAddress()).isEqualTo(a.getAddress());
+      m.insert(PLAYER_ALICE);
+      Player p = m.readOne(Player.class, "SELECT * FROM PLAYERS");
+      assertThat(p.getName()).isEqualTo(PLAYER_ALICE.getName());
       // auto roll-back;
     });
     sorm.acceptHandler(TRANSACTION_READ_COMMITTED, m -> {
-      m.insert(a);
+      m.insert(PLAYER_ALICE);
       m.commit();
       m.close();
     });
     sorm.acceptHandler(m -> {
-      Guest g = m.readFirst(Guest.class, "SELECT * FROM GUESTS");
-      assertThat(g.getAddress()).isEqualTo(a.getAddress());
+      Player p = m.readOne(Player.class, "SELECT * FROM PLAYERS");
+      assertThat(p.getName()).isEqualTo(PLAYER_ALICE.getName());
     });
   }
 
@@ -192,6 +189,7 @@ class OrmConnectionTest {
       Player b = PLAYER_BOB;
       m.insertIn("players1", a);
       m.deleteIn("players1", a);
+      assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
       m.insertIn("players1", a, b);
       m.deleteIn("players1", a, b);
       assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
@@ -316,11 +314,12 @@ class OrmConnectionTest {
 
   @Test
   void testExec() {
-    Player a = PLAYER_ALICE;
     sorm.acceptHandler(m -> {
-      m.insert(a);
-      m.executeUpdate("DROP TABLE IF EXISTS PLAYERS1");
-      m.executeUpdate(ParameterizedSql.of("DROP TABLE IF EXISTS PLAYERS1", new Object[0]));
+      m.insert(PLAYER_ALICE);
+      assertThat(m.executeUpdate("delete from players")).isEqualTo(1);
+      m.insert(PLAYER_ALICE, PLAYER_BOB);
+      assertThat(m.executeUpdate(ParameterizedSql.of("delete from players", new Object[0])))
+          .isEqualTo(2);;
 
     });
   }
@@ -334,27 +333,23 @@ class OrmConnectionTest {
         m.merge(a);
       });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("SQL");
+      assertThat(e.getMessage()).contains("Parameter \"#3\" is not set;");
     }
   }
 
   @Test
   void testmergeInT() {
-    sorm.acceptHandler(m -> {
-      m.mergeIn("players1", new Player[] {});
-      m.merge(new Player[] {});
-    });
+    sorm.mergeIn("players1", new Player[] {});
+    sorm.merge(new Player[] {});
 
-    sorm.acceptHandler(m -> {
-      Player a = PLAYER_ALICE;
-      Player b = PLAYER_BOB;
-      m.mergeIn("players1", a);
-      m.mergeIn("players1", a, b);
-      assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(2);
+    Player a = PLAYER_ALICE;
+    Player b = PLAYER_BOB;
+    sorm.mergeIn("players1", a);
+    sorm.mergeIn("players1", a, b);
+    assertThat(sorm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
 
-      m.mergeIn("players1", List.of(a, b));
-      assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(2);
-    });
+    sorm.mergeIn("players1", List.of(a, b));
+    assertThat(sorm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
   }
 
   @Test
@@ -372,17 +367,15 @@ class OrmConnectionTest {
 
   @Test
   void testMergeT() {
-    sorm.acceptHandler(m -> {
-      Player a = PLAYER_ALICE;
-      Player b = PLAYER_BOB;
-      m.merge(a);
-      m.merge(a, b);
-      m.merge(List.of(a, b));
-      Player c = new Player(a.getId(), "UPDATED", "UPDATED");
-      m.merge(c, b);
-      assertThat(m.selectAll(Player.class).size()).isEqualTo(2);
-      assertThat(m.selectByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
-    });
+    Player a = PLAYER_ALICE;
+    Player b = PLAYER_BOB;
+    sorm.merge(a);
+    sorm.merge(a, b);
+    sorm.merge(List.of(a, b));
+    Player c = new Player(a.getId(), "UPDATED", "UPDATED");
+    sorm.merge(c, b);
+    assertThat(sorm.selectAll(Player.class).size()).isEqualTo(2);
+    assertThat(sorm.selectByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
   }
 
 

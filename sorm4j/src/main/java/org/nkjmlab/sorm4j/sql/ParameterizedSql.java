@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.sql;
 import java.util.Map;
 import java.util.TreeMap;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
@@ -96,15 +97,20 @@ public interface ParameterizedSql {
    */
   @Experimental
   public static String embedParameter(String sql, Object... parameters) {
-    if (parameters == null || parameters.length == 0) {
-      return sql;
-    }
-    return ParameterizedStringUtils.newString(sql, "{?}", parameters.length,
+    String ret = ParameterizedStringUtils.newString(sql, "{?}", parameters.length,
         index -> parameters[index] == null ? null : parameters[index].toString());
+    if (ret.contains("{?}")) {
+      throw new SormException(ParameterizedStringUtils
+          .newString("Could not embed all parameters. sql={},parameters={}", sql, parameters));
+    } else {
+      return ret;
+    }
   }
 
   /**
-   * Embeds the given parameters to the give SQL string.
+   * Embeds the given parameters to the give SQL string. The given parameters must contain
+   * everything to be embedded. If any of the given parameters are not embedded, they will be
+   * ignored.
    *
    * @param sql
    * @param parameters
@@ -112,9 +118,6 @@ public interface ParameterizedSql {
    */
   @Experimental
   public static String embedParameter(String sql, Map<String, Object> parameters) {
-    if (parameters == null || parameters.size() == 0) {
-      return sql;
-    }
     // Ordered by position in the sentence
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
 
@@ -128,8 +131,7 @@ public interface ParameterizedSql {
     String _sql = sql.replaceAll("\\{:.*?\\}", "{?}");
     Object[] _parameters = orderdParams.values().toArray();
 
-    return ParameterizedStringUtils.newString(_sql, "{?}", _parameters.length,
-        index -> _parameters[index] == null ? null : _parameters[index].toString());
+    return embedParameter(_sql, _parameters);
   }
 
 

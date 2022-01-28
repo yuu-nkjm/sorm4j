@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.test.common;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
-import org.h2.jdbcx.JdbcConnectionPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
@@ -10,29 +10,45 @@ import org.nkjmlab.sorm4j.util.table.TableSchema;
 import org.nkjmlab.sorm4j.util.table.TableWithSchema;
 
 public class SormTestUtils {
-  public static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
-  public static final String USER = "sa";
-  public static final String PASSWORD = "";
 
-
-
+  /**
+   * <code>Guest("Alice", "Kyoto")</code>
+   */
   public static final Guest GUEST_ALICE = new Guest("Alice", "Kyoto");
+  /**
+   * <code>Guest("Bob", "Tokyo")</code>
+   */
   public static final Guest GUEST_BOB = new Guest("Bob", "Tokyo");
+  /**
+   * <code>Guest("Carol", "Osaka")</code>
+   */
   public static final Guest GUEST_CAROL = new Guest("Carol", "Osaka");
+  /**
+   * <code>Guest("Dave", "Nara")</code>
+   */
   public static final Guest GUEST_DAVE = new Guest("Dave", "Nara");
 
 
+  /**
+   * <code>Player(1, "Alice", "Kyoto")</code>
+   */
   public static final Player PLAYER_ALICE = new Player(1, "Alice", "Kyoto");
+  /**
+   * <code>Player(2, "Bob", "Tokyo")</code>
+   */
   public static final Player PLAYER_BOB = new Player(2, "Bob", "Tokyo");
+  /**
+   * <code>Player(3, "Carol", "Osaka")</code>
+   */
   public static final Player PLAYER_CAROL = new Player(3, "Carol", "Osaka");
+  /**
+   * <code>Player(4, "Dave", "Nara")</code>
+   */
   public static final Player PLAYER_DAVE = new Player(4, "Dave", "Nara");
 
 
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
-
-  public static final Sorm SORM = createSormWithNewContextAndTables();
-
 
   public static TableWithSchema<Guest> createGuestsTable(Sorm sorm) {
     TableSchema schema =
@@ -110,8 +126,8 @@ public class SormTestUtils {
   }
 
 
-  public static Sorm createSormAndTables(SormContext sormContext) {
-    Sorm sorm = createNewContextSorm(sormContext);
+  public static Sorm createSormWithNewDatabaseAndCreateTables(SormContext sormContext) {
+    Sorm sorm = createSormWithNewDatabase(sormContext);
     dropAndCreateSportsTable(sorm);
     dropAndCreateGuestTable(sorm);
     dropAndCreatePlayerTable(sorm);
@@ -119,17 +135,26 @@ public class SormTestUtils {
   }
 
 
-  private static Sorm createNewContextSorm(SormContext sormContext) {
-    return Sorm.create(Sorm.createDataSource(JDBC_URL, USER, PASSWORD), sormContext);
+  public static Sorm createSormWithNewDatabaseAndCreateTables() {
+    return createSormWithNewDatabaseAndCreateTables(SormContext.builder().build());
   }
 
-  public static Sorm createSormWithNewContextAndTables() {
-    return createSormAndTables(Sorm.getDefaultContext());
+  public static Sorm createSormWithNewContext() {
+    return createSormWithNewDatabase(SormContext.builder().build());
   }
 
+  private static AtomicInteger urlSuffuix = new AtomicInteger();
 
-  public static Sorm createNewContextSorm() {
-    return createNewContextSorm(SormContext.builder().build());
+  public static DriverManagerDataSource createNewDatabaseDataSource() {
+    final String JDBC_URL =
+        "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1;";
+    final String USER = "sa";
+    final String PASSWORD = "";
+    return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
+  }
+
+  private static Sorm createSormWithNewDatabase(SormContext sormContext) {
+    return Sorm.create(createNewDatabaseDataSource(), sormContext);
   }
 
   private static void dropAndCreateSportsTable(Sorm sorm) {
@@ -146,14 +171,6 @@ public class SormTestUtils {
         .createIndexesIfNotExists();
     createPlayersTable(sorm, "players1").dropTableIfExists().createTableIfNotExists()
         .createIndexesIfNotExists();
-  }
-
-  public static JdbcConnectionPool createDataSourceH2() {
-    return JdbcConnectionPool.create(JDBC_URL, USER, PASSWORD);
-  }
-
-  public static DriverManagerDataSource createDriverManagerDataSource() {
-    return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
   }
 
 }

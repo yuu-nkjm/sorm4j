@@ -12,7 +12,7 @@ public class Address {
 
 
   public static final String CREATE_TABLE_SQL =
-      "CREATE TABLE IF NOT EXISTS address (name VARCHAR PRIMARY KEY, postal_code varchar)";
+      "CREATE TABLE IF NOT EXISTS addresses (name VARCHAR PRIMARY KEY, postal_code varchar)";
 
   private String name;
   private String postalCode;

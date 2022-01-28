@@ -41,7 +41,7 @@ class OrmConfigStoreTest {
 
     ColumnValueToJavaObjectConverters rsc = DEFAULT_RESULT_SET_CONVERTER;
 
-    SormContext.builder().setColumnFieldMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+    SormContext.builder().setColumnToFieldAccessorMapper(DEFAULT_COLUMN_FIELD_MAPPER)
         .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setColumnValueToJavaObjectConverter(rsc)
         .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
         .setTableSqlFactory(new DefaultTableSqlFactory())

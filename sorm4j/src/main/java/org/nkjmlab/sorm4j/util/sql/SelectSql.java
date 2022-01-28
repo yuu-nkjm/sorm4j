@@ -346,13 +346,18 @@ public final class SelectSql {
    * @return
    */
   public static String castAs(String src, String toType) {
-    return wrapSpace("cast " + wrapParentheses(src + AS + toType));
+    return wrapSpace("cast" + wrapParentheses(src + AS + toType));
   }
 
-  public static String column(String tableName, String... colNames) {
-    return Arrays.stream(colNames).map(col -> column(tableName, col))
-        .collect(Collectors.joining(", "));
+  public static String columnWithTableName(String tableName, String... colNames) {
+    return wrapSpace(Arrays.stream(colNames).map(col -> column(tableName, col))
+        .collect(Collectors.joining(",")));
   }
+
+  public static String column(String tableName, String colName) {
+    return wrapSpace(tableName + "." + colName);
+  }
+
 
   public static String from(String tableName) {
     return wrapSpace("from " + tableName);

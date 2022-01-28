@@ -1,9 +1,7 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 
-@OrmColumnAliasPrefix("s")
 @OrmRecord
 public class Sport {
 

@@ -1,11 +1,13 @@
 package org.nkjmlab.sorm4j.internal;
 
+import static java.lang.System.*;
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,17 +35,19 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SormContextImpl implements SormContext {
 
-  private final ConcurrentMap<String, TableMetaData> tableMetaDataMap;
+  private final ConcurrentMap<String, TableMetaDataImpl> tableMetaDataMap;
+  private final ConcurrentMap<String, TableSql> tableSqlMap;
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
   private final ConcurrentMap<String, SqlParametersToTableMapping<?>> sqlParametersToTableMappings;
   private final ConcurrentMap<Class<?>, SqlResultToColumnsMapping<?>> sqlResultToColumnsMappings;
 
-  private final SormConfig sormConfig;
+  private final SormConfig config;
 
   private SormContextImpl(SormConfig sormConfig) {
-    this.sormConfig = sormConfig;
+    this.config = sormConfig;
     this.tableMetaDataMap = new ConcurrentHashMap<>();
+    this.tableSqlMap = new ConcurrentHashMap<>();
     this.classNameToValidTableNameMap = new ConcurrentHashMap<>();
     this.tableNameToValidTableNameMap = new ConcurrentHashMap<>();
     this.sqlParametersToTableMappings = new ConcurrentHashMap<>();
@@ -65,18 +69,23 @@ public final class SormContextImpl implements SormContext {
     return getTableMetaData(connection, tableName, Object.class);
   }
 
-  private <T> TableMetaData getTableMetaData(Connection connection, String tableName,
+  private <T> TableMetaDataImpl getTableMetaData(Connection connection, String tableName,
       Class<T> objectClass) {
     TableName _tableName = toTableName(connection, tableName);
-    TableMetaData ret =
-        tableMetaDataMap.computeIfAbsent(_tableName.getName(), Try.createFunctionWithThrow(_key -> {
-          TableMetaData m =
-              createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
-          return m;
-        }, Try::rethrow));
+    TableMetaDataImpl ret = tableMetaDataMap.computeIfAbsent(_tableName.getName(), _key -> {
+      try {
+        return createTableMetaData(objectClass, _tableName.getName(), connection.getMetaData());
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
     return ret;
   }
 
+  public <T> TableSql getTableSql(TableMetaData tableMetaData) {
+    return tableSqlMap.computeIfAbsent(tableMetaData.getTableName(),
+        _key -> config.getTableSqlFactory().create(tableMetaData));
+  }
 
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
@@ -95,14 +104,14 @@ public final class SormContextImpl implements SormContext {
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, TableName tableName,
       Class<T> objectClass) {
-    String key = tableName.getName() + "-" + objectClass.getName();
+    String key = objectClass.getName() + "-" + tableName.getName();
     @SuppressWarnings("unchecked")
     SqlParametersToTableMapping<T> ret =
         (SqlParametersToTableMapping<T>) sqlParametersToTableMappings.computeIfAbsent(key, _k -> {
           try {
             SqlParametersToTableMapping<T> m =
                 createTableMapping(objectClass, tableName.getName(), connection);
-            sormConfig.getLoggerContext()
+            config.getLoggerContext()
                 .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
                 .ifPresent(lp -> lp.logMapping(m.toString()));
             return m;
@@ -117,10 +126,10 @@ public final class SormContextImpl implements SormContext {
   <T> SqlResultToColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
 
     ColumnToAccessorMapping columnToAccessorMap = new ColumnToAccessorMapping(objectClass,
-        sormConfig.getColumnToFieldAccessorMapper().createMapping(objectClass),
-        sormConfig.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
+        config.getColumnToFieldAccessorMapper().createMapping(objectClass),
+        config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
-    return new SqlResultToColumnsMapping<>(sormConfig.getColumnValueToJavaObjectConverter(),
+    return new SqlResultToColumnsMapping<>(config.getColumnValueToJavaObjectConverter(),
         objectClass, columnToAccessorMap);
   }
 
@@ -130,20 +139,19 @@ public final class SormContextImpl implements SormContext {
 
 
     ColumnToAccessorMapping columnToAccessorMap = new ColumnToAccessorMapping(objectClass,
-        sormConfig.getColumnToFieldAccessorMapper().createMapping(objectClass),
-        sormConfig.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
+        config.getColumnToFieldAccessorMapper().createMapping(objectClass),
+        config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
-    TableMetaData tableMetaData = getTableMetaData(connection, tableName, objectClass);
+    TableMetaDataImpl tableMetaData = getTableMetaData(connection, tableName, objectClass);
+    TableSql sql = getTableSql(tableMetaData);
 
     validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 
 
-    TableSql sql = sormConfig.getTableSqlFactory().create(tableMetaData, objectClass, connection);
-
-    return new SqlParametersToTableMapping<>(sormConfig.getLoggerContext(),
-        sormConfig.getColumnValueToJavaObjectConverter(), sormConfig.getSqlParametersSetter(),
-        sormConfig.getPreparedStatementSupplier(), sormConfig.getMultiRowProcessorFactory(),
-        objectClass, columnToAccessorMap, tableMetaData, sql);
+    return new SqlParametersToTableMapping<>(config.getLoggerContext(),
+        config.getColumnValueToJavaObjectConverter(), config.getSqlParametersSetter(),
+        config.getPreparedStatementSupplier(), config.getMultiRowProcessorFactory(), objectClass,
+        columnToAccessorMap, tableMetaData, sql);
   }
 
 
@@ -166,19 +174,18 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  private <T> TableMetaData createTableMetaData(Class<T> objectClass, String tableName,
+  private <T> TableMetaDataImpl createTableMetaData(Class<T> objectClass, String tableName,
       DatabaseMetaData metaData) throws SQLException {
 
     List<ColumnMetaData> columns =
-        sormConfig.getTableMetaDataReader().getColumnsMetaData(metaData, tableName);
+        config.getTableMetaDataReader().getColumnsMetaData(metaData, tableName);
 
-    List<String> primaryKeys =
-        sormConfig.getTableMetaDataReader().getPrimaryKeys(metaData, tableName);
+    List<String> primaryKeys = config.getTableMetaDataReader().getPrimaryKeys(metaData, tableName);
 
     List<String> autoGeneratedColumns =
-        sormConfig.getTableMetaDataReader().getAutoGeneratedColumns(metaData, tableName);
+        config.getTableMetaDataReader().getAutoGeneratedColumns(metaData, tableName);
 
-    String prefix = sormConfig.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass);
+    String prefix = config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass);
     return new TableMetaDataImpl(tableName, prefix, columns, primaryKeys, autoGeneratedColumns);
   }
 
@@ -200,10 +207,9 @@ public final class SormContextImpl implements SormContext {
     SqlResultToColumnsMapping<T> ret = (SqlResultToColumnsMapping<T>) sqlResultToColumnsMappings
         .computeIfAbsent(objectClass, _k -> {
           SqlResultToColumnsMapping<T> m = createColumnsMapping(objectClass);
-          sormConfig.getLoggerContext()
+          config.getLoggerContext()
               .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
-              .ifPresent(lp -> lp.logMapping(m.getFormattedString()));
-
+              .ifPresent(lp -> lp.logMapping(m.toString()));
           return m;
         });
     return ret;
@@ -213,7 +219,7 @@ public final class SormContextImpl implements SormContext {
     return classNameToValidTableNameMap.computeIfAbsent(objectClass, k -> {
       try {
         return new TableName(
-            sormConfig.getTableNameMapper().getTableName(objectClass, connection.getMetaData()));
+            config.getTableNameMapper().getTableName(objectClass, connection.getMetaData()));
       } catch (SQLException e) {
         throw Try.rethrow(e);
       }
@@ -228,7 +234,7 @@ public final class SormContextImpl implements SormContext {
     return tableNameToValidTableNameMap.computeIfAbsent(tableName, k -> {
       try {
         return new TableName(
-            sormConfig.getTableNameMapper().getTableName(tableName, connection.getMetaData()));
+            config.getTableNameMapper().getTableName(tableName, connection.getMetaData()));
       } catch (SQLException e) {
         throw Try.rethrow(e);
       }
@@ -236,37 +242,69 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  @Override
   public LoggerContext getLoggerContext() {
-    return sormConfig.getLoggerContext();
+    return config.getLoggerContext();
   }
 
 
   ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
-    return sormConfig.getColumnValueToJavaObjectConverter();
+    return config.getColumnValueToJavaObjectConverter();
   }
 
   ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
-    return sormConfig.getColumnValueToMapEntryConverter();
+    return config.getColumnValueToMapEntryConverter();
   }
 
 
   SqlParametersSetter getSqlParametersSetter() {
-    return sormConfig.getSqlParametersSetter();
+    return config.getSqlParametersSetter();
   }
 
   PreparedStatementSupplier getPreparedStatementSupplier() {
-    return sormConfig.getPreparedStatementSupplier();
+    return config.getPreparedStatementSupplier();
   }
 
 
+
+  /**
+   * Returns string of this context. This is for debugging.
+   */
   @Override
   public String toString() {
-    return "SormContext [tableMappings=" + sqlParametersToTableMappings + ", columnsMappings="
-        + sqlResultToColumnsMappings + ", classNameToValidTableNameMap="
-        + classNameToValidTableNameMap + ", tableNameToValidTableNameMap="
-        + tableNameToValidTableNameMap + ", sormConfig=" + sormConfig + "]";
+    return "SormContext {" + lineSeparator() + "[Table metadata]" + lineSeparator()
+        + convertMapToString(tableMetaDataMap) + lineSeparator() + "[SqlParameterToTableMappings]"
+        + lineSeparator() + convertMapToString(sqlParametersToTableMappings) + lineSeparator()
+        + "[SqlResultToColumnsMapping]" + lineSeparator()
+        + convertClassMapToString(sqlResultToColumnsMappings) + lineSeparator()
+        + "[classNameToValidTableNameMap]" + lineSeparator()
+        + convertClassMapToString(classNameToValidTableNameMap) + lineSeparator()
+        + "[tableNameToValidTableNameMap]" + lineSeparator()
+        + convertMapToString(tableNameToValidTableNameMap) + lineSeparator() + "[SormConfig]"
+        + lineSeparator() + config + lineSeparator() + "}";
   }
 
+  private String convertClassMapToString(Map<Class<?>, ? extends Object> map) {
+    return convertMapToString(map.entrySet().stream()
+        .collect(Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue())));
+  }
+
+  private String convertMapToString(Map<String, ? extends Object> map) {
+    List<String> keySet = map.keySet().stream().sorted().collect(Collectors.toList());
+    return String.join(lineSeparator(),
+        keySet.stream().map(e -> e + " => " + map.get(e).toString()).collect(Collectors.toList()));
+  }
+
+  public SormContext.Builder builder() {
+    return SormContext.builder()
+        .setColumnToFieldAccessorMapper(config.getColumnToFieldAccessorMapper())
+        .setColumnValueToJavaObjectConverter(config.getColumnValueToJavaObjectConverter())
+        .setColumnValueToMapEntryConverter(config.getColumnValueToMapEntryConverter())
+        .setLoggerContext(config.getLoggerContext())
+        .setMultiRowProcessorFactory(config.getMultiRowProcessorFactory())
+        .setPreparedStatementSupplier(config.getPreparedStatementSupplier())
+        .setSqlParametersSetter(config.getSqlParametersSetter())
+        .setTableNameMapper(config.getTableNameMapper())
+        .setTableSqlFactory(config.getTableSqlFactory());
+  }
 
 }

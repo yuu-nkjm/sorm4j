@@ -124,7 +124,7 @@ public interface Sorm extends Orm {
    * @param streamHandler
    */
   @Experimental
-  <T> void acceptHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
+  <T> void acceptHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
       ConsumerHandler<Stream<T>> streamHandler);
 
   /**
@@ -163,7 +163,7 @@ public interface Sorm extends Orm {
    * @return
    */
   @Experimental
-  <T, R> R applyHandler(FunctionHandler<OrmStream, Stream<T>> streamGenerator,
+  <T, R> R applyHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
       FunctionHandler<Stream<T>, R> streamHandler);
 
   /**
