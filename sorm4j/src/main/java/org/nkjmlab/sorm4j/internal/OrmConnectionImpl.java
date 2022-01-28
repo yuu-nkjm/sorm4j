@@ -335,10 +335,12 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getTableMapping(connection, objectClass);
   }
 
+  @Override
   public TableSql getTableSql(Class<?> objectClass) {
     return getTableMapping(objectClass).getSql();
   }
 
+  @Override
   public TableSql getTableSql(String tableName) {
     return sormContext.getTableSql(getTableMetaData(tableName));
   }
@@ -352,7 +354,6 @@ public class OrmConnectionImpl implements OrmConnection {
   public TableMetaData getTableMetaData(String tableName) {
     return sormContext.getTableMetaData(connection, tableName);
   }
-
 
   @Override
   public String getTableName(Class<?> objectClass) {

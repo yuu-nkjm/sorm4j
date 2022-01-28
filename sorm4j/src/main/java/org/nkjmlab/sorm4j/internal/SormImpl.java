@@ -16,6 +16,7 @@ import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
@@ -443,6 +444,16 @@ public final class SormImpl implements Sorm {
   @Override
   public TableMetaData getTableMetaData(String tableName) {
     return applyAndClose(conn -> conn.getTableMetaData(tableName));
+  }
+
+  @Override
+  public TableSql getTableSql(Class<?> objectClass) {
+    return applyAndClose(conn -> conn.getTableSql(objectClass));
+  }
+
+  @Override
+  public TableSql getTableSql(String tableName) {
+    return applyAndClose(conn -> conn.getTableSql(tableName));
   }
 
   @Override

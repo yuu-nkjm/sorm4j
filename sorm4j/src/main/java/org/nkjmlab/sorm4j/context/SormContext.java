@@ -13,6 +13,21 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  */
 public interface SormContext {
 
+  /**
+   * Returns new {@link Builder} which has set values from the given {@link SormContext}
+   *
+   * @return
+   */
+  public static Builder builder(SormContext context) {
+    SormContextImpl ctx = (SormContextImpl) context;
+    return ctx.builder();
+  }
+
+  /**
+   * Returns new {@link Builder}
+   *
+   * @return
+   */
   public static Builder builder() {
     return new Builder();
   }
@@ -56,7 +71,7 @@ public interface SormContext {
         DEFAULT_COLUMN_TO_FIELD_ACCESSOR_MAPPAER;
     private LoggerContext loggerContext = DEFAULT_LOGGER_CONTEXT;
 
-    private PreparedStatementSupplier preparedStatementSupplier = DEFAULT_STATEMENT_SUPPLIER;
+    private PreparedStatementSupplier statementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
 
 
@@ -65,11 +80,11 @@ public interface SormContext {
     public SormContext build() {
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
           columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
-          preparedStatementSupplier, tableSqlFactory, multiRowProcessorFactory);
+          statementSupplier, tableSqlFactory, multiRowProcessorFactory);
     }
 
 
-    public Builder setColumnFieldMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
+    public Builder setColumnToFieldAccessorMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
       this.columnFieldMapper = fieldNameMapper;
       return this;
     }
@@ -99,7 +114,7 @@ public interface SormContext {
 
     public Builder setPreparedStatementSupplier(
         PreparedStatementSupplier preparedStatementSupplier) {
-      this.preparedStatementSupplier = preparedStatementSupplier;
+      this.statementSupplier = preparedStatementSupplier;
       return this;
     }
 
