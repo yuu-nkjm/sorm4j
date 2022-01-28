@@ -13,7 +13,7 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlImpl;
  *
  * <pre>
  * <code>
- * ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
+ * ('a' &lt;= c &amp;&amp; c &lt;= 'z') || ('A' &lt;= c &amp;&amp; c &lt;= 'Z') || ('0' &lt;= c &amp;&amp; c &lt;= '9') || c == '_';
  * </code>
  * </pre>
  *

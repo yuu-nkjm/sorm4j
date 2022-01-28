@@ -1,15 +1,13 @@
 package org.nkjmlab.sorm4j.result;
 
-import java.sql.Connection;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
 
 /**
- * Except for {@link #getColumnAliases()} and {@link #getColumnAliasPrefix()}, this object is
- * created from metadata. {@link Connection#getMetaData}
+ * An instance of this class contains table metadata.
  *
- * @author nkjm
+ * @author yuu_nkjm
  *
  */
 public interface TableMetaData {
