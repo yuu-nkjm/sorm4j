@@ -70,6 +70,7 @@ public final class SqlResultToColumnsMapping<T> {
     }
     return Try.getOrElseThrow(
         () -> objectClass.getConstructor(Arrays.stream(objectClass.getDeclaredFields())
+            .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
             .map(f -> f.getType()).toArray(Class[]::new)),
         e -> new SormException(newString(
             "The given container class [{}] annotated by @{} should have the canonical constructor.",
@@ -102,8 +103,8 @@ public final class SqlResultToColumnsMapping<T> {
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
     return Try.getOrElseThrow(() -> objectClass.getConstructor(), e -> new SormException(newString(
-        "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by [{}].",
-        objectClass, OrmConstructor.class.getName()), e));
+        "The given container class [{}] should have the public default constructor (with no arguments) or the constructor annotated by @{}. Or the container class should be annotated by@{}.",
+        objectClass, OrmConstructor.class.getSimpleName(), OrmRecord.class.getSimpleName()), e));
   }
 
 
