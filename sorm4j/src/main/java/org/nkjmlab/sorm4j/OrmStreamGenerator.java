@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-public interface OrmStream {
+public interface OrmStreamGenerator {
 
   /**
    * Returns {@link Stream} represents all rows from the table indicated by object class.

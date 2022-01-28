@@ -30,7 +30,7 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -593,7 +593,7 @@ public class OrmConnectionImpl implements OrmConnection {
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
-      ResultSetStreamImpl<T> ret = new ResultSetStreamImpl<T>(this, objectClass, stmt, resultSet);
+      ResultSetStream<T> ret = new ResultSetStream<T>(this, objectClass, stmt, resultSet);
       this.resultSetStream = ret;
       return ret.stream();
     } catch (SQLException e) {
