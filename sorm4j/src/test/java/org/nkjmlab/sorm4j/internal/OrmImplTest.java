@@ -322,10 +322,23 @@ class OrmImplTest {
   @Test
   void testOpenMapStream() {
     sorm.acceptHandler(conn -> {
+      conn.insert(PLAYER_ALICE);
       ResultSetStream<RowMap> stream =
           conn.stream(RowMap.class, ParameterizedSql.of("select * from players"));
       int ret = stream.apply(strm -> strm.collect(Collectors.toList()).size());
-      assertThat(ret).isEqualTo(0);
+      assertThat(ret).isEqualTo(1);
+
+      ResultSetStream<Player> strm1 = conn.streamAll(Player.class);
+      int ret1 = strm1.apply(strm -> strm.collect(Collectors.toList()).size());
+      assertThat(ret1).isEqualTo(1);
+
+      assertThat(conn.getTableSql(PLAYERS1).toString()).contains("PLAYERS1");
+
+      assertThat(conn.mapTo(Player.class).count()).isEqualTo(1);
+      conn.mapTo(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
+
+      assertThat(conn.mapTo(Player.class, PLAYERS1).count()).isEqualTo(3);
+
     });
 
 

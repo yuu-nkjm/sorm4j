@@ -18,7 +18,7 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableSql;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
@@ -516,7 +516,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public <T> ResultSetStream<T> streamAll(Class<T> type) {
-    return new ResultSetStreamImpl<T>(() -> open(), type, getTableSql(type).getSelectAllSql());
+    return stream(type, getTableSql(type).getSelectAllSql());
   }
 
   @Override
@@ -526,7 +526,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters) {
-    return new ResultSetStreamImpl<T>(() -> open(), type, sql, parameters);
+    return new ResultSetStreamSorm<T>(this, type, sql, parameters);
   }
 
 

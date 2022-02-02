@@ -245,6 +245,7 @@ public final class SormContextImpl implements SormContext {
   }
 
 
+  @Override
   public LoggerContext getLoggerContext() {
     return config.getLoggerContext();
   }
@@ -259,11 +260,13 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  SqlParametersSetter getSqlParametersSetter() {
+  @Override
+  public SqlParametersSetter getSqlParametersSetter() {
     return config.getSqlParametersSetter();
   }
 
-  PreparedStatementSupplier getPreparedStatementSupplier() {
+  @Override
+  public PreparedStatementSupplier getPreparedStatementSupplier() {
     return config.getPreparedStatementSupplier();
   }
 
