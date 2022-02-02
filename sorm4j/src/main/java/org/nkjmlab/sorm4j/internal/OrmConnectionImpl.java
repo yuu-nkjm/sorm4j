@@ -33,7 +33,7 @@ import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl.ResultSetStreamHelper;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl.ResultSetStreamWrapper;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -589,7 +589,7 @@ public class OrmConnectionImpl implements OrmConnection {
     return new ResultSetStreamImpl<T>(() -> this, objectClass, sql, parameters);
   }
 
-  public <T> ResultSetStreamHelper<T> createStream(Class<T> objectClass, String sql,
+  public <T> ResultSetStreamWrapper<T> createStream(Class<T> objectClass, String sql,
       Object... parameters) {
     try {
       final PreparedStatement stmt =
@@ -600,8 +600,8 @@ public class OrmConnectionImpl implements OrmConnection {
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
-      ResultSetStreamHelper<T> ret =
-          new ResultSetStreamHelper<>(this, objectClass, stmt, resultSet);
+      ResultSetStreamWrapper<T> ret =
+          new ResultSetStreamWrapper<>(this, objectClass, stmt, resultSet);
       return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);

@@ -38,8 +38,9 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
 
   @Override
   public void accept(ConsumerHandler<Stream<T>> handler) {
-    try (Stream<T> strm = ormConnection.get().createStream(objectClass, sql, parameters).stream()) {
-      handler.accept(strm);
+    try (OrmConnectionImpl conn = ormConnection.get();
+        ResultSetStreamWrapper<T> wrapper = conn.createStream(objectClass, sql, parameters)) {
+      handler.accept(wrapper.stream());
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
@@ -47,15 +48,16 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
 
   @Override
   public <R> R apply(FunctionHandler<Stream<T>, R> handler) {
-    try (Stream<T> strm = ormConnection.get().createStream(objectClass, sql, parameters).stream()) {
-      return handler.apply(strm);
+    try (OrmConnectionImpl conn = ormConnection.get();
+        ResultSetStreamWrapper<T> wrapper = conn.createStream(objectClass, sql, parameters)) {
+      return handler.apply(wrapper.stream());
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
   }
 
 
-  public static class ResultSetStreamHelper<T> implements AutoCloseable {
+  public static class ResultSetStreamWrapper<T> implements AutoCloseable {
 
     private final Class<T> objectClass;
     private final OrmConnectionImpl ormConnection;
@@ -63,20 +65,12 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
     private final ResultSet resultSet;
     private final PreparedStatement stmt;
 
-    public ResultSetStreamHelper(OrmConnectionImpl ormConnection, Class<T> objectClass,
+    public ResultSetStreamWrapper(OrmConnectionImpl ormConnection, Class<T> objectClass,
         PreparedStatement stmt, ResultSet resultSet) {
       this.ormConnection = ormConnection;
       this.objectClass = objectClass;
       this.stmt = stmt;
       this.resultSet = resultSet;
-    }
-
-    /**
-     * Iterates all the rows of the result set. The Iterator must be closed to release database
-     * resources. The iterator is closed automatically if hasNext is false.
-     */
-    private Iterator<T> iterator() {
-      return new ResultSetIterator<>();
     }
 
     /**
@@ -86,9 +80,9 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
      * This method is expected that it is used with try-with-resources block.
      */
     public Stream<T> stream() {
-      return StreamSupport
-          .stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false)
-          .onClose(() -> close());
+      return StreamSupport.stream(
+          Spliterators.spliteratorUnknownSize(new ResultSetIterator<T>(), Spliterator.ORDERED),
+          false);
     }
 
     /**
@@ -98,15 +92,11 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
     @Override
     public void close() {
       try {
-        if (resultSet != null) {
-          resultSet.close();
-        }
+        resultSet.close();
       } catch (SQLException e) {
       } finally {
         try {
-          if (stmt != null) {
-            stmt.close();
-          }
+          stmt.close();
         } catch (SQLException e) {
         }
       }
@@ -117,24 +107,21 @@ public final class ResultSetStreamImpl<T> implements ResultSetStream<T> {
       @Override
       public boolean hasNext() {
         try {
-          boolean hasNext = resultSet.next();
-          if (!hasNext) {
-            close();
-          }
-          return hasNext;
+          return resultSet.next();
         } catch (SQLException e) {
-          close();
           throw Try.rethrow(e);
         }
       }
 
+      /**
+       * This iterator is closed if hasNext is false.
+       */
       @SuppressWarnings("unchecked")
       @Override
       public S next() {
         try {
           return (S) ormConnection.mapRowToObject(objectClass, resultSet);
         } catch (SQLException e) {
-          close();
           throw Try.rethrow(e);
         }
       }
