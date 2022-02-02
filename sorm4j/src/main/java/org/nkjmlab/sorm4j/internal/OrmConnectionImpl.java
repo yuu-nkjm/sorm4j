@@ -32,13 +32,15 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStream;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl.ResultSetStreamHelper;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
@@ -62,8 +64,6 @@ public class OrmConnectionImpl implements OrmConnection {
 
   private final Connection connection;
 
-  private ResultSetStream<?> resultSetStream;
-
   /**
    * Creates a instance that will use the default cache for table-object and column-object
    * sormConfig.
@@ -78,14 +78,6 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void close() {
-    try {
-      if (resultSetStream != null) {
-        resultSetStream.close();
-      }
-    } catch (Exception e) {
-      sormContext.getLoggerContext().getLogger(OrmConnectionImpl.class)
-          .warn("resultset stream close error");
-    }
     try {
       getJdbcConnection().close();
     } catch (SQLException e) {
@@ -588,12 +580,17 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> Stream<T> stream(Class<T> objectClass, ParameterizedSql sql) {
+  public <T> ResultSetStream<T> stream(Class<T> objectClass, ParameterizedSql sql) {
     return stream(objectClass, sql.getSql(), sql.getParameters());
   }
 
   @Override
-  public <T> Stream<T> stream(Class<T> objectClass, String sql, Object... parameters) {
+  public <T> ResultSetStream<T> stream(Class<T> objectClass, String sql, Object... parameters) {
+    return new ResultSetStreamImpl<T>(() -> this, objectClass, sql, parameters);
+  }
+
+  public <T> ResultSetStreamHelper<T> createStream(Class<T> objectClass, String sql,
+      Object... parameters) {
     try {
       final PreparedStatement stmt =
           getPreparedStatementSupplier().prepareStatement(connection, sql);
@@ -603,16 +600,16 @@ public class OrmConnectionImpl implements OrmConnection {
           OrmConnectionImpl.class, connection, sql, parameters);
 
       final ResultSet resultSet = stmt.executeQuery();
-      ResultSetStream<T> ret = new ResultSetStream<T>(this, objectClass, stmt, resultSet);
-      this.resultSetStream = ret;
-      return ret.stream();
+      ResultSetStreamHelper<T> ret =
+          new ResultSetStreamHelper<>(this, objectClass, stmt, resultSet);
+      return ret;
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
 
   @Override
-  public <T> Stream<T> streamAll(Class<T> type) {
+  public <T> ResultSetStream<T> streamAll(Class<T> type) {
     return stream(type, getTableMapping(type).getSql().getSelectAllSql());
   }
 

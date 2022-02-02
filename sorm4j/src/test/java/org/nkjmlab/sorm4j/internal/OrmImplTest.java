@@ -5,12 +5,12 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Player;
@@ -188,70 +188,84 @@ class OrmImplTest {
 
   @Test
   void testInsertAndGetOnStringListOfT() {
-    InsertResult<Player> ret = sorm.insertAndGetIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
     assertThat(ret.getObject().id).isEqualTo(2);
   }
 
   @Test
   void testInsertAndGetOnStringT() {
-    InsertResult<Player> ret = sorm.insertAndGetIn("players", PLAYER_ALICE);
+    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, PLAYER_ALICE);
     assertThat(ret.getObject().id).isEqualTo(1);
   }
 
   @Test
   void testInsertAndGetOnStringTArray() {
-    sorm.insertAndGetIn("players", PLAYER_ALICE, PLAYER_BOB);
+    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    assertThat(ret.getObject().id).isEqualTo(2);
   }
 
   @Test
   void testInsertOnStringListOfT() {
-    sorm.insertIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.insertIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
+    assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
   }
 
   @Test
   void testInsertOnStringT() {
-    sorm.insertIn("players", PLAYER_ALICE);
+    sorm.insertIn(PLAYERS1, PLAYER_ALICE);
+    assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(1);
   }
 
   @Test
   void testInsertOnStringTArray() {
-    sorm.insertIn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
   }
 
   @Test
   void testmergeListOfT() {
     sorm.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
-    sorm.merge(List.of(PLAYER_ALICE, PLAYER_BOB));
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(2);
+    sorm.merge(List.of(PLAYER_ALICE, PLAYER_CAROL));
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(3);
   }
 
   @Test
   void testmergeT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.merge(PLAYER_ALICE);
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(1);
+    sorm.merge(PLAYER_ALICE, PLAYER_BOB);
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(2);
   }
 
   @Test
   void testmergeTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.merge(PLAYER_ALICE, PLAYER_BOB);
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(2);
+    sorm.merge(PLAYER_ALICE, PLAYER_CAROL);
+    assertThat(sorm.getTable(Player.class).count()).isEqualTo(3);
   }
 
   @Test
   void testmergeInStringListOfT() {
-    sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.mergeIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
+    sorm.mergeIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_CAROL));
+    assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(3);
   }
 
   @Test
   void testmergeInStringT() {
+    assertThat(sorm.getTable(Player.class));
+
     sorm.insert(PLAYER_ALICE);
-    sorm.mergeIn("players", PLAYER_ALICE);
+    sorm.mergeIn(PLAYERS1, PLAYER_ALICE);
   }
 
   @Test
   void testmergeInStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.mergeIn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.mergeIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -275,19 +289,19 @@ class OrmImplTest {
   @Test
   void testUpdateOnStringListOfT() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateIn("players", List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.updateIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testUpdateOnStringT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.updateIn("players", PLAYER_ALICE);
+    sorm.updateIn(PLAYERS1, PLAYER_ALICE);
   }
 
   @Test
   void testUpdateOnStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateIn("players", PLAYER_ALICE, PLAYER_BOB);
+    sorm.updateIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -302,33 +316,31 @@ class OrmImplTest {
 
   @Test
   void testGetTableMetaDataClassOfQString() {
-    sorm.getTableMetaData("players");
+    sorm.getTableMetaData(PLAYERS1);
   }
 
   @Test
   void testOpenMapStream() {
     sorm.acceptHandler(conn -> {
-      try (Stream<RowMap> stream = conn.stream(RowMap.class, "select * from players")) {
-        assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
-      }
+      ResultSetStream<RowMap> stream =
+          conn.stream(RowMap.class, ParameterizedSql.of("select * from players"));
+      int ret = stream.apply(strm -> strm.collect(Collectors.toList()).size());
+      assertThat(ret).isEqualTo(0);
     });
-    sorm.acceptHandler(conn -> {
-      try (Stream<RowMap> stream =
-          conn.stream(RowMap.class, ParameterizedSql.of("select * from players"))) {
-        assertThat(stream.collect(Collectors.toList()).size()).isEqualTo(0);
-      }
-    });
+
+
+
   }
 
   @SuppressWarnings("unchecked")
   @Test
   void testInsertMapIn() {
     Map<String, Object> map = Map.of("id", 99, "name", "Test", "address", "Chiba");
-    sorm.insertMapIn("players", map);
-    sorm.deleteAllIn("players");
-    sorm.insertMapIn("players", List.of(map));
-    sorm.deleteAllIn("players");
-    sorm.insertMapIn("players", new Map[] {map});
+    sorm.insertMapIn(PLAYERS1, map);
+    sorm.deleteAllIn(PLAYERS1);
+    sorm.insertMapIn(PLAYERS1, List.of(map));
+    sorm.deleteAllIn(PLAYERS1);
+    sorm.insertMapIn(PLAYERS1, new Map[] {map});
   }
 
   @Test

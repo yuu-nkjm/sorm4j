@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.internal.SormImpl;
  * @author yuu_nkjm
  *
  */
-public interface OrmConnection extends Orm, OrmStreamGenerator, AutoCloseable {
+public interface OrmConnection extends Orm, AutoCloseable {
 
   /**
    * Create a {@link OrmConnection} wrapping the given JDBC Connection.

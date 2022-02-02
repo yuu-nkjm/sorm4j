@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.example.first;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 
@@ -30,11 +29,9 @@ public class WithTryWithResourcesExample {
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
-        List<String> messages = stream.map(c -> c.getName() + " lives in " + c.getAddress())
-            .collect(Collectors.toList());
-        System.out.println("messages = " + messages);
-      }
+      List<String> messages = conn.streamAll(Customer.class).apply(stream -> stream
+          .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
+      System.out.println("messages = " + messages);
 
       // Execute select sql and convert result to a pojo object.
       Customer lastCustomer =

@@ -1,15 +1,20 @@
 package org.nkjmlab.sorm4j;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
+import org.nkjmlab.sorm4j.util.table.Table;
 import org.nkjmlab.sorm4j.util.table.TableWithSchema;
 
 @Experimental
@@ -253,14 +258,58 @@ public interface TableMappedOrm<T> {
   }
 
   /**
-   * Counts rows satisfied condition.
+   * Returns {@link Stream} represents all rows from the table indicated by object class.
    *
-   * @param whereCondition
+   * <strong>Note: </strong>
+   *
+   * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
+   * {@link AutoCloseable} and it is expected that it is used with
+   * {@link Table#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)}
+   * for closing the database resources.
+   *
    * @return
    */
-  default int count(String whereCondition) {
-    return getOrm().readOne(int.class,
-        "select count(*) from " + getTableName() + " where " + whereCondition);
+
+  default ResultSetStream<T> streamAll() {
+    return getOrm().streamAll(getValueType());
+  }
+
+  /**
+   * Returns an {@link Stream}. It is able to convert to Stream, List, and so on.
+   *
+   * <strong>Note: </strong>
+   *
+   * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
+   * {@link AutoCloseable} and it is expected that it is used with
+   * {@link Table#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)}
+   * for closing the database resources.
+   *
+   * @param sql
+   * @return
+   */
+  default ResultSetStream<T> stream(ParameterizedSql sql) {
+    return stream(sql.getSql(), sql.getParameters());
+  }
+
+  /**
+   * Returns an {@link Stream}. It is able to convert to Stream, List, and so on.
+   * <p>
+   * Parameters will be set according with the correspondence defined in
+   * {@link SqlParametersSetter#setParameters(PreparedStatement,Object[])}
+   *
+   * <strong>Note: </strong>
+   *
+   * This method keeps ResultSet and PreparedStatement to open. {@link Stream} implements
+   * {@link AutoCloseable} and it is expected that it is used with
+   * {@link Table#acceptHandler(org.nkjmlab.sorm4j.common.FunctionHandler, org.nkjmlab.sorm4j.common.ConsumerHandler)}
+   * for closing the database resources.
+   *
+   * @param sql
+   * @param parameters
+   * @return
+   */
+  default ResultSetStream<T> stream(String sql, Object... parameters) {
+    return getOrm().stream(getValueType(), sql, parameters);
   }
 
 }

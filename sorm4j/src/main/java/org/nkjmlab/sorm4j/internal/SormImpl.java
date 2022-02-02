@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.OrmStreamGenerator;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -20,11 +18,13 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.internal.result.ResultSetStreamImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.table.BasicTable;
 import org.nkjmlab.sorm4j.util.table.Table;
@@ -98,7 +98,7 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public OrmConnection open() {
+  public OrmConnectionImpl open() {
     return new OrmConnectionImpl(getJdbcConnection(), sormContext);
   }
 
@@ -501,27 +501,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.getJdbcDatabaseMetaData());
   }
 
-
-  @Override
-  public <T> void acceptHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      ConsumerHandler<Stream<T>> streamHandler) {
-    try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
-      streamHandler.accept(stream);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  @Override
-  public <T, R> R applyHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      FunctionHandler<Stream<T>, R> streamHandler) {
-    try (OrmConnection conn = open(); Stream<T> stream = streamGenerator.apply(conn)) {
-      return streamHandler.apply(stream);
-    } catch (Exception e) {
-      throw Try.rethrow(e);
-    }
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public <T> Table<T> getTable(Class<T> type) {
@@ -534,5 +513,21 @@ public final class SormImpl implements Sorm {
     return (Table<T>) tables.computeIfAbsent(type.getName() + "-" + tableName,
         key -> new BasicTable<>(this, type, tableName));
   }
+
+  @Override
+  public <T> ResultSetStream<T> streamAll(Class<T> type) {
+    return new ResultSetStreamImpl<T>(() -> open(), type, getTableSql(type).getSelectAllSql());
+  }
+
+  @Override
+  public <T> ResultSetStream<T> stream(Class<T> type, ParameterizedSql sql) {
+    return stream(type, sql.getSql(), sql.getParameters());
+  }
+
+  @Override
+  public <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters) {
+    return new ResultSetStreamImpl<T>(() -> open(), type, sql, parameters);
+  }
+
 
 }

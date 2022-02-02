@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.example.first;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.util.table.Table;
 
@@ -26,32 +25,9 @@ public class FirstExample {
     List<Customer> allCustomers = sorm.selectAll(Customer.class);
     System.out.println("all customers = " + allCustomers);
 
-    // Execute select sql and convert result to stream. The stream must be closed.
-    sorm.acceptHandler(conn -> {
-      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
-        List<String> msgs = stream.map(c -> c.getName() + " lives in " + c.getAddress())
-            .collect(Collectors.toList());
-        System.out.println("messages = " + msgs);
-      }
-    });
-
-    sorm.acceptHandler(conn -> {
-      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
-        List<String> msgs = stream.map(c -> c.getName() + " lives in " + c.getAddress())
-            .collect(Collectors.toList());
-        System.out.println("messages = " + msgs);
-      }
-    });
-
-    sorm.acceptHandler(conn -> conn.streamAll(Customer.class), stream -> {
-      List<String> msgs =
-          stream.map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList());
-      System.out.println("messages = " + msgs);
-    });
-
-    List<String> tmp =
-        sorm.applyHandler(conn -> conn.streamAll(Customer.class), stream -> stream
-            .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
+    // Execute select sql and convert result to stream.
+    List<String> tmp = sorm.streamAll(Customer.class).apply(stream -> stream
+        .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
     System.out.println(tmp);
 
     // Execute select sql and convert result to a pojo object.
@@ -70,8 +46,7 @@ public class FirstExample {
 
 
     Table<Customer> customerTable = Table.create(sorm, Customer.class);
-    customerTable.applyHandler(conn -> conn.streamAll(),
-        stream -> stream.collect(Collectors.toList()));
+    customerTable.streamAll().apply(stream -> stream.collect(Collectors.toList()));
 
   }
 

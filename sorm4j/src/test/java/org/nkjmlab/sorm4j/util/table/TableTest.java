@@ -59,8 +59,7 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
-        .contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
   }
 
   @Test
@@ -69,18 +68,12 @@ class TableTest {
     playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
         .contains("INDEX_IN_GUESTS_ON_NAME");
-
-    playersTable.acceptHandler(conn -> conn.streamAll(),
-        stream -> stream.collect(Collectors.toList()));
-    playersTable.applyHandler(conn -> conn.stream(ParameterizedSql.of("select * from guests")),
-        stream -> stream.collect(Collectors.toList()));
   }
 
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
-        .contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
   }
 
   @Test
@@ -232,7 +225,6 @@ class TableTest {
   }
 
 
-
   @Test
   void testJoin() {
     playersTable.insert(PLAYER_ALICE);
@@ -247,5 +239,18 @@ class TableTest {
     sportsTable.insert(TENNIS);
     assertThat(playersTable.leftJoin(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
+  }
+
+  @Test
+  void testStream() {
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.streamAll().accept(stream -> stream.collect(Collectors.toList()));
+
+    int ret = playersTable.streamAll().apply(stream -> stream.collect(Collectors.toList())).size();
+    assertThat(ret).isEqualTo(1);
+    List<Player> ret1 = playersTable.stream(ParameterizedSql.of("select * from players"))
+        .apply(stream -> stream.collect(Collectors.toList()));
+    assertThat(ret1.size()).isEqualTo(1);
+
   }
 }

@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -118,15 +117,6 @@ public interface Sorm extends Orm {
    */
   void acceptHandler(int isolationLevel, ConsumerHandler<OrmTransaction> transactionHandler);
 
-  /**
-   *
-   * @param <T>
-   * @param streamGenerator
-   * @param streamHandler
-   */
-  @Experimental
-  <T> void acceptHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      ConsumerHandler<Stream<T>> streamHandler);
 
   /**
    * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
@@ -154,18 +144,6 @@ public interface Sorm extends Orm {
    * @return
    */
   <R> R applyHandler(int isolationLevel, FunctionHandler<OrmTransaction, R> transactionHandler);
-
-  /**
-   *
-   * @param <T>
-   * @param <R>
-   * @param streamGenerator
-   * @param streamHandler
-   * @return
-   */
-  @Experimental
-  <T, R> R applyHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      FunctionHandler<Stream<T>, R> streamHandler);
 
   /**
    * Gets {@link DataSource}.

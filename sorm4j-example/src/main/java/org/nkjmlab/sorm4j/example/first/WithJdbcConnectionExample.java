@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
 
 public class WithJdbcConnectionExample {
@@ -36,11 +35,9 @@ public class WithJdbcConnectionExample {
       System.out.println("all customers = " + allCustomers);
 
       // Execute select sql and convert result to stream.
-      try (Stream<Customer> stream = conn.streamAll(Customer.class)) {
-        List<String> messages = stream.map(c -> c.getName() + " lives in " + c.getAddress())
-            .collect(Collectors.toList());
-        System.out.println("messages = " + messages);
-      }
+      List<String> messages = conn.streamAll(Customer.class).apply(stream -> stream
+          .map(c -> c.getName() + " lives in " + c.getAddress()).collect(Collectors.toList()));
+      System.out.println("messages = " + messages);
 
       // Execute select sql and convert result to a pojo object.
       Customer lastCustomer =
@@ -57,7 +54,9 @@ public class WithJdbcConnectionExample {
           conn.readList(Customer.class, "SELECT * FROM customer WHERE address=?", "Kyoto");
       System.out.println("customers living in Kyoto = " + customersLivingInKyoto);
 
-    } catch (SQLException e) {
+    } catch (
+
+    SQLException e) {
       e.printStackTrace();
     }
   }
