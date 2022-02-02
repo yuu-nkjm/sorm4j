@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.TableMappedOrmConnection;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -971,6 +972,16 @@ public class OrmConnectionImpl implements OrmConnection {
     public List<Integer> getColumnTypes() {
       return columnTypes;
     }
+  }
+
+  @Override
+  public <T> TableMappedOrmConnection<T> mapTo(Class<T> type) {
+    return new TableMappedOrmConnectionImpl<>(this, type);
+  }
+
+  @Override
+  public <T> TableMappedOrmConnection<T> mapTo(Class<T> type, String tableName) {
+    return new TableMappedOrmConnectionImpl<>(this, type, tableName);
   }
 
 }

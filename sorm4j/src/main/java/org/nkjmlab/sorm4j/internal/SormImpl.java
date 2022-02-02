@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.OrmConnection;
@@ -24,6 +26,8 @@ import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.table.BasicTable;
+import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An entry point of object-relation mapping.
@@ -38,6 +42,8 @@ public final class SormImpl implements Sorm {
 
   private final DataSource dataSource;
   private final SormContextImpl sormContext;
+  private final ConcurrentMap<String, Table<?>> tables;
+
 
   public static Sorm create(DataSource dataSource, SormContext context) {
     return new SormImpl(dataSource, (SormContextImpl) context);
@@ -46,6 +52,7 @@ public final class SormImpl implements Sorm {
   public SormImpl(DataSource connectionSource, SormContextImpl context) {
     this.sormContext = context;
     this.dataSource = connectionSource;
+    this.tables = new ConcurrentHashMap<>();
   }
 
   @Override
@@ -513,6 +520,19 @@ public final class SormImpl implements Sorm {
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Table<T> getTable(Class<T> type) {
+    return (Table<T>) tables.computeIfAbsent(type.getName(), key -> new BasicTable<>(this, type));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> Table<T> getTable(Class<T> type, String tableName) {
+    return (Table<T>) tables.computeIfAbsent(type.getName() + "-" + tableName,
+        key -> new BasicTable<>(this, type, tableName));
   }
 
 }

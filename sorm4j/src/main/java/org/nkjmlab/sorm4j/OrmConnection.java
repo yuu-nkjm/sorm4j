@@ -73,5 +73,24 @@ public interface OrmConnection extends Orm, OrmStreamGenerator, AutoCloseable {
    */
   void setAutoCommit(boolean autoCommit);
 
+  /**
+   * Gets a {@link TableMappedOrmConnection} instance indicated the given parameter. The table name
+   * is guessed from the given type.
+   *
+   * @param <T>
+   * @param type
+   * @return
+   */
+  <T> TableMappedOrmConnection<T> mapTo(Class<T> type);
+
+  /**
+   * Gets a {@link TableMappedOrmConnection} instance indicated the given parameters.
+   *
+   * @param <T>
+   * @param type
+   * @param tableName
+   * @return
+   */
+  <T> TableMappedOrmConnection<T> mapTo(Class<T> type, String tableName);
 
 }

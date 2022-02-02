@@ -5,9 +5,9 @@ import org.nkjmlab.sorm4j.util.sql.SqlKeyword;
 
 public class BasicTable<T> implements Table<T>, SqlKeyword {
 
-  private final String tableName;
   private final Sorm sorm;
   private final Class<T> valueType;
+  private final String tableName;
 
   public BasicTable(Sorm sorm, Class<T> valueType, String tableName) {
     this.sorm = sorm;
@@ -32,7 +32,7 @@ public class BasicTable<T> implements Table<T>, SqlKeyword {
   }
 
   @Override
-  public Sorm getSorm() {
+  public Sorm getOrm() {
     return sorm;
   }
 

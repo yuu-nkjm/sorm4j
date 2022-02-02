@@ -41,7 +41,6 @@ public final class SormContextImpl implements SormContext {
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
   private final ConcurrentMap<String, SqlParametersToTableMapping<?>> sqlParametersToTableMappings;
   private final ConcurrentMap<Class<?>, SqlResultToColumnsMapping<?>> sqlResultToColumnsMappings;
-
   private final SormConfig config;
 
   private SormContextImpl(SormConfig sormConfig) {
@@ -104,7 +103,7 @@ public final class SormContextImpl implements SormContext {
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, TableName tableName,
       Class<T> objectClass) {
-    String key = objectClass.getName() + "-" + tableName.getName();
+    String key = toKey(objectClass, tableName);
     @SuppressWarnings("unchecked")
     SqlParametersToTableMapping<T> ret =
         (SqlParametersToTableMapping<T>) sqlParametersToTableMappings.computeIfAbsent(key, _k -> {
@@ -122,6 +121,10 @@ public final class SormContextImpl implements SormContext {
     return ret;
   }
 
+
+  private static String toKey(Class<?> objectClass, TableName tableName) {
+    return objectClass.getName() + "-" + tableName.getName();
+  }
 
   <T> SqlResultToColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
 
@@ -306,5 +309,6 @@ public final class SormContextImpl implements SormContext {
         .setTableNameMapper(config.getTableNameMapper())
         .setTableSqlFactory(config.getTableSqlFactory());
   }
+
 
 }
