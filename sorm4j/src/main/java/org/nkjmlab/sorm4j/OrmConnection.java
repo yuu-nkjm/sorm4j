@@ -81,7 +81,7 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * @param type
    * @return
    */
-  <T> TableMappedOrmConnection<T> mapTo(Class<T> type);
+  <T> TableMappedOrmConnection<T> mapToTable(Class<T> type);
 
   /**
    * Gets a {@link TableMappedOrmConnection} instance indicated the given parameters.
@@ -91,6 +91,6 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * @param tableName
    * @return
    */
-  <T> TableMappedOrmConnection<T> mapTo(Class<T> type, String tableName);
+  <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName);
 
 }

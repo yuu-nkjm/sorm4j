@@ -952,12 +952,12 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> TableMappedOrmConnection<T> mapTo(Class<T> type) {
+  public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type) {
     return new TableMappedOrmConnectionImpl<>(this, type);
   }
 
   @Override
-  public <T> TableMappedOrmConnection<T> mapTo(Class<T> type, String tableName) {
+  public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName) {
     return new TableMappedOrmConnectionImpl<>(this, type, tableName);
   }
 

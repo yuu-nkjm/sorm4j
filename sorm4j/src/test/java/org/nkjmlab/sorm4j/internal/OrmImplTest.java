@@ -334,10 +334,10 @@ class OrmImplTest {
 
       assertThat(conn.getTableSql(PLAYERS1).toString()).contains("PLAYERS1");
 
-      assertThat(conn.mapTo(Player.class).count()).isEqualTo(1);
-      conn.mapTo(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
+      assertThat(conn.mapToTable(Player.class).count()).isEqualTo(1);
+      conn.mapToTable(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
 
-      assertThat(conn.mapTo(Player.class, PLAYERS1).count()).isEqualTo(3);
+      assertThat(conn.mapToTable(Player.class, PLAYERS1).count()).isEqualTo(3);
 
     });
 
