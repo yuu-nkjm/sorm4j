@@ -48,7 +48,7 @@ class TableTest {
 
   @Test
   void testGetSorm() {
-    playersTable.getSorm();
+    playersTable.getOrm();
   }
 
   @Test
@@ -59,52 +59,45 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames())
-        .contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
   }
 
   @Test
   void testCreateIndexesIfNotExists() {
     playersTable.createTableIfNotExists().createIndexesIfNotExists();
-    playersTable.insertIn(PLAYER_ALICE);
-    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
+    playersTable.insert(PLAYER_ALICE);
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getJdbcIndexesMetaData().toString())
         .contains("INDEX_IN_GUESTS_ON_NAME");
-
-    playersTable.acceptHandler(conn -> conn.streamAll(),
-        stream -> stream.collect(Collectors.toList()));
-    playersTable.applyHandler(conn -> conn.stream(ParameterizedSql.of("select * from guests")),
-        stream -> stream.collect(Collectors.toList()));
   }
 
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getSorm().getJdbcDatabaseMetaData().getTableNames())
-        .contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
   }
 
   @Test
   void testReadAll() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectAll().size()).isEqualTo(1);
   }
 
   @Test
   void testReadByPrimaryKey() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectByPrimaryKey(PLAYER_ALICE.getId())).isEqualTo(PLAYER_ALICE);
   }
 
   @Test
   void testReadFirstParameterizedSql() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readFirst(SELECT_FROM_PLAYERS_WHERE_ID_PSQL).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadFirstStringObjectArray() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readFirst(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
         .isEqualTo(PLAYER_ALICE.getId());
 
@@ -117,28 +110,28 @@ class TableTest {
 
   @Test
   void testReadListParameterizedSql() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readList(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).get(0).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadListStringObjectArray() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readList(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).get(0).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadOneParameterizedSql() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readOne(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testReadOneStringObjectArray() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.readOne(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
@@ -155,52 +148,52 @@ class TableTest {
 
   @Test
   void testExists() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.exists(PLAYER_ALICE));
   }
 
   @Test
   void testDeleteListOfT() {
-    playersTable.insertIn(List.of(PLAYER_ALICE));
-    playersTable.updateIn(List.of(PLAYER_ALICE));
-    playersTable.mergeIn(List.of(PLAYER_ALICE));
-    playersTable.deleteIn(List.of(PLAYER_ALICE));
+    playersTable.insert(List.of(PLAYER_ALICE));
+    playersTable.update(List.of(PLAYER_ALICE));
+    playersTable.merge(List.of(PLAYER_ALICE));
+    playersTable.delete(List.of(PLAYER_ALICE));
     assertThat(
-        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(0);
-    playersTable.insertAndGetIn(List.of(PLAYER_BOB));
+    playersTable.insertAndGet(List.of(PLAYER_BOB));
   }
 
   @Test
   void testDeleteT() {
-    playersTable.insertIn(PLAYER_ALICE);
-    playersTable.updateIn(PLAYER_ALICE);
-    playersTable.mergeIn(PLAYER_ALICE);
-    playersTable.deleteIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.update(PLAYER_ALICE);
+    playersTable.merge(PLAYER_ALICE);
+    playersTable.delete(PLAYER_ALICE);
     assertThat(
-        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(0);
-    playersTable.insertAndGetIn(PLAYER_BOB);
+    playersTable.insertAndGet(PLAYER_BOB);
   }
 
   @Test
   void testDeleteTArray() {
-    playersTable.insertIn(new Player[] {PLAYER_ALICE});
-    playersTable.updateIn(new Player[] {PLAYER_ALICE});
-    playersTable.mergeIn(new Player[] {PLAYER_ALICE});
-    playersTable.deleteIn(new Player[] {PLAYER_ALICE});
+    playersTable.insert(new Player[] {PLAYER_ALICE});
+    playersTable.update(new Player[] {PLAYER_ALICE});
+    playersTable.merge(new Player[] {PLAYER_ALICE});
+    playersTable.delete(new Player[] {PLAYER_ALICE});
     assertThat(
-        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(0);
-    playersTable.insertAndGetIn(new Player[] {PLAYER_BOB});
+    playersTable.insertAndGet(new Player[] {PLAYER_BOB});
   }
 
   @Test
   void testDeleteAll() {
-    playersTable.insertIn(PLAYER_ALICE);
-    playersTable.deleteAllIn();
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.deleteAll();
     assertThat(
-        playersTable.getSorm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(0);
   }
 
@@ -211,41 +204,53 @@ class TableTest {
 
   @Test
   void testSelectFirstAllEqual() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectFirstAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectOneAllEqual() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectOneAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectListAllEqual() {
-    playersTable.insertIn(PLAYER_ALICE);
+    playersTable.insert(PLAYER_ALICE);
     assertThat(
         playersTable.selectListAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).get(0).getId())
             .isEqualTo(PLAYER_ALICE.getId());
   }
 
 
-
   @Test
   void testJoin() {
-    playersTable.insertIn(PLAYER_ALICE);
-    sportsTable.insertIn(TENNIS);
+    playersTable.insert(PLAYER_ALICE);
+    sportsTable.insert(TENNIS);
     assertThat(playersTable.join(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testLeftJoin() {
-    playersTable.insertIn(PLAYER_ALICE);
-    sportsTable.insertIn(TENNIS);
+    playersTable.insert(PLAYER_ALICE);
+    sportsTable.insert(TENNIS);
     assertThat(playersTable.leftJoin(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
+  }
+
+  @Test
+  void testStream() {
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.streamAll().accept(stream -> stream.collect(Collectors.toList()));
+
+    int ret = playersTable.streamAll().apply(stream -> stream.collect(Collectors.toList())).size();
+    assertThat(ret).isEqualTo(1);
+    List<Player> ret1 = playersTable.stream(ParameterizedSql.of("select * from players"))
+        .apply(stream -> stream.collect(Collectors.toList()));
+    assertThat(ret1.size()).isEqualTo(1);
+
   }
 }

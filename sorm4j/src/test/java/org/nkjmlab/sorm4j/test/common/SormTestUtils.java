@@ -85,7 +85,7 @@ public class SormTestUtils {
       }
 
       @Override
-      public Sorm getSorm() {
+      public Sorm getOrm() {
         return sorm;
       }
 
@@ -116,7 +116,7 @@ public class SormTestUtils {
       }
 
       @Override
-      public Sorm getSorm() {
+      public Sorm getOrm() {
         return sorm;
       }
     };

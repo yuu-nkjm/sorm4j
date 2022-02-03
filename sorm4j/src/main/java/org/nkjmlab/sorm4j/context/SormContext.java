@@ -13,6 +13,13 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  */
 public interface SormContext {
 
+  PreparedStatementSupplier getPreparedStatementSupplier();
+
+  SqlParametersSetter getSqlParametersSetter();
+
+  LoggerContext getLoggerContext();
+
+
   /**
    * Returns new {@link Builder} which has set values from the given {@link SormContext}
    *
@@ -136,6 +143,5 @@ public interface SormContext {
     }
 
   }
-
 
 }

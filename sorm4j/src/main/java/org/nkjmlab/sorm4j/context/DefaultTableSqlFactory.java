@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.context;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 
 public final class DefaultTableSqlFactory implements TableSqlFactory {
 

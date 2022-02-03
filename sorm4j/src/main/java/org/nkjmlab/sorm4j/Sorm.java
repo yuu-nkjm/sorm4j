@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
-import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
@@ -9,6 +8,7 @@ import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.util.table.Table;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -117,15 +117,6 @@ public interface Sorm extends Orm {
    */
   void acceptHandler(int isolationLevel, ConsumerHandler<OrmTransaction> transactionHandler);
 
-  /**
-   *
-   * @param <T>
-   * @param streamGenerator
-   * @param streamHandler
-   */
-  @Experimental
-  <T> void acceptHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      ConsumerHandler<Stream<T>> streamHandler);
 
   /**
    * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
@@ -153,18 +144,6 @@ public interface Sorm extends Orm {
    * @return
    */
   <R> R applyHandler(int isolationLevel, FunctionHandler<OrmTransaction, R> transactionHandler);
-
-  /**
-   *
-   * @param <T>
-   * @param <R>
-   * @param streamGenerator
-   * @param streamHandler
-   * @return
-   */
-  @Experimental
-  <T, R> R applyHandler(FunctionHandler<OrmStreamGenerator, Stream<T>> streamGenerator,
-      FunctionHandler<Stream<T>, R> streamHandler);
 
   /**
    * Gets {@link DataSource}.
@@ -205,6 +184,25 @@ public interface Sorm extends Orm {
    */
   OrmTransaction open(int isolationLevel);
 
+  /**
+   * Gets a new {@link Table} instance.
+   *
+   * @param <T>
+   * @param objectClass
+   * @return
+   */
+  @Experimental
+  <T> Table<T> getTable(Class<T> objectClass);
 
+  /**
+   * Gets a new {@link Table} instance.
+   *
+   * @param <T>
+   * @param type
+   * @param tableName
+   * @return
+   */
+  @Experimental
+  <T> Table<T> getTable(Class<T> type, String tableName);
 
 }

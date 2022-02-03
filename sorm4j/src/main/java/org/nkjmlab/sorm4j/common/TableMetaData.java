@@ -1,8 +1,7 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.common;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.common.ColumnMetaData;
 
 /**
  * An instance of this class contains table metadata.

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class OrmStreamTest {
@@ -21,11 +22,9 @@ class OrmStreamTest {
   void test() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
 
-    sorm.acceptHandler(gen -> gen.streamAll(Guest.class),
-        strm -> strm.collect(Collectors.toList()));
+    assertThat(sorm.getTableSql(Player.class).toString()).contains("select");
 
-    int ret = sorm.applyHandler(gen -> gen.streamAll(Guest.class),
-        strm -> strm.collect(Collectors.toList()).size());
+    int ret = sorm.streamAll(Guest.class).apply(strm -> strm.collect(Collectors.toList()).size());
 
     assertThat(ret).isEqualTo(1);
 

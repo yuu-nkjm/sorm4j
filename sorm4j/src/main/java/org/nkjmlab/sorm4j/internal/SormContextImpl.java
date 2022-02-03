@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
 import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.ColumnValueToMapEntryConverter;
@@ -24,13 +25,12 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.internal.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.mapping.TableName;
-import org.nkjmlab.sorm4j.internal.result.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.result.TableMetaData;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SormContextImpl implements SormContext {
@@ -41,7 +41,6 @@ public final class SormContextImpl implements SormContext {
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
   private final ConcurrentMap<String, SqlParametersToTableMapping<?>> sqlParametersToTableMappings;
   private final ConcurrentMap<Class<?>, SqlResultToColumnsMapping<?>> sqlResultToColumnsMappings;
-
   private final SormConfig config;
 
   private SormContextImpl(SormConfig sormConfig) {
@@ -104,7 +103,7 @@ public final class SormContextImpl implements SormContext {
 
   <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, TableName tableName,
       Class<T> objectClass) {
-    String key = objectClass.getName() + "-" + tableName.getName();
+    String key = toKey(objectClass, tableName);
     @SuppressWarnings("unchecked")
     SqlParametersToTableMapping<T> ret =
         (SqlParametersToTableMapping<T>) sqlParametersToTableMappings.computeIfAbsent(key, _k -> {
@@ -122,6 +121,10 @@ public final class SormContextImpl implements SormContext {
     return ret;
   }
 
+
+  private static String toKey(Class<?> objectClass, TableName tableName) {
+    return objectClass.getName() + "-" + tableName.getName();
+  }
 
   <T> SqlResultToColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
 
@@ -242,6 +245,7 @@ public final class SormContextImpl implements SormContext {
   }
 
 
+  @Override
   public LoggerContext getLoggerContext() {
     return config.getLoggerContext();
   }
@@ -256,11 +260,13 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  SqlParametersSetter getSqlParametersSetter() {
+  @Override
+  public SqlParametersSetter getSqlParametersSetter() {
     return config.getSqlParametersSetter();
   }
 
-  PreparedStatementSupplier getPreparedStatementSupplier() {
+  @Override
+  public PreparedStatementSupplier getPreparedStatementSupplier() {
     return config.getPreparedStatementSupplier();
   }
 
@@ -306,5 +312,6 @@ public final class SormContextImpl implements SormContext {
         .setTableNameMapper(config.getTableNameMapper())
         .setTableSqlFactory(config.getTableSqlFactory());
   }
+
 
 }

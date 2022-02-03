@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.result.TableMetaData;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and

@@ -125,21 +125,6 @@ class SormImplTest {
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
-    try {
-      sorm.applyHandler(null, con -> {
-        throw new RuntimeException("");
-      });
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-    }
-    try {
-      sorm.acceptHandler(null, con -> {
-        throw new RuntimeException("");
-      });
-      failBecauseExceptionWasNotThrown(Exception.class);
-    } catch (Exception e) {
-    }
-
   }
 
   @Test
