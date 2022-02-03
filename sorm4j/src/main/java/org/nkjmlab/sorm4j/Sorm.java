@@ -198,7 +198,7 @@ public interface Sorm extends Orm {
    * Gets a new {@link Table} instance.
    *
    * @param <T>
-   * @param objectClass
+   * @param type
    * @param tableName
    * @return
    */
