@@ -652,7 +652,8 @@ public class OrmBenchmarkPostSimple {
           springJdbcTemplateBench, sql2oBench, springJdbcTemplateBench);
 
 
-
+  // "select * " is faster than "select col1, col2, ..., coln" in H2 2.1.210. the former is also
+  // faster than "select tablname.col1, tablname.col2, ..., tablname.coln".
   static final String SELECT_TYPICAL_SQL = "SELECT * FROM post";
 
 
