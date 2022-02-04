@@ -13,6 +13,10 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  */
 public interface SormContext {
 
+  ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter();
+
+  ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter();
+
   PreparedStatementSupplier getPreparedStatementSupplier();
 
   SqlParametersSetter getSqlParametersSetter();

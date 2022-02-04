@@ -251,14 +251,14 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-  ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
+  @Override
+  public ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter() {
     return config.getColumnValueToJavaObjectConverter();
   }
 
-  ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
+  public @Override ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
     return config.getColumnValueToMapEntryConverter();
   }
-
 
   @Override
   public SqlParametersSetter getSqlParametersSetter() {
