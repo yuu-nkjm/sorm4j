@@ -18,8 +18,8 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
@@ -135,8 +135,8 @@ class OrmConnectionImplTest {
     assertThat(row).isEqualTo(1);
 
     row = sorm.applyHandler(conn -> {
-      NamedParameterSql sql =
-          NamedParameterSql.parse("insert into players values(`id`, `name`, `address`)", '`', '`',
+      NamedParameterSqlParser sql =
+          NamedParameterSqlParser.of("insert into players values(`id`, `name`, `address`)", '`', '`',
               new DefaultColumnToFieldAccessorMapper());
       sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
       return conn.executeUpdate(sql.parse());
@@ -436,7 +436,7 @@ class OrmConnectionImplTest {
       assertThat(m.readList(Player.class, ParameterizedSql.of("select * from players"))).contains(a,
           b);
       assertThat(
-          m.readOne(Player.class, OrderedParameterSql.parse("select * from players where id=?", 1)))
+          m.readOne(Player.class, OrderedParameterSqlParser.parse("select * from players where id=?", 1)))
               .isEqualTo(a);
       assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
 
@@ -453,7 +453,7 @@ class OrmConnectionImplTest {
         m.insert(a);
         m.insert(b);
         Guest g =
-            m.readOne(Guest.class, OrderedParameterSql.parse("select * from guests where id=?", 1));
+            m.readOne(Guest.class, OrderedParameterSqlParser.parse("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));

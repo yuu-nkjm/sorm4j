@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 public class ParameterizedSqlExample {
@@ -21,7 +21,7 @@ public class ParameterizedSqlExample {
     // Ordered parameter binding and query execution
     String sql = "select * from customer where name=? and address=?";
     ParameterizedSql psql1 = ParameterizedSql.parse(sql, "Alice", "Kyoto");
-    ParameterizedSql psql2 = OrderedParameterSql.from(sql).addParameter("Alice", "Kyoto").parse();
+    ParameterizedSql psql2 = OrderedParameterSqlParser.from(sql).addParameter("Alice", "Kyoto").parse();
 
     List<Customer> customers = sorm.applyHandler(conn -> conn.readList(Customer.class, psql1));
     System.out.println("customers=" + customers);

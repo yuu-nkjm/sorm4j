@@ -271,7 +271,6 @@ public final class SormContextImpl implements SormContext {
   }
 
 
-
   /**
    * Returns string of this context. This is for debugging.
    */

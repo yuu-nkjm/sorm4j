@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.util.command;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.command.OrderedParameterCommandImpl;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
+import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 
 /**
  * An executable request with ordered parameters.
@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.sql.OrderedParameterSql;
  *
  */
 @Experimental
-public interface OrderedParameterCommand extends OrderedParameterSql, Command {
+public interface OrderedParameterCommand extends OrderedParameterSqlParser, Command {
 
   @Override
   OrderedParameterCommand addParameter(Object parameter);

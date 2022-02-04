@@ -4,7 +4,7 @@ import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.command.NamedParameterCommandImpl;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 
 
 /**
@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSql;
  *
  */
 @Experimental
-public interface NamedParameterCommand extends NamedParameterSql, Command {
+public interface NamedParameterCommand extends NamedParameterSqlParser, Command {
 
 
   @Override

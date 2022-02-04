@@ -1,17 +1,17 @@
 package org.nkjmlab.sorm4j.sql;
 
 import java.util.List;
-import org.nkjmlab.sorm4j.internal.sql.OrderedParameterSqlImpl;
+import org.nkjmlab.sorm4j.internal.sql.OrderedParameterSqlParserImpl;
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 
 /**
- * SQL with ordered parameters. The instance could be convert to {@link ParameterizedSql}. The class
+ * SQL parser for ordered parameters. The instance could be convert to {@link ParameterizedSql}. The class
  * could treat {@link List} parameter.
  *
  * @author nkjm
  *
  */
-public interface OrderedParameterSql extends ParameterizedSqlParser {
+public interface OrderedParameterSqlParser extends ParameterizedSqlParser {
 
   /**
    * Add one parameter to the SQL statement sequentially.
@@ -19,7 +19,7 @@ public interface OrderedParameterSql extends ParameterizedSqlParser {
    * @param parameter
    * @return
    */
-  OrderedParameterSql addParameter(Object parameter);
+  OrderedParameterSqlParser addParameter(Object parameter);
 
   /**
    * Add parameters to the SQL statement sequentially.
@@ -27,10 +27,10 @@ public interface OrderedParameterSql extends ParameterizedSqlParser {
    * @param parameters
    * @return
    */
-  OrderedParameterSql addParameter(Object... parameters);
+  OrderedParameterSqlParser addParameter(Object... parameters);
 
   /**
-   * Creates a {@link OrderedParameterSql} object with parameters.
+   * Creates a {@link OrderedParameterSqlParser} object with parameters.
    *
    * @param sql
    * @param parameters
@@ -41,13 +41,13 @@ public interface OrderedParameterSql extends ParameterizedSqlParser {
   }
 
   /**
-   * Creates a {@link OrderedParameterSql} object.
+   * Creates a {@link OrderedParameterSqlParser} object.
    *
    * @param sql
    * @return
    */
-  static OrderedParameterSql from(String sql) {
-    return new OrderedParameterSqlImpl(sql);
+  static OrderedParameterSqlParser of(String sql) {
+    return new OrderedParameterSqlParserImpl(sql);
   }
 
 }

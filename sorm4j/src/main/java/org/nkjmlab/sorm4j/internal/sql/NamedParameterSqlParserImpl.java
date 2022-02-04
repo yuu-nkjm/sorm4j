@@ -11,17 +11,17 @@ import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
- * SQL with named parameters. The instance could be convert to {@link ParameterizedSql}.The class
+ * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The class
  * could treat {@link List} parameter.
  *
  * @author nkjm
  *
  */
-public final class NamedParameterSqlImpl implements NamedParameterSql {
+public final class NamedParameterSqlParserImpl implements NamedParameterSqlParser {
   private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
@@ -35,7 +35,7 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
   private final Map<String, Object> parameters;
   private Object bean;
 
-  public NamedParameterSqlImpl(String sql, char prefix, char suffix,
+  public NamedParameterSqlParserImpl(String sql, char prefix, char suffix,
       ColumnToFieldAccessorMapper columnFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
@@ -45,24 +45,24 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
   }
 
 
-  public NamedParameterSqlImpl(String sql) {
+  public NamedParameterSqlParserImpl(String sql) {
     this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_COLUMN_FIELD_MAPPER);
   }
 
   @Override
-  public NamedParameterSql bindAll(Map<String, Object> namedParams) {
+  public NamedParameterSqlParser bindAll(Map<String, Object> namedParams) {
     this.parameters.putAll(namedParams);
     return this;
   }
 
   @Override
-  public NamedParameterSql bind(String key, Object value) {
+  public NamedParameterSqlParser bind(String key, Object value) {
     this.parameters.put(key, value);
     return this;
   }
 
   @Override
-  public NamedParameterSql bindBean(Object bean) {
+  public NamedParameterSqlParser bindBean(Object bean) {
     this.bean = bean;
     return this;
   }

@@ -73,7 +73,7 @@ public interface ParameterizedSql {
    * @return
    */
   static ParameterizedSql parse(String sql, Object... parameters) {
-    return OrderedParameterSql.parse(sql, parameters);
+    return OrderedParameterSqlParser.parse(sql, parameters);
   }
 
   /**
@@ -85,7 +85,7 @@ public interface ParameterizedSql {
    * @return
    */
   static ParameterizedSql parse(String sql, Map<String, Object> parameters) {
-    return NamedParameterSql.parse(sql, parameters);
+    return NamedParameterSqlParser.parse(sql, parameters);
   }
 
   /**
