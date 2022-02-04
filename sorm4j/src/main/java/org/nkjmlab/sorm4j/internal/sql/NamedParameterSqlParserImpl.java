@@ -15,8 +15,8 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
- * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The class
- * could treat {@link List} parameter.
+ * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The
+ * class could treat {@link List} parameter.
  *
  * @author nkjm
  *
@@ -26,7 +26,7 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
       new DefaultColumnToFieldAccessorMapper();
 
   private static final char DEFAULT_PREFIX = ':';
-  private static final char DEFAULT_SUFFIX = 0;
+  private static final char DEFAULT_SUFFIX = Character.MIN_VALUE;
 
   private final String sql;
   private final char prefix;

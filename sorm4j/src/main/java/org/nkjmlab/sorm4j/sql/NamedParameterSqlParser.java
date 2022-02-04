@@ -49,12 +49,13 @@ public interface NamedParameterSqlParser extends ParameterizedSqlParser {
   NamedParameterSqlParser bindBean(Object bean);
 
   /**
-   * Creates {@link NamedParameterSqlParser} object. the named parameters should have the given prefix and
-   * suffix.
+   * Creates {@link NamedParameterSqlParser} object. the named parameters should have the given
+   * prefix and suffix.
    *
    * @param sql
    * @param prefix
    * @param suffix
+   * @param columnFieldMapper
    * @return
    */
   @Experimental
@@ -62,6 +63,18 @@ public interface NamedParameterSqlParser extends ParameterizedSqlParser {
       ColumnToFieldAccessorMapper columnFieldMapper) {
     return new NamedParameterSqlParserImpl(sql, prefix, suffix, columnFieldMapper);
   }
+
+  /**
+   *
+   * @param sql
+   * @param columnFieldMapper
+   * @return
+   */
+  @Experimental
+  static NamedParameterSqlParser of(String sql, ColumnToFieldAccessorMapper columnFieldMapper) {
+    return of(sql, ':', Character.MIN_VALUE, columnFieldMapper);
+  }
+
 
   /**
    * Creates {@link NamedParameterSqlParser} object.
