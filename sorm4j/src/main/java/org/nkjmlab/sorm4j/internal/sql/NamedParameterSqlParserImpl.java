@@ -1,15 +1,15 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
-import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.context.NameToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -22,7 +22,11 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  *
  */
 public final class NamedParameterSqlParserImpl implements NamedParameterSqlParser {
-  private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
+
+  private static final Map<Class<?>, Map<String, FieldAccessor>> nameToFieldMaps =
+      new ConcurrentHashMap<>();
+
+  private static final NameToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
   private static final char DEFAULT_PREFIX = ':';
@@ -31,16 +35,16 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   private final String sql;
   private final char prefix;
   private final char suffix;
-  private final ColumnToFieldAccessorMapper columnFieldMapper;
+  private final NameToFieldAccessorMapper nameToFieldMapper;
   private final Map<String, Object> parameters;
   private Object bean;
 
   public NamedParameterSqlParserImpl(String sql, char prefix, char suffix,
-      ColumnToFieldAccessorMapper columnFieldMapper) {
+      NameToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
-    this.columnFieldMapper = columnFieldMapper;
+    this.nameToFieldMapper = nameToFieldMapper;
     this.parameters = new HashMap<>();
   }
 
@@ -131,17 +135,11 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
   }
 
-  private static final Map<Class<?>, ColumnToAccessorMapping> columnToAccessorMaps =
-      new ConcurrentHashMap<>();
-
   private FieldAccessor getAccessor(String parameterName) {
     final Class<?> objectClass = bean.getClass();
-    return columnToAccessorMaps
-        .computeIfAbsent(objectClass, k -> new ColumnToAccessorMapping(objectClass,
-            columnFieldMapper.createMapping(objectClass), ""))
-        .get(parameterName);
+    return nameToFieldMaps
+        .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
+        .get(toCanonicalCase(parameterName));
   }
-
-
 
 }
