@@ -7,13 +7,14 @@ import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logBeforeSql(String tag, Connection connection, String sql, Object... parameters) {
-    logBeforeSql(tag, connection, ParameterizedSql.parse(sql, parameters));
+    logBeforeSql(tag, connection, ParameterizedSqlParser.parse(sql, parameters));
   }
 
   @Override
@@ -34,20 +35,22 @@ public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logAfterQuery(String tag, long elapsedTime, Object ret) {
-    debug(ParameterizedStringUtils.newString("{} Read [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
+    debug(ParameterizedStringUtils.newString("{} Read [{}] objects",
+        getTagAndElapsedTime(tag, elapsedTime),
         ret instanceof Collection ? ((Collection<?>) ret).size() : 1));
   }
 
   @Override
   public void logAfterUpdate(String tag, long elapsedTime, int ret) {
-    debug(ParameterizedStringUtils.newString("{} Affect [{}] rows", getTagAndElapsedTime(tag, elapsedTime), ret));
+    debug(ParameterizedStringUtils.newString("{} Affect [{}] rows",
+        getTagAndElapsedTime(tag, elapsedTime), ret));
   }
 
 
   @Override
   public void logAfterMultiRow(String tag, long elapsedTime, int[] result) {
-    debug(ParameterizedStringUtils.newString("{} Affect [{}] objects", getTagAndElapsedTime(tag, elapsedTime),
-        IntStream.of(result).sum()));
+    debug(ParameterizedStringUtils.newString("{} Affect [{}] objects",
+        getTagAndElapsedTime(tag, elapsedTime), IntStream.of(result).sum()));
   }
 
   @Override

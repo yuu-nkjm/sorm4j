@@ -56,7 +56,7 @@ public interface Command {
    */
   static NamedParameterCommand create(OrmConnection conn, String sql,
       Map<String, Object> parameters) {
-    return NamedParameterCommand.from(conn, sql).bindAll(parameters);
+    return NamedParameterCommand.of(conn, sql).bindAll(parameters);
   }
 
 
@@ -68,7 +68,7 @@ public interface Command {
    * @return
    */
   static OrderedParameterCommand create(OrmConnection conn, String sql, Object... parameters) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+    return OrderedParameterCommand.of(conn, sql).addParameter(parameters);
   }
 
   /**

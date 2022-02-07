@@ -22,7 +22,7 @@ class ParameterizedSqlTest {
   void testParseAsOrdered() {
     String sql = "select * from guest where id=?";
     Object[] params = {1};
-    ParameterizedSql ps = ParameterizedSql.parse(sql, params);
+    ParameterizedSql ps = ParameterizedSqlParser.parse(sql, params);
     assertThat(ps.getSql()).isEqualTo(sql);
     assertThat(ps.getParameters()).isEqualTo(params);
   }
@@ -31,7 +31,7 @@ class ParameterizedSqlTest {
   void testParseAsNamed() {
     String sql = "select * from guest where id=:id";
     Map<String, Object> map = Map.of("id", 1);
-    ParameterizedSql ps = ParameterizedSql.parse(sql, map);
+    ParameterizedSql ps = ParameterizedSqlParser.parse(sql, map);
 
     String sql1 = "select * from guest where id=?";
     Object[] params = {1};
@@ -46,7 +46,7 @@ class ParameterizedSqlTest {
   void testEmbeddedOrdered() {
     String sql = "select * from guest where id={?}";
     Object[] params = {1};
-    assertThat(ParameterizedSql.embedParameter(sql, params))
+    assertThat(ParameterizedSqlParser.embedParameter(sql, params))
         .contains("select * from guest where id=1");
 
 
@@ -57,7 +57,7 @@ class ParameterizedSqlTest {
     String sql = "select * from guest where name={:name} and id={:id}";
     Map<String, Object> params = Map.of("id", 1, "name", "'a'");
 
-    assertThat(ParameterizedSql.embedParameter(sql, params))
+    assertThat(ParameterizedSqlParser.embedParameter(sql, params))
         .contains("select * from guest where name='a' and id=1");
   }
 
@@ -65,7 +65,7 @@ class ParameterizedSqlTest {
   void testEmbeddedOrderFail() {
     String sql = "select * from guest where id={?}";
 
-    assertThatThrownBy(() -> ParameterizedSql.embedParameter(sql)).isInstanceOfSatisfying(
+    assertThatThrownBy(() -> ParameterizedSqlParser.embedParameter(sql)).isInstanceOfSatisfying(
         SormException.class,
         e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
   }
@@ -76,7 +76,7 @@ class ParameterizedSqlTest {
     String sql = "select * from guest where name={:name} and id={:id}";
 
 
-    assertThatThrownBy(() -> ParameterizedSql.embedParameter(sql, Map.of("name1", 1)))
+    assertThatThrownBy(() -> ParameterizedSqlParser.embedParameter(sql, Map.of("name1", 1)))
         .isInstanceOfSatisfying(SormException.class,
             e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
 

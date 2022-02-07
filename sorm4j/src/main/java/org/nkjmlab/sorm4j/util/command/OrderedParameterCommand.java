@@ -27,7 +27,7 @@ public interface OrderedParameterCommand extends OrderedParameterSqlParser, Comm
    * @param sql
    * @return
    */
-  static OrderedParameterCommand from(OrmConnection conn, String sql) {
+  static OrderedParameterCommand of(OrmConnection conn, String sql) {
     return new OrderedParameterCommandImpl(conn, sql);
   }
 

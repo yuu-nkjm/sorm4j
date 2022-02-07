@@ -33,7 +33,7 @@ public interface NamedParameterCommand extends NamedParameterSqlParser, Command 
    * @param sql
    * @return
    */
-  static NamedParameterCommand from(OrmConnection conn, String sql) {
+  static NamedParameterCommand of(OrmConnection conn, String sql) {
     return new NamedParameterCommandImpl(conn, sql);
   }
 

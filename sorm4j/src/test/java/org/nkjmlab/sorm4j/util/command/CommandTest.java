@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -119,7 +119,7 @@ class CommandTest {
       conn.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
       conn.insert(List.of(GUEST_ALICE, GUEST_BOB));
 
-      String sql = ParameterizedSql.embedParameter(
+      String sql = ParameterizedSqlParser.embedParameter(
           "select {?}, {?} from players join guests on players.id=guests.id where players.id=?",
           conn.getTableMetaData(Player.class).getColumnAliases(),
           conn.getTableMetaData(Guest.class).getColumnAliases());
@@ -139,7 +139,7 @@ class CommandTest {
       conn.insert(List.of(GUEST_ALICE, GUEST_BOB));
       conn.insert(List.of(SOCCER, TENNIS));
 
-      String sql = ParameterizedSql.embedParameter(
+      String sql = ParameterizedSqlParser.embedParameter(
           "select {?}, {?}, {?} from players join guests on players.id=guests.id "
               + " join sports on players.id=sports.id " + " where players.id=?",
           conn.getTableMetaData(Player.class).getColumnAliases(),
@@ -183,12 +183,13 @@ class CommandTest {
   @Test
   void testCommand() {
 
-    sorm.applyHandler(
-        conn -> Command.create(conn, ParameterizedSql.parse("select * from players where id=?", 1))
-            .readList(Player.class));
+    sorm.applyHandler(conn -> Command
+        .create(conn, ParameterizedSqlParser.parse("select * from players where id=?", 1))
+        .readList(Player.class));
 
     sorm.applyHandler(conn -> Command
-        .create(conn, ParameterizedSql.parse("select * from players where id=:id", Map.of("id", 1)))
+        .create(conn,
+            ParameterizedSqlParser.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
     sorm.applyHandler(conn -> conn.getTableMetaData("players"));
   }
