@@ -204,52 +204,52 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       throws SQLException {
     switch (typeName) {
       case "boolean":
-        return conn.createArrayOf("BOOLEAN", toObjectArray((boolean[]) parameter));
+        return conn.createArrayOf("boolean", toObjectArray((boolean[]) parameter));
       case "byte":
-        return conn.createArrayOf("TINYINT", toObjectArray((byte[]) parameter));
+        return conn.createArrayOf("tinyint", toObjectArray((byte[]) parameter));
       case "short":
-        return conn.createArrayOf("SMALLINT", ArrayUtils.toObjectArray((short[]) parameter));
+        return conn.createArrayOf("smallint", ArrayUtils.toObjectArray((short[]) parameter));
       case "int":
-        return conn.createArrayOf("INTEGER", ArrayUtils.toObjectArray((int[]) parameter));
+        return conn.createArrayOf("integer", ArrayUtils.toObjectArray((int[]) parameter));
       case "long":
-        return conn.createArrayOf("BINGINT", ArrayUtils.toObjectArray((long[]) parameter));
+        return conn.createArrayOf("bigint", ArrayUtils.toObjectArray((long[]) parameter));
       case "float":
-        return conn.createArrayOf("REAL", ArrayUtils.toObjectArray((float[]) parameter));
+        return conn.createArrayOf("real", ArrayUtils.toObjectArray((float[]) parameter));
       case "double":
-        return conn.createArrayOf("DOUBLE", ArrayUtils.toObjectArray((double[]) parameter));
+        return conn.createArrayOf("double", ArrayUtils.toObjectArray((double[]) parameter));
       case "char":
-        return conn.createArrayOf("CHARACTER", ArrayUtils.toObjectArray((char[]) parameter));
+        return conn.createArrayOf("character", ArrayUtils.toObjectArray((char[]) parameter));
       // case "java.lang.Boolean":
-      // return conn.createArrayOf("BOOLEAN", (Object[]) parameter);
+      // return conn.createArrayOf("boolean", (Object[]) parameter);
       // case "java.lang.Byte":
-      // return conn.createArrayOf("TINYINT", (Object[]) parameter);
+      // return conn.createArrayOf("tinyint", (Object[]) parameter);
       // case "java.lang.Short":
-      // return conn.createArrayOf("SMALLINT", (Object[]) parameter);
+      // return conn.createArrayOf("smallint", (Object[]) parameter);
       // case "java.lang.Integer":
-      // return conn.createArrayOf("INTEGER", (Object[]) parameter);
+      // return conn.createArrayOf("integer", (Object[]) parameter);
       // case "java.lang.Long":
-      // return conn.createArrayOf("BIGINT", (Object[]) parameter);
+      // return conn.createArrayOf("bigint", (Object[]) parameter);
       // case "java.lang.Float":
-      // return conn.createArrayOf("REAL", (Object[]) parameter);
+      // return conn.createArrayOf("real", (Object[]) parameter);
       // case "java.lang.Double":
-      // return conn.createArrayOf("DOUBLE", (Object[]) parameter);
+      // return conn.createArrayOf("double", (Object[]) parameter);
       // case "java.lang.Character":
-      // return conn.createArrayOf("CHARACTER", (Object[]) parameter);
+      // return conn.createArrayOf("character", (Object[]) parameter);
       // case "java.lang.String":
-      // return conn.createArrayOf("VARCHAR", (Object[]) parameter);
+      // return conn.createArrayOf("varchar", (Object[]) parameter);
       // case "java.math.BigDecimal":
-      // return conn.createArrayOf("NUMERIC", (Object[]) parameter);
+      // return conn.createArrayOf("numeric", (Object[]) parameter);
       // case "java.sql.Date":
-      // return conn.createArrayOf("DATE", (Object[]) parameter);
+      // return conn.createArrayOf("date", (Object[]) parameter);
       // case "java.sql.Time":
-      // return conn.createArrayOf("TIME", (Object[]) parameter);
+      // return conn.createArrayOf("time", (Object[]) parameter);
       // case "java.sql.Timestamp":
-      // return conn.createArrayOf("TIMESTAMP", (Object[]) parameter);
+      // return conn.createArrayOf("timestamp", (Object[]) parameter);
       default:
         // The first argument is "JAVA_OBJECT", however the type of elements depends on JDBC driver.
         // The JDBC driver is responsible for mapping the elements Object array to the default JDBC
         // SQL type defined injava.sql.Types for the given class of Object.
-        return conn.createArrayOf("JAVA_OBJECT", (Object[]) parameter);
+        return conn.createArrayOf("java_object", (Object[]) parameter);
     }
   }
 
