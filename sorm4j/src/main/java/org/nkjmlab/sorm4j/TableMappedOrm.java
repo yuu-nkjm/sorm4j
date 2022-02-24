@@ -13,7 +13,8 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
-import org.nkjmlab.sorm4j.util.table.TableWithSchema;
+import org.nkjmlab.sorm4j.util.table.Table;
+import org.nkjmlab.sorm4j.util.table_schema.TableWithSchema;
 
 @Experimental
 public interface TableMappedOrm<T> {
@@ -82,6 +83,10 @@ public interface TableMappedOrm<T> {
 
   default boolean exists(T object) {
     return getOrm().exists(object);
+  }
+
+  default boolean exists(Object... primaryKeyValues) {
+    return getOrm().exists(getValueType(), primaryKeyValues);
   }
 
 
@@ -164,12 +169,16 @@ public interface TableMappedOrm<T> {
     return getOrm().updateIn(getTableName(), objects);
   }
 
-  default <S> List<Tuple2<T, S>> join(TableWithSchema<S> other, String onCondition) {
-    return getOrm().join(getValueType(), other.getValueType(), onCondition);
+  default <S> List<Tuple2<T, S>> joinUsing(Table<S> other, String... columns) {
+    return getOrm().joinUsing(getValueType(), other.getValueType(), columns);
   }
 
-  default <S> List<Tuple2<T, S>> leftJoin(TableWithSchema<S> other, String onCondition) {
-    return getOrm().leftJoin(getValueType(), other.getValueType(), onCondition);
+  default <S> List<Tuple2<T, S>> joinOn(TableWithSchema<S> other, String onCondition) {
+    return getOrm().joinOn(getValueType(), other.getValueType(), onCondition);
+  }
+
+  default <S> List<Tuple2<T, S>> leftJoinOn(TableWithSchema<S> other, String onCondition) {
+    return getOrm().leftJoinOn(getValueType(), other.getValueType(), onCondition);
   }
 
   default List<T> selectAll() {

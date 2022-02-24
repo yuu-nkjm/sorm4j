@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.Map;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
@@ -19,6 +18,7 @@ import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 
@@ -219,6 +219,9 @@ public interface Orm {
    */
   <T> boolean exists(T object);
 
+  <T> boolean exists(String tableName, Object... primaryKeyValues);
+
+  <T> boolean exists(Class<T> type, Object... primaryKeyValues);
 
   /**
    * Gets function which traverses and maps the all the rows in the given resultSet to an object
@@ -381,11 +384,11 @@ public interface Orm {
    * This method is experimental.
    *
    * @param tableName
-   * @param objects
+   * @param result
    * @return
    */
   @Experimental
-  int[] insertMapIn(String tableName, List<Map<String, Object>> objects);
+  int[] insertMapIn(String tableName, List<RowMap> result);
 
   /**
    *
@@ -394,7 +397,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int insertMapIn(String tableName, Map<String, Object> object);
+  int insertMapIn(String tableName, RowMap object);
 
   /**
    * This method is experimental.
@@ -404,8 +407,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int[] insertMapIn(String tableName,
-      @SuppressWarnings("unchecked") Map<String, Object>... objects);
+  int[] insertMapIn(String tableName, RowMap... objects);
 
   /**
    * Inserts objects and get the last insert result.
@@ -438,17 +440,20 @@ public interface Orm {
   <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition);
+  <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+  <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns);
+
+  @Experimental
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String t1T2OnCondition, String t2T3OnCondition);
 
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition);
+  <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String t1T2OnCondition, String t2T3OnCondition);
 
   /**
@@ -775,6 +780,7 @@ public interface Orm {
    * @return
    */
   <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters);
+
 
 
 }

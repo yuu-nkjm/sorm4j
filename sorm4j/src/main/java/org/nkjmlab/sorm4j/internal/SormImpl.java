@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.sql.DataSource;
@@ -25,6 +24,7 @@ import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.table.BasicTable;
 import org.nkjmlab.sorm4j.util.table.Table;
@@ -210,25 +210,30 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return applyAndClose(conn -> conn.join(t1, t2, onCondition));
+  public <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return applyAndClose(conn -> conn.joinOn(t1, t2, onCondition));
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+  public <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns) {
+    return applyAndClose(conn -> conn.joinUsing(t1, t2, columns));
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String t1t2OnCondition, String t2t3OnCondition) {
-    return applyAndClose(conn -> conn.join(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
+    return applyAndClose(conn -> conn.joinOn(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> leftJoin(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return applyAndClose(conn -> conn.leftJoin(t1, t2, onCondition));
+  public <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
+    return applyAndClose(conn -> conn.leftJoinOn(t1, t2, onCondition));
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoin(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String t1t2OnCondition, String t2t3OnCondition) {
-    return applyAndClose(conn -> conn.leftJoin(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
+    return applyAndClose(conn -> conn.leftJoinOn(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
 
 
@@ -250,6 +255,16 @@ public final class SormImpl implements Sorm {
   @Override
   public <T> boolean exists(String tableName, T object) {
     return applyAndClose(conn -> conn.exists(tableName, object));
+  }
+
+  @Override
+  public <T> boolean exists(String tableName, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.exists(tableName, primaryKeyValues));
+  }
+
+  @Override
+  public <T> boolean exists(Class<T> type, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.exists(type, primaryKeyValues));
   }
 
   @Override
@@ -304,18 +319,17 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public int insertMapIn(String tableName, Map<String, Object> object) {
+  public int insertMapIn(String tableName, RowMap object) {
     return applyAndClose(conn -> conn.insertMapIn(tableName, object));
   }
 
   @Override
-  public int[] insertMapIn(String tableName,
-      @SuppressWarnings("unchecked") Map<String, Object>... objects) {
+  public int[] insertMapIn(String tableName, RowMap... objects) {
     return applyAndClose(conn -> conn.insertMapIn(tableName, objects));
   }
 
   @Override
-  public int[] insertMapIn(String tableName, List<Map<String, Object>> objects) {
+  public int[] insertMapIn(String tableName, List<RowMap> objects) {
     return applyAndClose(conn -> conn.insertMapIn(tableName, objects));
   }
 
