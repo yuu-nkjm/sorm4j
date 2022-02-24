@@ -11,4 +11,5 @@ public final class JdbcTypeUtils {
   public static List<JDBCType> convert(int[] sqlTypes) {
     return Arrays.stream(sqlTypes).mapToObj(i -> JDBCType.valueOf(i)).collect(Collectors.toList());
   }
+
 }

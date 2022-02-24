@@ -143,4 +143,35 @@ public final class ArrayUtils {
 
   private ArrayUtils() {}
 
+  /**
+   *
+   * @param <T>
+   * @param valueType
+   * @param srcArray Object[] or primitive array
+   * @return
+   */
+  public static Object convertToArray(Class<?> valueType, Object srcArray) {
+    final int length = Array.getLength(srcArray);
+    Object destArray = Array.newInstance(valueType, length);
+    for (int i = 0; i < length; i++) {
+      Object v = Array.get(srcArray, i);
+      Array.set(destArray, i, v);
+    }
+    return destArray;
+  }
+
+  public static <T> T[] convertToObjectArray(Class<?> valueType, Object srcArray) {
+    final int length = Array.getLength(srcArray);
+    Object destArray = Array.newInstance(
+        valueType.isPrimitive() ? ClassUtils.primitiveToWrapper(valueType) : valueType, length);
+    for (int i = 0; i < length; i++) {
+      Object v = Array.get(srcArray, i);
+      Array.set(destArray, i, v);
+    }
+    @SuppressWarnings("unchecked")
+    T[] ret = (T[]) destArray;
+    return ret;
+  }
+
+
 }
