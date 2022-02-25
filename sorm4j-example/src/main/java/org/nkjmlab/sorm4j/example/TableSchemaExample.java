@@ -4,7 +4,7 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.table.TableSchema;
+import org.nkjmlab.sorm4j.util.table_schema.TableSchema;
 
 public class TableSchemaExample {
 

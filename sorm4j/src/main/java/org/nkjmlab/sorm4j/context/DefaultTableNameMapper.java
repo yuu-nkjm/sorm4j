@@ -6,7 +6,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
@@ -49,12 +48,13 @@ public final class DefaultTableNameMapper implements TableNameMapper {
    */
   private List<String> guessTableNameCandidates(Class<?> objectClass) {
 
-    List<String> annotatedTableName = Optional.ofNullable(objectClass.getAnnotation(OrmTable.class))
-        .map(a -> List.of(a.value())).orElse(Collections.emptyList());
+    Optional<String> annotatedTableName =
+        Optional.ofNullable(objectClass.getAnnotation(OrmTable.class)).map(a -> a.value());
 
-    if (!annotatedTableName.isEmpty()) {
-      return annotatedTableName;
+    if (annotatedTableName.isPresent()) {
+      return List.of(annotatedTableName.get());
     }
+
     String className = objectClass.getSimpleName();
     String cannonicalClassName = toCanonicalCase(className);
 

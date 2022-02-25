@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -347,15 +346,15 @@ class OrmImplTest {
 
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   void testInsertMapIn() {
-    Map<String, Object> map = Map.of("id", 99, "name", "Test", "address", "Chiba");
+
+    RowMap map = RowMap.of("id", 99, "name", "Test", "address", "Chiba");
     sorm.insertMapIn(PLAYERS1, map);
     sorm.deleteAllIn(PLAYERS1);
     sorm.insertMapIn(PLAYERS1, List.of(map));
     sorm.deleteAllIn(PLAYERS1);
-    sorm.insertMapIn(PLAYERS1, new Map[] {map});
+    sorm.insertMapIn(PLAYERS1, new RowMap[] {map});
   }
 
   @Test

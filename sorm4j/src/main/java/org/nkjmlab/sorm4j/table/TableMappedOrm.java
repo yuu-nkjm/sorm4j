@@ -1,8 +1,9 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.table;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
@@ -13,8 +14,6 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
-import org.nkjmlab.sorm4j.util.table.Table;
-import org.nkjmlab.sorm4j.util.table_schema.TableWithSchema;
 
 @Experimental
 public interface TableMappedOrm<T> {
@@ -173,11 +172,11 @@ public interface TableMappedOrm<T> {
     return getOrm().joinUsing(getValueType(), other.getValueType(), columns);
   }
 
-  default <S> List<Tuple2<T, S>> joinOn(TableWithSchema<S> other, String onCondition) {
+  default <S> List<Tuple2<T, S>> joinOn(Table<S> other, String onCondition) {
     return getOrm().joinOn(getValueType(), other.getValueType(), onCondition);
   }
 
-  default <S> List<Tuple2<T, S>> leftJoinOn(TableWithSchema<S> other, String onCondition) {
+  default <S> List<Tuple2<T, S>> leftJoinOn(Table<S> other, String onCondition) {
     return getOrm().leftJoinOn(getValueType(), other.getValueType(), onCondition);
   }
 

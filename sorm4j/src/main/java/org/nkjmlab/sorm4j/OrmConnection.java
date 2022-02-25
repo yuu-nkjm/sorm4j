@@ -5,6 +5,7 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 
 /**
  *

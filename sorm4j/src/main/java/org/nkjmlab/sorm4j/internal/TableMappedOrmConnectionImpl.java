@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal;
 
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.TableMappedOrmConnection;
+import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 
 public class TableMappedOrmConnectionImpl<T> implements TableMappedOrmConnection<T> {
 

@@ -21,7 +21,7 @@ public class JoinExample {
       conn.insert(Address.KYOTO, Address.TOKYO, Address.NARA);
 
       List<Tuple2<Address, Customer>> result =
-          conn.join(Address.class, Customer.class, "address.name=customer.address");
+          conn.joinOn(Address.class, Customer.class, "address.name=customer.address");
 
       System.out.println(result);
 

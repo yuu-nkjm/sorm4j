@@ -565,6 +565,10 @@ public final class SelectSql {
     return wrapSingleQuote(str.contains("'") ? str.replaceAll("'", "''") : str);
   }
 
+  public static String joinCommaAndSpace(String... elements) {
+    return joinObjects(", ", (Object[]) elements);
+  }
+
   public static String joinCommaAndSpace(Object... elements) {
     return joinObjects(", ", elements);
   }

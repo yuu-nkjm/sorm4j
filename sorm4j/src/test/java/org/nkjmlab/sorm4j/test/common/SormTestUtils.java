@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.util.table.BasicTableWithSchema;
-import org.nkjmlab.sorm4j.util.table.TableSchema;
-import org.nkjmlab.sorm4j.util.table.TableWithSchema;
+import org.nkjmlab.sorm4j.util.table_schema.BasicTableWithSchema;
+import org.nkjmlab.sorm4j.util.table_schema.TableSchema;
+import org.nkjmlab.sorm4j.util.table_schema.TableWithSchema;
 
 public class SormTestUtils {
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ClassUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
@@ -172,21 +173,14 @@ public final class DefaultColumnValueToJavaObjectConverters
             case "byte":
               return resultSet.getBytes(columnIndex);
             default: {
-              java.sql.Array arry = resultSet.getArray(columnIndex);
-              Object srcArry = arry.getArray();
-              final int length = Array.getLength(srcArry);
-              Object destArray = Array.newInstance(ClassUtils.convertToClass(compName), length);
               try {
-                for (int i = 0; i < length; i++) {
-                  Object v = Array.get(srcArry, i);
-                  Array.set(destArray, i, v);
-                }
+                return ArrayUtils.convertToArray(ClassUtils.convertToClass(compName),
+                    resultSet.getArray(columnIndex).getArray());
               } catch (Exception e) {
                 throw new SormException(ParameterizedStringUtils.newString(
                     "Could not convert column ({}) to  array ({}[])",
-                    JDBCType.valueOf(columnType).getName(), compName));
+                    JDBCType.valueOf(columnType).getName(), compName), e);
               }
-              return destArray;
             }
           }
         } else {

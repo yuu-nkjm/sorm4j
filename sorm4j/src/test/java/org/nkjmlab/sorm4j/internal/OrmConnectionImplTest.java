@@ -55,13 +55,13 @@ class OrmConnectionImplTest {
     sorm.insert(SormTestUtils.TENNIS);
 
     List<Tuple2<Guest, Player>> result =
-        sorm.join(Guest.class, Player.class, "guests.id=players.id");
+        sorm.joinOn(Guest.class, Player.class, "guests.id=players.id");
 
     assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
     assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result.get(0).toString()).contains("Alice");
 
-    List<Tuple3<Guest, Player, Sport>> result1 = sorm.join(Guest.class, Player.class, Sport.class,
+    List<Tuple3<Guest, Player, Sport>> result1 = sorm.joinOn(Guest.class, Player.class, Sport.class,
         "guests.id=players.id", "players.id=sports.id");
 
     assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);

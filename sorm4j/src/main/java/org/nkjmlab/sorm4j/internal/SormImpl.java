@@ -26,8 +26,8 @@ import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.table.BasicTable;
-import org.nkjmlab.sorm4j.util.table.Table;
+import org.nkjmlab.sorm4j.table.BasicTable;
+import org.nkjmlab.sorm4j.table.Table;
 
 /**
  * An entry point of object-relation mapping.

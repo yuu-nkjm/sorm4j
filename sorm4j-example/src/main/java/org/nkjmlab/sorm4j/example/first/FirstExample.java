@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.table.Table;
+import org.nkjmlab.sorm4j.table.Table;
 
 public class FirstExample {
 

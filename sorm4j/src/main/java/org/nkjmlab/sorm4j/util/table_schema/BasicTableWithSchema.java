@@ -1,6 +1,7 @@
-package org.nkjmlab.sorm4j.util.table;
+package org.nkjmlab.sorm4j.util.table_schema;
 
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.table.BasicTable;
 
 public class BasicTableWithSchema<T> extends BasicTable<T> implements TableWithSchema<T> {
 
@@ -16,6 +17,10 @@ public class BasicTableWithSchema<T> extends BasicTable<T> implements TableWithS
   public BasicTableWithSchema(Sorm sorm, Class<T> valueType, TableSchema tableSchema) {
     super(sorm, valueType, tableSchema.getTableName());
     this.tableSchema = tableSchema;
+  }
+
+  public BasicTableWithSchema(Sorm sorm, Class<T> valueType) {
+    this(sorm, valueType, TableSchema.builder(valueType).build());
   }
 
   @Override

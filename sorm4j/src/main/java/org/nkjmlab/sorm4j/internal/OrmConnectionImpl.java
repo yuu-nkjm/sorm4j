@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.TableMappedOrmConnection;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -39,6 +38,7 @@ import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
@@ -549,7 +549,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   private RowMap mapRowToMap(ResultSet resultSet) throws SQLException {
     ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
-    return toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes());
+    return toSingleRowMap(resultSet, ct.getColumns(), ct.getColumnTypes());
   }
 
   @SuppressWarnings("unchecked")
@@ -751,7 +751,7 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private RowMap toSingleMap(ResultSet resultSet, List<String> columns, List<Integer> columnTypes)
+  private RowMap toSingleRowMap(ResultSet resultSet, List<String> columns, List<Integer> columnTypes)
       throws SQLException {
     final int colsNum = columns.size();
     final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
@@ -785,16 +785,16 @@ public class OrmConnectionImpl implements OrmConnection {
       throws SQLException {
     return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
         ? loadSupportedReturnedTypeList(objectClass, resultSet)
-        : (objectClass.equals(RowMap.class) ? (List<T>) traverseAndMapToMapList(resultSet)
+        : (objectClass.equals(RowMap.class) ? (List<T>) traverseAndMapToRowMapList(resultSet)
             : loadResultContainerObjectList(objectClass, resultSet));
   }
 
 
-  private List<RowMap> traverseAndMapToMapList(ResultSet resultSet) throws SQLException {
+  private List<RowMap> traverseAndMapToRowMapList(ResultSet resultSet) throws SQLException {
     final List<RowMap> ret = new ArrayList<>();
     final ColumnsAndTypes ct = ColumnsAndTypes.createColumnsAndTypes(resultSet);
     while (resultSet.next()) {
-      ret.add(toSingleMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
+      ret.add(toSingleRowMap(resultSet, ct.getColumns(), ct.getColumnTypes()));
     }
     return ret;
   }

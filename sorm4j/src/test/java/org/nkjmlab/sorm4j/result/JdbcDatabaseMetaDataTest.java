@@ -5,7 +5,7 @@ import java.sql.Connection;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table.TableWithSchema;
+import org.nkjmlab.sorm4j.util.table_schema.TableWithSchema;
 
 class JdbcDatabaseMetaDataTest {
 

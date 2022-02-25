@@ -1,6 +1,7 @@
-package org.nkjmlab.sorm4j.util.table;
+package org.nkjmlab.sorm4j.util.table_schema;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.table.Table;
 
 @Experimental
 public interface TableWithSchema<T> extends Table<T> {

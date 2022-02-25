@@ -15,11 +15,11 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.table.Table;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.table.Table;
 
 class SormImplTest {
 
@@ -40,10 +40,10 @@ class SormImplTest {
   @Test
   void testJoin() {
     List<Tuple2<Guest, Player>> ret =
-        sorm.leftJoin(Guest.class, Player.class, "guests.id=players.id");
+        sorm.leftJoinOn(Guest.class, Player.class, "guests.id=players.id");
     assertThat(ret.size()).isEqualTo(sorm.selectAll(Guest.class).size());
 
-    List<Tuple3<Guest, Player, Sport>> ret1 = sorm.leftJoin(Guest.class, Player.class, Sport.class,
+    List<Tuple3<Guest, Player, Sport>> ret1 = sorm.leftJoinOn(Guest.class, Player.class, Sport.class,
         "guests.id=players.id", "players.id=sports.id");
     assertThat(ret1.size()).isEqualTo(sorm.selectAll(Guest.class).size());
 

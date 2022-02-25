@@ -1,19 +1,15 @@
 package org.nkjmlab.sorm4j.internal;
 
 import static java.lang.System.*;
-import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
-import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
@@ -139,8 +135,6 @@ public final class SormContextImpl implements SormContext {
   <T> SqlParametersToTableMapping<T> createTableMapping(Class<T> objectClass, String tableName,
       Connection connection) throws SQLException {
 
-
-
     ColumnToAccessorMapping columnToAccessorMap = new ColumnToAccessorMapping(objectClass,
         config.getColumnToFieldAccessorMapper().createMapping(objectClass),
         config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
@@ -148,8 +142,7 @@ public final class SormContextImpl implements SormContext {
     TableMetaDataImpl tableMetaData = getTableMetaData(connection, tableName, objectClass);
     TableSql sql = getTableSql(tableMetaData);
 
-    validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
-
+    // validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 
     return new SqlParametersToTableMapping<>(config.getLoggerContext(),
         config.getColumnValueToJavaObjectConverter(), config.getSqlParametersSetter(),
@@ -159,22 +152,22 @@ public final class SormContextImpl implements SormContext {
 
 
 
-  private void validate(Class<?> objectClass, TableMetaData tableMetaData,
-      Set<String> keySetWithoutAlias) {
-    List<String> notMatchColumns = tableMetaData.getColumns().stream()
-        .filter(e -> !keySetWithoutAlias.contains(toCanonicalCase(e))).sorted()
-        .collect(Collectors.toList());
-    if (!notMatchColumns.isEmpty()) {
-      throw new SormException(newString(
-          "{} does not match any field. Table [{}] contains Columns {} but [{}] contains field accessors {}.",
-          notMatchColumns, tableMetaData.getTableName(),
-          tableMetaData.getColumns().stream().map(c -> c.toString()).sorted()
-              .collect(Collectors.toList()),
-          objectClass.getName(),
-          keySetWithoutAlias.stream().sorted().collect(Collectors.toList())));
-    }
-
-  }
+  // private void validate(Class<?> objectClass, TableMetaData tableMetaData,
+  // Set<String> keySetWithoutAlias) {
+  // List<String> notMatchColumns = tableMetaData.getColumns().stream()
+  // .filter(e -> !keySetWithoutAlias.contains(toCanonicalCase(e))).sorted()
+  // .collect(Collectors.toList());
+  // if (!notMatchColumns.isEmpty()) {
+  // throw new SormException(newString(
+  // "{} does not match any field. Table [{}] contains Columns {} but [{}] contains field accessors
+  // {}.",
+  // notMatchColumns, tableMetaData.getTableName(),
+  // tableMetaData.getColumns().stream().map(c -> c.toString()).sorted()
+  // .collect(Collectors.toList()),
+  // objectClass.getName(),
+  // keySetWithoutAlias.stream().sorted().collect(Collectors.toList())));
+  // }
+  // }
 
 
   private <T> TableMetaDataImpl createTableMetaData(Class<T> objectClass, String tableName,
