@@ -13,6 +13,7 @@ import java.util.Set;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ClassUtils;
+import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 /**
@@ -45,9 +46,15 @@ public final class DefaultColumnValueToJavaObjectConverters
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
-      throws SQLException {
-    return (T) convertToHelper(resultSet, columnIndex, columnType, toType);
+  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType) {
+    try {
+      return (T) convertToHelper(resultSet, columnIndex, columnType, toType);
+    } catch (Exception e) {
+      throw new SormException(
+          ParameterizedStringUtils.newString("ColumnIndex={},ColumnType={},toType={}", columnIndex,
+              JdbcTypeUtils.convert(columnType), toType),
+          e);
+    }
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

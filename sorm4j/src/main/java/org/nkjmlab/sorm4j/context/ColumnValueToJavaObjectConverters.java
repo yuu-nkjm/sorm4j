@@ -34,8 +34,7 @@ public interface ColumnValueToJavaObjectConverters {
    * @throws SQLException
    *
    */
-  <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
-      throws SQLException;
+  <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType);
 
   /**
    * Returns the given type could be converted to Java object or not.

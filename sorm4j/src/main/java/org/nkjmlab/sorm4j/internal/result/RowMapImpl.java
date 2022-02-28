@@ -177,6 +177,7 @@ public final class RowMapImpl implements RowMap {
     return LocalDate.parse(val.toString());
   }
 
+
   @Override
   public LocalTime getLocalTime(String key) {
     Object val = get(key);
@@ -188,6 +189,7 @@ public final class RowMapImpl implements RowMap {
     }
     return LocalTime.parse(val.toString());
   }
+
 
   @Override
   public LocalDateTime getLocalDateTime(String key) {
@@ -214,5 +216,6 @@ public final class RowMapImpl implements RowMap {
     }
 
   }
+
 
 }

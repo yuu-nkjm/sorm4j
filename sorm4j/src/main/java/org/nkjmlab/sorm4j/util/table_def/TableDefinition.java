@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.table_schema;
+package org.nkjmlab.sorm4j.util.table_def;
 
 import static java.lang.String.*;
 import java.lang.annotation.Annotation;
@@ -16,15 +16,15 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.AutoIncrement;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.Check;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.Default;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.Index;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.Indexes;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.NotNull;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.Unique;
-import org.nkjmlab.sorm4j.util.table_schema.annotation.UniqueConstraints;
+import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
+import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
+import org.nkjmlab.sorm4j.util.table_def.annotation.Default;
+import org.nkjmlab.sorm4j.util.table_def.annotation.Index;
+import org.nkjmlab.sorm4j.util.table_def.annotation.Indexes;
+import org.nkjmlab.sorm4j.util.table_def.annotation.NotNull;
+import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKey;
+import org.nkjmlab.sorm4j.util.table_def.annotation.Unique;
+import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueConstraints;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and
@@ -36,43 +36,43 @@ import org.nkjmlab.sorm4j.util.table_schema.annotation.UniqueConstraints;
  *
  */
 @Experimental
-public final class TableSchema {
+public final class TableDefinition {
 
   /**
-   * Creates a new {@link TableSchema.Builder} with the given table name.
+   * Creates a new {@link TableDefinition.Builder} with the given table name.
    *
    * @return
    */
-  public static TableSchema.Builder builder(String tableName) {
-    return new TableSchema.Builder(tableName);
+  public static TableDefinition.Builder builder(String tableName) {
+    return new TableDefinition.Builder(tableName);
   }
 
-  public static TableSchema.Builder builder(Class<?> containerClass) {
+  public static TableDefinition.Builder builder(Class<?> tableDefinitionClass) {
 
-    Builder builder = TableSchema.builder(StringCache
-        .toCanonicalCase(Optional.ofNullable(containerClass.getAnnotation(OrmTable.class))
-            .map(a -> a.value()).orElseGet(() -> containerClass.getSimpleName() + "s")));
+    Builder builder = TableDefinition.builder(StringCache
+        .toCanonicalCase(Optional.ofNullable(tableDefinitionClass.getAnnotation(OrmTable.class))
+            .map(a -> a.value()).orElseGet(() -> tableDefinitionClass.getSimpleName() + "s")));
 
-    Optional.ofNullable(containerClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
+    Optional.ofNullable(tableDefinitionClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
         vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
 
-    Optional.ofNullable(containerClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
+    Optional.ofNullable(tableDefinitionClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
 
-    Optional.ofNullable(containerClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
+    Optional.ofNullable(tableDefinitionClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v)));
 
 
     Annotation[][] parameterAnnotations =
-        containerClass.getConstructors()[0].getParameterAnnotations();
-    Field[] fields = containerClass.getDeclaredFields();
+        tableDefinitionClass.getConstructors()[0].getParameterAnnotations();
+    Field[] fields = tableDefinitionClass.getDeclaredFields();
 
 
     for (int i = 0; i < fields.length; i++) {
       Field field = fields[i];
       List<String> opt = new ArrayList<>();
-      opt.add(TableSchema.toSqlDataType(field.getType()));
+      opt.add(TableDefinition.toSqlDataType(field.getType()));
       for (Annotation ann : parameterAnnotations[i]) {
         if (ann instanceof PrimaryKey) {
           opt.add("primary key");
@@ -97,7 +97,7 @@ public final class TableSchema {
   }
 
   private final String tableName;
-  private final String tableSchema;
+  private final String tableNameAndColumnDefinitions;
 
   private final List<String> columnNames;
 
@@ -108,10 +108,10 @@ public final class TableSchema {
   private final List<String> createIndexStatements;
 
 
-  private TableSchema(String tableName, String tableSchema, List<String> columnNames,
+  private TableDefinition(String tableName, String tableSchema, List<String> columnNames,
       String createTableStatement, String dropTableStatement, List<String> createIndexStatements) {
     this.tableName = tableName;
-    this.tableSchema = tableSchema;
+    this.tableNameAndColumnDefinitions = tableSchema;
     this.columnNames = Collections.unmodifiableList(columnNames);
     this.createTableStatement = createTableStatement;
     this.dropTableStatement = dropTableStatement;
@@ -120,22 +120,22 @@ public final class TableSchema {
 
   @Override
   public String toString() {
-    return "TableSchema [tableName=" + tableName + ", tableSchema=" + tableSchema + ", columnNames="
+    return "TableDefinition [tableName=" + tableName + ", tableNameAndColumnDefinitions=" + tableNameAndColumnDefinitions + ", columnNames="
         + columnNames + ", createTableStatement=" + createTableStatement + ", dropTableStatement="
         + dropTableStatement + ", createIndexStatements=" + createIndexStatements + "]";
   }
 
-  public TableSchema createIndexesIfNotExists(Orm orm) {
+  public TableDefinition createIndexesIfNotExists(Orm orm) {
     getCreateIndexIfNotExistsStatements().forEach(s -> orm.executeUpdate(s));
     return this;
   }
 
-  public TableSchema createTableIfNotExists(Orm orm) {
+  public TableDefinition createTableIfNotExists(Orm orm) {
     orm.executeUpdate(getCreateTableIfNotExistsStatement());
     return this;
   }
 
-  public TableSchema dropTableIfExists(Orm orm) {
+  public TableDefinition dropTableIfExists(Orm orm) {
     orm.executeUpdate(getDropTableIfExistsStatement());
     return this;
   }
@@ -151,7 +151,7 @@ public final class TableSchema {
    * Example.
    *
    * <pre>
-   * TableSchema.builder("reports") .addColumnDefinition("id", VARCHAR,
+   * TableDefinition.builder("reports") .addColumnDefinition("id", VARCHAR,
    * PRIMARY_KEY).addColumnDefinition("score", INT)
    * .addIndexDefinition("score").addIndexDefinition("id",
    * "score").build().getCreateIndexIfNotExistsStatements();
@@ -168,10 +168,10 @@ public final class TableSchema {
   }
 
   /**
-   * Returns a {@code String} object representing this {@link TableSchema}'s value.
+   * Returns a {@code String} object representing this {@link TableDefinition}'s value.
    *
    * <pre>
-   * TableSchema.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
+   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
    * .addColumnDefinition("score", INT).build().getTableSchema();
    *
    * generates
@@ -198,10 +198,10 @@ public final class TableSchema {
   }
 
   /**
-   * Returns a {@code String} object representing this {@link TableSchema}'s value.
+   * Returns a {@code String} object representing this {@link TableDefinition}'s value.
    *
    * <pre>
-   * TableSchema.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
+   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
    * .addColumnDefinition("score", INT).build().getTableSchema();
    *
    * generates
@@ -210,8 +210,8 @@ public final class TableSchema {
    *
    * @return
    */
-  public String getTableSchema() {
-    return tableSchema;
+  public String getTableNameAndColumnDefinitions() {
+    return tableNameAndColumnDefinitions;
   }
 
   public static class Builder {
@@ -333,7 +333,7 @@ public final class TableSchema {
      * Example.
      *
      * <pre>
-     * TableSchema.builder("reports") .addColumnDefinition("score",
+     * TableDefinition.builder("reports") .addColumnDefinition("score",
      * INT).addIndexDefinition("id","score").build();
      *
      * generates an index name like
@@ -376,20 +376,20 @@ public final class TableSchema {
 
 
     /**
-     * Builds a {@link TableSchema}.
+     * Builds a {@link TableDefinition}.
      *
      * @return
      */
-    public TableSchema build() {
+    public TableDefinition build() {
       if (columnDefinitions.isEmpty()) {
-        return new TableSchema(tableName, "", Collections.emptyList(), "", "",
+        return new TableDefinition(tableName, "", Collections.emptyList(), "", "",
             Collections.emptyList());
       } else {
         String tableSchema = getTableSchema(tableName, columnDefinitions, primaryKeys,
             uniqueColumnPairs, checkConditions);
         String createTableStatement = "create table if not exists " + tableSchema;
         String dropTableStatement = "drop table if exists " + tableName;
-        return new TableSchema(tableName, tableSchema, getColumunNames(), createTableStatement,
+        return new TableDefinition(tableName, tableSchema, getColumunNames(), createTableStatement,
             dropTableStatement, getCreateIndexIfNotExistsStatements());
       }
     }

@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
-import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
@@ -74,8 +73,6 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
         columnToAccessorMap.setValue(ret, columnName, value);
       }
       return ret;
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
       throw new SormException(

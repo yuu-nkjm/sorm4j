@@ -60,11 +60,11 @@ public final class ColumnToAccessorMapping {
         aliasColumnToAccessorMap.keySet().stream().sorted().collect(Collectors.toList());
     return "columns " + keySet + System.lineSeparator() + String.join(System.lineSeparator(),
         keySet.stream()
-            .map(e -> "  Column " + e + " <=> " + columnToAccessorMap.get(e).getFormattedString())
+            .map(e -> "  CsvColumn " + e + " <=> " + columnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()))
         + System.lineSeparator() + "column aliases " + aliasKeySet + System.lineSeparator()
         + String.join(System.lineSeparator(), aliasKeySet.stream().map(
-            e -> "  Column " + e + " <=> " + aliasColumnToAccessorMap.get(e).getFormattedString())
+            e -> "  CsvColumn " + e + " <=> " + aliasColumnToAccessorMap.get(e).getFormattedString())
             .collect(Collectors.toList()));
 
   }

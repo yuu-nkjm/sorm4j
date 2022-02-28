@@ -13,7 +13,7 @@ import org.nkjmlab.sorm4j.common.ColumnMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverter;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
@@ -52,11 +52,11 @@ public final class SormContextImpl implements SormContext {
   public SormContextImpl(LoggerContext loggerContext, ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
-      ColumnValueToMapEntryConverter columnValueToMapEntryConverter,
+      ColumnValueToMapValueConverter columnValueToMapValueConverter,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
       TableSqlFactory tableSqlFactory, MultiRowProcessorFactory multiRowProcessorFactory) {
     this(new SormConfig(loggerContext, columnFieldMapper, tableNameMapper,
-        columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
+        columnValueToJavaObjectConverter, columnValueToMapValueConverter, sqlParametersSetter,
         statementSupplier, tableSqlFactory, multiRowProcessorFactory));
   }
 
@@ -249,8 +249,9 @@ public final class SormContextImpl implements SormContext {
     return config.getColumnValueToJavaObjectConverter();
   }
 
-  public @Override ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
-    return config.getColumnValueToMapEntryConverter();
+  @Override
+  public ColumnValueToMapValueConverter getColumnValueToMapValueConverter() {
+    return config.getColumnValueToMapValueConverter();
   }
 
   @Override
@@ -296,7 +297,7 @@ public final class SormContextImpl implements SormContext {
     return SormContext.builder()
         .setColumnToFieldAccessorMapper(config.getColumnToFieldAccessorMapper())
         .setColumnValueToJavaObjectConverter(config.getColumnValueToJavaObjectConverter())
-        .setColumnValueToMapEntryConverter(config.getColumnValueToMapEntryConverter())
+        .setColumnValueToMapValueConverter(config.getColumnValueToMapValueConverter())
         .setLoggerContext(config.getLoggerContext())
         .setMultiRowProcessorFactory(config.getMultiRowProcessorFactory())
         .setPreparedStatementSupplier(config.getPreparedStatementSupplier())

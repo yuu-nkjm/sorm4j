@@ -4,7 +4,7 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.util.List;
 import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.table_schema.TableSchema;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 public class TableSchemaExample {
 
@@ -22,7 +22,7 @@ public class TableSchemaExample {
 
 
   public static class QuizTable {
-    private final TableSchema schema;
+    private final TableDefinition schema;
     private final Sorm sorm;
 
     public static final String TABLE_NAME = "QUIZ";
@@ -36,7 +36,7 @@ public class TableSchemaExample {
 
     public QuizTable(DataSource dataSorce) {
       this.sorm = Sorm.create(dataSorce);
-      this.schema = TableSchema.builder(TABLE_NAME)
+      this.schema = TableDefinition.builder(TABLE_NAME)
           .addColumnDefinition(ID, INT, AUTO_INCREMENT, PRIMARY_KEY)
           .addColumnDefinition(BOOK_NAME, VARCHAR).addColumnDefinition(BOOK_NAME, VARCHAR)
           .addColumnDefinition(QUESTION, VARCHAR).addColumnDefinition(ANSWER, VARCHAR).build();

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.table_schema.annotation;
+package org.nkjmlab.sorm4j.util.table_def.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

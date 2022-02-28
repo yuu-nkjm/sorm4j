@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.util.table_schema.BasicTableWithSchema;
-import org.nkjmlab.sorm4j.util.table_schema.TableSchema;
-import org.nkjmlab.sorm4j.util.table_schema.TableWithSchema;
+import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
+import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 public class SormTestUtils {
 
@@ -50,32 +50,32 @@ public class SormTestUtils {
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  public static TableWithSchema<Guest> createGuestsTable(Sorm sorm) {
-    TableSchema schema =
-        TableSchema.builder("guests").addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
+  public static TableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
+    TableDefinition schema =
+        TableDefinition.builder("guests").addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
             .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
             .addIndexDefinition("name").addIndexDefinition("name").build();
 
 
-    BasicTableWithSchema<Guest> tbl = new BasicTableWithSchema<>(sorm, Guest.class, schema);
+    BasicTableWithDefinition<Guest> tbl = new BasicTableWithDefinition<>(sorm, Guest.class, schema);
     tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static TableWithSchema<Player> createPlayersTable(Sorm sorm) {
+  public static TableWithDefinition<Player> createPlayersTable(Sorm sorm) {
     return createPlayersTable(sorm, "players");
   }
 
-  public static TableWithSchema<Player> createPlayersTable(Sorm sorm, String tableName) {
+  public static TableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
 
-    TableSchema schema = TableSchema.builder(tableName).addColumnDefinition("id", INT, PRIMARY_KEY)
+    TableDefinition schema = TableDefinition.builder(tableName).addColumnDefinition("id", INT, PRIMARY_KEY)
         .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
         .addIndexDefinition("name").addIndexDefinition("name").build();
 
-    TableWithSchema<Player> tbl = new TableWithSchema<>() {
+    TableWithDefinition<Player> tbl = new TableWithDefinition<>() {
 
       @Override
-      public TableSchema getTableSchema() {
+      public TableDefinition getTableDefinition() {
         return schema;
       }
 
@@ -99,14 +99,14 @@ public class SormTestUtils {
     return tbl;
   }
 
-  public static TableWithSchema<Sport> createSportsTable(Sorm sorm) {
-    TableSchema schema = TableSchema.builder("sports").addColumnDefinition("id", INT, PRIMARY_KEY)
+  public static TableWithDefinition<Sport> createSportsTable(Sorm sorm) {
+    TableDefinition schema = TableDefinition.builder("sports").addColumnDefinition("id", INT, PRIMARY_KEY)
         .addColumnDefinition("name", VARCHAR).build();
 
-    TableWithSchema<Sport> tbl = new TableWithSchema<>() {
+    TableWithDefinition<Sport> tbl = new TableWithDefinition<>() {
 
       @Override
-      public TableSchema getTableSchema() {
+      public TableDefinition getTableDefinition() {
         return schema;
       }
 

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public final class JdbcTypeUtils {
   private JdbcTypeUtils() {}
 
-  public static List<JDBCType> convert(int[] sqlTypes) {
+  public static List<JDBCType> convert(int... sqlTypes) {
     return Arrays.stream(sqlTypes).mapToObj(i -> JDBCType.valueOf(i)).collect(Collectors.toList());
   }
 

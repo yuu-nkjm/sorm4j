@@ -20,8 +20,7 @@ import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapEntryConverter;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapKeyConverter;
+import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverter;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
@@ -273,8 +272,8 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getColumnValueToJavaObjectConverter();
   }
 
-  private ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter() {
-    return sormContext.getColumnValueToMapEntryConverter();
+  private ColumnValueToMapValueConverter getColumnValueToMapValueConverter() {
+    return sormContext.getColumnValueToMapValueConverter();
   }
 
 
@@ -751,13 +750,13 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private RowMap toSingleRowMap(ResultSet resultSet, List<String> columns, List<Integer> columnTypes)
-      throws SQLException {
+  private RowMap toSingleRowMap(ResultSet resultSet, List<String> columns,
+      List<Integer> columnTypes) throws SQLException {
     final int colsNum = columns.size();
     final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
     for (int i = 1; i <= colsNum; i++) {
-      ret.put(getColumnValueToMapEntryConverter().convertToKey(columns.get(i - 1)),
-          getColumnValueToMapEntryConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
+      ret.put(columns.get(i - 1),
+          getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
     }
     return ret;
   }

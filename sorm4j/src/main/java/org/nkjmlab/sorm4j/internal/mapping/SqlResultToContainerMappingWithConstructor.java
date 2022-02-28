@@ -17,7 +17,6 @@ import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
 
@@ -81,8 +80,6 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
             constructorParameters[i].getType());
       }
       return constructor.newInstance(params);
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
       throw new SormException(ParameterizedStringUtils.newString(
@@ -128,8 +125,8 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   public String toString() {
     List<String> keySet =
         constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
-    return ParameterizedStringUtils.newString("constructor=[{}], arguments={}" + System.lineSeparator() + "{}", constructor,
-        keySet,
+    return ParameterizedStringUtils.newString(
+        "constructor=[{}], arguments={}" + System.lineSeparator() + "{}", constructor, keySet,
         String.join(System.lineSeparator(),
             keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
                 .collect(Collectors.toList())));

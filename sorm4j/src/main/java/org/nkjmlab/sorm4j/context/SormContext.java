@@ -15,7 +15,7 @@ public interface SormContext {
 
   ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter();
 
-  ColumnValueToMapEntryConverter getColumnValueToMapEntryConverter();
+  ColumnValueToMapValueConverter getColumnValueToMapValueConverter();
 
   PreparedStatementSupplier getPreparedStatementSupplier();
 
@@ -57,8 +57,8 @@ public interface SormContext {
     private static final ColumnValueToJavaObjectConverters DEFAULT_RESULT_SET_CONVERTER =
         new DefaultColumnValueToJavaObjectConverters();
 
-    public static final ColumnValueToMapEntryConverter DEFAULT_COLUMN_VALUE_TO_MAP_CONVERTER =
-        new DefaultColumnValueToMapEntryConverter();
+    public static final ColumnValueToMapValueConverter DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTER =
+        new DefaultColumnValueToMapValueConverter();
 
     private static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
 
@@ -72,8 +72,8 @@ public interface SormContext {
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
     private ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter =
         DEFAULT_RESULT_SET_CONVERTER;
-    private ColumnValueToMapEntryConverter columnValueToMapEntryConverter =
-        DEFAULT_COLUMN_VALUE_TO_MAP_CONVERTER;
+    private ColumnValueToMapValueConverter columnValueToMapValueConverter =
+        DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTER;
     private SqlParametersSetter sqlParametersSetter = DEFAULT_SQL_PARAMETER_SETTER;
     private MultiRowProcessorFactory multiRowProcessorFactory = DEFAULT_MULTI_ROW_PROCESSOR_FACTORY;
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
@@ -90,7 +90,7 @@ public interface SormContext {
 
     public SormContext build() {
       return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
-          columnValueToJavaObjectConverter, columnValueToMapEntryConverter, sqlParametersSetter,
+          columnValueToJavaObjectConverter, columnValueToMapValueConverter, sqlParametersSetter,
           statementSupplier, tableSqlFactory, multiRowProcessorFactory);
     }
 
@@ -113,8 +113,8 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setColumnValueToMapEntryConverter(ColumnValueToMapEntryConverter converter) {
-      this.columnValueToMapEntryConverter = converter;
+    public Builder setColumnValueToMapValueConverter(ColumnValueToMapValueConverter converter) {
+      this.columnValueToMapValueConverter = converter;
       return this;
     }
 

@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_schema.TableSchema;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 class TableSchemaTest {
 
@@ -20,10 +20,10 @@ class TableSchemaTest {
       ID, NAME, TEL
     }
 
-    private final TableSchema schema;
+    private final TableDefinition schema;
 
     public TempGuestTable() {
-      this.schema = TableSchema.builder("temp_guests").addColumnDefinition(ID, INT)
+      this.schema = TableDefinition.builder("temp_guests").addColumnDefinition(ID, INT)
           .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
           .addUniqueConstraint(TEL).addIndexDefinition(TEL).setPrimaryKey(ID).build();
     }
@@ -32,22 +32,22 @@ class TableSchemaTest {
 
   @Test
   void testSchemeBuilder() {
-    TableSchema schema1 = TableSchema.builder("temp_guests")
+    TableDefinition schema1 = TableDefinition.builder("temp_guests")
         .addColumnDefinition(ID.name(), INT).addColumnDefinition(NAME.name(), VARCHAR)
         .addColumnDefinition(TEL.name(), VARCHAR).addUniqueConstraint(TEL.name())
         .addIndexDefinition(TEL.name()).setPrimaryKey(ID.name()).build();
 
-    TableSchema schema2 = TableSchema.builder("temp_guests").addColumnDefinition(ID, INT)
+    TableDefinition schema2 = TableDefinition.builder("temp_guests").addColumnDefinition(ID, INT)
         .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
         .addUniqueConstraint(TEL).addIndexDefinition(TEL).setPrimaryKey(ID).build();
 
-    assertThat(schema1.getTableSchema()).isEqualTo(schema2.getTableSchema());
+    assertThat(schema1.getTableNameAndColumnDefinitions()).isEqualTo(schema2.getTableNameAndColumnDefinitions());
 
   }
 
   @Test
   void testSchemeBuilder2() {
-    TableSchema.builder("temp_guests").addColumnDefinition(ID.name(), INT)
+    TableDefinition.builder("temp_guests").addColumnDefinition(ID.name(), INT)
         .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
   }
 
@@ -65,7 +65,7 @@ class TableSchemaTest {
 
   @Test
   void testGetTableSchema() {
-    assertThat(tempGuestTable.schema.getTableSchema()).isEqualToIgnoringCase(
+    assertThat(tempGuestTable.schema.getTableNameAndColumnDefinitions()).isEqualToIgnoringCase(
         "temp_guests(id int, name varchar, tel varchar, primary key(id), unique(tel))");
   }
 

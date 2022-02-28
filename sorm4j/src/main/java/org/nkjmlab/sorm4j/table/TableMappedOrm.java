@@ -12,6 +12,7 @@ import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
@@ -123,11 +124,21 @@ public interface TableMappedOrm<T> {
     return getOrm().insertIn(getTableName(), objects);
   }
 
+  default int insertMapIn(RowMap object) {
+    return getOrm().insertMapIn(getTableName(), object);
+  }
+
+  default int[] insertMapIn(RowMap... objects) {
+    return getOrm().insertMapIn(getTableName(), objects);
+  }
+
+  default int[] insertMapIn(List<RowMap> objects) {
+    return getOrm().insertMapIn(getTableName(), objects);
+  }
 
   default InsertResult<T> insertAndGet(List<T> objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
-
 
   default InsertResult<T> insertAndGet(T object) {
     return getOrm().insertAndGetIn(getTableName(), object);
