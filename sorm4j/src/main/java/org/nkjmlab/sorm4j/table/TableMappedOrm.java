@@ -6,6 +6,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -205,18 +206,37 @@ public interface TableMappedOrm<T> {
    * @param tupplesOfNameAndValue
    * @return
    */
-  default List<T> selectListAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default List<T> selectListAllEqual(List<Tuple2<?, ?>> tupplesOfNameAndValue) {
     return getOrm().readList(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
+  default List<T> selectListAllEqual(Object column, Object value) {
+    return selectListAllEqual(List.of(Tuple.of(column, value)));
+  }
+
+  default List<T> selectListAllEqual(Object column1, Object value1, Object column2, Object value2) {
+    return selectListAllEqual(
+        List.of(Tuple.of(Tuple.of(column1, value1), Tuple.of(column2, value2))));
+  }
+
+
   /**
    * @see {@link #getAllEqualSql(Tuple2...)}
    *
    * @param tupplesOfNameAndValue
    * @return
    */
-  default T selectFirstAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default T selectFirstAllEqual(List<Tuple2<?, ?>> tupplesOfNameAndValue) {
     return getOrm().readFirst(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
+  }
+
+  default T selectFirstAllEqual(Object column, Object value) {
+    return selectFirstAllEqual(List.of(Tuple.of(column, value)));
+  }
+
+  default T selectFirstAllEqual(Object column1, Object value1, Object column2, Object value2) {
+    return selectFirstAllEqual(
+        List.of(Tuple.of(Tuple.of(column1, value1), Tuple.of(column2, value2))));
   }
 
   /**
@@ -225,8 +245,17 @@ public interface TableMappedOrm<T> {
    * @param tupplesOfNameAndValue
    * @return
    */
-  default T selectOneAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default T selectOneAllEqual(List<Tuple2<?, ?>> tupplesOfNameAndValue) {
     return getOrm().readOne(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
+  }
+
+  default T selectOneAllEqual(Object column, Object value) {
+    return selectOneAllEqual(List.of(Tuple.of(column, value)));
+  }
+
+  default T selectOneAllEqual(Object column1, Object value1, Object column2, Object value2) {
+    return selectOneAllEqual(
+        List.of(Tuple.of(Tuple.of(column1, value1), Tuple.of(column2, value2))));
   }
 
   /**
@@ -246,8 +275,8 @@ public interface TableMappedOrm<T> {
    * @param tupplesOfNameAndValue
    * @return
    */
-  default ParameterizedSql getAllEqualSql(Tuple2<?, ?>... tupplesOfNameAndValue) {
-    int argLength = tupplesOfNameAndValue.length;
+  default ParameterizedSql getAllEqualSql(List<Tuple2<?, ?>> tupplesOfNameAndValue) {
+    int argLength = tupplesOfNameAndValue.size();
     if (argLength == 0) {
       return ParameterizedSql.of(SelectSql.selectStarFrom(getTableName()));
     }
@@ -255,7 +284,7 @@ public interface TableMappedOrm<T> {
     Object[] parameters = new Object[argLength];
 
     for (int i = 0; i < argLength; i++) {
-      Tuple2<?, ?> tuple2 = tupplesOfNameAndValue[i];
+      Tuple2<?, ?> tuple2 = tupplesOfNameAndValue.get(i);
       conditions[i] = tuple2.getT1() + "=?";
       parameters[i] = tuple2.getT2();
     }

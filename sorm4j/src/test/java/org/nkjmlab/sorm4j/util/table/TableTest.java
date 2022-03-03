@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.table.BasicTable;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -207,23 +206,22 @@ class TableTest {
   @Test
   void testSelectFirstAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(playersTable.selectFirstAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
+    assertThat(playersTable.selectFirstAllEqual("name", PLAYER_ALICE.getName()).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectOneAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(playersTable.selectOneAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
+    assertThat(playersTable.selectOneAllEqual("name", PLAYER_ALICE.getName()).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectListAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(
-        playersTable.selectListAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).get(0).getId())
-            .isEqualTo(PLAYER_ALICE.getId());
+    assertThat(playersTable.selectListAllEqual("name", PLAYER_ALICE.getName()).get(0).getId())
+        .isEqualTo(PLAYER_ALICE.getId());
   }
 
 
