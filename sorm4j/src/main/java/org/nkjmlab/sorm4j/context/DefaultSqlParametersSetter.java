@@ -121,8 +121,7 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         stmt.setTimestamp(parameterIndex, (java.sql.Timestamp) parameter);
         return;
       case "java.time.Instant":
-        stmt.setTimestamp(parameterIndex,
-            parameter == null ? null : Timestamp.from((java.time.Instant) parameter));
+        stmt.setObject(parameterIndex, parameter);
         return;
       case "java.time.LocalTime":
         stmt.setTime(parameterIndex,

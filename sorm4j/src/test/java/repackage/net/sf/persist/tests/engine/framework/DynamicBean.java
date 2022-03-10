@@ -11,8 +11,12 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -171,6 +175,9 @@ public class DynamicBean {
       value = useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     else if (fieldType == java.time.Instant.class)
       value = useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).toInstant();
+    else if (fieldType == java.time.LocalDateTime.class)
+      value =
+          useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).toLocalDateTime();
     else {
       if (useNull)
         value = null;
@@ -449,6 +456,28 @@ public class DynamicBean {
 
     if (cls == value.getClass())
       return value;
+
+    if (cls == OffsetDateTime.class) {
+      if (value instanceof Instant) {
+        return ((Instant) value).atOffset(OffsetDateTime.now().getOffset());
+      }
+    }
+
+    if (cls == Instant.class) {
+      if (value instanceof OffsetDateTime) {
+        return ((OffsetDateTime) value).toInstant();
+      }
+    }
+
+    if (cls == LocalDateTime.class) {
+      if (value instanceof Timestamp) {
+        return ((Timestamp) value).toLocalDateTime();
+      } else if (value instanceof java.util.Date) {
+        return LocalDateTime.ofInstant(((java.util.Date) value).toInstant(),
+            ZoneId.systemDefault());
+      }
+    }
+
 
     // if cls implements Clob or Blob, upcast
     for (Class<?> iface : cls.getInterfaces()) {

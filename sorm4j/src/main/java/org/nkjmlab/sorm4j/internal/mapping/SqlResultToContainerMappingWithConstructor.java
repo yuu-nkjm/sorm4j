@@ -83,7 +83,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
       throw new SormException(ParameterizedStringUtils.newString(
-          "Constructor with parameters of container class for object-relation mapping is not match with columns. sqltypes={}, param={}",
+          "Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}",
           JdbcTypeUtils.convert(sqlTypes), constructorParameters), e);
     }
   }
