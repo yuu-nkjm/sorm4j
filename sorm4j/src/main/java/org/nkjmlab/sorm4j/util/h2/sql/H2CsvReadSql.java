@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
+@Experimental
 public class H2CsvReadSql {
   public static Builder builder(File csvFile) {
     return new Builder(csvFile);

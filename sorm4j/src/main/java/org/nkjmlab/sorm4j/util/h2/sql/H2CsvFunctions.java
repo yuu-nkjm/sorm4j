@@ -4,7 +4,9 @@ import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 
+@Experimental
 public class H2CsvFunctions {
   private H2CsvFunctions() {}
 

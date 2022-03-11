@@ -1,8 +1,10 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.BasicTable;
 
+@Experimental
 public class BasicTableWithDefinition<T> extends BasicTable<T> implements TableWithDefinition<T> {
 
   private final TableDefinition tableDefinition;

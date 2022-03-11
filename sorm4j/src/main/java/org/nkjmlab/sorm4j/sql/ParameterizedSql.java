@@ -34,8 +34,7 @@ public interface ParameterizedSql {
   String getBindedSql();
 
   /**
-   * Creates {@link ParameterizedSql} object of the given SQL string. When you use a SQL statement
-   * with parameter, use {@link #parse} method.
+   * Creates {@link ParameterizedSql} object of the given SQL string.
    *
    * @param sql without parameter.
    * @return
@@ -46,8 +45,7 @@ public interface ParameterizedSql {
 
   /**
    * Creates {@link ParameterizedSql} object of the given SQL string and parameters. The given
-   * parameters should be simple ordered parameters. When you use special parameters, use
-   * {@link #parse} method.
+   * parameters should be simple ordered parameters.
    *
    * @param sql
    * @param parameters ordered parameters without special parameters (e.g. named parameter, list

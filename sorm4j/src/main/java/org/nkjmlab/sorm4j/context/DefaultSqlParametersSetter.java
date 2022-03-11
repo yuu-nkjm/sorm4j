@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -120,34 +119,15 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       case "java.sql.Timestamp":
         stmt.setTimestamp(parameterIndex, (java.sql.Timestamp) parameter);
         return;
-      case "java.time.Instant":
-        stmt.setObject(parameterIndex, parameter);
-        return;
-      case "java.time.LocalTime":
-        stmt.setTime(parameterIndex,
-            parameter == null ? null : java.sql.Time.valueOf((java.time.LocalTime) parameter));
-        return;
-      case "java.time.LocalDate":
-        stmt.setDate(parameterIndex,
-            parameter == null ? null : java.sql.Date.valueOf((java.time.LocalDate) parameter));
-        return;
-      case "java.time.LocalDateTime":
-        stmt.setTimestamp(parameterIndex,
-            parameter == null ? null : Timestamp.valueOf((java.time.LocalDateTime) parameter));
-        return;
-      case "java.time.OffsetTime":
-        stmt.setObject(parameterIndex, parameter);
-        return;
-      case "java.time.OffsetDateTime":
-        stmt.setObject(parameterIndex, parameter);
-        return;
       case "java.util.Date":
-        stmt.setTimestamp(parameterIndex,
-            parameter == null ? null : new Timestamp(((java.util.Date) parameter).getTime()));
-        return;
+      case "java.time.LocalTime":
+      case "java.time.LocalDate":
+      case "java.time.LocalDateTime":
+      case "java.time.OffsetTime":
+      case "java.time.OffsetDateTime":
+      case "java.time.Instant":
       case "java.util.UUID":
-        stmt.setString(parameterIndex,
-            parameter == null ? null : ((java.util.UUID) parameter).toString());
+        stmt.setObject(parameterIndex, parameter);
         return;
       default:
         if (type.isArray()) {
@@ -167,11 +147,9 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         } else if (parameter instanceof java.sql.Clob) {
           stmt.setClob(parameterIndex, (java.sql.Clob) parameter);
         } else if (parameter instanceof java.io.InputStream) {
-          final java.io.InputStream is = (java.io.InputStream) parameter;
-          stmt.setBinaryStream(parameterIndex, is);
+          stmt.setBinaryStream(parameterIndex, (java.io.InputStream) parameter);
         } else if (parameter instanceof java.io.Reader) {
-          final java.io.Reader reader = (java.io.Reader) parameter;
-          stmt.setCharacterStream(parameterIndex, reader);
+          stmt.setCharacterStream(parameterIndex, (java.io.Reader) parameter);
         } else {
           stmt.setObject(parameterIndex, parameter);
         }

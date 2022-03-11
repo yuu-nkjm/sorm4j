@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.util.table_def;
 
 import static java.lang.String.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,33 +48,35 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
-  public static TableDefinition.Builder builder(Class<?> tableDefinitionClass) {
+  public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
 
-    Builder builder = TableDefinition.builder(StringCache
-        .toCanonicalCase(Optional.ofNullable(tableDefinitionClass.getAnnotation(OrmTable.class))
-            .map(a -> a.value()).orElseGet(() -> tableDefinitionClass.getSimpleName() + "s")));
+    Builder builder =
+        TableDefinition.builder(StringCache.toCanonicalCase(toTableName(ormRecordClass)));
 
-    Optional.ofNullable(tableDefinitionClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
+    Optional.ofNullable(ormRecordClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
         vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
 
-    Optional.ofNullable(tableDefinitionClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
+    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
 
-    Optional.ofNullable(tableDefinitionClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
+    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v)));
 
 
-    Annotation[][] parameterAnnotations =
-        tableDefinitionClass.getConstructors()[0].getParameterAnnotations();
-    Field[] fields = tableDefinitionClass.getDeclaredFields();
+    Annotation[][] parameterAnnotationsOfConstructor = getCanonicalConstructor(ormRecordClass)
+        .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
+
+    Field[] fields = ormRecordClass.getDeclaredFields();
 
 
     for (int i = 0; i < fields.length; i++) {
       Field field = fields[i];
       List<String> opt = new ArrayList<>();
       opt.add(TableDefinition.toSqlDataType(field.getType()));
-      for (Annotation ann : parameterAnnotations[i]) {
+
+      for (Annotation ann : parameterAnnotationsOfConstructor == null ? field.getAnnotations()
+          : parameterAnnotationsOfConstructor[i]) {
         if (ann instanceof PrimaryKey) {
           opt.add("primary key");
         } else if (ann instanceof AutoIncrement) {
@@ -94,6 +97,26 @@ public final class TableDefinition {
       builder.addColumnDefinition(field.getName(), opt.toArray(String[]::new));
     }
     return builder;
+  }
+
+  private static String toTableName(Class<?> ormRecordClass) {
+    OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
+    if (ann == null || ann.value().length() == 0) {
+      return ormRecordClass.getSimpleName() + "s";
+    } else {
+      return ann.value();
+    }
+  }
+
+  private static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
+    try {
+      Class<?>[] componentTypes = Arrays.stream(recordClass.getDeclaredFields())
+          .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers())).map(f -> f.getType())
+          .toArray(Class[]::new);
+      return Optional.of(recordClass.getDeclaredConstructor(componentTypes));
+    } catch (NoSuchMethodException | SecurityException e) {
+      return Optional.empty();
+    }
   }
 
   private final String tableName;
@@ -120,9 +143,10 @@ public final class TableDefinition {
 
   @Override
   public String toString() {
-    return "TableDefinition [tableName=" + tableName + ", tableNameAndColumnDefinitions=" + tableNameAndColumnDefinitions + ", columnNames="
-        + columnNames + ", createTableStatement=" + createTableStatement + ", dropTableStatement="
-        + dropTableStatement + ", createIndexStatements=" + createIndexStatements + "]";
+    return "TableDefinition [tableName=" + tableName + ", tableNameAndColumnDefinitions="
+        + tableNameAndColumnDefinitions + ", columnNames=" + columnNames + ", createTableStatement="
+        + createTableStatement + ", dropTableStatement=" + dropTableStatement
+        + ", createIndexStatements=" + createIndexStatements + "]";
   }
 
   public TableDefinition createIndexesIfNotExists(Orm orm) {
@@ -482,9 +506,9 @@ public final class TableDefinition {
       case "java.time.LocalDate":
         return "date";
       case "java.time.OffsetTime":
-        return "time_with_time_zone";
+        return "time with time zone";
       case "java.time.OffsetDateTime":
-        return "timestamp_with_time_zone";
+        return "timestamp with time zone";
       case "java.sql.Blob":
         return "blob";
       case "java.sql.Clob":
