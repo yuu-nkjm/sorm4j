@@ -3,11 +3,16 @@ package org.nkjmlab.sorm4j.context;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
+import java.util.Collections;
 import java.util.Map;
 
 public final class DefaultColumnValueToMapValueConverter implements ColumnValueToMapValueConverter {
 
   private final Map<Integer, ColumnValueToMapValueConverter> converters;
+
+  public DefaultColumnValueToMapValueConverter() {
+    this(Collections.emptyMap());
+  }
 
   public DefaultColumnValueToMapValueConverter(
       Map<Integer, ColumnValueToMapValueConverter> converters) {

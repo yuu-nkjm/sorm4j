@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.internal;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
@@ -48,7 +48,7 @@ class OrmImplTest {
   void testReadFirstClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-        sorm.readFirst(Player.class, ParameterizedSql.parse("select * from players limit 1")))
+        sorm.readFirst(Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
             .isEqualTo(PLAYER_ALICE);
   }
 
@@ -64,8 +64,8 @@ class OrmImplTest {
   void testReadListClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-        sorm.readList(Player.class, ParameterizedSql.parse("select * from players limit 1")).get(0))
-            .isEqualTo(PLAYER_ALICE);
+        sorm.readList(Player.class, ParameterizedSqlParser.parse("select * from players limit 1"))
+            .get(0)).isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -78,8 +78,9 @@ class OrmImplTest {
   @Test
   void testReadOneClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(sorm.readOne(Player.class, ParameterizedSql.parse("select * from players limit 1")))
-        .isEqualTo(PLAYER_ALICE);
+    assertThat(
+        sorm.readOne(Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
+            .isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -334,10 +335,10 @@ class OrmImplTest {
 
       assertThat(conn.getTableSql(PLAYERS1).toString()).contains("PLAYERS1");
 
-      assertThat(conn.mapTo(Player.class).count()).isEqualTo(1);
-      conn.mapTo(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
+      assertThat(conn.mapToTable(Player.class).count()).isEqualTo(1);
+      conn.mapToTable(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
 
-      assertThat(conn.mapTo(Player.class, PLAYERS1).count()).isEqualTo(3);
+      assertThat(conn.mapToTable(Player.class, PLAYERS1).count()).isEqualTo(3);
 
     });
 
@@ -345,15 +346,15 @@ class OrmImplTest {
 
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   void testInsertMapIn() {
-    Map<String, Object> map = Map.of("id", 99, "name", "Test", "address", "Chiba");
+
+    RowMap map = RowMap.of("id", 99, "name", "Test", "address", "Chiba");
     sorm.insertMapIn(PLAYERS1, map);
     sorm.deleteAllIn(PLAYERS1);
     sorm.insertMapIn(PLAYERS1, List.of(map));
     sorm.deleteAllIn(PLAYERS1);
-    sorm.insertMapIn(PLAYERS1, new Map[] {map});
+    sorm.insertMapIn(PLAYERS1, new RowMap[] {map});
   }
 
   @Test
@@ -370,16 +371,16 @@ class OrmImplTest {
 
   @Test
   void testExecuteQueryParameterizedSqlResultSetTraverserOfT() {
-    sorm.executeQuery(ParameterizedSql.parse("select * from players"),
+    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
         sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
-    sorm.executeQuery(ParameterizedSql.parse("select * from players"),
+    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
         sorm.getRowMapper(Player.class));
 
-    sorm.executeQuery(ParameterizedSql.parse("select * from players"),
+    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
         sorm.getResultSetTraverser(Player.class));
   }
 
@@ -390,7 +391,8 @@ class OrmImplTest {
 
   @Test
   void testExecuteUpdateParameterizedSql() {
-    sorm.executeUpdate(ParameterizedSql.parse("insert into players values(?,?,?)", 9, "A", "B"));
+    sorm.executeUpdate(
+        ParameterizedSqlParser.parse("insert into players values(?,?,?)", 9, "A", "B"));
   }
 
 }

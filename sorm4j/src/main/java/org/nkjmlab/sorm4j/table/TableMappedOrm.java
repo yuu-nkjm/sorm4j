@@ -1,8 +1,9 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.table;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
 import java.sql.PreparedStatement;
 import java.util.List;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
@@ -11,9 +12,9 @@ import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
-import org.nkjmlab.sorm4j.util.table.TableWithSchema;
 
 @Experimental
 public interface TableMappedOrm<T> {
@@ -84,6 +85,10 @@ public interface TableMappedOrm<T> {
     return getOrm().exists(object);
   }
 
+  default boolean exists(Object... primaryKeyValues) {
+    return getOrm().exists(getValueType(), primaryKeyValues);
+  }
+
 
   default int[] delete(List<T> objects) {
     return getOrm().deleteIn(getTableName(), objects);
@@ -119,11 +124,21 @@ public interface TableMappedOrm<T> {
     return getOrm().insertIn(getTableName(), objects);
   }
 
+  default int insertMapIn(RowMap object) {
+    return getOrm().insertMapIn(getTableName(), object);
+  }
+
+  default int[] insertMapIn(RowMap... objects) {
+    return getOrm().insertMapIn(getTableName(), objects);
+  }
+
+  default int[] insertMapIn(List<RowMap> objects) {
+    return getOrm().insertMapIn(getTableName(), objects);
+  }
 
   default InsertResult<T> insertAndGet(List<T> objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
-
 
   default InsertResult<T> insertAndGet(T object) {
     return getOrm().insertAndGetIn(getTableName(), object);
@@ -164,12 +179,16 @@ public interface TableMappedOrm<T> {
     return getOrm().updateIn(getTableName(), objects);
   }
 
-  default <S> List<Tuple2<T, S>> join(TableWithSchema<S> other, String onCondition) {
-    return getOrm().join(getValueType(), other.getValueType(), onCondition);
+  default <S> List<Tuple2<T, S>> joinUsing(Table<S> other, String... columns) {
+    return getOrm().joinUsing(getValueType(), other.getValueType(), columns);
   }
 
-  default <S> List<Tuple2<T, S>> leftJoin(TableWithSchema<S> other, String onCondition) {
-    return getOrm().leftJoin(getValueType(), other.getValueType(), onCondition);
+  default <S> List<Tuple2<T, S>> joinOn(Table<S> other, String onCondition) {
+    return getOrm().joinOn(getValueType(), other.getValueType(), onCondition);
+  }
+
+  default <S> List<Tuple2<T, S>> leftJoinOn(Table<S> other, String onCondition) {
+    return getOrm().leftJoinOn(getValueType(), other.getValueType(), onCondition);
   }
 
   default List<T> selectAll() {
@@ -181,38 +200,43 @@ public interface TableMappedOrm<T> {
   }
 
   /**
-   * @see {@link #getAllEqualSql(Tuple2...)}
+   * @see {@link #getAllEqualSql(List)}
    *
    * @param tupplesOfNameAndValue
    * @return
    */
-  default List<T> selectListAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default List<T> selectListAllEqual(Object... tupplesOfNameAndValue) {
     return getOrm().readList(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
+
+
   /**
-   * @see {@link #getAllEqualSql(Tuple2...)}
+   * @see {@link #getAllEqualSql(Object...)}
    *
    * @param tupplesOfNameAndValue
    * @return
    */
-  default T selectFirstAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default T selectFirstAllEqual(Object... tupplesOfNameAndValue) {
     return getOrm().readFirst(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
+
   /**
-   * @see {@link #getAllEqualSql(Tuple2...)}
+   * @see {@link #getAllEqualSql(Object...))}
    *
    * @param tupplesOfNameAndValue
    * @return
    */
-  default T selectOneAllEqual(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default T selectOneAllEqual(Object... tupplesOfNameAndValue) {
     return getOrm().readOne(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
+
+
   /**
-   * Creates a SQL statement selecting rows which are satisfied all condition corresponding to the
-   * given arguments.
+   * Creates a SQL statement selecting rows which are satisfied all equal condition corresponding to
+   * the given arguments.
    *
    * <strong>Note:</strong> All the rows will be selected, if length of arguments is zero
    *
@@ -224,21 +248,21 @@ public interface TableMappedOrm<T> {
    * ParameterizedSql("select * from [TABLE_NAME] where address=? and age=?", "Tokyo", 20)
    * </pre>
    *
-   * @param tupplesOfNameAndValue
+   * @param tupplesOfNameAndValue is [colum1, value1, colum2, value2,... ]
    * @return
    */
-  default ParameterizedSql getAllEqualSql(Tuple2<?, ?>... tupplesOfNameAndValue) {
+  default ParameterizedSql getAllEqualSql(Object... tupplesOfNameAndValue) {
     int argLength = tupplesOfNameAndValue.length;
     if (argLength == 0) {
       return ParameterizedSql.of(SelectSql.selectStarFrom(getTableName()));
     }
-    String[] conditions = new String[argLength];
-    Object[] parameters = new Object[argLength];
+    int pairLength = argLength / 2;
+    String[] conditions = new String[pairLength];
+    Object[] parameters = new Object[pairLength];
 
-    for (int i = 0; i < argLength; i++) {
-      Tuple2<?, ?> tuple2 = tupplesOfNameAndValue[i];
-      conditions[i] = tuple2.getT1() + "=?";
-      parameters[i] = tuple2.getT2();
+    for (int i = 0; i < pairLength; i++) {
+      conditions[i] = tupplesOfNameAndValue[i * 2] + "=?";
+      parameters[i] = tupplesOfNameAndValue[i * 2 + 1];
     }
 
     return ParameterizedSql.of(

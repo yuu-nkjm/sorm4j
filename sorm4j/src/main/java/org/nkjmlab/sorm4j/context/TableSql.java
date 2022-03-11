@@ -29,8 +29,8 @@ public final class TableSql {
 
   /**
    * <pre>
-   * selectByPrimaryKeySql=select ID, NAME, ADDRESS from GUESTS  where ID=?
-   * selectAllSql=select ID, NAME, ADDRESS from GUESTS
+   * selectByPrimaryKeySql=select * from GUESTS  where ID=?
+   * selectAllSql=select * from GUESTS
    * insertSql=insert into GUESTS (NAME, ADDRESS) values (?,?)
    * updateSql=update GUESTS set NAME=?, ADDRESS=? where ID=?
    * deleteSql=delete from GUESTS where ID=?

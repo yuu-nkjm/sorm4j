@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ClassUtils;
+import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 /**
@@ -44,9 +45,15 @@ public final class DefaultColumnValueToJavaObjectConverters
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
-      throws SQLException {
-    return (T) convertToHelper(resultSet, columnIndex, columnType, toType);
+  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType) {
+    try {
+      return (T) convertToHelper(resultSet, columnIndex, columnType, toType);
+    } catch (Exception e) {
+      throw new SormException(
+          ParameterizedStringUtils.newString("ColumnIndex={},ColumnType={},toType={}", columnIndex,
+              JdbcTypeUtils.convert(columnType), toType),
+          e);
+    }
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
@@ -58,8 +65,7 @@ public final class DefaultColumnValueToJavaObjectConverters
       return converter.convertTo(resultSet, columnIndex, columnType, toType);
     }
 
-    final String name = toType.getName();
-    switch (name) {
+    switch (toType.getName()) {
       case "boolean":
         return resultSet.getBoolean(columnIndex);
       case "java.lang.Boolean": {
@@ -127,27 +133,15 @@ public final class DefaultColumnValueToJavaObjectConverters
         return resultSet.getBlob(columnIndex);
       case "java.sql.Clob":
         return resultSet.getClob(columnIndex);
-      case "java.time.Instant":
-        return Optional.ofNullable(resultSet.getObject(columnIndex)).orElse(null);
-      case "java.time.LocalTime":
-        return Optional.ofNullable(resultSet.getTime(columnIndex)).map(t -> t.toLocalTime())
-            .orElse(null);
-      case "java.time.LocalDate":
-        return Optional.ofNullable(resultSet.getDate(columnIndex)).map(t -> t.toLocalDate())
-            .orElse(null);
-      case "java.time.LocalDateTime":
-        return Optional.ofNullable(resultSet.getTimestamp(columnIndex))
-            .map(t -> t.toLocalDateTime()).orElse(null);
       case "java.util.Date":
-        return Optional.ofNullable(resultSet.getTimestamp(columnIndex))
-            .map(t -> new java.util.Date(t.getTime())).orElse(null);
+      case "java.time.LocalTime":
+      case "java.time.LocalDate":
+      case "java.time.LocalDateTime":
+      case "java.time.Instant":
       case "java.util.UUID":
-        return Optional.ofNullable(resultSet.getString(columnIndex))
-            .map(s -> java.util.UUID.fromString(s)).orElse(null);
       case "java.time.OffsetTime":
-        return Optional.ofNullable(resultSet.getObject(columnIndex)).orElse(null);
       case "java.time.OffsetDateTime":
-        return Optional.ofNullable(resultSet.getObject(columnIndex)).orElse(null);
+        return resultSet.getObject(columnIndex, toType);
       case "java.util.ArrayList":
       case "java.util.List": {
         java.sql.Array arry = resultSet.getArray(columnIndex);
@@ -172,25 +166,18 @@ public final class DefaultColumnValueToJavaObjectConverters
             case "byte":
               return resultSet.getBytes(columnIndex);
             default: {
-              java.sql.Array arry = resultSet.getArray(columnIndex);
-              Object srcArry = arry.getArray();
-              final int length = Array.getLength(srcArry);
-              Object destArray = Array.newInstance(ClassUtils.convertToClass(compName), length);
               try {
-                for (int i = 0; i < length; i++) {
-                  Object v = Array.get(srcArry, i);
-                  Array.set(destArray, i, v);
-                }
+                return ArrayUtils.convertToArray(ClassUtils.convertToClass(compName),
+                    resultSet.getArray(columnIndex).getArray());
               } catch (Exception e) {
                 throw new SormException(ParameterizedStringUtils.newString(
                     "Could not convert column ({}) to  array ({}[])",
-                    JDBCType.valueOf(columnType).getName(), compName));
+                    JDBCType.valueOf(columnType).getName(), compName), e);
               }
-              return destArray;
             }
           }
         } else {
-          return resultSet.getObject(columnIndex);
+          return resultSet.getObject(columnIndex, toType);
           // throw new SormException(ParameterizedStringUtils.newString(
           // "Could not find corresponding converter columnType={}, toType={}. ",
           // JDBCType.valueOf(columnType).getName(), toType));

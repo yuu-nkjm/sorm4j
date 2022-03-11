@@ -6,6 +6,7 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.example.first.Address;
 import org.nkjmlab.sorm4j.example.first.Customer;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 
 public class JoinExample {
 
@@ -20,7 +21,7 @@ public class JoinExample {
       conn.insert(Address.KYOTO, Address.TOKYO, Address.NARA);
 
       List<Tuple2<Address, Customer>> result =
-          conn.join(Address.class, Customer.class, "address.name=customer.address");
+          conn.joinOn(Address.class, Customer.class, "address.name=customer.address");
 
       System.out.println(result);
 
@@ -35,7 +36,7 @@ public class JoinExample {
 
       String aAliasses = conn.getTableMetaData(Address.class).getColumnAliases();
       String cAliasses = conn.getTableMetaData(Customer.class).getColumnAliases();
-      ParameterizedSql psql = ParameterizedSql.parse(
+      ParameterizedSql psql = ParameterizedSqlParser.parse(
           "select {?}, {?} from address join customer on address.name=customer.address", aAliasses,
           cAliasses);
       System.out.println(psql.getSql());

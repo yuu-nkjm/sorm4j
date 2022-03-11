@@ -25,11 +25,11 @@ class NamedParameterSqlTest {
     {
       String sql = "select * from guests where id=:id and address=:address";
       ParameterizedSql statement =
-          NamedParameterSql.from(sql).bind("id", 1).bind("address", "Kyoto").parse();
+          NamedParameterSqlParser.of(sql).bind("id", 1).bind("address", "Kyoto").parse();
       sorm.readList(Guest.class, statement);
     }
     {
-      ParameterizedSql statement = NamedParameterSql.parse(
+      ParameterizedSql statement = NamedParameterSqlParser.parse(
           "select * from guests where name like {:name} and address in(<:address>) and id=:id",
           Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
       sorm.applyHandler(conn -> conn.readList(Customer.class, statement));
@@ -38,7 +38,7 @@ class NamedParameterSqlTest {
 
   @Test
   void testCreate() {
-    ParameterizedSql sp = NamedParameterSql.parse(sql, namedParams);
+    ParameterizedSql sp = NamedParameterSqlParser.parse(sql, namedParams);
 
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
@@ -53,7 +53,7 @@ class NamedParameterSqlTest {
 
   @Test
   void testBindAll() {
-    ParameterizedSql sp = NamedParameterSql.from(sql).bindAll(namedParams).parse();
+    ParameterizedSql sp = NamedParameterSqlParser.of(sql).bindAll(namedParams).parse();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
@@ -63,7 +63,7 @@ class NamedParameterSqlTest {
   void testBind() {
 
     ParameterizedSql sp =
-        NamedParameterSql.from(sql).bind("name", "foo").bind("id", 1).bind("idid", 2).parse();
+        NamedParameterSqlParser.of(sql).bind("name", "foo").bind("id", 1).bind("idid", 2).parse();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
     assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
@@ -72,7 +72,7 @@ class NamedParameterSqlTest {
   @Test
   void testBindList() {
 
-    ParameterizedSql sp = NamedParameterSql.from("select * from where ID in(<:player_names_1>)")
+    ParameterizedSql sp = NamedParameterSqlParser.of("select * from where ID in(<:player_names_1>)")
         .bind("player_names_1", List.of("foo", "bar")).parse();
 
     assertThat(sp.getSql()).contains("?,?");
@@ -83,7 +83,8 @@ class NamedParameterSqlTest {
 
   @Test
   void testBindListFail() {
-    assertThatThrownBy(() -> NamedParameterSql.from("select * from where ID in(<:names>)")
+    assertThatThrownBy(() -> NamedParameterSqlParser
+        .of("select * from where ID in(<:names>)")
         .bind("names", "foo").parse()).isInstanceOfSatisfying(SormException.class,
             e -> assertThat(e.getMessage())
                 .isEqualTo("<?> parameter should be bind Collection or Array"));

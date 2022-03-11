@@ -4,6 +4,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
 import org.nkjmlab.sorm4j.util.command.Command;
 
 public class ListEmbeddedParameterExample {
@@ -18,9 +19,9 @@ public class ListEmbeddedParameterExample {
 
 
     // List parameter and embedded parameter binding
-    ParameterizedSql psql =
-        ParameterizedSql.parse("select * from customer where name like {?} and address in(<?>)",
-            "'A%'", List.of("Kyoto", "Tokyo"));
+    ParameterizedSql psql = ParameterizedSqlParser.parse(
+        "select * from customer where name like {?} and address in(<?>)", "'A%'",
+        List.of("Kyoto", "Tokyo"));
 
     System.out.println(psql);
 

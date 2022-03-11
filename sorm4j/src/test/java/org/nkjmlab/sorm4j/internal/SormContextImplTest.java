@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToMapEntryConverter;
+import org.nkjmlab.sorm4j.context.DefaultColumnValueToMapValueConverter;
 import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
@@ -25,17 +25,17 @@ class SormContextImplTest {
 
   @Test
   void testBuild() {
-    SormContext context =
-        SormContext.builder().setColumnToFieldAccessorMapper(new DefaultColumnToFieldAccessorMapper())
-            .setTableNameMapper(new DefaultTableNameMapper())
-            .setColumnValueToMapEntryConverter(new DefaultColumnValueToMapEntryConverter())
-            .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters())
-            .setSqlParametersSetter(new DefaultSqlParametersSetter())
-            .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder().setBatchSize(10)
-                .setBatchSizeWithMultiRow(20).build())
-            .setLoggerContext(LoggerContext.builder().enable(LoggerContext.Category.MAPPING)
-                .disable(LoggerContext.Category.MAPPING).build())
-            .build();
+    SormContext context = SormContext.builder()
+        .setColumnToFieldAccessorMapper(new DefaultColumnToFieldAccessorMapper())
+        .setTableNameMapper(new DefaultTableNameMapper())
+        .setColumnValueToMapValueConverter(new DefaultColumnValueToMapValueConverter())
+        .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters())
+        .setSqlParametersSetter(new DefaultSqlParametersSetter())
+        .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder().setBatchSize(10)
+            .setBatchSizeWithMultiRow(20).build())
+        .setLoggerContext(LoggerContext.builder().enable(LoggerContext.Category.MAPPING)
+            .disable(LoggerContext.Category.MAPPING).build())
+        .build();
 
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
 

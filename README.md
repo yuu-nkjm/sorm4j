@@ -21,7 +21,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.4.5</version>
+   <version>1.4.6</version>
  </dependency>
 ```
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`
@@ -68,17 +68,17 @@ Inserts new rows with Java object (the table name is guessed from the class name
 sorm.insert(new Customer(1, "Alice", "Tokyo"), new Customer(2, "Bob", "Tokyo"));
 ```
 
-## Benchmarking with Oracle JMH (average operation times: microsec/op) (1.4.0)
+## Benchmarking with Oracle JMH (average operation times: microsec/op) (1.4.6)
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
-|Hand coded (baseline)|4.2 |5.2 |3405 |21135 |
-|Sorm4j|4.3 (2% slower)|5.7 (10% slower)|3091 (-9% slower)|21259 (1% slower)|
-|Sql2o|6.3 (50% slower)|9.3 (79% slower)|3878 (14% slower)|41126 (95% slower)|
-|JDBI|16.5 (293% slower)|12.1 (133% slower)|5128 (51% slower)|37644 (78% slower)|
-|JOOQ|42.9 (921% slower)| |14123 (315% slower)||
-|MyBatis|9.6 (129% slower)| |10083 (196% slower)||
-|Spring JdbcTemplate|8.7 (107% slower)| |||
+|Hand coded (baseline)|4.4 |5.6 |3528 |24312 |
+|Sorm4j|3.8 (-14% slower)|6.1 (9% slower)|3175 (-10% slower)|21580 (-11% slower)|
+|Sql2o|6.5 (48% slower)|9.7 (73% slower)|3871 (10% slower)|42668 (76% slower)|
+|JDBI|17.0 (286% slower)|12.7 (127% slower)|5487 (56% slower)|37723 (55% slower)|
+|JOOQ|44.2 (905% slower)| |14440 (309% slower)||
+|MyBatis|10.2 (132% slower)| |10440 (196% slower)||
+|Spring JdbcTemplate|9.1 (107% slower)| |||
 
 - `read`: reads one row from the table including 10,240 rows.
 - `insert`: inserts one row to the table.

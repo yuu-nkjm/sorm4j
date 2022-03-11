@@ -1,68 +1,72 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
-import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
+import org.nkjmlab.sorm4j.context.NameToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.NamedParameterSql;
+import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
 /**
- * SQL with named parameters. The instance could be convert to {@link ParameterizedSql}.The class
- * could treat {@link List} parameter.
+ * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The
+ * class could treat {@link List} parameter.
  *
  * @author nkjm
  *
  */
-public final class NamedParameterSqlImpl implements NamedParameterSql {
-  private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
+public final class NamedParameterSqlParserImpl implements NamedParameterSqlParser {
+
+  private static final Map<Class<?>, Map<String, FieldAccessor>> nameToFieldMaps =
+      new ConcurrentHashMap<>();
+
+  private static final NameToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
   private static final char DEFAULT_PREFIX = ':';
-  private static final char DEFAULT_SUFFIX = 0;
+  private static final char DEFAULT_SUFFIX = Character.MIN_VALUE;
 
   private final String sql;
   private final char prefix;
   private final char suffix;
-  private final ColumnToFieldAccessorMapper columnFieldMapper;
+  private final NameToFieldAccessorMapper nameToFieldMapper;
   private final Map<String, Object> parameters;
   private Object bean;
 
-  public NamedParameterSqlImpl(String sql, char prefix, char suffix,
-      ColumnToFieldAccessorMapper columnFieldMapper) {
+  public NamedParameterSqlParserImpl(String sql, char prefix, char suffix,
+      NameToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
-    this.columnFieldMapper = columnFieldMapper;
+    this.nameToFieldMapper = nameToFieldMapper;
     this.parameters = new HashMap<>();
   }
 
 
-  public NamedParameterSqlImpl(String sql) {
+  public NamedParameterSqlParserImpl(String sql) {
     this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_COLUMN_FIELD_MAPPER);
   }
 
   @Override
-  public NamedParameterSql bindAll(Map<String, Object> namedParams) {
+  public NamedParameterSqlParser bindAll(Map<String, Object> namedParams) {
     this.parameters.putAll(namedParams);
     return this;
   }
 
   @Override
-  public NamedParameterSql bind(String key, Object value) {
+  public NamedParameterSqlParser bind(String key, Object value) {
     this.parameters.put(key, value);
     return this;
   }
 
   @Override
-  public NamedParameterSql bindBean(Object bean) {
+  public NamedParameterSqlParser bindBean(Object bean) {
     this.bean = bean;
     return this;
   }
@@ -131,17 +135,11 @@ public final class NamedParameterSqlImpl implements NamedParameterSql {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
   }
 
-  private static final Map<Class<?>, ColumnToAccessorMapping> columnToAccessorMaps =
-      new ConcurrentHashMap<>();
-
   private FieldAccessor getAccessor(String parameterName) {
     final Class<?> objectClass = bean.getClass();
-    return columnToAccessorMaps
-        .computeIfAbsent(objectClass, k -> new ColumnToAccessorMapping(objectClass,
-            columnFieldMapper.createMapping(objectClass), ""))
-        .get(parameterName);
+    return nameToFieldMaps
+        .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
+        .get(toCanonicalCase(parameterName));
   }
-
-
 
 }

@@ -85,8 +85,8 @@ public class TestH2 {
           .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
           .addField(new FieldMap("timezCol").setTypes(java.time.OffsetTime.class))
           .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
-          .addField(
-              new FieldMap("timestampCol").setTypes(java.sql.Timestamp.class, java.util.Date.class))
+          .addField(new FieldMap("timestampCol").setTypes(java.time.LocalDateTime.class,
+              java.sql.Timestamp.class, java.util.Date.class))
           .addField(new FieldMap("timestampzCol").setTypes(java.time.OffsetDateTime.class,
               java.time.Instant.class));
 

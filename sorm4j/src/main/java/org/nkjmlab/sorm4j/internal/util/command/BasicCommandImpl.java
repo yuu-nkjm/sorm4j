@@ -18,27 +18,27 @@ public final class BasicCommandImpl extends AbstractCommand implements BasicComm
 
   @Override
   public OrderedParameterCommand addParameter(Object parameter) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameter);
+    return OrderedParameterCommand.of(conn, sql).addParameter(parameter);
   }
 
   @Override
   public OrderedParameterCommand addParameter(Object... parameters) {
-    return OrderedParameterCommand.from(conn, sql).addParameter(parameters);
+    return OrderedParameterCommand.of(conn, sql).addParameter(parameters);
   }
 
   @Override
   public NamedParameterCommand bindAll(Map<String, Object> keyValuePairOfNamedParameters) {
-    return NamedParameterCommand.from(conn, sql).bindAll(keyValuePairOfNamedParameters);
+    return NamedParameterCommand.of(conn, sql).bindAll(keyValuePairOfNamedParameters);
   }
 
   @Override
   public NamedParameterCommand bind(String key, Object value) {
-    return NamedParameterCommand.from(conn, sql).bind(key, value);
+    return NamedParameterCommand.of(conn, sql).bind(key, value);
   }
 
   @Override
   public NamedParameterCommand bindBean(Object bean) {
-    return NamedParameterCommand.from(conn, sql).bindBean(bean);
+    return NamedParameterCommand.of(conn, sql).bindBean(bean);
   }
 
   @Override

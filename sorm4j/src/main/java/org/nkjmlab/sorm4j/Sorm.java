@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.util.table.Table;
+import org.nkjmlab.sorm4j.table.Table;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an

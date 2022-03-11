@@ -35,7 +35,7 @@ public final class StringCache {
    */
   public static String toCanonicalCase(String str) {
     return canonicalCaseCaches.computeIfAbsent(str,
-        key -> str.replaceAll("_", "").replaceAll("\\s", "").toUpperCase(Locale.ENGLISH));
+        key -> str.replaceAll("[_/\\s]", "").toUpperCase(Locale.ENGLISH));
   }
 
   /**

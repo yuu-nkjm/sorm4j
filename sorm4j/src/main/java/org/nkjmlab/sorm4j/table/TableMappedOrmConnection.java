@@ -1,5 +1,6 @@
-package org.nkjmlab.sorm4j;
+package org.nkjmlab.sorm4j.table;
 
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 @Experimental

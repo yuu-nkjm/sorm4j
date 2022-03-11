@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.slf4j.Logger;
 
@@ -178,8 +179,10 @@ public class BeanTest {
           // (eg char[]-String, double-BigDecimal, etc)
           Object retConverted = DynamicBean.convertToType(fieldValue.getClass(), ret);
           if (!DynamicBean.compareValues(fieldValue, retConverted)) {
-            throw new AssertionError(
-                "Expected [" + fieldValue + "] but got [" + ret + "] as result of [" + sql + "]");
+            throw new AssertionError(ParameterizedStringUtils.newString(
+                "Expected [{}]({}) but actual [{}]({}) converted from [{}]({}) as result of [{}]",
+                fieldValue, fieldValue.getClass(), retConverted, retConverted.getClass(), ret,
+                ret.getClass(), sql));
           }
         }
       }

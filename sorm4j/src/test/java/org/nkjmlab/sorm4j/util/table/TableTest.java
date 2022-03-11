@@ -8,19 +8,20 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.table.BasicTable;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
+import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private TableWithSchema<Player> playersTable;
-  private TableWithSchema<Sport> sportsTable;
+  private TableWithDefinition<Player> playersTable;
+  private TableWithDefinition<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
@@ -34,7 +35,7 @@ class TableTest {
   @Test
   void testGetTableSchema() {
     Sorm sorm = createSormWithNewDatabaseAndCreateTables();
-    playersTable.getTableSchema();
+    playersTable.getTableDefinition();
 
     BasicTable<Guest> gt = new BasicTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
@@ -205,23 +206,22 @@ class TableTest {
   @Test
   void testSelectFirstAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(playersTable.selectFirstAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
+    assertThat(playersTable.selectFirstAllEqual("name", PLAYER_ALICE.getName()).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectOneAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(playersTable.selectOneAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).getId())
+    assertThat(playersTable.selectOneAllEqual("name", PLAYER_ALICE.getName()).getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
   void testSelectListAllEqual() {
     playersTable.insert(PLAYER_ALICE);
-    assertThat(
-        playersTable.selectListAllEqual(Tuple.of("name", PLAYER_ALICE.getName())).get(0).getId())
-            .isEqualTo(PLAYER_ALICE.getId());
+    assertThat(playersTable.selectListAllEqual("name", PLAYER_ALICE.getName()).get(0).getId())
+        .isEqualTo(PLAYER_ALICE.getId());
   }
 
 
@@ -229,7 +229,7 @@ class TableTest {
   void testJoin() {
     playersTable.insert(PLAYER_ALICE);
     sportsTable.insert(TENNIS);
-    assertThat(playersTable.join(sportsTable, "players.id=sports.id").get(0).getT1().getId())
+    assertThat(playersTable.joinOn(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
@@ -237,7 +237,7 @@ class TableTest {
   void testLeftJoin() {
     playersTable.insert(PLAYER_ALICE);
     sportsTable.insert(TENNIS);
-    assertThat(playersTable.leftJoin(sportsTable, "players.id=sports.id").get(0).getT1().getId())
+    assertThat(playersTable.leftJoinOn(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
