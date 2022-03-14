@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.util;
+package org.nkjmlab.sorm4j.common;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

@@ -21,7 +21,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>1.4.6</version>
+   <version>1.4.7</version>
  </dependency>
 ```
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`

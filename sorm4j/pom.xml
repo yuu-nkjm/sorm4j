@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.nkjmlab</groupId>
     <artifactId>sorm4j-parent</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
   </parent>
   <properties>
     <slf4j-version>1.7.30</slf4j-version>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.17.1</version>
+      <version>2.17.2</version>
       <optional>true</optional>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -57,14 +57,14 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>4.2.0</version>
+      <version>4.4.0</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.17.1</version>
+      <version>2.17.2</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
@@ -78,28 +78,28 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.27</version>
+      <version>8.0.28</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.3.1</version>
+      <version>42.3.3</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>10.1.0.jre17-preview</version>
+      <version>10.2.0.jre17</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc10 -->
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc10</artifactId>
-      <version>19.13.0.0.1</version>
+      <version>19.14.0.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -131,8 +131,35 @@
             <additionalClasspathElement>src/test/java/</additionalClasspathElement>
           </additionalClasspathElements>
           <argLine>
-            --illegal-access=warn
             --add-opens java.base/java.lang=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.annotation=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.common=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.context=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.mapping=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.result=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.sql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.table=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.command=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.sql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.logger=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.sql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.table_def=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.table_def.annotation=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.common=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.mapping=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.mapping.multirow=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.result=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.sql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.util=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.engine=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.common=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.h2=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.mysql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.oracle=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.postgresql=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.sqlserver=ALL-UNNAMED
             ${argLine}
           </argLine>
         </configuration>

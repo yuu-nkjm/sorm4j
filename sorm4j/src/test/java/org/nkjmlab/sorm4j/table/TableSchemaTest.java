@@ -1,8 +1,8 @@
-package org.nkjmlab.sorm4j.util.table;
+package org.nkjmlab.sorm4j.table;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.*;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
-import static org.nkjmlab.sorm4j.util.table.TableSchemaTest.TempGuestTable.Column.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
