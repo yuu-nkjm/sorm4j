@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -50,8 +52,7 @@ public final class TableDefinition {
 
   public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
 
-    Builder builder =
-        TableDefinition.builder(StringCache.toCanonicalCase(toTableName(ormRecordClass)));
+    Builder builder = TableDefinition.builder(toUpperSnakeCase(toTableName(ormRecordClass)));
 
     Optional.ofNullable(ormRecordClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
         vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
@@ -75,8 +76,12 @@ public final class TableDefinition {
       List<String> opt = new ArrayList<>();
       opt.add(TableDefinition.toSqlDataType(field.getType()));
 
-      for (Annotation ann : parameterAnnotationsOfConstructor == null ? field.getAnnotations()
-          : parameterAnnotationsOfConstructor[i]) {
+      Set<Annotation> anns = new LinkedHashSet<>();
+      Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
+      if (parameterAnnotationsOfConstructor != null) {
+        Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
+      }
+      for (Annotation ann : anns) {
         if (ann instanceof PrimaryKey) {
           opt.add("primary key");
         } else if (ann instanceof AutoIncrement) {
@@ -84,9 +89,9 @@ public final class TableDefinition {
         } else if (ann instanceof NotNull) {
           opt.add("not null");
         } else if (ann instanceof Index) {
-          builder.addIndexDefinition(field.getName());
+          builder.addIndexDefinition(toUpperSnakeCase(field.getName()));
         } else if (ann instanceof Unique) {
-          builder.addUniqueConstraint(field.getName());
+          builder.addUniqueConstraint(toUpperSnakeCase(field.getName()));
         } else if (ann instanceof Check) {
           opt.add("check (" + ((Check) ann).value() + ")");
         } else if (ann instanceof Default) {
@@ -94,9 +99,18 @@ public final class TableDefinition {
         }
 
       }
-      builder.addColumnDefinition(field.getName(), opt.toArray(String[]::new));
+      builder.addColumnDefinition(toUpperSnakeCase(field.getName()), opt.toArray(String[]::new));
     }
     return builder;
+  }
+
+  /**
+   * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)
+   * will return a set of guessed names such as [COMPOUND_NAME].
+   */
+  public static String toUpperSnakeCase(final String compoundName) {
+    String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
+    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1"));
   }
 
   private static String toTableName(Class<?> ormRecordClass) {
