@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.table;
+package org.nkjmlab.sorm4j.table;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.BasicTable;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;

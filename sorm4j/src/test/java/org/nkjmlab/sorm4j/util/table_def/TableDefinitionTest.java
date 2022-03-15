@@ -34,7 +34,7 @@ class TableDefinitionTest {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
     TableDefinition def = TableDefinition.builder(TableDefExample.class).build();
     assertThat(def.getTableNameAndColumnDefinitions()).isEqualTo(
-        "TABLEDEFEXAMPLES(id bigint primary key auto_increment, booleanCol boolean, byteCol tinyint, charCol character, shortCol smallint, intCol integer default 0, floatCol float, doubleCol double check (doubleCol>0), bigDecimal numeric, phoneNumber varchar not null, localDateCol date, localTimeCol time, localDateTime timestamp, offsetTime time with time zone, offsetDateTime timestamp with time zone, blob blob, clob clob, inputStream longvarbinary, reader longvarchar, unique(phoneNumber))");
+        "TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, unique(PHONE_NUMBER))");
     sorm.executeUpdate(def.getCreateTableIfNotExistsStatement());
 
     String selectSql = H2CsvReadSql
@@ -74,7 +74,7 @@ class TableDefinitionTest {
 
     public TableDefExample(@PrimaryKey @AutoIncrement Long id, Boolean booleanCol, Byte byteCol,
         Character charCol, Short shortCol, @Default("0") Integer intCol, Float floatCol,
-        @Check("doubleCol>0") Double doubleCol, BigDecimal bigDecimal,
+        @Check("double_col>0") Double doubleCol, BigDecimal bigDecimal,
         @Index @Unique @NotNull String phoneNumber, LocalDate localDateCol, LocalTime localTimeCol,
         LocalDateTime localDateTimeCol, OffsetTime offsetTime, OffsetDateTime offsetDateTime,
         Blob blob, Clob clob, InputStream inputStream, Reader reader) {
