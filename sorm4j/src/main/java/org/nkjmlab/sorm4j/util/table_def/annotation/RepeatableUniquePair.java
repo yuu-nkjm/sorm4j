@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface UniqueConstraints {
-  String[] value();
+public @interface RepeatableUniquePair {
 
+  public UniquePair[] value();
 }

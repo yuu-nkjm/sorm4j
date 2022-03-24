@@ -30,7 +30,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
     SormContext context = SormContext.builder()
         .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder()
             .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).build())
-        .setLoggerContext(LoggerContext.builder().disableAll().enableAll()
+        .setLoggerContext(LoggerContext.builder().enableAll().disableAll()
             .setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build())
         .build();
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);

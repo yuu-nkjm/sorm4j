@@ -21,13 +21,15 @@ import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
+import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraints;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Default;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Index;
-import org.nkjmlab.sorm4j.util.table_def.annotation.Indexes;
+import org.nkjmlab.sorm4j.util.table_def.annotation.IndexPair;
 import org.nkjmlab.sorm4j.util.table_def.annotation.NotNull;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKey;
+import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyPair;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Unique;
-import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueConstraints;
+import org.nkjmlab.sorm4j.util.table_def.annotation.UniquePair;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and
@@ -54,14 +56,16 @@ public final class TableDefinition {
 
     Builder builder = TableDefinition.builder(toUpperSnakeCase(toTableName(ormRecordClass)));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
-        vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
+    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyPair.class)).map(a -> a.value())
+        .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
-        .ifPresent(
-            vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexPair.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniquePair.class)).ifPresent(
+        vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
+
+    Optional.ofNullable(ormRecordClass.getAnnotation(CheckConstraints.class)).map(a -> a.value())
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v)));
 
 
