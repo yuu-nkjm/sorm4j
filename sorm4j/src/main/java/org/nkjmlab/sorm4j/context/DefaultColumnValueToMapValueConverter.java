@@ -43,7 +43,7 @@ public final class DefaultColumnValueToMapValueConverter implements ColumnValueT
     }
     switch (sqlType) {
       case java.sql.Types.ARRAY:
-        return resultSet.getArray(column);
+        return resultSet.getArray(column).getArray();
       case java.sql.Types.BIGINT: {
         final long ret = resultSet.getLong(column);
         return (ret == 0 && resultSet.wasNull()) ? null : ret;

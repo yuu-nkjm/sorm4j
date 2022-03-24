@@ -66,7 +66,7 @@ public interface RowMap extends Map<String, Object> {
 
   LocalDateTime getLocalDateTime(String key);
 
-  <T> T[] getArray(String key, Class<T> valueType);
+  <T> T[] getArray(String key, Class<T> componentType);
 
 
 }
