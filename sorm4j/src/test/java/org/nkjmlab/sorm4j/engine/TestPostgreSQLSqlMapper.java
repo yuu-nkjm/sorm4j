@@ -102,7 +102,7 @@ public class TestPostgreSQLSqlMapper {
     try (Connection conn = dataSource.getConnection();
         OrmConnection c = OrmConnection.of(conn, context);) {
 
-      log.info(c.readFirst(RowMap.class, "select * from sql_mapper_test"));
+      // log.debug(c.readFirst(RowMap.class, "select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
       doTest(c, "c_integer by int", "c_integer", 1);
       doTest(c, "c_integer by BigDecimal", "c_integer", new BigDecimal("1"));
@@ -161,7 +161,7 @@ public class TestPostgreSQLSqlMapper {
       Class<?> clazz = toClass(param.getClass());
       Object retFromDb = c.readFirst(clazz, "SELECT " + column + " FROM sql_mapper_test");
       if (equals(retFromDb, param)) {
-        log.debug("[" + testName + "] " + messagePrefix + "success ret =>" + retFromDb);
+        // log.debug("[" + testName + "] " + messagePrefix + "success ret =>" + retFromDb);
       } else {
         log.error("[" + testName + "] " + messagePrefix + "fail ret => " + retFromDb + ", param => "
             + param);
@@ -188,7 +188,7 @@ public class TestPostgreSQLSqlMapper {
 
     if (retFromDb.getClass().isArray() && param.getClass().isArray()) {
       return equalsArray(retFromDb, param);
-    } else if (param instanceof Instant) {
+    } else if (param instanceof Instant && retFromDb instanceof OffsetDateTime) {
       OffsetDateTime odt = (OffsetDateTime) retFromDb;
       return odt.toInstant().equals(param);
     } else if (retFromDb instanceof Reader) {
@@ -258,7 +258,7 @@ public class TestPostgreSQLSqlMapper {
       Map<String, Object> ret = c.readFirst(RowMap.class,
           "SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
       if (ret != null) {
-        log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
+        // log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
         log.error("[" + testName + "] " + messagePrefix + "fail => " + ret);
       }
@@ -281,7 +281,7 @@ public class TestPostgreSQLSqlMapper {
           .addParameter(param).parse();
       Map<String, Object> ret = c.readFirst(RowMap.class, statement);
       if (ret != null) {
-        log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
+        // log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
         log.error("[" + testName + "] " + messagePrefix + "fail => " + ret);
       }

@@ -3,7 +3,7 @@
 <configuration status="OFF">
   <Properties>
     <property name="root_log_level">DEBUG</property>
-    <property name="sorm4j_log_level">DEBUG</property>
+    <property name="sorm4j_log_level">TRACE</property>
     <property name="log_pattern">${log_pattern_loc}</property>
     <property name="log_pattern_loc">
       %d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %c.%M(%F:%L) %m%n

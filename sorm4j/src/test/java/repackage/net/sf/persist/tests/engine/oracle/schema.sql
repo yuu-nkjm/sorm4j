@@ -1,10 +1,7 @@
-drop table numeric_types;
-
-drop table datetime_types;
-
-drop table string_types;
-
-drop table binary_types;
+-- drop table numeric_types;
+-- drop table datetime_types;
+-- drop table string_types;
+-- drop table binary_types;
 
 create table numeric_types (
 	number_col number
