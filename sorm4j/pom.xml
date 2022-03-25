@@ -161,6 +161,7 @@
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.result=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.util=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.internal.util.logger=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.engine=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.common=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/repackage.net.sf.persist.tests.engine.h2=ALL-UNNAMED

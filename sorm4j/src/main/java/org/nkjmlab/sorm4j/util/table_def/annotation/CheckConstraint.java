@@ -5,9 +5,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Defines indexes.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RepeatableIndexColumn {
+public @interface CheckConstraint {
 
-  public IndexColumns[] value();
+  /**
+   * Name of the index
+   */
+  String value();
+
 }

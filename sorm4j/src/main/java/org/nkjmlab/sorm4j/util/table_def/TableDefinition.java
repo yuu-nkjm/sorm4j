@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
-import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraints;
+import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Default;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Index;
 import org.nkjmlab.sorm4j.util.table_def.annotation.IndexColumns;
@@ -65,8 +65,8 @@ public final class TableDefinition {
     Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class)).ifPresent(
         vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(CheckConstraints.class)).map(a -> a.value())
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v)));
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(CheckConstraint.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
 
     Annotation[][] parameterAnnotationsOfConstructor = getCanonicalConstructor(ormRecordClass)
