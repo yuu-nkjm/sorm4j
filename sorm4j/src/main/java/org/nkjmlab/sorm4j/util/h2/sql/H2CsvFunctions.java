@@ -42,7 +42,7 @@ public class H2CsvFunctions {
    *
    * returns
    *
-   * csvread('C:\Users\bar\foo.csv',null,'charset=UTF-8 fieldSeparator=,')
+   * csvread('C:\Users\bar\foo.csv',null,'charset=UTF-8 fieldSeparator='||char(44))
    *
    * @see <a href= "https://www.h2database.com/html/functions.html#csvread">Functions - CSVREAD</a>
    * @param csvFile
@@ -53,11 +53,14 @@ public class H2CsvFunctions {
    */
   public static String getCsvReadSql(File csvFile, List<String> csvColumns, Charset charset,
       String fieldSeparator) {
-    String csvOptions = "charset=" + charset.name() + " fieldSeparator=" + fieldSeparator;
-    String readCsvSql = "csvread(" + literal(csvFile.getAbsolutePath()) + ","
-        + (csvColumns == null || csvColumns.size() == 0 ? "null"
-            : "'" + String.join(fieldSeparator, csvColumns) + "'")
-        + "," + literal(csvOptions) + ")";
+    String csvOptions =
+        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + fieldSeparator;
+    String colSql = (csvColumns == null || csvColumns.size() == 0 ? "null"
+        : String.join("||" + fieldSeparator + "||", csvColumns.stream()
+            .map(col -> literal(col.toUpperCase().replace("`", ""))).toArray(String[]::new)));
+
+    String readCsvSql =
+        "csvread(" + literal(csvFile.getAbsolutePath()) + "," + colSql + "," + csvOptions + ")";
     return readCsvSql;
   }
 
@@ -75,7 +78,7 @@ public class H2CsvFunctions {
       List<String> csvColumns, Charset charset, String fieldSeparator) {
     return "select "
         + (selectedColumns == null || selectedColumns.size() == 0 ? "*"
-            : String.join(fieldSeparator, selectedColumns))
+            : String.join(",", selectedColumns))
         + " from " + getCsvReadSql(csvFile, csvColumns, charset, fieldSeparator);
   }
 

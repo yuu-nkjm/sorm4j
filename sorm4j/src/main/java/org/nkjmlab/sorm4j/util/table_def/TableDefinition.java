@@ -24,12 +24,12 @@ import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraints;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Default;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Index;
-import org.nkjmlab.sorm4j.util.table_def.annotation.IndexPair;
+import org.nkjmlab.sorm4j.util.table_def.annotation.IndexColumns;
 import org.nkjmlab.sorm4j.util.table_def.annotation.NotNull;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyPair;
+import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Unique;
-import org.nkjmlab.sorm4j.util.table_def.annotation.UniquePair;
+import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueColumns;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and
@@ -56,13 +56,13 @@ public final class TableDefinition {
 
     Builder builder = TableDefinition.builder(toUpperSnakeCase(toTableName(ormRecordClass)));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyPair.class)).map(a -> a.value())
+    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class)).map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexPair.class))
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexColumns.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniquePair.class)).ifPresent(
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class)).ifPresent(
         vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
     Optional.ofNullable(ormRecordClass.getAnnotation(CheckConstraints.class)).map(a -> a.value())

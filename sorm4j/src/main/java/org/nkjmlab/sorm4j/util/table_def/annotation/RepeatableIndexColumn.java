@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RepeatableUniquePair {
+public @interface RepeatableIndexColumn {
 
-  public UniquePair[] value();
+  public IndexColumns[] value();
 }

@@ -51,10 +51,10 @@ public class SormTestUtils {
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
   public static TableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
-    TableDefinition schema =
-        TableDefinition.builder("guests").addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
-            .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
-            .addIndexDefinition("name").addIndexDefinition("name").build();
+    TableDefinition schema = TableDefinition.builder("guests")
+        .addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
+        .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
+        .addIndexDefinition("name").addIndexDefinition("name").build();
 
 
     BasicTableWithDefinition<Guest> tbl = new BasicTableWithDefinition<>(sorm, Guest.class, schema);
@@ -68,9 +68,10 @@ public class SormTestUtils {
 
   public static TableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
 
-    TableDefinition schema = TableDefinition.builder(tableName).addColumnDefinition("id", INT, PRIMARY_KEY)
-        .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
-        .addIndexDefinition("name").addIndexDefinition("name").build();
+    TableDefinition schema =
+        TableDefinition.builder(tableName).addColumnDefinition("id", INT, PRIMARY_KEY)
+            .addColumnDefinition("name", VARCHAR).addColumnDefinition("address", VARCHAR)
+            .addIndexDefinition("name").addIndexDefinition("name").build();
 
     TableWithDefinition<Player> tbl = new TableWithDefinition<>() {
 
@@ -100,8 +101,8 @@ public class SormTestUtils {
   }
 
   public static TableWithDefinition<Sport> createSportsTable(Sorm sorm) {
-    TableDefinition schema = TableDefinition.builder("sports").addColumnDefinition("id", INT, PRIMARY_KEY)
-        .addColumnDefinition("name", VARCHAR).build();
+    TableDefinition schema = TableDefinition.builder("sports")
+        .addColumnDefinition("id", INT, PRIMARY_KEY).addColumnDefinition("name", VARCHAR).build();
 
     TableWithDefinition<Sport> tbl = new TableWithDefinition<>() {
 
@@ -146,8 +147,8 @@ public class SormTestUtils {
   private static AtomicInteger urlSuffuix = new AtomicInteger();
 
   public static DriverManagerDataSource createNewDatabaseDataSource() {
-    final String JDBC_URL =
-        "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1;";
+    final String JDBC_URL = "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet()
+        + ";DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
     final String USER = "sa";
     final String PASSWORD = "";
     return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);

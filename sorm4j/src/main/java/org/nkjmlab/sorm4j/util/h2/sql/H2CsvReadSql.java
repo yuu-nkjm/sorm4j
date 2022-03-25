@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,6 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 
 @Experimental
 public class H2CsvReadSql {
-  public static Builder builder(File csvFile) {
-    return new Builder(csvFile);
-  }
 
   private final List<String> columns;
 
@@ -32,6 +30,10 @@ public class H2CsvReadSql {
 
   public String getCsvReadAndSelectSql() {
     return csvReadAndSelectSql;
+  }
+
+  public static Builder builder(File csvFile) {
+    return new Builder(csvFile);
   }
 
   @Override
@@ -53,7 +55,7 @@ public class H2CsvReadSql {
     private List<String> csvColumns = new ArrayList<>();
     private final File csvFile;
     private Charset charset = StandardCharsets.UTF_8;
-    private String fieldSeparator = ",";
+    private String fieldSeparator = "char(" + ((int) ',') + ")";
 
 
     public Builder(File csvFile) {
@@ -61,18 +63,18 @@ public class H2CsvReadSql {
     }
 
     public H2CsvReadSql build() {
-      List<String> columnsWithAlias = new ArrayList<>(columns);
+      List<String> selectedColumns = new ArrayList<>(columns);
 
       aliases.entrySet().forEach(en -> {
-        int index = columnsWithAlias.indexOf(en.getKey());
+        int index = selectedColumns.indexOf(en.getKey());
         if (index == -1) {
           throw new IllegalStateException(ParameterizedStringUtils
               .newString("{} is not found in Columns {}", en.getKey(), columns));
         }
-        columnsWithAlias.set(index, en.getValue());
+        selectedColumns.set(index, en.getValue());
       });
 
-      return new H2CsvReadSql(columns, H2CsvFunctions.getCsvReadAndSelectSql(columnsWithAlias,
+      return new H2CsvReadSql(columns, H2CsvFunctions.getCsvReadAndSelectSql(selectedColumns,
           csvFile, csvColumns, charset, fieldSeparator));
     }
 
@@ -81,8 +83,8 @@ public class H2CsvReadSql {
       return this;
     }
 
-    public Builder setFieldSeparator(String fieldSeparator) {
-      this.fieldSeparator = fieldSeparator;
+    public Builder setFieldSeparator(char fieldSeparator) {
+      this.fieldSeparator = "char(" + ((int) fieldSeparator) + ")";
       return this;
     }
 
@@ -91,18 +93,26 @@ public class H2CsvReadSql {
       return setCharset(Charset.forName(charset));
     }
 
-    public Builder setColumns(List<String> columns) {
-      this.columns = new ArrayList<>(columns);
+    public Builder setTableColumns(List<String> tableColumns) {
+      this.columns = new ArrayList<>(tableColumns);
       return this;
     }
 
-    public Builder setDateTimePatternToColumns(String dateTimePattern, List<String> columns) {
-      columns.forEach(column -> aliases.put(column,
-          "parsedatetime(`" + column + "`,'" + dateTimePattern + "') as " + column));
+    public Builder setTableColumns(String... tableColumns) {
+      return setTableColumns(Arrays.asList(tableColumns));
+    }
+
+    public Builder setCsvColumns(List<String> csvColumns) {
+      this.csvColumns = new ArrayList<>(csvColumns);
       return this;
     }
 
-    public Builder setExpressionToColumn(String expression, String column) {
+    public Builder setCsvColumns(String... csvColumns) {
+      return setCsvColumns(Arrays.asList(csvColumns));
+    }
+
+
+    public Builder mapCsvColumnToTableColumn(String expression, String column) {
       aliases.put(column, expression + " as " + column);
       return this;
     }
