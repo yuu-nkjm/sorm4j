@@ -3,19 +3,19 @@ package org.nkjmlab.sorm4j.internal.mapping;
 import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -29,14 +29,11 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 public final class SqlResultToColumnsMapping<T> {
 
-  private static final ConcurrentMap<Class<?>, String[]> primaryKeyColumnLabels =
-      new ConcurrentHashMap<>();
-
   private final Class<T> objectClass;
+  private final Map<Class<?>, ColumnsAndTypesAndString> metaDataForSelectByPrimaryKey =
+      new ConcurrentHashMap<>();
   private final ColumnValueToJavaObjectConverters columnValueConverter;
   private final ColumnToAccessorMapping columnToAccessorMap;
-
-  private final Map<String, int[]> columnTypesMap = new ConcurrentHashMap<>();
   private final SqlResultToContainerMapping<T> containerObjectCreator;
 
   public SqlResultToColumnsMapping(ColumnValueToJavaObjectConverters converter,
@@ -110,71 +107,63 @@ public final class SqlResultToColumnsMapping<T> {
 
 
   public List<T> traverseAndMap(ResultSet resultSet) throws SQLException {
-    ResultSetMetaData metaData = resultSet.getMetaData();
-    String[] columns = createColumnLabels(resultSet, metaData);
-    String columnsString = getObjectColumnsString(columns);
-    int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return containerObjectCreator.loadContainerObjectList(columnValueConverter, resultSet, columns,
-        columnTypes, columnsString);
+    ColumnsAndTypes columnsAndTypes =
+        OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
+    String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
+
+    return containerObjectCreator.loadContainerObjectList(columnValueConverter, resultSet,
+        columnsAndTypes.getColumns(), columnsAndTypes.getColumnTypes(), columnsString);
   }
 
   public T loadResultContainerObject(ResultSet resultSet) throws SQLException {
-    ResultSetMetaData metaData = resultSet.getMetaData();
-    String[] columns = createColumnLabels(resultSet, metaData);
-    String columnsString = getObjectColumnsString(columns);
-    int[] columnTypes = getColumnTypes(resultSet, metaData, columns, columnsString);
-    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet, columns,
-        columnTypes, columnsString);
+
+    ColumnsAndTypes columnsAndTypes =
+        OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
+    String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
+
+    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet,
+        columnsAndTypes.getColumns(), columnsAndTypes.getColumnTypes(), columnsString);
   }
 
   public T loadResultContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
-    String[] columns = primaryKeyColumnLabels.computeIfAbsent(objectClass, key -> {
+
+    ColumnsAndTypesAndString columnsAndTypesAndString = metaDataForSelectByPrimaryKey
+        .computeIfAbsent(objectClass, key -> ColumnsAndTypesAndString.create(resultSet));
+
+    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet,
+        columnsAndTypesAndString.columnsAndTypes.getColumns(),
+        columnsAndTypesAndString.columnsAndTypes.getColumnTypes(),
+        columnsAndTypesAndString.columnsString);
+  }
+
+  private static class ColumnsAndTypesAndString {
+
+    final ColumnsAndTypes columnsAndTypes;
+    final String columnsString;
+
+    public ColumnsAndTypesAndString(ColumnsAndTypes columnsAndTypes, String columnsString) {
+      this.columnsAndTypes = columnsAndTypes;
+      this.columnsString = columnsString;
+    }
+
+    static ColumnsAndTypesAndString create(ResultSet resultSet) {
       try {
-        return createColumnLabels(resultSet, resultSet.getMetaData());
+        ColumnsAndTypes columnsAndTypes =
+            OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
+        String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
+        return new ColumnsAndTypesAndString(columnsAndTypes, columnsString);
       } catch (SQLException e) {
         throw Try.rethrow(e);
       }
-    });
-    String columnsString = getObjectColumnsString(columns);
-    int[] columnTypes = getColumnTypes(resultSet, null, columns, columnsString);
-    return containerObjectCreator.loadContainerObject(columnValueConverter, resultSet, columns,
-        columnTypes, columnsString);
+    }
+
   }
 
-  private String getObjectColumnsString(String[] columns) {
+  private static String getObjectColumnsString(String[] columns) {
     return String.join("-", columns);
   }
 
-
-
-  private int[] getColumnTypes(ResultSet resultSet, ResultSetMetaData metaData, String[] columns,
-      String columnsStr) {
-    return columnTypesMap.computeIfAbsent(columnsStr, k -> {
-      try {
-        ResultSetMetaData _metaData = metaData == null ? resultSet.getMetaData() : metaData;
-        int n = _metaData.getColumnCount();
-        int[] ret = new int[n];
-        for (int i = 1; i <= ret.length; i++) {
-          ret[i - 1] = _metaData.getColumnType(i);
-        }
-        return ret;
-      } catch (SQLException e) {
-        throw Try.rethrow(e);
-      }
-    });
-  }
-
-
-  private String[] createColumnLabels(ResultSet resultSet, ResultSetMetaData metaData)
-      throws SQLException {
-    final int colNum = metaData.getColumnCount();
-    final String[] columns = new String[colNum];
-    for (int i = 1; i <= colNum; i++) {
-      columns[i - 1] = metaData.getColumnLabel(i);
-    }
-    return columns;
-  }
 
 
   ColumnToAccessorMapping getColumnToAccessorMap() {

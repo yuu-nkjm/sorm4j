@@ -750,13 +750,13 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private RowMap toSingleRowMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException {
-    final int colsNum = columns.size();
+  private RowMap toSingleRowMap(ResultSet resultSet, String[] columns, int[] columnTypes)
+      throws SQLException {
+    final int colsNum = columns.length;
     final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
     for (int i = 1; i <= colsNum; i++) {
-      ret.put(columns.get(i - 1),
-          getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
+      ret.put(columns[i - 1],
+          getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes[i - 1]));
     }
     return ret;
   }
@@ -936,36 +936,38 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private static class ColumnsAndTypes {
+  public static class ColumnsAndTypes {
 
-    private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
+    public static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
       ResultSetMetaData metaData = resultSet.getMetaData();
       int colNum = metaData.getColumnCount();
-      List<String> columns = new ArrayList<>(colNum);
-      List<Integer> columnTypes = new ArrayList<>(colNum);
+      String[] columns = new String[colNum];
+      int[] columnTypes = new int[colNum];
       for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnLabel(i));
-        columnTypes.add(metaData.getColumnType(i));
+        columns[i - 1] = metaData.getColumnLabel(i);
+        columnTypes[i - 1] = metaData.getColumnType(i);
       }
       return new ColumnsAndTypes(columns, columnTypes);
     }
 
-    private final List<String> columns;
+    private final String[] columns;
 
-    private final List<Integer> columnTypes;
+    private final int[] columnTypes;
 
-    private ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+    public ColumnsAndTypes(String[] columns, int[] columnTypes) {
       this.columns = columns;
       this.columnTypes = columnTypes;
     }
 
-    public List<String> getColumns() {
+    public String[] getColumns() {
       return columns;
     }
 
-    public List<Integer> getColumnTypes() {
+    public int[] getColumnTypes() {
       return columnTypes;
     }
+
+
   }
 
   @Override
