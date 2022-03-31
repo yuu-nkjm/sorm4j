@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
 import static java.lang.String.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,7 +19,6 @@ import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -108,14 +108,6 @@ public final class TableDefinition {
     return builder;
   }
 
-  /**
-   * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)
-   * will return a set of guessed names such as [COMPOUND_NAME].
-   */
-  public static String toUpperSnakeCase(final String compoundName) {
-    String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
-    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1"));
-  }
 
   private static String toTableName(Class<?> ormRecordClass) {
     OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
@@ -126,7 +118,7 @@ public final class TableDefinition {
     }
   }
 
-  private static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
+  public static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
     try {
       Class<?>[] componentTypes = Arrays.stream(recordClass.getDeclaredFields())
           .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers())).map(f -> f.getType())
