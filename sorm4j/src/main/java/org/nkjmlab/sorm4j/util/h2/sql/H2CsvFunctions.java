@@ -28,10 +28,12 @@ public class H2CsvFunctions {
    * @return
    */
   public static String getCallCsvWriteSql(File toFile, String selectSql, Charset charset,
-      String fieldSeparator) {
-    String csvOptions = "charset=" + charset.name() + " fieldSeparator=" + fieldSeparator;
+      char fieldSeparator) {
+    String _fieldSeparator = toStringChar(fieldSeparator);
+    String csvOptions =
+        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + _fieldSeparator;
     String csvStmt = "call csvwrite(" + literal(toFile.getAbsolutePath()) + "," + literal(selectSql)
-        + "," + literal(csvOptions) + ")";
+        + "," + csvOptions + ")";
     return csvStmt;
   }
 
@@ -48,15 +50,16 @@ public class H2CsvFunctions {
    * @param csvFile
    * @param csvColumns columns in CSV file. null or empty means the all columns.
    * @param charset
-   * @param fieldSeparator
+   * @param _fieldSeparator
    * @return
    */
   public static String getCsvReadSql(File csvFile, List<String> csvColumns, Charset charset,
-      String fieldSeparator) {
+      char fieldSeparator) {
+    String _fieldSeparator = toStringChar(fieldSeparator);
     String csvOptions =
-        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + fieldSeparator;
+        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + _fieldSeparator;
     String colSql = (csvColumns == null || csvColumns.size() == 0 ? "null"
-        : String.join("||" + fieldSeparator + "||", csvColumns.stream()
+        : String.join("||" + _fieldSeparator + "||", csvColumns.stream()
             .map(col -> literal(col.toUpperCase().replace("`", ""))).toArray(String[]::new)));
 
     String readCsvSql =
@@ -64,6 +67,10 @@ public class H2CsvFunctions {
     return readCsvSql;
   }
 
+
+  private static String toStringChar(char fieldSeparator) {
+    return "char(" + ((int) fieldSeparator) + ")";
+  }
 
   /**
    *
@@ -75,7 +82,7 @@ public class H2CsvFunctions {
    * @return
    */
   public static String getCsvReadAndSelectSql(List<String> selectedColumns, File csvFile,
-      List<String> csvColumns, Charset charset, String fieldSeparator) {
+      List<String> csvColumns, Charset charset, char fieldSeparator) {
     return "select "
         + (selectedColumns == null || selectedColumns.size() == 0 ? "*"
             : String.join(",", selectedColumns))

@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.test.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.Connection;
@@ -8,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class H2ServerUtils {
@@ -41,8 +44,8 @@ public class H2ServerUtils {
     }
 
     public static abstract class Builder<T extends H2ServerProperties> {
-      protected String javaCommand = SystemPropertyUtils.findJavaCommand();
-      protected String h2ClassPath = SystemPropertyUtils.findOneClassPathElement("^h2-.*.jar$");
+      protected String javaCommand = findJavaCommand();
+      protected String h2ClassPath = findOneClassPathElement("^h2-.*.jar$");
       protected final String name;
       protected int port;
       protected String password = "";
@@ -327,5 +330,25 @@ public class H2ServerUtils {
     startServerProcessAndWaitFor(H2WebConsoleServerProperties.builder().build());
   }
 
+  private static String[] getClassPathElements() {
+    return System.getProperty("java.class.path").split(File.pathSeparator);
+  }
+
+  private static String findOneClassPathElement(String regex) {
+    String[] classPathElements = getClassPathElements();
+    List<String> elements = Arrays.stream(classPathElements)
+        .filter(elem -> new File(elem).getName().matches(regex)).collect(Collectors.toList());
+    if (elements.size() == 1) {
+      return elements.get(0);
+    } else {
+      throw new IllegalStateException(ParameterizedStringUtils
+          .newString("Jar should be one in class path ({})", Arrays.toString(classPathElements)));
+    }
+  }
+
+  private static String findJavaCommand() {
+    String javaHome = System.getProperty("java.home");
+    return new File(new File(javaHome, "bin"), "java").getAbsolutePath();
+  }
 
 }
