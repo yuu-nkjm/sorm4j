@@ -50,7 +50,7 @@ public class H2CsvFunctions {
    * @param csvFile
    * @param csvColumns columns in CSV file. null or empty means the all columns.
    * @param charset
-   * @param _fieldSeparator
+   * @param fieldSeparator
    * @return
    */
   public static String getCsvReadSql(File csvFile, List<String> csvColumns, Charset charset,

@@ -149,6 +149,7 @@
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.table=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.command=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.logger=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.sql=ALL-UNNAMED
