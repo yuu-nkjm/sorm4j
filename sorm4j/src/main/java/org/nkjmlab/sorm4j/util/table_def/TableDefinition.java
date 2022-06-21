@@ -527,6 +527,8 @@ public final class TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
+      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
+        return "json";
       default:
         if (type.isArray()) {
           final Class<?> compType = type.getComponentType();

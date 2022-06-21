@@ -27,6 +27,7 @@ import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.mapping.TableName;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SormContextImpl implements SormContext {
@@ -77,9 +78,15 @@ public final class SormContextImpl implements SormContext {
     return ret;
   }
 
-  public <T> TableSql getTableSql(TableMetaData tableMetaData) {
-    return tableSqlMap.computeIfAbsent(tableMetaData.getTableName(),
-        _key -> config.getTableSqlFactory().create(tableMetaData));
+  public <T> TableSql getTableSql(Connection connection, TableMetaData tableMetaData) {
+    return tableSqlMap.computeIfAbsent(tableMetaData.getTableName(), _key -> {
+      try {
+        return config.getTableSqlFactory().create(tableMetaData,
+            JdbcDatabaseMetaData.of(connection.getMetaData()));
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    });
   }
 
 
@@ -140,7 +147,8 @@ public final class SormContextImpl implements SormContext {
         config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
     TableMetaDataImpl tableMetaData = getTableMetaData(connection, tableName, objectClass);
-    TableSql sql = getTableSql(tableMetaData);
+
+    TableSql sql = getTableSql(connection, tableMetaData);
 
     // validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 

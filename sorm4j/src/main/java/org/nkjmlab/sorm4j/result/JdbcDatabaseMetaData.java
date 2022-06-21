@@ -130,7 +130,7 @@ public final class JdbcDatabaseMetaData {
           List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "TABLE_TYPE", "REMARKS", "TYPE_CAT",
               "TYPE_SCHEM", "TYPE_NAME", "SELF_REFERENCING_COL_NAME", "REF_GENERATION")).stream()
                   .map(e -> new JdbcTableMetaData(e))
-                  .collect(Collectors.toMap(m -> m.get("TABLE_NAME"), m -> m));
+                  .collect(Collectors.toMap(m -> m.get("TABLE_NAME"), m -> m, (v1, v2) -> v1));
 
       Map<String, Map<String, JdbcIndexMetaData>> indexes = new HashMap<>();
       for (Entry<String, JdbcTableMetaData> jdbcTableEntry : tables.entrySet()) {
@@ -140,7 +140,7 @@ public final class JdbcDatabaseMetaData {
               List.of("TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "INDEX_QUALIFIER", "INDEX_NAME",
                   "TYPE", "ORDINAL_POSITION", "COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES",
                   "FILTER_CONDITION")).stream().map(e -> new JdbcIndexMetaData(e))
-                      .collect(Collectors.toMap(m -> m.get("INDEX_NAME"), m -> m));
+                      .collect(Collectors.toMap(m -> m.get("INDEX_NAME"), m -> m, (v1, v2) -> v1));
           indexes.put(tableName, l);
         }
       }

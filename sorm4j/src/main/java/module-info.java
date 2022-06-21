@@ -12,6 +12,7 @@ module org.nkjmlab.sorm4j {
   exports org.nkjmlab.sorm4j.table;
   exports org.nkjmlab.sorm4j.util.command;
   exports org.nkjmlab.sorm4j.util.h2;
+  exports org.nkjmlab.sorm4j.util.h2.datatype;
   exports org.nkjmlab.sorm4j.util.h2.sql;
   exports org.nkjmlab.sorm4j.util.logger;
   exports org.nkjmlab.sorm4j.util.sql;

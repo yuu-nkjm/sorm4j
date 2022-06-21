@@ -141,6 +141,19 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public <T> int deleteByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
+    final String sql = getTableMapping(objectClass).getSql().getDeleteSql();
+    return executeUpdate(sql, primaryKeyValues);
+  }
+
+  @Override
+  public <T> int deleteByPrimaryKeyIn(String tableName, Class<T> objectClass,
+      Object... primaryKeyValues) {
+    final String sql = getCastedTableMapping(tableName, objectClass).getSql().getDeleteSql();
+    return executeUpdate(sql, primaryKeyValues);
+  }
+
+  @Override
   public <T> int[] deleteIn(String tableName, List<T> objects) {
     return applytoArray(objects, array -> deleteIn(tableName, array));
   }
@@ -341,7 +354,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public TableSql getTableSql(String tableName) {
-    return sormContext.getTableSql(getTableMetaData(tableName));
+    return sormContext.getTableSql(connection, getTableMetaData(tableName));
   }
 
   @Override
