@@ -26,7 +26,7 @@ public final class StringCache {
    */
   public static String toUpperSnakeCase(final String compoundName) {
     String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
-    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1"));
+    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1").replace("__", "_"));
   }
 
 
