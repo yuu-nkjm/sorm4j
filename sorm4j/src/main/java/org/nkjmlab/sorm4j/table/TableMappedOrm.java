@@ -109,6 +109,15 @@ public interface TableMappedOrm<T> {
     return getOrm().deleteAllIn(getTableName());
   }
 
+  @Experimental
+  default int deleteByPrimaryKey(Object... primaryKeyValues) {
+    return getOrm().deleteByPrimaryKey(getValueType(), primaryKeyValues);
+  }
+
+  @Experimental
+  default int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues) {
+    return getOrm().deleteByPrimaryKeyIn(tableName, primaryKeyValues);
+  }
 
   default int[] insert(List<T> objects) {
     return getOrm().insertIn(getTableName(), objects);

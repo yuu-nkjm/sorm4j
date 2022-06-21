@@ -62,7 +62,7 @@ public final class SormContextImpl implements SormContext {
   }
 
   TableMetaData getTableMetaData(Connection connection, String tableName) {
-    return getTableMetaData(connection, tableName, Object.class);
+    return getTableMetaData(connection, tableName, NoValueType.class);
   }
 
   private <T> TableMetaDataImpl getTableMetaData(Connection connection, String tableName,
@@ -315,4 +315,7 @@ public final class SormContextImpl implements SormContext {
   }
 
 
+  private static class NoValueType {
+
+  }
 }

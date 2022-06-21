@@ -92,6 +92,28 @@ public interface Orm {
    */
   int deleteAllIn(String tableName);
 
+  /**
+   * Deletes a row from the table corresponding to the class the by primary key.
+   *
+   * @param <T>
+   * @param objectClass
+   * @param primaryKeyValues
+   * @return
+   */
+  @Experimental
+  <T> int deleteByPrimaryKey(Class<T> type, Object... primaryKeyValues);
+
+  /**
+   * Deletes a row from the table corresponding to the table name the by primary key.
+   *
+   * @param <T>
+   * @param tableName
+   * @param primaryKeyValues
+   * @param objectClass
+   * @return
+   */
+  @Experimental
+  <T> int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues);
 
   /**
    * Deletes objects in the table of the given table name.

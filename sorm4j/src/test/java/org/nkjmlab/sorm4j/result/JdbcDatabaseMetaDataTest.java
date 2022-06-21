@@ -13,7 +13,7 @@ class JdbcDatabaseMetaDataTest {
   void test() {
     TableWithDefinition<Player> playersTable =
         SormTestUtils.createPlayersTable(SormTestUtils.createSormWithNewContext());
-    String version = "2.1.210 (2022-01-17)";
+    String version = "2.1.214 (2022-06-13)";
     JdbcDatabaseMetaData md = playersTable.getOrm().getJdbcDatabaseMetaData();
     assertThat(md.getDatabaseProductName()).isEqualTo("H2");
     assertThat(md.getDatabaseProductVersion()).isEqualTo(version);

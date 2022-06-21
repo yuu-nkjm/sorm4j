@@ -177,6 +177,33 @@ class TableTest {
   }
 
   @Test
+  void testDeleteByPrimaryKey() {
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.insert(PLAYER_BOB);
+    assertThat(
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(2);
+    playersTable.deleteByPrimaryKey(PLAYER_ALICE.id);
+    assertThat(
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(1);
+  }
+
+  @Test
+  void testDeleteByPrimaryKeyIn() {
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.insert(PLAYER_BOB);
+    assertThat(
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(2);
+    playersTable.deleteByPrimaryKeyIn(playersTable.getTableName(), PLAYER_ALICE.id);
+    assertThat(
+        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+            .isEqualTo(1);
+  }
+
+
+  @Test
   void testDeleteTArray() {
     playersTable.insert(new Player[] {PLAYER_ALICE});
     playersTable.update(new Player[] {PLAYER_ALICE});
