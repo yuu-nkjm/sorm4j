@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.context;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 
 // "select * " is faster than "select col1, col2, ..., coln" in H2 2.1.210. the former is also
@@ -30,13 +32,16 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
     String errorMsg =
         "This opperation requiers primary key but Table [" + tableName + "] doesn't have it.";
 
+    String whereClauseIdentifyByPrimaryKeys = createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
+
     String existsSql = !tableMetaData.hasPrimaryKey() ? errorMsg
-        : "select 1 from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
-    String updateSql = !tableMetaData.hasPrimaryKey() ? errorMsg
-        : "update " + tableName + createUpdateSetClause(tableMetaData.getNotPrimaryKeys())
-            + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
+        : "select 1 from " + tableName + whereClauseIdentifyByPrimaryKeys;
+
+    UpdateSqlFactory updateSqlFactory = new UpdateSqlFactory(tableMetaData.hasPrimaryKey(),
+        errorMsg, tableName, tableMetaData.getNotPrimaryKeys(), whereClauseIdentifyByPrimaryKeys);
+    String updateSql = updateSqlFactory.create(tableMetaData.getNotPrimaryKeys());
     String deleteSql = !tableMetaData.hasPrimaryKey() ? errorMsg
-        : "delete from " + tableName + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
+        : "delete from " + tableName + whereClauseIdentifyByPrimaryKeys;
 
     String mergePlaceholders =
         " (" + generatePlaceholders(databaseMetaData, tableMetaData, columns) + ") ";
@@ -46,18 +51,49 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
     String mergeSql =
         !tableMetaData.hasPrimaryKey() ? errorMsg : mergeSqlPrefix + mergePlaceholders;
 
-    String selectByPrimaryKeySql = !tableMetaData.hasPrimaryKey() ? ""
-        : selectAllSql + " " + createWhereClauseIdentifyByPrimaryKeys(primaryKeys);
+    String selectByPrimaryKeySql =
+        !tableMetaData.hasPrimaryKey() ? "" : selectAllSql + " " + whereClauseIdentifyByPrimaryKeys;
 
 
     return new TableSql(insertPlaceholders, mergePlaceholders, selectByPrimaryKeySql, selectAllSql,
-        insertSql, updateSql, deleteSql, mergeSql, existsSql, insertSqlPrefix, mergeSqlPrefix);
+        insertSql, updateSql, deleteSql, mergeSql, existsSql, insertSqlPrefix, mergeSqlPrefix,
+        updateSqlFactory);
   }
 
-  private static String createUpdateSetClause(List<String> notPrimaryKeys) {
-    return " set " + String.join(", ",
-        notPrimaryKeys.stream().map(npk -> npk + "=?").collect(Collectors.toList()));
+  public static class UpdateSqlFactory {
+
+    private final boolean hasPrimaryKey;
+    private final String errorMsg;
+    private final String tableName;
+    private final String whereClauseIdentifyByPrimaryKeys;
+    private final Map<String, String> canonicalNameToDbColumnMap;
+
+    public UpdateSqlFactory(boolean hasPrimaryKey, String errorMsg, String tableName,
+        List<String> columns, String whereClauseIdentifyByPrimaryKeys) {
+      this.hasPrimaryKey = hasPrimaryKey;
+      this.errorMsg = errorMsg;
+      this.tableName = tableName;
+      this.whereClauseIdentifyByPrimaryKeys = whereClauseIdentifyByPrimaryKeys;
+      this.canonicalNameToDbColumnMap =
+          columns.stream().collect(Collectors.toMap(c -> StringCache.toCanonicalCase(c), c -> c));
+    }
+
+    public String create(List<String> columns) {
+      return !hasPrimaryKey ? errorMsg
+          : "update " + tableName + createUpdateSetClause(columns)
+              + whereClauseIdentifyByPrimaryKeys;
+    }
+
+    private String createUpdateSetClause(List<String> columns) {
+      return " set " + String.join(", ",
+          columns.stream()
+              .map(col -> canonicalNameToDbColumnMap.get(StringCache.toCanonicalCase(col)) + "=?")
+              .collect(Collectors.toList()));
+    }
+
   }
+
+
 
   private static String createWhereClauseIdentifyByPrimaryKeys(List<String> primaryKeys) {
     return " where " + String.join(" and ",
@@ -68,7 +104,8 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
       TableMetaData tableMetaData, List<String> targetColumns) {
     if (databaseMetaData.getDatabaseProductName().toLowerCase().contains("h2")) {
       return String.join(",",
-          tableMetaData.getColumnsWithMetaData().stream().filter(c -> targetColumns.contains(c.getName()))
+          tableMetaData.getColumnsWithMetaData().stream()
+              .filter(c -> targetColumns.contains(c.getName()))
               .map(c -> c.getTypeName().equalsIgnoreCase("json") ? "? format json" : "?")
               .toArray(String[]::new));
     } else {

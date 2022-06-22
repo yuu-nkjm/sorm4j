@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
@@ -188,6 +189,18 @@ class TableTest {
         playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(1);
   }
+
+  @Test
+  void testUpdateByPrimaryKey() {
+    playersTable.insert(PLAYER_ALICE);
+    playersTable.insert(PLAYER_BOB);
+    playersTable.updateByPrimaryKey(RowMap.of("name", "AAA"), PLAYER_ALICE.id);
+    playersTable.updateByPrimaryKey(RowMap.of("name", "bbb"), PLAYER_BOB.id);
+
+    assertThat(playersTable.selectByPrimaryKey(PLAYER_ALICE.id).getName()).isEqualTo("AAA");
+    assertThat(playersTable.selectByPrimaryKey(PLAYER_BOB.id).getName()).isEqualTo("bbb");
+  }
+
 
   @Test
   void testDeleteByPrimaryKeyIn() {

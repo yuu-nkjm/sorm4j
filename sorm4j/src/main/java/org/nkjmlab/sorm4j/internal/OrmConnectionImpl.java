@@ -827,6 +827,22 @@ public class OrmConnectionImpl implements OrmConnection {
     return executeUpdate(mapping.getSql().getUpdateSql(), mapping.getUpdateParameters(object));
   }
 
+  @Override
+  public <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues) {
+    final String sql = getTableSql(clazz).getUpdateSql(object);
+    List<Object> params = new ArrayList<>(object.values());
+    params.addAll(Arrays.asList(primaryKeyValues));
+    return executeUpdate(sql, params.toArray());
+  }
+
+  @Override
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+    final String sql = getTableSql(tableName).getUpdateSql(object);
+    List<Object> params = new ArrayList<>(object.values());
+    params.addAll(Arrays.asList(primaryKeyValues));
+    return executeUpdate(sql, params.toArray());
+  }
+
 
   @Override
   public <T> int[] update(@SuppressWarnings("unchecked") T... objects) {
@@ -991,5 +1007,6 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName) {
     return new TableMappedOrmConnectionImpl<>(this, type, tableName);
   }
+
 
 }

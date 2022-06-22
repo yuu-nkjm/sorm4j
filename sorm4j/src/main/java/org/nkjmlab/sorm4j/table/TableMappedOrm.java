@@ -188,6 +188,10 @@ public interface TableMappedOrm<T> {
     return getOrm().updateIn(getTableName(), objects);
   }
 
+  default int updateByPrimaryKey(RowMap object, Object... primaryKeyValues) {
+    return getOrm().updateByPrimaryKeyIn(getTableName(), object, primaryKeyValues);
+  }
+
   default <S> List<Tuple2<T, S>> joinUsing(Table<S> other, String... columns) {
     return getOrm().joinUsing(getValueType(), other.getValueType(), columns);
   }

@@ -97,7 +97,7 @@ public interface Orm {
    *
    * @param <T>
    * @param objectClass
-   * @param primaryKeyValues
+   * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
   @Experimental
@@ -108,8 +108,7 @@ public interface Orm {
    *
    * @param <T>
    * @param tableName
-   * @param primaryKeyValues
-   * @param objectClass
+   * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
   @Experimental
@@ -707,7 +706,7 @@ public interface Orm {
    *
    * @param <T>
    * @param type
-   * @param primaryKeyValues
+   * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
   <T> T selectByPrimaryKey(Class<T> type, Object... primaryKeyValues);
@@ -739,6 +738,27 @@ public interface Orm {
    * @return
    */
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
+
+  /**
+   *
+   * @param <T>
+   * @param clazz
+   * @param object
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues);
+
+  /**
+   *
+   * @param tableName
+   * @param object
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues);
 
   /**
    * Updates by objects in the table corresponding to the given table name.

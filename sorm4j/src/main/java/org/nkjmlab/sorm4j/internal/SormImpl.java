@@ -445,6 +445,15 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.update(objects));
   }
 
+  @Override
+  public <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKey(clazz, object, primaryKeyValues));
+  }
+
+  @Override
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKeyIn(tableName, object, primaryKeyValues));
+  }
 
   @Override
   public <T> int[] updateIn(String tableName, List<T> objects) {
