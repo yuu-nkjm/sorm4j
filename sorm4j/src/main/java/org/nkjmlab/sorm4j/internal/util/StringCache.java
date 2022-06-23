@@ -21,6 +21,16 @@ public final class StringCache {
   }
 
   /**
+   * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)
+   * will return a set of guessed names such as [COMPOUND_NAME].
+   */
+  public static String toUpperSnakeCase(final String compoundName) {
+    String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
+    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1").replace("__", "_"));
+  }
+
+
+  /**
    * Converts the given string to string in canonical case.
    *
    * <b>Example</b>

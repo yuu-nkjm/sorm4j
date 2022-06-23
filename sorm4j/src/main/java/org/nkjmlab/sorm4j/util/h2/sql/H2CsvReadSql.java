@@ -1,20 +1,27 @@
 package org.nkjmlab.sorm4j.util.h2.sql;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
+import org.nkjmlab.sorm4j.util.h2.sql.annotation.CsvColumn;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
+import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 
 @Experimental
 public class H2CsvReadSql {
-  public static Builder builder(File csvFile) {
-    return new Builder(csvFile);
-  }
 
   private final List<String> columns;
 
@@ -34,10 +41,16 @@ public class H2CsvReadSql {
     return csvReadAndSelectSql;
   }
 
-  @Override
-  public String toString() {
-    return "H2CsvReadSql [columns=" + columns + ", csvReadAndSelectSql=" + csvReadAndSelectSql
-        + "]";
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static Builder builder(File csvFile, Class<?> ormRecordClass) {
+    return new Builder(csvFile, ormRecordClass);
+  }
+
+  public static Builder builder(File csvFile) {
+    return new Builder(csvFile);
   }
 
   public static class Builder {
@@ -51,29 +64,42 @@ public class H2CsvReadSql {
      * Columns in CSV files. null or empty means using the first row as the header.
      */
     private List<String> csvColumns = new ArrayList<>();
-    private final File csvFile;
+    private File csvFile;
     private Charset charset = StandardCharsets.UTF_8;
-    private String fieldSeparator = ",";
+    private char fieldSeparator = ',';
 
 
     public Builder(File csvFile) {
-      this.csvFile = csvFile;
+      setCsvFile(csvFile);
     }
 
+    public Builder(File csvFile, Class<?> ormRecordClass) {
+      this(csvFile);
+      setOrmRecordClass(ormRecordClass);
+    }
+
+
+    public Builder() {}
+
     public H2CsvReadSql build() {
-      List<String> columnsWithAlias = new ArrayList<>(columns);
+      List<String> selectedColumns = new ArrayList<>(columns);
 
       aliases.entrySet().forEach(en -> {
-        int index = columnsWithAlias.indexOf(en.getKey());
+        int index = selectedColumns.indexOf(en.getKey());
         if (index == -1) {
           throw new IllegalStateException(ParameterizedStringUtils
               .newString("{} is not found in Columns {}", en.getKey(), columns));
         }
-        columnsWithAlias.set(index, en.getValue());
+        selectedColumns.set(index, en.getValue());
       });
 
-      return new H2CsvReadSql(columns, H2CsvFunctions.getCsvReadAndSelectSql(columnsWithAlias,
+      return new H2CsvReadSql(columns, H2CsvFunctions.getCsvReadAndSelectSql(selectedColumns,
           csvFile, csvColumns, charset, fieldSeparator));
+    }
+
+    public Builder setCsvFile(File csvFile) {
+      this.csvFile = csvFile;
+      return this;
     }
 
     public Builder setCharset(Charset charset) {
@@ -81,7 +107,7 @@ public class H2CsvReadSql {
       return this;
     }
 
-    public Builder setFieldSeparator(String fieldSeparator) {
+    public Builder setFieldSeparator(char fieldSeparator) {
       this.fieldSeparator = fieldSeparator;
       return this;
     }
@@ -91,18 +117,26 @@ public class H2CsvReadSql {
       return setCharset(Charset.forName(charset));
     }
 
-    public Builder setColumns(List<String> columns) {
-      this.columns = new ArrayList<>(columns);
+    public Builder setTableColumns(List<String> tableColumns) {
+      this.columns = new ArrayList<>(tableColumns);
       return this;
     }
 
-    public Builder setDateTimePatternToColumns(String dateTimePattern, List<String> columns) {
-      columns.forEach(column -> aliases.put(column,
-          "parsedatetime(`" + column + "`,'" + dateTimePattern + "') as " + column));
+    public Builder setTableColumns(String... tableColumns) {
+      return setTableColumns(Arrays.asList(tableColumns));
+    }
+
+    public Builder setCsvColumns(List<String> csvColumns) {
+      this.csvColumns = new ArrayList<>(csvColumns);
       return this;
     }
 
-    public Builder setExpressionToColumn(String expression, String column) {
+    public Builder setCsvColumns(String... csvColumns) {
+      return setCsvColumns(Arrays.asList(csvColumns));
+    }
+
+
+    public Builder mapCsvColumnToTableColumn(String expression, String column) {
       aliases.put(column, expression + " as " + column);
       return this;
     }
@@ -114,7 +148,44 @@ public class H2CsvReadSql {
           + "]";
     }
 
+    public Builder setOrmRecordClass(Class<?> ormRecordClass) {
+
+      Annotation[][] parameterAnnotationsOfConstructor =
+          TableDefinition.getCanonicalConstructor(ormRecordClass)
+              .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
+
+      Field[] fields = ormRecordClass.getDeclaredFields();
+
+      List<Field> autoGeneratedColumn = new ArrayList<>();
+
+      for (int i = 0; i < fields.length; i++) {
+        Field field = fields[i];
+        List<String> opt = new ArrayList<>();
+        opt.add(TableDefinition.toSqlDataType(field.getType()));
+
+        Set<Annotation> anns = new LinkedHashSet<>();
+        Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
+        if (parameterAnnotationsOfConstructor != null) {
+          Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
+        }
+        for (Annotation ann : anns) {
+          if (ann instanceof CsvColumn) {
+            mapCsvColumnToTableColumn(((CsvColumn) ann).value(),
+                StringCache.toUpperSnakeCase(field.getName()));
+          } else if (ann instanceof AutoIncrement) {
+            autoGeneratedColumn.add(field);
+          }
+
+        }
+      }
+      setTableColumns(Stream.of(fields).filter(f -> !autoGeneratedColumn.contains(f))
+          .map(f -> StringCache.toUpperSnakeCase(f.getName())).toArray(String[]::new));
+
+      return this;
+    }
+
 
   }
+
 
 }

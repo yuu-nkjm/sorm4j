@@ -141,6 +141,18 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public <T> int deleteByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
+    final String sql = getTableSql(objectClass).getDeleteSql();
+    return executeUpdate(sql, primaryKeyValues);
+  }
+
+  @Override
+  public <T> int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues) {
+    final String sql = getTableSql(tableName).getDeleteSql();
+    return executeUpdate(sql, primaryKeyValues);
+  }
+
+  @Override
   public <T> int[] deleteIn(String tableName, List<T> objects) {
     return applytoArray(objects, array -> deleteIn(tableName, array));
   }
@@ -341,7 +353,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public TableSql getTableSql(String tableName) {
-    return sormContext.getTableSql(getTableMetaData(tableName));
+    return sormContext.getTableSql(connection, getTableMetaData(tableName));
   }
 
   @Override
@@ -750,13 +762,13 @@ public class OrmConnectionImpl implements OrmConnection {
    * @throws SQLException
    */
 
-  private RowMap toSingleRowMap(ResultSet resultSet, List<String> columns,
-      List<Integer> columnTypes) throws SQLException {
-    final int colsNum = columns.size();
+  private RowMap toSingleRowMap(ResultSet resultSet, String[] columns, int[] columnTypes)
+      throws SQLException {
+    final int colsNum = columns.length;
     final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
     for (int i = 1; i <= colsNum; i++) {
-      ret.put(columns.get(i - 1),
-          getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes.get(i - 1)));
+      ret.put(columns[i - 1],
+          getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes[i - 1]));
     }
     return ret;
   }
@@ -813,6 +825,22 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> int update(T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(object.getClass());
     return executeUpdate(mapping.getSql().getUpdateSql(), mapping.getUpdateParameters(object));
+  }
+
+  @Override
+  public <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues) {
+    final String sql = getTableSql(clazz).getUpdateSql(object);
+    List<Object> params = new ArrayList<>(object.values());
+    params.addAll(Arrays.asList(primaryKeyValues));
+    return executeUpdate(sql, params.toArray());
+  }
+
+  @Override
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+    final String sql = getTableSql(tableName).getUpdateSql(object);
+    List<Object> params = new ArrayList<>(object.values());
+    params.addAll(Arrays.asList(primaryKeyValues));
+    return executeUpdate(sql, params.toArray());
   }
 
 
@@ -936,36 +964,38 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private static class ColumnsAndTypes {
+  public static class ColumnsAndTypes {
 
-    private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
+    public static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) throws SQLException {
       ResultSetMetaData metaData = resultSet.getMetaData();
       int colNum = metaData.getColumnCount();
-      List<String> columns = new ArrayList<>(colNum);
-      List<Integer> columnTypes = new ArrayList<>(colNum);
+      String[] columns = new String[colNum];
+      int[] columnTypes = new int[colNum];
       for (int i = 1; i <= colNum; i++) {
-        columns.add(metaData.getColumnLabel(i));
-        columnTypes.add(metaData.getColumnType(i));
+        columns[i - 1] = metaData.getColumnLabel(i);
+        columnTypes[i - 1] = metaData.getColumnType(i);
       }
       return new ColumnsAndTypes(columns, columnTypes);
     }
 
-    private final List<String> columns;
+    private final String[] columns;
 
-    private final List<Integer> columnTypes;
+    private final int[] columnTypes;
 
-    private ColumnsAndTypes(List<String> columns, List<Integer> columnTypes) {
+    public ColumnsAndTypes(String[] columns, int[] columnTypes) {
       this.columns = columns;
       this.columnTypes = columnTypes;
     }
 
-    public List<String> getColumns() {
+    public String[] getColumns() {
       return columns;
     }
 
-    public List<Integer> getColumnTypes() {
+    public int[] getColumnTypes() {
       return columnTypes;
     }
+
+
   }
 
   @Override
@@ -977,5 +1007,6 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName) {
     return new TableMappedOrmConnectionImpl<>(this, type, tableName);
   }
+
 
 }

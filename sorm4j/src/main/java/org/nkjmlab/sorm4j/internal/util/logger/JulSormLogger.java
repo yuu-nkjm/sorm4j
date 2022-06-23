@@ -17,9 +17,9 @@ public final class JulSormLogger extends AbstractSormLogger implements SormLogge
 
   private static Logger getDefaultLogger() {
     Logger logger = java.util.logging.Logger.getLogger(JulSormLogger.class.getName());
-    logger.setLevel(Level.FINE);
+    logger.setLevel(Level.FINEST);
     ConsoleHandler consoleHandler = new ConsoleHandler();
-    consoleHandler.setLevel(Level.FINE);
+    consoleHandler.setLevel(Level.FINEST);
     logger.addHandler(consoleHandler);
     return logger;
   }

@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal.result;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -13,7 +12,6 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
 
 public final class RowMapImpl implements RowMap {
@@ -204,17 +202,12 @@ public final class RowMapImpl implements RowMap {
   }
 
   @Override
-  public <T> T[] getArray(String key, Class<T> valueType) {
+  public <T> T[] getArray(String key, Class<T> componentType) {
     Object val = get(key);
     if (val == null) {
       return null;
     }
-    try {
-      return ArrayUtils.convertToObjectArray(valueType, ((java.sql.Array) val).getArray());
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-
+    return ArrayUtils.convertToObjectArray(componentType, val);
   }
 
 

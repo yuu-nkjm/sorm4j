@@ -92,6 +92,26 @@ public interface Orm {
    */
   int deleteAllIn(String tableName);
 
+  /**
+   * Deletes a row from the table corresponding to the class the by primary key.
+   *
+   * @param <T>
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  <T> int deleteByPrimaryKey(Class<T> type, Object... primaryKeyValues);
+
+  /**
+   * Deletes a row from the table corresponding to the table name the by primary key.
+   *
+   * @param <T>
+   * @param tableName
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  <T> int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues);
 
   /**
    * Deletes objects in the table of the given table name.
@@ -219,8 +239,22 @@ public interface Orm {
    */
   <T> boolean exists(T object);
 
+  /**
+   *
+   * @param <T>
+   * @param tableName
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
   <T> boolean exists(String tableName, Object... primaryKeyValues);
 
+  /**
+   *
+   * @param <T>
+   * @param type
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
   <T> boolean exists(Class<T> type, Object... primaryKeyValues);
 
   /**
@@ -685,7 +719,7 @@ public interface Orm {
    *
    * @param <T>
    * @param type
-   * @param primaryKeyValues
+   * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
   <T> T selectByPrimaryKey(Class<T> type, Object... primaryKeyValues);
@@ -717,6 +751,27 @@ public interface Orm {
    * @return
    */
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
+
+  /**
+   *
+   * @param <T>
+   * @param clazz
+   * @param object
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues);
+
+  /**
+   *
+   * @param tableName
+   * @param object
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
+  @Experimental
+  int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues);
 
   /**
    * Updates by objects in the table corresponding to the given table name.

@@ -14,6 +14,7 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ClassUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.util.h2.datatype.Json;
 
 /**
  * Default implementation of {@link ColumnValueToJavaObjectConverters}
@@ -153,6 +154,8 @@ public final class DefaultColumnValueToJavaObjectConverters
         }
         return ret;
       }
+      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
+        return new Json(resultSet.getBytes(columnIndex));
       default:
         if (toType.isEnum()) {
           try {

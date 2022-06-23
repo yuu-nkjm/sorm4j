@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
 import static java.lang.String.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,20 +16,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
+import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Default;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Index;
-import org.nkjmlab.sorm4j.util.table_def.annotation.Indexes;
+import org.nkjmlab.sorm4j.util.table_def.annotation.IndexColumns;
 import org.nkjmlab.sorm4j.util.table_def.annotation.NotNull;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKey;
+import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Unique;
-import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueConstraints;
+import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueColumns;
 
 /**
  * This class represent a table schema. This class is a utility for users to define tables and
@@ -50,25 +54,29 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
+
   public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
 
-    Builder builder = TableDefinition.builder(toUpperSnakeCase(toTableName(ormRecordClass)));
+    Builder builder = TableDefinition.builder(toTableName(ormRecordClass));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(Indexes.class)).map(a -> a.value()).ifPresent(
-        vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
+    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class)).map(a -> a.value())
+        .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
-        .ifPresent(
-            vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.split(","))));
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexColumns.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(UniqueConstraints.class)).map(a -> a.value())
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v)));
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class)).ifPresent(
+        vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
+
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(CheckConstraint.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
 
     Annotation[][] parameterAnnotationsOfConstructor = getCanonicalConstructor(ormRecordClass)
         .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
 
-    Field[] fields = ormRecordClass.getDeclaredFields();
+    Field[] fields = Stream.of(ormRecordClass.getDeclaredFields())
+        .filter(f -> !Modifier.isStatic(f.getModifiers())).toArray(Field[]::new);
 
 
     for (int i = 0; i < fields.length; i++) {
@@ -104,25 +112,17 @@ public final class TableDefinition {
     return builder;
   }
 
-  /**
-   * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)
-   * will return a set of guessed names such as [COMPOUND_NAME].
-   */
-  public static String toUpperSnakeCase(final String compoundName) {
-    String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
-    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1"));
-  }
 
   private static String toTableName(Class<?> ormRecordClass) {
     OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
     if (ann == null || ann.value().length() == 0) {
-      return ormRecordClass.getSimpleName() + "s";
+      return toUpperSnakeCase(ormRecordClass.getSimpleName() + "s");
     } else {
       return ann.value();
     }
   }
 
-  private static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
+  public static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
     try {
       Class<?>[] componentTypes = Arrays.stream(recordClass.getDeclaredFields())
           .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers())).map(f -> f.getType())
@@ -531,6 +531,8 @@ public final class TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
+      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
+        return "json";
       default:
         if (type.isArray()) {
           final Class<?> compType = type.getComponentType();

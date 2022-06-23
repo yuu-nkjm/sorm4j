@@ -309,6 +309,16 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public <T> int deleteByPrimaryKey(Class<T> type, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.deleteByPrimaryKey(type, primaryKeyValues));
+  }
+
+  @Override
+  public <T> int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.deleteByPrimaryKeyIn(tableName, primaryKeyValues));
+  }
+
+  @Override
   public <T> int[] insert(List<T> objects) {
     return applyAndClose(conn -> conn.insert(objects));
   }
@@ -435,6 +445,15 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.update(objects));
   }
 
+  @Override
+  public <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKey(clazz, object, primaryKeyValues));
+  }
+
+  @Override
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKeyIn(tableName, object, primaryKeyValues));
+  }
 
   @Override
   public <T> int[] updateIn(String tableName, List<T> objects) {
@@ -542,6 +561,5 @@ public final class SormImpl implements Sorm {
   public <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters) {
     return new ResultSetStreamSorm<T>(this, type, sql, parameters);
   }
-
 
 }

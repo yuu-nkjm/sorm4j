@@ -160,10 +160,11 @@ public final class ArrayUtils {
     return destArray;
   }
 
-  public static <T> T[] convertToObjectArray(Class<?> valueType, Object srcArray) {
+  public static <T> T[] convertToObjectArray(Class<?> componentType, Object srcArray) {
     final int length = Array.getLength(srcArray);
     Object destArray = Array.newInstance(
-        valueType.isPrimitive() ? ClassUtils.primitiveToWrapper(valueType) : valueType, length);
+        componentType.isPrimitive() ? ClassUtils.primitiveToWrapper(componentType) : componentType,
+        length);
     for (int i = 0; i < length; i++) {
       Object v = Array.get(srcArray, i);
       Array.set(destArray, i, v);

@@ -27,7 +27,7 @@ public final class Log4jSormLogger extends AbstractSormLogger implements SormLog
     return new Log4jSormLogger(org.apache.logging.log4j.LogManager.getLogger());
   }
 
-  private Log4jSormLogger(org.apache.logging.log4j.Logger logger) {
+  Log4jSormLogger(org.apache.logging.log4j.Logger logger) {
     this.logger = logger;
   }
 

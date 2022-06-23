@@ -18,7 +18,7 @@ public final class Slf4jSormLogger extends AbstractSormLogger implements SormLog
 
   private final org.slf4j.Logger logger;
 
-  private Slf4jSormLogger(org.slf4j.Logger logger) {
+  Slf4jSormLogger(org.slf4j.Logger logger) {
     this.logger = logger;
   }
 
@@ -63,17 +63,15 @@ public final class Slf4jSormLogger extends AbstractSormLogger implements SormLog
 
   @Override
   public void trace(int depth, String format, Object... params) {
-    logger
-        .trace(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + ParameterizedStringUtils.newString(format, params));
+    logger.trace(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
+        + ParameterizedStringUtils.newString(format, params));
   }
 
 
   @Override
   public void debug(int depth, String format, Object... params) {
-    logger
-        .debug(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + ParameterizedStringUtils.newString(format, params));
+    logger.debug(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
+        + ParameterizedStringUtils.newString(format, params));
   }
 
   @Override
@@ -90,9 +88,8 @@ public final class Slf4jSormLogger extends AbstractSormLogger implements SormLog
 
   @Override
   public void error(int depth, String format, Object... params) {
-    logger
-        .error(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + ParameterizedStringUtils.newString(format, params));
+    logger.error(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
+        + ParameterizedStringUtils.newString(format, params));
   }
 
 }

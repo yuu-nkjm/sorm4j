@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DefaultResultSetValueGetterTest {
@@ -23,25 +24,27 @@ class DefaultResultSetValueGetterTest {
   void testGetValueBySetterType() {
     String sql =
         "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry VARCHAR ARRAY, fl FLOAT)";
-    Sorm sormImpl = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
-    sormImpl.acceptHandler(con -> con.executeUpdate(sql));
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    sorm.acceptHandler(con -> con.executeUpdate(sql));
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
-    sormImpl.acceptHandler(con -> con.insert(a));
+    sorm.acceptHandler(con -> con.insert(a));
 
-    LocalDateTimeSample r = sormImpl.applyHandler(
+    LocalDateTimeSample r = sorm.applyHandler(
         con -> con.readFirst(LocalDateTimeSample.class, "select * from LocalDateTimeSample"));
     assertThat(r).isEqualTo(a);
-    sormImpl
-        .acceptHandler(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom())
-            .limit(10000).toArray(LocalDateTimeSample[]::new)));
+    sorm.acceptHandler(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom())
+        .limit(10000).toArray(LocalDateTimeSample[]::new)));
 
     try {
-      sormImpl.acceptHandler(con -> con.update(a));
+      sorm.acceptHandler(con -> con.update(a));
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("doesn't have them");
     }
 
+    RowMap map = sorm.readFirst(RowMap.class, "select * from LocalDateTimeSample");
+
+    assertThat(Arrays.asList(map.getArray("arry", String.class))).isEqualTo(List.of("a", "1"));
 
   }
 
@@ -51,7 +54,6 @@ class DefaultResultSetValueGetterTest {
         java.sql.Types.NUMERIC, java.sql.Types.NULL, java.sql.Types.LONGVARCHAR,
         java.sql.Types.LONGVARBINARY, java.sql.Types.JAVA_OBJECT, java.sql.Types.FLOAT,
         java.sql.Types.DATALINK, java.sql.Types.BIT, java.sql.Types.ARRAY);
-
 
   }
 

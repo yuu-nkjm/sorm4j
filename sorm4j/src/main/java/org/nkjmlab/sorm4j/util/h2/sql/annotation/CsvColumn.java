@@ -1,20 +1,14 @@
-package org.nkjmlab.sorm4j.util.table_def.annotation;
+package org.nkjmlab.sorm4j.util.h2.sql.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Defines indexes.
- */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface CheckConstraints {
+@Target({ElementType.PARAMETER, ElementType.FIELD})
+public @interface CsvColumn {
 
-  /**
-   * Name of the index
-   */
-  String[] value();
+  String value();
 
 }
