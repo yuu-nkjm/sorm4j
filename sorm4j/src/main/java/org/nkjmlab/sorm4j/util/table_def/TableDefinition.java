@@ -5,6 +5,7 @@ import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
@@ -52,9 +54,10 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
+
   public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
 
-    Builder builder = TableDefinition.builder(toUpperSnakeCase(toTableName(ormRecordClass)));
+    Builder builder = TableDefinition.builder(toTableName(ormRecordClass));
 
     Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class)).map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
@@ -72,7 +75,8 @@ public final class TableDefinition {
     Annotation[][] parameterAnnotationsOfConstructor = getCanonicalConstructor(ormRecordClass)
         .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
 
-    Field[] fields = ormRecordClass.getDeclaredFields();
+    Field[] fields = Stream.of(ormRecordClass.getDeclaredFields())
+        .filter(f -> !Modifier.isStatic(f.getModifiers())).toArray(Field[]::new);
 
 
     for (int i = 0; i < fields.length; i++) {
@@ -112,7 +116,7 @@ public final class TableDefinition {
   private static String toTableName(Class<?> ormRecordClass) {
     OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
     if (ann == null || ann.value().length() == 0) {
-      return ormRecordClass.getSimpleName() + "s";
+      return toUpperSnakeCase(ormRecordClass.getSimpleName() + "s");
     } else {
       return ann.value();
     }

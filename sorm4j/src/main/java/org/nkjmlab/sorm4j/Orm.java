@@ -240,8 +240,22 @@ public interface Orm {
    */
   <T> boolean exists(T object);
 
+  /**
+   *
+   * @param <T>
+   * @param tableName
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
   <T> boolean exists(String tableName, Object... primaryKeyValues);
 
+  /**
+   *
+   * @param <T>
+   * @param type
+   * @param primaryKeyValues the order should be the same as the column order.
+   * @return
+   */
   <T> boolean exists(Class<T> type, Object... primaryKeyValues);
 
   /**
