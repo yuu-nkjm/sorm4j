@@ -96,7 +96,6 @@ public interface Orm {
    * Deletes a row from the table corresponding to the class the by primary key.
    *
    * @param <T>
-   * @param objectClass
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */

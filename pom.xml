@@ -4,7 +4,7 @@
   <artifactId>sorm4j-parent</artifactId>
   <name>sorm4j-parent</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
-  <version>1.4.7</version>
+  <version>1.4.8</version>
   <packaging>pom</packaging>
   <url>https://github.com/nkjmlab</url>
   <licenses>
