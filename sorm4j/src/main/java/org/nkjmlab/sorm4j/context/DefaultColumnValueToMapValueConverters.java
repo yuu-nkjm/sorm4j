@@ -6,16 +6,16 @@ import java.sql.SQLType;
 import java.util.Collections;
 import java.util.Map;
 
-public final class DefaultColumnValueToMapValueConverter implements ColumnValueToMapValueConverter {
+public final class DefaultColumnValueToMapValueConverters implements ColumnValueToMapValueConverters {
 
-  private final Map<Integer, ColumnValueToMapValueConverter> converters;
+  private final Map<Integer, ColumnValueToMapValueConverters> converters;
 
-  public DefaultColumnValueToMapValueConverter() {
+  public DefaultColumnValueToMapValueConverters() {
     this(Collections.emptyMap());
   }
 
-  public DefaultColumnValueToMapValueConverter(
-      Map<Integer, ColumnValueToMapValueConverter> converters) {
+  public DefaultColumnValueToMapValueConverters(
+      Map<Integer, ColumnValueToMapValueConverters> converters) {
     this.converters = Map.copyOf(converters);
   }
 
@@ -37,7 +37,7 @@ public final class DefaultColumnValueToMapValueConverter implements ColumnValueT
   @Override
   public Object convertToValue(ResultSet resultSet, int column, int sqlType) throws SQLException {
 
-    final ColumnValueToMapValueConverter converter = converters.get(sqlType);
+    final ColumnValueToMapValueConverters converter = converters.get(sqlType);
     if (converter != null) {
       return converter.convertToValue(resultSet, column, sqlType);
     }

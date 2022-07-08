@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal;
 
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverter;
+import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
 import org.nkjmlab.sorm4j.context.DefaultTableMetaDataParser;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
@@ -18,7 +18,7 @@ final class SormConfig {
   private final ColumnToFieldAccessorMapper columnFieldMapper;
   private final MultiRowProcessorFactory multiRowProcessorFactory;
   private final ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter;
-  private final ColumnValueToMapValueConverter columnValueToMapValueConverter;
+  private final ColumnValueToMapValueConverters columnValueToMapValueConverter;
   private final SqlParametersSetter sqlParametersSetter;
   private final PreparedStatementSupplier preparedStatementSupplier;
   private final LoggerContext loggerContext;
@@ -28,7 +28,7 @@ final class SormConfig {
   SormConfig(LoggerContext loggerContext, ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
-      ColumnValueToMapValueConverter columnValueToMapValueConverter,
+      ColumnValueToMapValueConverters columnValueToMapValueConverter,
       SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier preparedStatementSupplier,
       TableSqlFactory tableSqlFactory, MultiRowProcessorFactory multiRowProcessorFactory) {
     this.loggerContext = loggerContext;
@@ -51,7 +51,7 @@ final class SormConfig {
     return columnValueToJavaObjectConverter;
   }
 
-  ColumnValueToMapValueConverter getColumnValueToMapValueConverter() {
+  ColumnValueToMapValueConverters getColumnValueToMapValueConverter() {
     return columnValueToMapValueConverter;
   }
 

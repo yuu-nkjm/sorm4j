@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,8 @@ public final class ArrayUtils {
   private static final Integer[] EMPTY_INTEGER_OBJECT_ARRAY = new Integer[0];
   private static final Long[] EMPTY_LONG_OBJECT_ARRAY = new Long[0];
   private static final Short[] EMPTY_SHORT_OBJECT_ARRAY = new Short[0];
+
+  private ArrayUtils() {}
 
   public static int[] add(int[] array, int i) {
     final int arrayLength = Array.getLength(array);
@@ -141,23 +144,42 @@ public final class ArrayUtils {
     return result;
   }
 
-  private ArrayUtils() {}
 
   /**
    *
    * @param <T>
-   * @param valueType
-   * @param srcArray Object[] or primitive array
+   * @param toComponentType
+   * @param srcArray
    * @return
    */
-  public static Object convertToArray(Class<?> valueType, Object srcArray) {
-    final int length = Array.getLength(srcArray);
-    Object destArray = Array.newInstance(valueType, length);
-    for (int i = 0; i < length; i++) {
-      Object v = Array.get(srcArray, i);
-      Array.set(destArray, i, v);
+  public static Object convertSqlArrayToArray(Class<?> toComponentType, Object srcArray) {
+    if (srcArray instanceof java.sql.Array) {
+      try {
+        java.sql.Array sqlArray = (java.sql.Array) srcArray;
+        Object array = sqlArray.getArray();
+        return convertSqlArrayToArray(toComponentType, array);
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
     }
-    return destArray;
+    if (toComponentType.isArray()) {
+      int length = java.lang.reflect.Array.getLength(srcArray);
+      Class<?> compArrType = toComponentType.getComponentType();
+      Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
+      for (int i = 0; i < length; i++) {
+        Object v = java.lang.reflect.Array.get(srcArray, i);
+        java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArray(compArrType, v));
+      }
+      return destArray;
+    } else {
+      int length = java.lang.reflect.Array.getLength(srcArray);
+      Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
+      for (int i = 0; i < length; i++) {
+        Object v = java.lang.reflect.Array.get(srcArray, i);
+        java.lang.reflect.Array.set(destArray, i, v);
+      }
+      return destArray;
+    }
   }
 
   public static <T> T[] convertToObjectArray(Class<?> componentType, Object srcArray) {
@@ -171,6 +193,50 @@ public final class ArrayUtils {
     }
     @SuppressWarnings("unchecked")
     T[] ret = (T[]) destArray;
+    return ret;
+  }
+
+  public static Object[] convertToObjectArray(Object srcArray) {
+    Class<?> componentType = srcArray.getClass().getComponentType();
+    if (!componentType.isArray()) {
+      switch (srcArray.getClass().getComponentType().toString()) {
+        case "boolean":
+          return toObjectArray((boolean[]) srcArray);
+        case "byte":
+          return toObjectArray((byte[]) srcArray);
+        case "char":
+          return toObjectArray((char[]) srcArray);
+        case "short":
+          return toObjectArray((short[]) srcArray);
+        case "int":
+          return toObjectArray((int[]) srcArray);
+        case "long":
+          return toObjectArray((long[]) srcArray);
+        case "float":
+          return toObjectArray((float[]) srcArray);
+        case "double":
+          return toObjectArray((double[]) srcArray);
+        default:
+          return (Object[]) srcArray;
+      }
+    }
+    Object o = Array.get(srcArray, 0);
+    final int length = Array.getLength(srcArray);
+    Object destArray = Array.newInstance(
+        Array.newInstance(convertToObjectArray(o).getClass().getComponentType(), 0).getClass(),
+        length);
+    for (int i = 0; i < length; i++) {
+      Object v = Array.get(srcArray, i);
+      Array.set(destArray, i, convertToObjectArray(v));
+    }
+    return (Object[]) destArray;
+  }
+
+  public static Class<?> getInternalComponentType(Class<?> compType) {
+    Class<?> ret = compType;
+    while (ret.isArray()) {
+      ret = ret.getComponentType();
+    }
     return ret;
   }
 

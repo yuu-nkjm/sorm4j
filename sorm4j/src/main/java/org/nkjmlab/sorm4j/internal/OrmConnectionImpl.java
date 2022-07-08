@@ -20,7 +20,7 @@ import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverter;
+import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
@@ -284,7 +284,7 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getColumnValueToJavaObjectConverter();
   }
 
-  private ColumnValueToMapValueConverter getColumnValueToMapValueConverter() {
+  private ColumnValueToMapValueConverters getColumnValueToMapValueConverter() {
     return sormContext.getColumnValueToMapValueConverter();
   }
 

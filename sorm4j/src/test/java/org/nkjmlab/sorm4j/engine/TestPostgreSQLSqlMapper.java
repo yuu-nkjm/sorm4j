@@ -13,6 +13,8 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -59,26 +61,47 @@ public class TestPostgreSQLSqlMapper {
 
 
 
-    ColumnValueToJavaObjectConverter<PGobject> columnValueConverter =
-        ((resultSet, columnIndex, columnType, toType) -> {
-          return PGobject.class.cast(resultSet.getObject(columnIndex));
-        });
+    ColumnValueToJavaObjectConverter columnValueConverter = new ColumnValueToJavaObjectConverter() {
+
+      @Override
+      public boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType) {
+        return toType.equals(PGobject.class);
+      }
+
+      @Override
+      public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+          throws SQLException {
+        return PGobject.class.cast(resultSet.getObject(columnIndex));
+      }
+
+    };
 
 
 
-    SqlParameterSetter parameterSetter = ((stmt, parameterIndex, parameter) -> {
-      PGobject pg = new PGobject();
-      pg.setType("inet");
-      pg.setValue(((InetAddress) parameter).getHostAddress());
-      stmt.setObject(parameterIndex, pg);
-    });
+    SqlParameterSetter parameterSetter = new SqlParameterSetter() {
+
+      @Override
+      public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
+          throws SQLException {
+        return parameter.getClass().equals(java.net.InetAddress.class);
+      }
+
+      @Override
+      public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
+          throws SQLException {
+        PGobject pg = new PGobject();
+        pg.setType("inet");
+        pg.setValue(((InetAddress) parameter).getHostAddress());
+        stmt.setObject(parameterIndex, pg);
+      }
+    };
+
+
 
     context = SormContext.builder()
-        .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters(
-            Map.of(PGobject.class, columnValueConverter)))
-        .setSqlParametersSetter(
-            new DefaultSqlParametersSetter(Map.of(java.net.InetAddress.class, parameterSetter)))
-        .build();
+        .setColumnValueToJavaObjectConverters(
+            new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
+        .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter)).build();
 
   }
 
@@ -133,17 +156,17 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "c_integer_array by Integer[]", "c_integer_array", new Integer[] {1, 2, 3});
       doTest(c, "c_integer_array by int[]", "c_integer_array", new int[] {1, 2, 3});
 
-      doTest(c, "c_integer_array by List", "c_integer_array", List.of(1, 2, 3));
+      // doTest(c, "c_integer_array by List", "c_integer_array", List.of(1, 2, 3));
 
       doTest(c, "c_varchar_array by String[]", "c_varchar_array", new String[] {"A", "B", "C"});
-      doTest(c, "c_varchar_array by List", "c_varchar_array", List.of("A", "B", "C"));
+      // doTest(c, "c_varchar_array by List", "c_varchar_array", List.of("A", "B", "C"));
 
 
       log.debug("Array test --------");
-      doTestInClause(c, "c integer by List", "c_integer", List.of(1, 2, 3));
+      // doTestInClause(c, "c integer by List", "c_integer", List.of(1, 2, 3));
       doTestInClause(c, "c integer by Integer[]", "c_integer", new Integer[] {1, 2, 3});
       doTestInClause(c, "c integer by int[]", "c_integer", new int[] {1, 2, 3});
-      doTestInClause(c, "c_varchar by List", "c_varchar", List.of("integer", "varchar", "text"));
+      // doTestInClause(c, "c_varchar by List", "c_varchar", List.of("integer", "varchar", "text"));
       doTestInClause(c, "c_varchar by String[]", "c_varchar",
           new String[] {"integer", "varchar", "text"});
     }

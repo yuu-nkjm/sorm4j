@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 
-public interface ColumnValueToMapValueConverter {
+public interface ColumnValueToMapValueConverters {
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an

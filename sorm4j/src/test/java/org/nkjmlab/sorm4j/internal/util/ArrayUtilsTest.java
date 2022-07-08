@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.internal.util;
 
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class ArrayUtilsTest {
@@ -7,42 +8,67 @@ class ArrayUtilsTest {
 
   @Test
   void testToObjectArrayBooleanArray() {
-    ArrayUtils.toObjectArray(new boolean[] {true, false});
+    assertThat(ArrayUtils.toObjectArray(new boolean[] {true, false}))
+        .isEqualTo(new Boolean[] {true, false});
   }
 
   @Test
   void testToObjectArrayByteArray() {
-    ArrayUtils.toObjectArray(new byte[] {(byte) 1});
+    assertThat(ArrayUtils.toObjectArray(new byte[] {(byte) 1, (byte) 2}))
+        .isEqualTo(new Byte[] {(byte) 1, (byte) 2});
+
   }
 
   @Test
   void testToObjectArrayCharArray() {
-    ArrayUtils.toObjectArray(new char[] {'1'});
+    assertThat(ArrayUtils.toObjectArray(new char[] {'1', '2'}))
+        .isEqualTo(new Character[] {'1', '2'});
+
   }
 
   @Test
   void testToObjectArrayDoubleArray() {
-    ArrayUtils.toObjectArray(new double[] {0.1});
+    assertThat(ArrayUtils.toObjectArray(new double[] {0.1, 0.2}))
+        .isEqualTo(new Double[] {0.1, 0.2});
+
   }
 
   @Test
   void testToObjectArrayFloatArray() {
-    ArrayUtils.toObjectArray(new float[] {0.1f});
+    assertThat(ArrayUtils.toObjectArray(new float[] {0.1f, 0.2f}))
+        .isEqualTo(new Float[] {0.1f, 0.2f});
+
   }
 
   @Test
   void testToObjectArrayIntArray() {
-    ArrayUtils.toObjectArray(new int[] {1});
+    assertThat(ArrayUtils.toObjectArray(new int[] {1, 2})).isEqualTo(new Integer[] {1, 2});
+
   }
 
   @Test
   void testToObjectArrayLongArray() {
-    ArrayUtils.toObjectArray(new long[] {1L});
+    assertThat(ArrayUtils.toObjectArray(new long[] {1L, 2L})).isEqualTo(new Long[] {1L, 2L});
   }
 
   @Test
   void testToObjectArrayShortArray() {
-    ArrayUtils.toObjectArray(new short[] {(short) 1});
+    assertThat(ArrayUtils.toObjectArray(new short[] {(short) 1, (short) 2}))
+        .isEqualTo(new Short[] {(short) 1, (short) 2});
   }
+
+
+  @Test
+  void testConvertToObjectArray() {
+
+    assertThat(ArrayUtils.convertToObjectArray(new int[] {1})).isEqualTo(new Integer[] {1});
+    assertThat(ArrayUtils.convertToObjectArray(new int[][] {{1, 2, 3}, {4, 5, 6}}))
+        .isEqualTo(new Integer[][] {{1, 2, 3}, {4, 5, 6}});
+    assertThat(ArrayUtils
+        .convertToObjectArray(new int[][][] {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}}))
+            .isEqualTo(new Integer[][][] {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}});
+
+  }
+
 
 }

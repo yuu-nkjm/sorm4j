@@ -3,8 +3,10 @@ package org.nkjmlab.sorm4j.context;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@FunctionalInterface
-public interface ColumnValueToJavaObjectConverter<T> {
+public interface ColumnValueToJavaObjectConverter {
+
+  boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+      throws SQLException;;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
@@ -28,7 +30,8 @@ public interface ColumnValueToJavaObjectConverter<T> {
    * @throws SQLException
    *
    */
-  T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
+  Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
       throws SQLException;
+
 
 }
