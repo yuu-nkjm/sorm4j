@@ -524,7 +524,6 @@ public final class TableDefinition {
         return "varchar";
       case "java.math.BigDecimal":
         return "numeric";
-      case "java.util.Date":
       case "java.sql.Timestamp":
       case "java.time.Instant":
       case "java.time.LocalDateTime":

@@ -32,7 +32,7 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
   }
 
   @Override
-  public boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType) {
+  public boolean test(Class<?> toType) {
     return isOrmJsonContainer(toType);
   }
 

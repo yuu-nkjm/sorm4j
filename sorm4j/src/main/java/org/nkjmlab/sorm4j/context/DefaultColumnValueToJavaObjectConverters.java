@@ -35,7 +35,7 @@ public final class DefaultColumnValueToJavaObjectConverters
   private static final class DummyConverter implements ColumnValueToJavaObjectConverter {
 
     @Override
-    public boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType) {
+    public boolean test(Class<?> toType) {
       return false;
     }
 
@@ -75,19 +75,9 @@ public final class DefaultColumnValueToJavaObjectConverters
   private Object convertToHelper(ResultSet resultSet, int columnIndex, int columnType,
       Class<?> toType) throws SQLException {
 
-    if (!converters.isEmpty()) {
-      final ColumnValueToJavaObjectConverter converter =
-          convertersHitCache.computeIfAbsent(toType, key -> converters.stream().filter(conv -> {
-            try {
-              return conv.test(resultSet, columnIndex, columnType, toType);
-            } catch (SQLException e) {
-              throw Try.rethrow(e);
-            }
-          }).findFirst().orElse(DUMMY_CONVERTER));
-
-      if (!converter.equals(DUMMY_CONVERTER)) {
-        return converter.convertTo(resultSet, columnIndex, columnType, toType);
-      }
+    final ColumnValueToJavaObjectConverter converter = getHitConverter(toType);
+    if (!converter.equals(DUMMY_CONVERTER)) {
+      return converter.convertTo(resultSet, columnIndex, columnType, toType);
     }
 
     switch (toType.getName()) {
@@ -200,21 +190,39 @@ public final class DefaultColumnValueToJavaObjectConverters
   }
 
 
-  @Override
-  public boolean isSupportedReturnedType(Class<?> objectClass) {
-    return supportedTypes.contains(objectClass) || objectClass.isArray();
+  private ColumnValueToJavaObjectConverter getHitConverter(Class<?> toType) {
+    if (converters.isEmpty()) {
+      return DUMMY_CONVERTER;
+    }
+    return convertersHitCache.computeIfAbsent(toType, key -> converters.stream().filter(conv -> {
+      try {
+        return conv.test(toType);
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    }).findFirst().orElse(DUMMY_CONVERTER));
   }
 
-  private static final Set<Class<?>> supportedTypes = Set.of(boolean.class, byte.class, short.class,
-      int.class, long.class, float.class, double.class, char.class, java.io.InputStream.class,
-      java.io.Reader.class, java.lang.Boolean.class, java.lang.Byte.class, java.lang.Short.class,
-      java.lang.Integer.class, java.lang.Long.class, java.lang.Float.class, java.lang.Double.class,
-      java.lang.Character.class, java.lang.String.class, java.lang.Object.class,
-      java.math.BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
-      java.sql.Time.class, java.sql.Timestamp.class, java.time.Instant.class,
-      java.time.LocalDate.class, java.time.LocalTime.class, java.time.LocalDateTime.class,
-      java.time.OffsetTime.class, java.time.OffsetDateTime.class, java.util.Date.class,
-      java.util.UUID.class);
+  @Override
+  public boolean isSupportedReturnedType(Class<?> objectClass) {
+    return supportedReturnedTypes.contains(objectClass) || (objectClass.isArray()
+        && supportedReturnedTypes
+            .contains(ArrayUtils.getInternalComponentType(objectClass.getComponentType()))
+        || getHitConverter(objectClass) != DUMMY_CONVERTER);
+  }
+
+
+  private static final Set<Class<?>> supportedReturnedTypes =
+      Set.of(boolean.class, byte.class, short.class, int.class, long.class, float.class,
+          double.class, char.class, java.io.InputStream.class, java.io.Reader.class,
+          java.lang.Boolean.class, java.lang.Byte.class, java.lang.Short.class,
+          java.lang.Integer.class, java.lang.Long.class, java.lang.Float.class,
+          java.lang.Double.class, java.lang.Character.class, java.lang.String.class,
+          java.lang.Object.class, java.math.BigDecimal.class, java.sql.Clob.class,
+          java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
+          java.time.Instant.class, java.time.LocalDate.class, java.time.LocalTime.class,
+          java.time.LocalDateTime.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
+          java.util.Date.class, java.util.UUID.class, org.nkjmlab.sorm4j.util.json.JsonByte.class);
 
 
 

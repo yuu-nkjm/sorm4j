@@ -5,8 +5,7 @@ import java.sql.SQLException;
 
 public interface ColumnValueToJavaObjectConverter {
 
-  boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
-      throws SQLException;;
+  boolean test(Class<?> toType) throws SQLException;
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an

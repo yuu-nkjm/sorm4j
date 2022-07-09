@@ -64,7 +64,7 @@ public class TestPostgreSQLSqlMapper {
     ColumnValueToJavaObjectConverter columnValueConverter = new ColumnValueToJavaObjectConverter() {
 
       @Override
-      public boolean test(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType) {
+      public boolean test(Class<?> toType) {
         return toType.equals(PGobject.class);
       }
 
