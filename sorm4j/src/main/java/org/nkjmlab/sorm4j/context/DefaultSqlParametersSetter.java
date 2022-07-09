@@ -170,7 +170,7 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
           final Class<?> compType = type.getComponentType();
           procArray(compType, stmt, parameterIndex, parameter);
         } else if (type.isEnum()) {
-          stmt.setString(parameterIndex, parameter.toString());
+          stmt.setString(parameterIndex, ((Enum<?>) parameter).name());
         } else if (parameter instanceof java.sql.Blob) {
           stmt.setBlob(parameterIndex, (java.sql.Blob) parameter);
         } else if (parameter instanceof java.sql.Clob) {

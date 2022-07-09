@@ -171,10 +171,13 @@ public final class DefaultColumnValueToJavaObjectConverters
         return new JsonByte(resultSet.getBytes(columnIndex));
       default:
         if (toType.isEnum()) {
+          String str = resultSet.getString(columnIndex);
           try {
-            return Enum.valueOf((Class<? extends Enum>) toType, resultSet.getString(columnIndex));
+            return Enum.valueOf((Class<? extends Enum>) toType, str);
           } catch (Exception e) {
-            return null;
+            throw new SormException(ParameterizedStringUtils.newString(
+                "Could not convert {} in column ({}) to  Enum ({}[])", str,
+                JDBCType.valueOf(columnType).getName(), toType), e);
           }
         } else if (toType.isArray()) {
           if (toType.getComponentType().getName().equals("byte")) {
