@@ -144,7 +144,7 @@ public class SormTestUtils {
     return createSormWithNewDatabase(SormContext.builder().build());
   }
 
-  private static AtomicInteger urlSuffuix = new AtomicInteger();
+  private static final AtomicInteger urlSuffuix = new AtomicInteger();
 
   public static DriverManagerDataSource createNewDatabaseDataSource() {
     final String JDBC_URL = "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet()

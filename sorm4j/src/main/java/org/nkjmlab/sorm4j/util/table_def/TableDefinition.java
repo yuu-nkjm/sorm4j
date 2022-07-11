@@ -21,6 +21,8 @@ import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
+import org.nkjmlab.sorm4j.util.datatype.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -82,13 +84,17 @@ public final class TableDefinition {
     for (int i = 0; i < fields.length; i++) {
       Field field = fields[i];
       List<String> opt = new ArrayList<>();
-      opt.add(TableDefinition.toSqlDataType(field.getType()));
+
 
       Set<Annotation> anns = new LinkedHashSet<>();
       Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
+
       if (parameterAnnotationsOfConstructor != null) {
         Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
       }
+
+      opt.add(TableDefinition.toSqlDataType(field.getType()));
+
       for (Annotation ann : anns) {
         if (ann instanceof PrimaryKey) {
           opt.add("primary key");
@@ -478,7 +484,18 @@ public final class TableDefinition {
     }
   }
 
+
   public static String toSqlDataType(Class<?> type) {
+    if (type.getAnnotation(OrmJsonColumnContainer.class) != null) {
+      return "json";
+
+    }
+    if (ArrayUtils.getInternalComponentType(type)
+        .getAnnotation(OrmJsonColumnContainer.class) != null) {
+      return "json";
+    }
+
+
     switch (type.getName()) {
       case "int":
       case "java.lang.Integer":
@@ -508,7 +525,6 @@ public final class TableDefinition {
         return "varchar";
       case "java.math.BigDecimal":
         return "numeric";
-      case "java.util.Date":
       case "java.sql.Timestamp":
       case "java.time.Instant":
       case "java.time.LocalDateTime":
@@ -531,14 +547,15 @@ public final class TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
-      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
+      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
+      case "org.nkjmlab.sorm4j.util.jts.GeometryJts":
+        return "geometry";
+      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
+      case "java.util.List":
+      case "java.util.Map":
         return "json";
       default:
-        if (type.isArray()) {
-          final Class<?> compType = type.getComponentType();
-          return toSqlDataType(compType) + " array";
-        }
-        return "varchar";
+        return type.isArray() ? toSqlDataType(type.getComponentType()) + " array" : "java_object";
     }
   }
 }

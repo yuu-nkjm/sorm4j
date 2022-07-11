@@ -1,20 +1,21 @@
 package org.nkjmlab.sorm4j.context;
 
-import java.lang.reflect.Array;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.ClassUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
-import org.nkjmlab.sorm4j.util.h2.datatype.Json;
+import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.datatype.GeometryString;
+import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 
 /**
  * Default implementation of {@link ColumnValueToJavaObjectConverters}
@@ -27,11 +28,50 @@ public final class DefaultColumnValueToJavaObjectConverters
     implements ColumnValueToJavaObjectConverters {
 
 
-  private final Map<Class<?>, ColumnValueToJavaObjectConverter<?>> converters;
+  private final Map<Class<?>, ColumnValueToJavaObjectConverter> convertersHitCache;
+  private final List<ColumnValueToJavaObjectConverter> converters;
+  private final Set<Class<?>> supportedReturnedTypes;
 
-  public DefaultColumnValueToJavaObjectConverters() {
-    this(Collections.emptyMap());
+  private static final DummyConverter DUMMY_CONVERTER = new DummyConverter();
+
+  private static final class DummyConverter implements ColumnValueToJavaObjectConverter {
+
+    @Override
+    public boolean test(Class<?> toType) {
+      return false;
+    }
+
+    @Override
+    public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+        throws SQLException {
+      return null;
+    }
   }
+
+  private static final Set<Class<?>> DEFAULT_SUPPORTED_RETURNED_TYPES = Set.of(boolean.class,
+      byte.class, short.class, int.class, long.class, float.class, double.class, char.class,
+      java.io.InputStream.class, java.io.Reader.class, java.lang.Boolean.class,
+      java.lang.Byte.class, java.lang.Short.class, java.lang.Integer.class, java.lang.Long.class,
+      java.lang.Float.class, java.lang.Double.class, java.lang.Character.class,
+      java.lang.String.class, java.lang.Object.class, java.math.BigDecimal.class,
+      java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class,
+      java.sql.Timestamp.class, java.time.Instant.class, java.time.LocalDate.class,
+      java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
+      java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
+      org.nkjmlab.sorm4j.util.datatype.JsonByte.class,
+      org.nkjmlab.sorm4j.util.datatype.GeometryString.class);
+
+  private final Map<Class<?>, Boolean> supportedTypeCache = new ConcurrentHashMap<>();
+
+  @Override
+  public boolean isSupportedReturnedType(Class<?> objectClass) {
+    return supportedTypeCache.computeIfAbsent(objectClass,
+        key -> supportedReturnedTypes.contains(objectClass) || (objectClass.isArray()
+            && supportedReturnedTypes
+                .contains(ArrayUtils.getInternalComponentType(objectClass.getComponentType()))
+            || getHitConverter(objectClass) != DUMMY_CONVERTER));
+  }
+
 
 
   /**
@@ -39,9 +79,16 @@ public final class DefaultColumnValueToJavaObjectConverters
    * @param converters the converter which corresponding to the key class is applied to the column
    *        value.
    */
-  public DefaultColumnValueToJavaObjectConverters(
-      Map<Class<?>, ColumnValueToJavaObjectConverter<?>> converters) {
-    this.converters = Map.copyOf(converters);
+  public DefaultColumnValueToJavaObjectConverters(Set<Class<?>> supportedReturnedTypes,
+      ColumnValueToJavaObjectConverter... converters) {
+    this.supportedReturnedTypes = supportedReturnedTypes;
+    this.converters = Arrays.asList(converters);
+    this.convertersHitCache =
+        this.converters.isEmpty() ? Collections.emptyMap() : new ConcurrentHashMap<>();
+  }
+
+  public DefaultColumnValueToJavaObjectConverters(ColumnValueToJavaObjectConverter... converters) {
+    this(DEFAULT_SUPPORTED_RETURNED_TYPES, converters);
   }
 
   @SuppressWarnings("unchecked")
@@ -61,8 +108,8 @@ public final class DefaultColumnValueToJavaObjectConverters
   private Object convertToHelper(ResultSet resultSet, int columnIndex, int columnType,
       Class<?> toType) throws SQLException {
 
-    final ColumnValueToJavaObjectConverter converter = converters.get(toType);
-    if (converter != null) {
+    final ColumnValueToJavaObjectConverter converter = getHitConverter(toType);
+    if (!converter.equals(DUMMY_CONVERTER)) {
       return converter.convertTo(resultSet, columnIndex, columnType, toType);
     }
 
@@ -143,67 +190,53 @@ public final class DefaultColumnValueToJavaObjectConverters
       case "java.time.OffsetTime":
       case "java.time.OffsetDateTime":
         return resultSet.getObject(columnIndex, toType);
-      case "java.util.ArrayList":
-      case "java.util.List": {
-        java.sql.Array arry = resultSet.getArray(columnIndex);
-        Object srcArry = arry.getArray();
-        final int length = Array.getLength(srcArry);
-        List<Object> ret = new ArrayList<>(length);
-        for (int i = 0; i < length; i++) {
-          ret.add(Array.get(srcArry, i));
-        }
-        return ret;
-      }
-      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
-        return new Json(resultSet.getBytes(columnIndex));
+      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
+        return new JsonByte(resultSet.getBytes(columnIndex));
+      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
+        return new GeometryString(resultSet.getString(columnIndex));
       default:
         if (toType.isEnum()) {
+          String str = resultSet.getString(columnIndex);
           try {
-            return Enum.valueOf((Class<? extends Enum>) toType, resultSet.getString(columnIndex));
+            return Enum.valueOf((Class<? extends Enum>) toType, str);
           } catch (Exception e) {
-            return null;
+            throw new SormException(ParameterizedStringUtils.newString(
+                "Could not convert {} in column ({}) to  Enum ({}[])", str,
+                JDBCType.valueOf(columnType).getName(), toType), e);
           }
         } else if (toType.isArray()) {
-          final String compName = toType.getComponentType().getName();
-          switch (compName) {
-            case "byte":
-              return resultSet.getBytes(columnIndex);
-            default: {
-              try {
-                return ArrayUtils.convertToArray(ClassUtils.convertToClass(compName),
-                    resultSet.getArray(columnIndex).getArray());
-              } catch (Exception e) {
-                throw new SormException(ParameterizedStringUtils.newString(
-                    "Could not convert column ({}) to  array ({}[])",
-                    JDBCType.valueOf(columnType).getName(), compName), e);
-              }
-            }
+          if (toType.getComponentType().getName().equals("byte")) {
+            return resultSet.getBytes(columnIndex);
+          }
+          try {
+            return ArrayUtils.convertSqlArrayToArray(toType.getComponentType(),
+                resultSet.getArray(columnIndex));
+          } catch (Exception e) {
+            throw new SormException(
+                ParameterizedStringUtils.newString("Could not convert column ({}) to  array ({}[])",
+                    JDBCType.valueOf(columnType).getName(), toType.getComponentType().getName()),
+                e);
           }
         } else {
           return resultSet.getObject(columnIndex, toType);
-          // throw new SormException(ParameterizedStringUtils.newString(
-          // "Could not find corresponding converter columnType={}, toType={}. ",
-          // JDBCType.valueOf(columnType).getName(), toType));
         }
     }
+
   }
 
 
-  @Override
-  public boolean isSupportedReturnedType(Class<?> objectClass) {
-    return supportedTypes.contains(objectClass) || objectClass.isArray();
+  private ColumnValueToJavaObjectConverter getHitConverter(Class<?> toType) {
+    if (converters.isEmpty()) {
+      return DUMMY_CONVERTER;
+    }
+    return convertersHitCache.computeIfAbsent(toType, key -> converters.stream().filter(conv -> {
+      try {
+        return conv.test(toType);
+      } catch (SQLException e) {
+        throw Try.rethrow(e);
+      }
+    }).findFirst().orElse(DUMMY_CONVERTER));
   }
-
-  private static final Set<Class<?>> supportedTypes = Set.of(boolean.class, byte.class, short.class,
-      int.class, long.class, float.class, double.class, char.class, java.io.InputStream.class,
-      java.io.Reader.class, java.lang.Boolean.class, java.lang.Byte.class, java.lang.Short.class,
-      java.lang.Integer.class, java.lang.Long.class, java.lang.Float.class, java.lang.Double.class,
-      java.lang.Character.class, java.lang.String.class, java.lang.Object.class,
-      java.math.BigDecimal.class, java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class,
-      java.sql.Time.class, java.sql.Timestamp.class, java.time.Instant.class,
-      java.time.LocalDate.class, java.time.LocalTime.class, java.time.LocalDateTime.class,
-      java.time.OffsetTime.class, java.time.OffsetDateTime.class, java.util.Date.class,
-      java.util.UUID.class, java.util.List.class);
 
 
 

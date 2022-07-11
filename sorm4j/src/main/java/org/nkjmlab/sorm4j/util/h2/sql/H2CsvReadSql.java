@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
-import org.nkjmlab.sorm4j.util.h2.sql.annotation.CsvColumn;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 

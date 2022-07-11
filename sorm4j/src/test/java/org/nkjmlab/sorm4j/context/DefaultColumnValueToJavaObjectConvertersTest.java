@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.Inet4Address;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -15,15 +15,36 @@ class DefaultColumnValueToJavaObjectConvertersTest {
 
   @Test
   void testConvertTo() {
-    ColumnValueToJavaObjectConverter<String> columnValueConverter =
-        ((resultSet, columnIndex, columnType, toType) -> {
-          return resultSet.getString(columnIndex).toString();
-        });
+    ColumnValueToJavaObjectConverter columnValueConverter = new ColumnValueToJavaObjectConverter() {
 
-    SqlParameterSetter parameterSetter = ((stmt, parameterIndex, parameter) -> {
-      stmt.setString(parameterIndex, parameter.toString());
-    });
+      @Override
+      public boolean test(Class<?> toType) {
+        return toType.equals(String.class);
+      }
 
+      @Override
+      public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+          throws SQLException {
+        return resultSet.getString(columnIndex).toString();
+
+      }
+
+    };
+
+    SqlParameterSetter parameterSetter = new SqlParameterSetter() {
+
+      @Override
+      public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
+          throws SQLException {
+        return parameter.getClass().equals(java.net.Inet4Address.class);
+      }
+
+      @Override
+      public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
+          throws SQLException {
+        stmt.setString(parameterIndex, parameter.toString());
+      }
+    };
     PreparedStatementSupplier supplier = new PreparedStatementSupplier() {
       @Override
       public PreparedStatement prepareStatement(Connection connection, String sql,
@@ -38,10 +59,9 @@ class DefaultColumnValueToJavaObjectConvertersTest {
       }
     };
     SormContext context = SormContext.builder()
-        .setColumnValueToJavaObjectConverter(new DefaultColumnValueToJavaObjectConverters(
-            Map.of(String.class, columnValueConverter)))
-        .setSqlParametersSetter(
-            new DefaultSqlParametersSetter(Map.of(java.net.Inet4Address.class, parameterSetter)))
+        .setColumnValueToJavaObjectConverters(
+            new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
+        .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter))
         .setPreparedStatementSupplier(supplier).build();
 
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);

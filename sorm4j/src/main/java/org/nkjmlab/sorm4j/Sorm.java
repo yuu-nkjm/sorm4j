@@ -27,10 +27,10 @@ public interface Sorm extends Orm {
    * For example,
    *
    * <pre>
-   * <code>
-   * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
-   * Sorm.create(dataSource);
-   *</pre></code>
+   *  * <code>
+    * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+    * Sorm.create(dataSource);
+    *</pre></code>
    *
    * @param dataSource
    * @return
@@ -61,9 +61,9 @@ public interface Sorm extends Orm {
    * For example,
    *
    * <pre>
-   * <code>
-   * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
-   *</pre></code>
+   *  * <code>
+    * Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+    *</pre></code>
    *
    * @param jdbcUrl
    * @return
@@ -74,6 +74,12 @@ public interface Sorm extends Orm {
 
   /**
    * Creates an instance of {@link DriverManagerDataSource}
+   *
+   * Example:
+   *
+   * <pre>
+   * Sorm.createDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", null, null);
+   * </pre>
    *
    * @param jdbcUrl
    * @param username

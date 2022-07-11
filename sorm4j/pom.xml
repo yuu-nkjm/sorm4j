@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.nkjmlab</groupId>
     <artifactId>sorm4j-parent</artifactId>
-    <version>1.4.8</version>
+    <version>1.4.9</version>
   </parent>
   <properties>
     <slf4j-version>1.7.30</slf4j-version>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.17.2</version>
+      <version>2.18.0</version>
       <optional>true</optional>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -32,6 +32,22 @@
       <version>${slf4j-version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.13.3</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
+    <dependency>
+      <groupId>org.locationtech.jts</groupId>
+      <artifactId>jts-core</artifactId>
+      <version>1.19.0</version>
+      <optional>true</optional>
+    </dependency>
+
+
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -57,7 +73,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-iostreams</artifactId>
-      <version>2.17.2</version>
+      <version>2.18.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -72,7 +88,7 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.17.2</version>
+      <version>2.18.0</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
@@ -149,6 +165,9 @@
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.table=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.command=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.datatype=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jackson=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jts=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.logger=ALL-UNNAMED

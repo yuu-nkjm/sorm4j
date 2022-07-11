@@ -5,11 +5,13 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.nkjmlab.sorm4j.common.SormException;
+import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
+import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
  * Default implementation of {@link SqlParametersSetter}
@@ -20,14 +22,33 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
 public final class DefaultSqlParametersSetter implements SqlParametersSetter {
 
-  private final Map<Class<?>, SqlParameterSetter> setters;
+  private final List<SqlParameterSetter> setters;
+  private final Map<Class<?>, SqlParameterSetter> settersHitCache;
 
-  public DefaultSqlParametersSetter() {
-    this.setters = Collections.emptyMap();
+
+  private static final DummySetter DUMMY_SETTER = new DummySetter();
+
+  private static final class DummySetter implements SqlParameterSetter {
+
+    @Override
+    public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
+        throws SQLException {
+      return false;
+    }
+
+
+    @Override
+    public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
+        throws SQLException {}
+
   }
 
-  public DefaultSqlParametersSetter(Map<Class<?>, SqlParameterSetter> setters) {
-    this.setters = Map.copyOf(setters);
+
+
+  public DefaultSqlParametersSetter(SqlParameterSetter... setters) {
+    this.setters = Arrays.asList(setters);
+    this.settersHitCache =
+        this.setters.isEmpty() ? Collections.emptyMap() : new ConcurrentHashMap<>();
   }
 
   @Override
@@ -65,11 +86,22 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
     }
 
     final Class<?> type = parameter.getClass();
-    final SqlParameterSetter setter = setters.get(type);
-    if (setter != null) {
-      setter.setParameter(stmt, parameterIndex, parameter);
-      return;
+    if (!setters.isEmpty()) {
+      final SqlParameterSetter setter =
+          settersHitCache.computeIfAbsent(type, key -> setters.stream().filter(_setter -> {
+            try {
+              return _setter.test(stmt, parameterIndex, parameter);
+            } catch (SQLException e) {
+              throw Try.rethrow(e);
+            }
+          }).findFirst().orElse(DUMMY_SETTER));
+
+      if (!setter.equals(DUMMY_SETTER)) {
+        setter.setParameter(stmt, parameterIndex, parameter);
+        return;
+      }
     }
+
 
     switch (type.getName()) {
       case "java.lang.Boolean":
@@ -129,23 +161,20 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       case "java.util.UUID":
         stmt.setObject(parameterIndex, parameter);
         return;
-      case "org.nkjmlab.sorm4j.util.h2.datatype.Json":
+      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
         stmt.setObject(parameterIndex,
-            ((org.nkjmlab.sorm4j.util.h2.datatype.Json) parameter).getBytes());
+            ((org.nkjmlab.sorm4j.util.datatype.JsonByte) parameter).getBytes());
+        return;
+      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
+        stmt.setString(parameterIndex,
+            ((org.nkjmlab.sorm4j.util.datatype.GeometryString) parameter).getText());
         return;
       default:
         if (type.isArray()) {
           final Class<?> compType = type.getComponentType();
           procArray(compType, stmt, parameterIndex, parameter);
-        } else if (parameter instanceof List) {
-          List<?> list = (List<?>) parameter;
-          if (list.isEmpty()) {
-            throw new SormException(
-                "Size of parameter which type is List should be at least one. ");
-          }
-          procArray(list.get(0).getClass(), stmt, parameterIndex, list.toArray());
         } else if (type.isEnum()) {
-          stmt.setString(parameterIndex, parameter.toString());
+          stmt.setString(parameterIndex, ((Enum<?>) parameter).name());
         } else if (parameter instanceof java.sql.Blob) {
           stmt.setBlob(parameterIndex, (java.sql.Blob) parameter);
         } else if (parameter instanceof java.sql.Clob) {
@@ -162,7 +191,6 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
   }
 
 
-
   /**
    * Treats array.
    *
@@ -176,10 +204,15 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
     String typeName = compType.getName();
     if (typeName.equals("byte")) {
       stmt.setBytes(parameterIndex, (byte[]) parameter);
+    } else if (typeName.contains("[")) {
+      stmt.setArray(parameterIndex, stmt.getConnection().createArrayOf("java_object",
+          convertToObjectArray((Object[]) parameter)));
     } else {
       stmt.setArray(parameterIndex, toSqlArray(typeName, stmt.getConnection(), parameter));
     }
   }
+
+
 
   static java.sql.Array toSqlArray(String typeName, Connection conn, Object parameter)
       throws SQLException {
@@ -188,6 +221,8 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         return conn.createArrayOf("boolean", toObjectArray((boolean[]) parameter));
       case "byte":
         return conn.createArrayOf("tinyint", toObjectArray((byte[]) parameter));
+      case "char":
+        return conn.createArrayOf("character", ArrayUtils.toObjectArray((char[]) parameter));
       case "short":
         return conn.createArrayOf("smallint", ArrayUtils.toObjectArray((short[]) parameter));
       case "int":
@@ -198,34 +233,6 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         return conn.createArrayOf("real", ArrayUtils.toObjectArray((float[]) parameter));
       case "double":
         return conn.createArrayOf("double", ArrayUtils.toObjectArray((double[]) parameter));
-      case "char":
-        return conn.createArrayOf("character", ArrayUtils.toObjectArray((char[]) parameter));
-      // case "java.lang.Boolean":
-      // return conn.createArrayOf("boolean", (Object[]) parameter);
-      // case "java.lang.Byte":
-      // return conn.createArrayOf("tinyint", (Object[]) parameter);
-      // case "java.lang.Short":
-      // return conn.createArrayOf("smallint", (Object[]) parameter);
-      // case "java.lang.Integer":
-      // return conn.createArrayOf("integer", (Object[]) parameter);
-      // case "java.lang.Long":
-      // return conn.createArrayOf("bigint", (Object[]) parameter);
-      // case "java.lang.Float":
-      // return conn.createArrayOf("real", (Object[]) parameter);
-      // case "java.lang.Double":
-      // return conn.createArrayOf("double", (Object[]) parameter);
-      // case "java.lang.Character":
-      // return conn.createArrayOf("character", (Object[]) parameter);
-      // case "java.lang.String":
-      // return conn.createArrayOf("varchar", (Object[]) parameter);
-      // case "java.math.BigDecimal":
-      // return conn.createArrayOf("numeric", (Object[]) parameter);
-      // case "java.sql.Date":
-      // return conn.createArrayOf("date", (Object[]) parameter);
-      // case "java.sql.Time":
-      // return conn.createArrayOf("time", (Object[]) parameter);
-      // case "java.sql.Timestamp":
-      // return conn.createArrayOf("timestamp", (Object[]) parameter);
       default:
         // The first argument is "JAVA_OBJECT", however the type of elements depends on JDBC driver.
         // The JDBC driver is responsible for mapping the elements Object array to the default JDBC
