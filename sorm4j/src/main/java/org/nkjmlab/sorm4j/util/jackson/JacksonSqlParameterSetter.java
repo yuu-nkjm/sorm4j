@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.json.OrmJsonContainer;
+import org.nkjmlab.sorm4j.util.json.OrmJsonColumnContainer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,7 +25,7 @@ public class JacksonSqlParameterSetter implements SqlParameterSetter {
   private boolean isOrmJsonContainer(Class<?> type) {
     return ormJsonContainer.computeIfAbsent(type,
         key -> ArrayUtils.getInternalComponentType(type)
-            .getAnnotation(OrmJsonContainer.class) != null || List.class.isAssignableFrom(type)
+            .getAnnotation(OrmJsonColumnContainer.class) != null || List.class.isAssignableFrom(type)
             || Map.class.isAssignableFrom(type));
   }
 

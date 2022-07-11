@@ -76,7 +76,7 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
       throw new SormException(
-          "Container class for object relation mapping must have the public default constructor (with no arguments).",
+          "Container class for object relation mapping must have the public default constructor.",
           e);
     }
   }

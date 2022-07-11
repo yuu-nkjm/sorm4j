@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.util.json.OrmJsonContainer;
+import org.nkjmlab.sorm4j.util.json.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -486,11 +486,11 @@ public final class TableDefinition {
 
 
   public static String toSqlDataType(Class<?> type) {
-    if (type.getAnnotation(OrmJsonContainer.class) != null) {
+    if (type.getAnnotation(OrmJsonColumnContainer.class) != null) {
       return "json";
 
     }
-    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonContainer.class) != null) {
+    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonColumnContainer.class) != null) {
       return "json";
     }
 

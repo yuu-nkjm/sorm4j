@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.json.OrmJsonContainer;
+import org.nkjmlab.sorm4j.util.json.OrmJsonColumnContainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Experimental
@@ -27,7 +27,7 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
   private boolean isOrmJsonContainer(Class<?> type) {
     return ormJsonContainer.computeIfAbsent(type,
         key -> ArrayUtils.getInternalComponentType(type)
-            .getAnnotation(OrmJsonContainer.class) != null || List.class.isAssignableFrom(type)
+            .getAnnotation(OrmJsonColumnContainer.class) != null || List.class.isAssignableFrom(type)
             || Map.class.isAssignableFrom(type));
   }
 
