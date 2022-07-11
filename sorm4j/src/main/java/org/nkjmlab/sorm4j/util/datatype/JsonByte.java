@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.json;
+package org.nkjmlab.sorm4j.util.datatype;
 
 import java.nio.charset.StandardCharsets;
 import org.nkjmlab.sorm4j.annotation.Experimental;

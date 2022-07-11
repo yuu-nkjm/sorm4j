@@ -72,6 +72,12 @@ sorm.insert(new Customer(1, "Alice", "Tokyo"), new Customer(2, "Bob", "Tokyo"));
 
 | lib|read|insert|read multirow|insert multirow|
 |:----|:----|:----|:----|:----|
+|Hand coded (baseline)|4.4 |5.4 |3427 |23642 |
+|Sorm4j (1.4.9)|3.8 (-14% slower)|6.0 (11% slower)|3219 (-6% slower)|21898 (-7% slower)|
+
+
+| lib|read|insert|read multirow|insert multirow|
+|:----|:----|:----|:----|:----|
 |Hand coded (baseline)|4.4 |5.6 |3528 |24312 |
 |Sorm4j (1.4.6)|3.8 (-14% slower)|6.1 (9% slower)|3175 (-10% slower)|21580 (-11% slower)|
 |Sql2o (1.6.0)|6.5 (48% slower)|9.7 (73% slower)|3871 (10% slower)|42668 (76% slower)|

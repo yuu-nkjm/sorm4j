@@ -14,7 +14,8 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.json.JsonByte;
+import org.nkjmlab.sorm4j.util.datatype.GeometryString;
+import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 
 /**
  * Default implementation of {@link ColumnValueToJavaObjectConverters}
@@ -47,17 +48,18 @@ public final class DefaultColumnValueToJavaObjectConverters
     }
   }
 
-  private static final Set<Class<?>> DEFAULT_SUPPORTED_RETURNED_TYPES =
-      Set.of(boolean.class, byte.class, short.class, int.class, long.class, float.class,
-          double.class, char.class, java.io.InputStream.class, java.io.Reader.class,
-          java.lang.Boolean.class, java.lang.Byte.class, java.lang.Short.class,
-          java.lang.Integer.class, java.lang.Long.class, java.lang.Float.class,
-          java.lang.Double.class, java.lang.Character.class, java.lang.String.class,
-          java.lang.Object.class, java.math.BigDecimal.class, java.sql.Clob.class,
-          java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
-          java.time.Instant.class, java.time.LocalDate.class, java.time.LocalTime.class,
-          java.time.LocalDateTime.class, java.time.OffsetTime.class, java.time.OffsetDateTime.class,
-          java.util.Date.class, java.util.UUID.class, org.nkjmlab.sorm4j.util.json.JsonByte.class);
+  private static final Set<Class<?>> DEFAULT_SUPPORTED_RETURNED_TYPES = Set.of(boolean.class,
+      byte.class, short.class, int.class, long.class, float.class, double.class, char.class,
+      java.io.InputStream.class, java.io.Reader.class, java.lang.Boolean.class,
+      java.lang.Byte.class, java.lang.Short.class, java.lang.Integer.class, java.lang.Long.class,
+      java.lang.Float.class, java.lang.Double.class, java.lang.Character.class,
+      java.lang.String.class, java.lang.Object.class, java.math.BigDecimal.class,
+      java.sql.Clob.class, java.sql.Blob.class, java.sql.Date.class, java.sql.Time.class,
+      java.sql.Timestamp.class, java.time.Instant.class, java.time.LocalDate.class,
+      java.time.LocalTime.class, java.time.LocalDateTime.class, java.time.OffsetTime.class,
+      java.time.OffsetDateTime.class, java.util.Date.class, java.util.UUID.class,
+      org.nkjmlab.sorm4j.util.datatype.JsonByte.class,
+      org.nkjmlab.sorm4j.util.datatype.GeometryString.class);
 
   private final Map<Class<?>, Boolean> supportedTypeCache = new ConcurrentHashMap<>();
 
@@ -188,8 +190,10 @@ public final class DefaultColumnValueToJavaObjectConverters
       case "java.time.OffsetTime":
       case "java.time.OffsetDateTime":
         return resultSet.getObject(columnIndex, toType);
-      case "org.nkjmlab.sorm4j.util.json.JsonByte":
+      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
         return new JsonByte(resultSet.getBytes(columnIndex));
+      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
+        return new GeometryString(resultSet.getString(columnIndex));
       default:
         if (toType.isEnum()) {
           String str = resultSet.getString(columnIndex);

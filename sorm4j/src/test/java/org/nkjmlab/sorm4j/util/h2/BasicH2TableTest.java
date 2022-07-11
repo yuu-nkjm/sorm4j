@@ -17,8 +17,8 @@ import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.h2.sql.annotation.CsvColumn;
-import org.nkjmlab.sorm4j.util.json.JsonByte;
+import org.nkjmlab.sorm4j.util.datatype.JsonByte;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvColumn;
 
 class BasicH2TableTest {
 

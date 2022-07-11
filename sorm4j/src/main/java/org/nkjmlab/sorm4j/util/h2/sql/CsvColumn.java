@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.h2.sql.annotation;
+package org.nkjmlab.sorm4j.util.h2.sql;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

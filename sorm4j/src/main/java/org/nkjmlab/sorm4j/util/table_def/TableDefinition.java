@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.util.json.OrmJsonColumnContainer;
+import org.nkjmlab.sorm4j.util.datatype.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -490,7 +490,8 @@ public final class TableDefinition {
       return "json";
 
     }
-    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonColumnContainer.class) != null) {
+    if (ArrayUtils.getInternalComponentType(type)
+        .getAnnotation(OrmJsonColumnContainer.class) != null) {
       return "json";
     }
 
@@ -546,7 +547,10 @@ public final class TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
-      case "org.nkjmlab.sorm4j.util.json.JsonByte":
+      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
+      case "org.nkjmlab.sorm4j.util.jts.GeometryJts":
+        return "geometry";
+      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
       case "java.util.List":
       case "java.util.Map":
         return "json";

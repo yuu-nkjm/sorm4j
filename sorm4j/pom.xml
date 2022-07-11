@@ -39,6 +39,13 @@
       <version>2.13.3</version>
       <optional>true</optional>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
+    <dependency>
+      <groupId>org.locationtech.jts</groupId>
+      <artifactId>jts-core</artifactId>
+      <version>1.19.0</version>
+      <optional>true</optional>
+    </dependency>
 
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
@@ -158,8 +165,9 @@
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.table=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.command=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.datatype=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jackson=ALL-UNNAMED
-            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.json=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jts=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.logger=ALL-UNNAMED

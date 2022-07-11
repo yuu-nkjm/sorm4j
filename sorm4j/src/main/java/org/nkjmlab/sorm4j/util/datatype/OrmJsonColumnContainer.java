@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.json;
+package org.nkjmlab.sorm4j.util.datatype;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
