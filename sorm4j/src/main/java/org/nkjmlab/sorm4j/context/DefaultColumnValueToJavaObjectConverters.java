@@ -97,10 +97,13 @@ public final class DefaultColumnValueToJavaObjectConverters
     try {
       return (T) convertToHelper(resultSet, columnIndex, columnType, toType);
     } catch (Exception e) {
-      throw new SormException(
-          ParameterizedStringUtils.newString("ColumnIndex={},ColumnType={},toType={}", columnIndex,
-              JdbcTypeUtils.convert(columnType), toType),
-          e);
+      String tableName =
+          Try.getOrElse(() -> resultSet.getMetaData().getTableName(columnIndex), "UNKNOWN_TABLE");
+      String columnLabel = Try.getOrElse(() -> resultSet.getMetaData().getColumnLabel(columnIndex),
+          "UNKNOWN_COLUMN");
+      throw new SormException(ParameterizedStringUtils.newString(
+          "tableName=[{}], columnLabel=[{}], columnIndex=[{}], columnType=[{}], toType=[{}]",
+          tableName, columnLabel, columnIndex, JdbcTypeUtils.convert(columnType), toType), e);
     }
   }
 
@@ -200,9 +203,13 @@ public final class DefaultColumnValueToJavaObjectConverters
           try {
             return Enum.valueOf((Class<? extends Enum>) toType, str);
           } catch (Exception e) {
+            String tableName = Try.getOrElse(
+                () -> resultSet.getMetaData().getTableName(columnIndex), "UNKNOWN_TABLE");
+            String columnLabel = Try.getOrElse(
+                () -> resultSet.getMetaData().getColumnLabel(columnIndex), "UNKNOWN_COLUMN");
             throw new SormException(ParameterizedStringUtils.newString(
-                "Could not convert {} in column ({}) to  Enum ({}[])", str,
-                JDBCType.valueOf(columnType).getName(), toType), e);
+                "Could not convert [{}] in column [{}] to  Enum [{}], tableName=[{}], columnLabel=[{}]",
+                str, JDBCType.valueOf(columnType), toType, tableName, columnLabel), e);
           }
         } else if (toType.isArray()) {
           if (toType.getComponentType().getName().equals("byte")) {
@@ -212,10 +219,13 @@ public final class DefaultColumnValueToJavaObjectConverters
             return ArrayUtils.convertSqlArrayToArray(toType.getComponentType(),
                 resultSet.getArray(columnIndex));
           } catch (Exception e) {
-            throw new SormException(
-                ParameterizedStringUtils.newString("Could not convert column ({}) to  array ({}[])",
-                    JDBCType.valueOf(columnType).getName(), toType.getComponentType().getName()),
-                e);
+            String tableName = Try.getOrElse(
+                () -> resultSet.getMetaData().getTableName(columnIndex), "UNKNOWN_TABLE");
+            String columnLabel = Try.getOrElse(
+                () -> resultSet.getMetaData().getColumnLabel(columnIndex), "UNKNOWN_COLUMN");
+            throw new SormException(ParameterizedStringUtils.newString(
+                "Could not convert column [{}] to  array [{}], tableName=[{}], columnLabel=[{}]",
+                JdbcTypeUtils.convert(columnType), toType, tableName, columnLabel), e);
           }
         } else {
           return resultSet.getObject(columnIndex, toType);

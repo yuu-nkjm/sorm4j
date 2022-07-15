@@ -29,6 +29,7 @@ import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamOrmConnection;
 import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
@@ -659,10 +660,13 @@ public class OrmConnectionImpl implements OrmConnection {
           if (resultSet.next()) {
             ret = mapRowToObject(objectClass, resultSet);
           } else {
-            throw new SormException("No result returned");
+            throw new SormException(ParameterizedStringUtils.newString(
+                "Try to read an unique [{}] object but no result returned. [{}] ", objectClass, sql));
           }
           if (resultSet.next()) {
-            throw new SormException("Non-unique result returned");
+            throw new SormException(ParameterizedStringUtils.newString(
+                "Try to read an unique [{}] object but non-unique result returned. [{}] ", objectClass,
+                sql));
           }
           return ret;
         });

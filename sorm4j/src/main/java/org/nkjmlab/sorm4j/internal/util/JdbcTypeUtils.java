@@ -9,7 +9,11 @@ public final class JdbcTypeUtils {
   private JdbcTypeUtils() {}
 
   public static List<JDBCType> convert(int... sqlTypes) {
-    return Arrays.stream(sqlTypes).mapToObj(i -> JDBCType.valueOf(i)).collect(Collectors.toList());
+    return Arrays.stream(sqlTypes).mapToObj(i -> convert(i)).collect(Collectors.toList());
+  }
+
+  public static JDBCType convert(int sqlTypes) {
+    return JDBCType.valueOf(sqlTypes);
   }
 
 }
