@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 public final class JdbcDatabaseMetaData {
 
@@ -144,13 +144,13 @@ public final class JdbcDatabaseMetaData {
           indexes.put(tableName, l);
         }
       }
+      Object[] params = {metaData.getJDBCMajorVersion(), metaData.getJDBCMinorVersion()};
 
 
       return new JdbcDatabaseMetaData(metaData.getDatabaseProductName(),
           metaData.getDatabaseProductVersion(), metaData.getDriverName(),
           metaData.getDriverVersion(),
-          ParameterizedStringUtils.newString("{}.{}", metaData.getJDBCMajorVersion(),
-              metaData.getJDBCMinorVersion()),
+          ParameterizedStringFormat.DEFAULT.format("{}.{}", params),
           metaData.getDefaultTransactionIsolation(), metaData.getMaxConnections(),
           metaData.getURL(), metaData.getUserName(), metaData.getSearchStringEscape(), tables,
           indexes);

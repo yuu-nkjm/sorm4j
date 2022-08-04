@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.internal.util.logger;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.util.logger.LoggerContext.Category.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,6 +26,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
+import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 class SormLoggerTest {
@@ -69,7 +69,7 @@ class SormLoggerTest {
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(
         SormContext.builder().setLoggerContext(lc).build());
 
-    Optional<LogPoint> lp = lc.createLogPoint(EXECUTE_QUERY, getClass());
+    Optional<LogPoint> lp = lc.createLogPoint(Category.EXECUTE_QUERY, getClass());
     {
       String text = proc(stringWriter, () -> lp.get().logAfterQuery("one result"));
       assertThat(text.length()).isLessThan(300);

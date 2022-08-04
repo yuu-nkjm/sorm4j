@@ -313,7 +313,7 @@ class OrmImplTest {
 
   @Test
   void testGetTableMetaDataClassOfQString() {
-    sorm.getTableMetaData(PLAYERS1);
+    sorm.getJdbcTableMetaData(PLAYERS1);
   }
 
   @Test

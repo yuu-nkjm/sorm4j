@@ -29,6 +29,11 @@ public interface TableWithDefinition<T> extends Table<T> {
     return this;
   }
 
+  default TableWithDefinition<T> dropTableIfExistsCascade() {
+    getTableDefinition().dropTableIfExistsCascade(getOrm());
+    return this;
+  }
+
   @Override
   default String getTableName() {
     return getTableDefinition().getTableName();

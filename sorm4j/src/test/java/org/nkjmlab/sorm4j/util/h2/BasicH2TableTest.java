@@ -75,7 +75,8 @@ class BasicH2TableTest {
   @Test
   void test3() {
     H2Table<Item> table = new BasicH2Table<>(SormTestUtils.createSormWithNewContext(), Item.class);
-    String ret = table.getReadCsvWithHeaderSql(new File("file.csv"), StandardCharsets.UTF_8, '\t');
+    String ret =
+        table.getReadCsvWithHeaderSql(new File("file.csv"), StandardCharsets.UTF_8, '\t', '"');
     System.out.println(ret);
   }
 

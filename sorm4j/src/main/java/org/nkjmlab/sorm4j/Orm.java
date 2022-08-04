@@ -7,6 +7,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
@@ -289,12 +290,12 @@ public interface Orm {
   TableMetaData getTableMetaData(Class<?> type);
 
   /**
-   * Gets table metadata to the table name.
+   * Gets JDBC table metadata.
    *
    * @param tableName
    * @return
    */
-  TableMetaData getTableMetaData(String tableName);
+  JdbcTableMetaData getJdbcTableMetaData(String tableName);
 
 
   /**

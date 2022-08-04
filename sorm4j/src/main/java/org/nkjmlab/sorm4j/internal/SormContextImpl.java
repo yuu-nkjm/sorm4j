@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
-import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
@@ -61,11 +61,11 @@ public final class SormContextImpl implements SormContext {
         statementSupplier, tableSqlFactory, multiRowProcessorFactory));
   }
 
-  TableMetaData getTableMetaData(Connection connection, String tableName) {
+  JdbcTableMetaData getJdbcTableMetaData(Connection connection, String tableName) {
     return getTableMetaData(connection, tableName, NoValueType.class);
   }
 
-  private <T> TableMetaDataImpl getTableMetaData(Connection connection, String tableName,
+  <T> TableMetaDataImpl getTableMetaData(Connection connection, String tableName,
       Class<T> objectClass) {
     TableName _tableName = toTableName(connection, tableName);
     TableMetaDataImpl ret = tableMetaDataMap.computeIfAbsent(_tableName.getName(), _key -> {
@@ -78,7 +78,7 @@ public final class SormContextImpl implements SormContext {
     return ret;
   }
 
-  public <T> TableSql getTableSql(Connection connection, TableMetaData tableMetaData) {
+  public <T> TableSql getTableSql(Connection connection, JdbcTableMetaData tableMetaData) {
     return tableSqlMap.computeIfAbsent(tableMetaData.getTableName(), _key -> {
       try {
         return config.getTableSqlFactory().create(tableMetaData,

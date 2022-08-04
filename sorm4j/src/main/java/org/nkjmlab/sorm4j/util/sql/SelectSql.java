@@ -33,19 +33,17 @@ public final class SelectSql {
 
     private String columns = "*";
 
-    private boolean distinct;
+    private boolean distinct = false;
 
-    private String groupBy;
-
-    private String having;
-
-    private String limit;
-
-    private String orderBy;
-
-    private String table;
+    private String from;
 
     private String where;
+
+    private String groupBy;
+    private String orderBy;
+
+    private String having;
+    private String limit;
 
     private Builder() {}
 
@@ -76,14 +74,13 @@ public final class SelectSql {
      * from("player") returns "from player"
      * </pre>
      *
-     * @param table
+     * @param tables
      * @return
      */
-    public Builder from(String table) {
-      this.table = table;
+    public Builder from(String... tables) {
+      this.from = String.join(",", tables);
       return this;
     }
-
 
     /**
      * Creates group by clause.
@@ -200,7 +197,7 @@ public final class SelectSql {
       }
       sql.append(columns);
       sql.append(prettyPrint ? System.lineSeparator() : "");
-      sql.append(FROM + table);
+      sql.append(FROM + from);
       if (where != null) {
         sql.append(prettyPrint ? System.lineSeparator() : "");
         sql.append(WHERE + where);
@@ -599,4 +596,6 @@ public final class SelectSql {
   public static String wrapSpace(Object str) {
     return " " + (str == null ? "null" : str.toString().trim()) + " ";
   }
+
+
 }

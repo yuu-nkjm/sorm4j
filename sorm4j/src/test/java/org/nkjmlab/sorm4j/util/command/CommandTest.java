@@ -121,8 +121,8 @@ class CommandTest {
 
       String sql = ParameterizedSqlParser.embedParameter(
           "select {?}, {?} from players join guests on players.id=guests.id where players.id=?",
-          conn.getTableMetaData(Player.class).getColumnAliases(),
-          conn.getTableMetaData(Guest.class).getColumnAliases());
+          String.join(",", conn.getTableMetaData(Player.class).getColumnAliases()),
+          String.join(",", conn.getTableMetaData(Guest.class).getColumnAliases()));
 
       List<Tuple2<Player, Guest>> ret =
           Command.create(conn, sql, PLAYER_ALICE.getId()).readTupleList(Player.class, Guest.class);
@@ -142,9 +142,9 @@ class CommandTest {
       String sql = ParameterizedSqlParser.embedParameter(
           "select {?}, {?}, {?} from players join guests on players.id=guests.id "
               + " join sports on players.id=sports.id " + " where players.id=?",
-          conn.getTableMetaData(Player.class).getColumnAliases(),
-          conn.getTableMetaData(Guest.class).getColumnAliases(),
-          conn.getTableMetaData(Sport.class).getColumnAliases());
+          String.join(",", conn.getTableMetaData(Player.class).getColumnAliases()),
+          String.join(",", conn.getTableMetaData(Guest.class).getColumnAliases()),
+          String.join(",", conn.getTableMetaData(Sport.class).getColumnAliases()));
 
       List<Tuple3<Player, Guest, Sport>> ret = Command.create(conn, sql, PLAYER_ALICE.getId())
           .readTupleList(Player.class, Guest.class, Sport.class);
@@ -191,7 +191,7 @@ class CommandTest {
         .create(conn,
             ParameterizedSqlParser.parse("select * from players where id=:id", Map.of("id", 1)))
         .readList(Player.class));
-    sorm.applyHandler(conn -> conn.getTableMetaData("players"));
+    sorm.applyHandler(conn -> conn.getJdbcTableMetaData("players"));
   }
 
 

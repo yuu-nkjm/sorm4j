@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 
@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 public final class DefaultTableSqlFactory implements TableSqlFactory {
 
   @Override
-  public TableSql create(TableMetaData tableMetaData, JdbcDatabaseMetaData databaseMetaData) {
+  public TableSql create(JdbcTableMetaData tableMetaData, JdbcDatabaseMetaData databaseMetaData) {
     String tableName = tableMetaData.getTableName();
 
     List<String> columns = tableMetaData.getColumns();
@@ -101,7 +101,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
   }
 
   protected String generatePlaceholders(JdbcDatabaseMetaData databaseMetaData,
-      TableMetaData tableMetaData, List<String> targetColumns) {
+      JdbcTableMetaData tableMetaData, List<String> targetColumns) {
     if (databaseMetaData.getDatabaseProductName().toLowerCase().contains("h2")) {
       return String.join(",",
           tableMetaData.getColumnsWithMetaData().stream()

@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -11,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 public final class ColumnToAccessorMapping {
 
@@ -76,19 +75,16 @@ public final class ColumnToAccessorMapping {
   public final void setValue(Object object, String columnName, Object value) {
     final FieldAccessor acc = get(columnName);
     if (acc == null) {
-      throw new SormException(ParameterizedStringUtils.newString("Error: setting value [{}]"
-          + " of type [{}] in [{}]"
-          + " because column [{}] does not have a corresponding setter method or field access =>[{}]",
-          value, value.getClass().getSimpleName(), object.getClass().getName(), columnName,
-          columnToAccessorMap.toString()));
+      Object[] params = {value, value.getClass().getSimpleName(), object.getClass().getName(), columnName, columnToAccessorMap.toString()};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Error: setting value [{}]"
+      + " of type [{}] in [{}]"
+      + " because column [{}] does not have a corresponding setter method or field access =>[{}]", params));
     }
     try {
       acc.set(object, value);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new SormException(newString(
-          "Could not set a value for column [{}] to instance of [{}] with [{}]. The value is=[{}]",
-          columnName, object == null ? "null" : object.getClass().getSimpleName(),
-          acc.getFormattedString(), value), e);
+      Object[] params = {columnName, object == null ? "null" : object.getClass().getSimpleName(), acc.getFormattedString(), value};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Could not set a value for column [{}] to instance of [{}] with [{}]. The value is=[{}]", params), e);
 
     }
   }
@@ -96,9 +92,8 @@ public final class ColumnToAccessorMapping {
   private final FieldAccessor getAccessor(Object object, String columnName) {
     final FieldAccessor acc = get(columnName);
     if (acc == null) {
-      throw new SormException(newString(
-          "Error: getting value from [{}] because column [{}] does not have a corresponding getter method or field access. {}",
-          object.getClass(), columnName, this));
+      Object[] params = {object.getClass(), columnName, this};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Error: getting value from [{}] because column [{}] does not have a corresponding getter method or field access. {}", params));
     }
     return acc;
   }
@@ -108,10 +103,8 @@ public final class ColumnToAccessorMapping {
     try {
       return acc.get(object);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new SormException(ParameterizedStringUtils.newString(
-          "Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]",
-          (object == null ? "null" : object.getClass().getName()), acc.getFormattedString(),
-          acc.getFormattedString(), object), e);
+      Object[] params = {(object == null ? "null" : object.getClass().getName()), acc.getFormattedString(), acc.getFormattedString(), object};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Could not get a value from instance of [{}] for column [{}] with [{}] The instance is =[{}]", params), e);
     }
   }
 
@@ -132,9 +125,8 @@ public final class ColumnToAccessorMapping {
     for (String key : accessors.keySet()) {
       String aKey = toCanonicalCase(prefix + key);
       if (accessors.containsKey(aKey)) {
-        throw new SormException(ParameterizedStringUtils.newString(
-            "Modify table alias because table alias [{}] and column [{}] is concatenated and it becomes duplicated column",
-            prefix, key));
+        Object[] params = {prefix, key};
+        throw new SormException(ParameterizedStringFormat.DEFAULT.format("Modify table alias because table alias [{}] and column [{}] is concatenated and it becomes duplicated column", params));
       }
       ret.put(aKey, accessors.get(key));
     }

@@ -39,7 +39,7 @@ import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -256,8 +256,8 @@ public class TestPostgreSQLSqlMapper {
       return false;
     }
     if (!arr1.getClass().isArray() || !arr2.getClass().isArray()) {
-      throw new IllegalArgumentException(ParameterizedStringUtils
-          .newString("args should be array. arr1={}, arr2={}", arr1.getClass(), arr2.getClass()));
+      Object[] params = {arr1.getClass(), arr2.getClass()};
+      throw new IllegalArgumentException(ParameterizedStringFormat.DEFAULT.format("args should be array. arr1={}, arr2={}", params));
     }
     int l1 = Array.getLength(arr1);
 

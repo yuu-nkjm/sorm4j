@@ -18,12 +18,12 @@ class H2CsvReadSqlTest {
         .mapCsvColumnToTableColumn("`col-1`", "col_1").mapCsvColumnToTableColumn("`col-2`", "col_2")
         .build().getCsvReadAndSelectSql()).isEqualTo(
             "select `col-1` as col_1,`col-2` as col_2 from csvread('" + file.getAbsolutePath()
-                + "','COL-1'||char(9)||'COL-2','charset=UTF-16 fieldSeparator='||char(9))");
+                + "','COL-1'||char(9)||'COL-2','charset=UTF-16'||' fieldSeparator='||char(9))");
 
     assertThat(H2CsvReadSql.builder(file, OrmRecordExample.class).build()
         .getCsvReadAndInsertSql("test_table"))
             .isEqualTo("insert into test_table(ID,NAME) select ID,NAME from csvread('"
-                + file.getAbsolutePath() + "',null,'charset=UTF-8 fieldSeparator='||char(44))");
+                + file.getAbsolutePath() + "',null,'charset=UTF-8'||' fieldSeparator='||char(44))");
 
 
   }

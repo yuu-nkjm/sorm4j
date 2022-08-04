@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
 
@@ -82,9 +82,8 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
       return constructor.newInstance(params);
     } catch (IllegalArgumentException | SecurityException | InstantiationException
         | IllegalAccessException | InvocationTargetException e) {
-      throw new SormException(ParameterizedStringUtils.newString(
-          "Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}",
-          JdbcTypeUtils.convert(sqlTypes), constructorParameters), e);
+      Object[] params = {JdbcTypeUtils.convert(sqlTypes), constructorParameters};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}", params), e);
     }
   }
 
@@ -125,11 +124,10 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   public String toString() {
     List<String> keySet =
         constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
-    return ParameterizedStringUtils.newString(
-        "constructor=[{}], arguments={}" + System.lineSeparator() + "{}", constructor, keySet,
-        String.join(System.lineSeparator(),
-            keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
-                .collect(Collectors.toList())));
+    Object[] params = {constructor, keySet, String.join(System.lineSeparator(),
+        keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
+            .collect(Collectors.toList()))};
+    return ParameterizedStringFormat.DEFAULT.format("constructor=[{}], arguments={}" + System.lineSeparator() + "{}", params);
 
   }
 

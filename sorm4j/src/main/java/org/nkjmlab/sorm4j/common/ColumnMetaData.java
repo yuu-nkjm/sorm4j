@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.common;
 
-import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import java.util.Objects;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 /**
  * ColumnName name and data type for message.
@@ -31,9 +31,8 @@ public final class ColumnMetaData implements Comparable<ColumnMetaData> {
     this.isNullable = isNullable;
     this.isAutoIncremented = isAutoIncremented;
     this.isGenerated = isGenerated;
-    this.msg = newString("{{}: {} [{}({})] [n={},a={},g={}]}",
-        String.format("%02d", getOrdinalPosition()), getName(), getTypeName(), getDataType(),
-        getIsNullable(), getIsAutoIncremented(), getIsGenerated());
+    Object[] params = {String.format("%02d", getOrdinalPosition()), getName(), getTypeName(), getDataType(), getIsNullable(), getIsAutoIncremented(), getIsGenerated()};
+    this.msg = ParameterizedStringFormat.DEFAULT.format("{{}: {} [{}({})] [n={},a={},g={}]}", params);
   }
 
   private int getDataType() {
