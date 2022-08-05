@@ -29,7 +29,6 @@ import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamOrmConnection;
-import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -38,6 +37,7 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.result.BasicRowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
@@ -569,11 +569,14 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @SuppressWarnings("unchecked")
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
-    return getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
-        ? toSupportedReturnedTypeObject(resultSet, getOneSqlType(objectClass, resultSet),
-            objectClass)
-        : (objectClass.equals(RowMap.class) ? (T) mapRowToMap(resultSet)
-            : loadResultContainerObject(objectClass, resultSet));
+    if (objectClass.equals(RowMap.class)) {
+      return (T) mapRowToMap(resultSet);
+    } else if (getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)) {
+      return toSupportedReturnedTypeObject(resultSet, getOneSqlType(objectClass, resultSet),
+          objectClass);
+    } else {
+      return loadResultContainerObject(objectClass, resultSet);
+    }
   }
 
   @Override
@@ -773,7 +776,7 @@ public class OrmConnectionImpl implements OrmConnection {
   private RowMap toSingleRowMap(ResultSet resultSet, String[] columns, int[] columnTypes)
       throws SQLException {
     final int colsNum = columns.length;
-    final RowMap ret = new RowMapImpl(colsNum + 1, 1.0f);
+    final RowMap ret = new BasicRowMap(colsNum + 1, 1.0f);
     for (int i = 1; i <= colsNum; i++) {
       ret.put(columns[i - 1],
           getColumnValueToMapValueConverter().convertToValue(resultSet, i, columnTypes[i - 1]));
