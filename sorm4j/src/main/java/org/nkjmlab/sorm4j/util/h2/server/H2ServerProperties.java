@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j.util.h2.server;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.h2.server.H2ServerPropertiesBuilder.H2TcpServerPropertiesBuilder;
-import org.nkjmlab.sorm4j.util.h2.server.H2ServerPropertiesBuilder.H2WebConsoleServerPropertiesBuilder;
 
 @Experimental
 public class H2ServerProperties {
@@ -19,13 +17,6 @@ public class H2ServerProperties {
     this.args = args;
   }
 
-  public static H2TcpServerPropertiesBuilder createTcpServerPropertiesBuilder() {
-    return new H2TcpServerPropertiesBuilder();
-  }
-
-  public static H2WebConsoleServerPropertiesBuilder createWebConsoleServerPropertiesBuilder() {
-    return new H2WebConsoleServerPropertiesBuilder();
-  }
 
 
 }
