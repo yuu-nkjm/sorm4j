@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.UUID;
+import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
@@ -255,12 +257,12 @@ public class H2LocalDataSourceFactory {
       setDatabaseDirectory(databaseDirectory);
     }
 
-    public Builder setUsername(String username) {
+    public H2LocalDataSourceFactory.Builder setUsername(String username) {
       this.username = username;
       return this;
     }
 
-    public Builder setPassword(String password) {
+    public H2LocalDataSourceFactory.Builder setPassword(String password) {
       this.password = password;
       return this;
     }
@@ -273,7 +275,7 @@ public class H2LocalDataSourceFactory {
      * @param databaseDirectoryPath
      * @return
      */
-    public Builder setDatabaseDirectory(File databaseDirectoryPath) {
+    public H2LocalDataSourceFactory.Builder setDatabaseDirectory(File databaseDirectoryPath) {
       String prefix = databaseDirectoryPath.getPath().substring(0, 2);
 
       if (!allowPrefixes.contains(prefix) && !databaseDirectoryPath.isAbsolute()) {
@@ -286,7 +288,7 @@ public class H2LocalDataSourceFactory {
       return this;
     }
 
-    public Builder setDatabaseName(String dbName) {
+    public H2LocalDataSourceFactory.Builder setDatabaseName(String dbName) {
       this.databaseName = dbName;
       return this;
     }
@@ -300,6 +302,11 @@ public class H2LocalDataSourceFactory {
       return new H2LocalDataSourceFactory(databaseDirectory, databaseName, username, password);
     }
 
+  }
+
+  public static DataSource createInMemoryDataSource() {
+    return JdbcConnectionPool
+        .create("jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;", "", "");
   }
 
 

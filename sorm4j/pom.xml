@@ -114,10 +114,10 @@
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>mssql-jdbc</artifactId>
-      <version>11.1.2.jre18-preview</version>
-      <scope>test</scope>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>11.2.0.jre11</version>
+        <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc10 -->
     <dependency>
