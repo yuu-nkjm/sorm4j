@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.context;
 
-import static org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils.*;
 import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 /**
  * Default implementation of {@link TableNameMapper}
@@ -27,17 +27,18 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public String getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
+    Object[] params = {tableName, OrmTable.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(
-        newString(ERROR_MESSAGE, tableName, OrmTable.class.getSimpleName(), candidates)));
+        ParameterizedStringFormat.DEFAULT.format(ERROR_MESSAGE, params)));
   }
 
 
   @Override
   public String getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
+    Object[] params = {objectClass.getName(), OrmTable.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates)
-        .orElseThrow(() -> new SormException(newString(ERROR_MESSAGE, objectClass.getName(),
-            OrmTable.class.getSimpleName(), candidates)));
+        .orElseThrow(() -> new SormException(ParameterizedStringFormat.DEFAULT.format(ERROR_MESSAGE, params)));
   }
 
   /**

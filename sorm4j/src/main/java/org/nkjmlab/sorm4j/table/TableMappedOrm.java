@@ -7,6 +7,7 @@ import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
@@ -14,6 +15,7 @@ import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.sql.JoinSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
 @Experimental
@@ -78,7 +80,7 @@ public interface TableMappedOrm<T> {
 
 
   default TableMetaData getTableMetaData() {
-    return getOrm().getTableMetaData(getTableName());
+    return getOrm().getTableMetaData(getValueType());
   }
 
   default boolean exists(T object) {
@@ -192,15 +194,15 @@ public interface TableMappedOrm<T> {
     return getOrm().updateByPrimaryKeyIn(getTableName(), object, primaryKeyValues);
   }
 
-  default <S> List<Tuple2<T, S>> joinUsing(Table<S> other, String... columns) {
+  default <S> List<Tuple2<T, S>> joinUsing(TableMappedOrm<S> other, String... columns) {
     return getOrm().joinUsing(getValueType(), other.getValueType(), columns);
   }
 
-  default <S> List<Tuple2<T, S>> joinOn(Table<S> other, String onCondition) {
+  default <S> List<Tuple2<T, S>> joinOn(TableMappedOrm<S> other, String onCondition) {
     return getOrm().joinOn(getValueType(), other.getValueType(), onCondition);
   }
 
-  default <S> List<Tuple2<T, S>> leftJoinOn(Table<S> other, String onCondition) {
+  default <S> List<Tuple2<T, S>> leftJoinOn(TableMappedOrm<S> other, String onCondition) {
     return getOrm().leftJoinOn(getValueType(), other.getValueType(), onCondition);
   }
 
@@ -324,6 +326,23 @@ public interface TableMappedOrm<T> {
    */
   default ResultSetStream<T> stream(String sql, Object... parameters) {
     return getOrm().stream(getValueType(), sql, parameters);
+  }
+
+  @Experimental
+  default <S> List<Tuple2<T, S>> join(TableMappedOrm<S> second, String sql, Object... parameters) {
+    return getOrm().readTupleList(getValueType(), second.getValueType(), sql, parameters);
+  }
+
+  @Experimental
+  default <S, U> List<Tuple3<T, S, U>> join(TableMappedOrm<S> second, TableMappedOrm<U> third,
+      String sql, Object... parameters) {
+    return getOrm().readTupleList(getValueType(), second.getValueType(), third.getValueType(), sql,
+        parameters);
+  }
+
+  @Experimental
+  default JoinSql.Builder createJoinSql() {
+    return JoinSql.builder(this);
   }
 
 }

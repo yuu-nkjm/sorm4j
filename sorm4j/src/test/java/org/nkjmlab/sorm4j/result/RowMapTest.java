@@ -3,7 +3,6 @@ package org.nkjmlab.sorm4j.result;
 import static org.assertj.core.api.Assertions.*;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.result.RowMapImpl;
 
 class RowMapTest {
 
@@ -12,7 +11,7 @@ class RowMapTest {
 
 
 
-    RowMap rm = new RowMapImpl();
+    RowMap rm = RowMap.create();
     rm.put("key1", "value");
     assertThat(rm.containsKey("key1")).isTrue();
     assertThat(rm.containsValue("value")).isTrue();

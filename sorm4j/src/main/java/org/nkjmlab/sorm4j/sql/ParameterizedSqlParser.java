@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 
 public interface ParameterizedSqlParser {
   /**
@@ -47,11 +47,12 @@ public interface ParameterizedSqlParser {
    */
   @Experimental
   public static String embedParameter(String sql, Object... parameters) {
-    String ret = ParameterizedStringUtils.newString(sql, "{?}", parameters.length,
+    String ret = ParameterizedStringFormat.newString(sql, "{?}", parameters.length,
         index -> parameters[index] == null ? null : parameters[index].toString());
     if (ret.contains("{?}")) {
-      throw new SormException(ParameterizedStringUtils
-          .newString("Could not embed all parameters. sql={},parameters={}", sql, parameters));
+      Object[] params = {sql, parameters};
+      throw new SormException(ParameterizedStringFormat.DEFAULT
+          .format("Could not embed all parameters. sql={},parameters={}", params));
     } else {
       return ret;
     }

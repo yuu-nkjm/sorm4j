@@ -460,7 +460,7 @@ class OrmConnectionImplTest {
         failBecauseExceptionWasNotThrown(SormException.class);
       });
     } catch (SormException e) {
-      assertThat(e.getMessage()).contains("Non-unique");
+      assertThat(e.getMessage()).contains("non-unique");
     }
 
   }

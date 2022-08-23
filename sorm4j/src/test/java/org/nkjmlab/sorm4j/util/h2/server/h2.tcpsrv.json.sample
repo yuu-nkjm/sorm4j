@@ -1,0 +1,4 @@
+{
+  "password": "password",
+  "h2ClassPath": "~/tmp/h2/h2-2.1.214.jar"
+ }

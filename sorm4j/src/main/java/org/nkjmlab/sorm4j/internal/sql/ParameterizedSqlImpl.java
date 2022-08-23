@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SelectSql;
 
@@ -89,7 +89,7 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
         flattenListParams.add(parameters[i]);
       }
     }
-    String _sql = ParameterizedStringUtils.newString(sql, LIST_PLACEHOLDER,
+    String _sql = ParameterizedStringFormat.newString(sql, LIST_PLACEHOLDER,
         specialParameterIndexes.size(), index -> {
           int parameterLength = getSize(parameters[specialParameterIndexes.get(index)]);
           return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
@@ -120,7 +120,7 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
         removedEmbeddedParams.add(parameters[i]);
       }
     }
-    String _sql = ParameterizedStringUtils.newString(sql, EMBEDDED_PLACEHOLDER,
+    String _sql = ParameterizedStringFormat.newString(sql, EMBEDDED_PLACEHOLDER,
         specialParameterIndexes.size(),
         index -> parameters[specialParameterIndexes.get(index)] == null ? "null"
             : parameters[specialParameterIndexes.get(index)].toString());

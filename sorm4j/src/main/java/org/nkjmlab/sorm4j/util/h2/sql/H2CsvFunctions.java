@@ -28,15 +28,25 @@ public class H2CsvFunctions {
    * @return
    */
   public static String getCallCsvWriteSql(File toFile, String selectSql, Charset charset,
-      char fieldSeparator) {
+      char fieldSeparator, Character fieldDelimiter) {
     String _fieldSeparator = toStringChar(fieldSeparator);
-    String csvOptions =
-        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + _fieldSeparator;
+    String csvOptions = literal("charset=" + charset.name()) + createFiledDelimiter(fieldDelimiter)
+        + createFieldSepartor(_fieldSeparator);
     String csvStmt = "call csvwrite(" + literal(toFile.getAbsolutePath()) + "," + literal(selectSql)
         + "," + csvOptions + ")";
     return csvStmt;
   }
 
+
+  private static String createFieldSepartor(String _fieldSeparator) {
+    return "||" + literal(" fieldSeparator=") + "||" + _fieldSeparator;
+  }
+
+  private static String createFiledDelimiter(Character fieldDelimiter) {
+    return (fieldDelimiter != null
+        ? ("||" + literal(" fieldDelimiter=") + "||" + toStringChar(fieldDelimiter))
+        : "");
+  }
 
   /**
    * <pre>
@@ -54,10 +64,11 @@ public class H2CsvFunctions {
    * @return
    */
   public static String getCsvReadSql(File csvFile, List<String> csvColumns, Charset charset,
-      char fieldSeparator) {
+      char fieldSeparator, Character fieldDelimiter) {
     String _fieldSeparator = toStringChar(fieldSeparator);
-    String csvOptions =
-        literal("charset=" + charset.name() + " fieldSeparator=") + "||" + _fieldSeparator;
+    String csvOptions = literal("charset=" + charset.name()) + (fieldDelimiter != null
+        ? ("||" + literal(" fieldDelimiter=") + "||" + toStringChar(fieldDelimiter))
+        : "") + ("||" + literal(" fieldSeparator=") + "||" + _fieldSeparator);
     String colSql = (csvColumns == null || csvColumns.size() == 0 ? "null"
         : String.join("||" + _fieldSeparator + "||", csvColumns.stream()
             .map(col -> literal(col.toUpperCase().replace("`", ""))).toArray(String[]::new)));
@@ -82,11 +93,11 @@ public class H2CsvFunctions {
    * @return
    */
   public static String getCsvReadAndSelectSql(List<String> selectedColumns, File csvFile,
-      List<String> csvColumns, Charset charset, char fieldSeparator) {
+      List<String> csvColumns, Charset charset, char fieldSeparator, Character fieldDelimiter) {
     return "select "
         + (selectedColumns == null || selectedColumns.size() == 0 ? "*"
             : String.join(",", selectedColumns))
-        + " from " + getCsvReadSql(csvFile, csvColumns, charset, fieldSeparator);
+        + " from " + getCsvReadSql(csvFile, csvColumns, charset, fieldSeparator, fieldDelimiter);
   }
 
 

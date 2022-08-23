@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.internal.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
@@ -89,8 +89,8 @@ public final class SqlParametersToTableMapping<T> {
 
   public Object[] getParameters(Object object, List<String> columns) {
     if (object == null) {
-      throw new SormException(ParameterizedStringUtils
-          .newString("Fail to get value from a instance of [{}] but it is null.", objectClass));
+      Object[] params = {objectClass};
+      throw new SormException(ParameterizedStringFormat.DEFAULT.format("Fail to get value from a instance of [{}] but it is null.", params));
     }
     final Object[] ret = new Object[columns.size()];
 
@@ -185,9 +185,8 @@ public final class SqlParametersToTableMapping<T> {
           columnToAccessorMap.setValue(object, columnName, value);
           ret.add(value);
         } catch (Exception e) {
-          throw Try.rethrow(new SormException(ParameterizedStringUtils.newString(
-              "Try to insert an instance of [{}] and get the result, but it fails because [{}] an has invalid setter.",
-              object.getClass(), columnName), e));
+          Object[] params = {object.getClass(), columnName};
+          throw Try.rethrow(new SormException(ParameterizedStringFormat.DEFAULT.format("Try to insert an instance of [{}] and get the result, but it fails because [{}] an has invalid setter.", params), e));
         }
       }
       return ret;

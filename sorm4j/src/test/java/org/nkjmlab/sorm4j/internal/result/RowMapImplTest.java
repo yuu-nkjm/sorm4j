@@ -7,13 +7,14 @@ import java.time.LocalTime;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.result.BasicRowMap;
 
 class RowMapImplTest {
 
-  private static final RowMap map0 = new RowMapImpl(Map.of("k1", "v1"));
-  private static final RowMap map1 = new RowMapImpl(Map.of("k1", "v1"));
-  private static final RowMap map2 = new RowMapImpl(Map.of("k2", "v2"));
-  private static final RowMap map3 = new RowMapImpl(
+  private static final RowMap map0 = new BasicRowMap(Map.of("k1", "v1"));
+  private static final RowMap map1 = new BasicRowMap(Map.of("k1", "v1"));
+  private static final RowMap map2 = new BasicRowMap(Map.of("k2", "v2"));
+  private static final RowMap map3 = new BasicRowMap(
       Map.of("s", "vs", "i", 1, "l", 1, "f", 1.0f, "d", 1.0d, "ld", LocalDate.of(2022, 3, 24), "lt",
           LocalTime.of(1, 2, 3), "ltd", LocalDateTime.of(2022, 3, 24, 1, 2, 3)));
 

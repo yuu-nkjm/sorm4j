@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Orm;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -93,7 +94,9 @@ public final class TableDefinition {
         Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
       }
 
-      opt.add(TableDefinition.toSqlDataType(field.getType()));
+      opt.add(
+          anns.stream().filter(ann -> ann instanceof OrmJsonColumnContainer).count() > 0 ? "json"
+              : TableDefinition.toSqlDataType(field.getType()));
 
       for (Annotation ann : anns) {
         if (ann instanceof PrimaryKey) {
@@ -182,6 +185,10 @@ public final class TableDefinition {
   public TableDefinition dropTableIfExists(Orm orm) {
     orm.executeUpdate(getDropTableIfExistsStatement());
     return this;
+  }
+
+  public void dropTableIfExistsCascade(Sorm orm) {
+    orm.executeUpdate(getDropTableIfExistsStatement() + " cascade");
   }
 
 
@@ -558,4 +565,5 @@ public final class TableDefinition {
         return type.isArray() ? toSqlDataType(type.getComponentType()) + " array" : "java_object";
     }
   }
+
 }

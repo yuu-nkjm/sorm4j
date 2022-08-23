@@ -65,12 +65,13 @@ public final class LoggerContext {
         + getLogger(LoggerContext.class) + "]";
   }
 
+  public static Supplier<SormLogger> getDefaultLoggerSupplier() {
+    return Log4jSormLogger.enableLogger ? Log4jSormLogger::getLogger
+        : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger::getLogger : JulSormLogger::getLogger);
+  }
+
   public static class Builder {
 
-    private static Supplier<SormLogger> getDefaultLoggerSupplier() {
-      return Log4jSormLogger.enableLogger ? Log4jSormLogger::getLogger
-          : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger::getLogger : JulSormLogger::getLogger);
-    }
 
     private Supplier<SormLogger> loggerSupplier;
 

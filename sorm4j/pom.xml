@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.nkjmlab</groupId>
     <artifactId>sorm4j-parent</artifactId>
-    <version>1.4.9</version>
+    <version>1.4.10</version>
   </parent>
   <properties>
     <slf4j-version>1.7.30</slf4j-version>
@@ -46,13 +46,20 @@
       <version>1.19.0</version>
       <optional>true</optional>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.1.214</version>
+      <optional>true</optional>
+    </dependency>
 
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.9.0-M1</version>
+      <version>5.9.0</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
@@ -91,33 +98,26 @@
       <version>2.18.0</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>2.1.214</version>
-      <scope>test</scope>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.29</version>
+      <version>8.0.30</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.0</version>
+      <version>42.4.1</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>mssql-jdbc</artifactId>
-      <version>11.1.2.jre17-preview</version>
-      <scope>test</scope>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>11.2.0.jre11</version>
+        <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc10 -->
     <dependency>
@@ -169,6 +169,8 @@
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jackson=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.jts=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.datasource=ALL-UNNAMED
+            --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.server=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.h2.sql=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.logger=ALL-UNNAMED
             --add-opens org.nkjmlab.sorm4j/org.nkjmlab.sorm4j.util.sql=ALL-UNNAMED

@@ -34,8 +34,8 @@ public class JoinExample {
       System.out.println(result);
 
 
-      String aAliasses = conn.getTableMetaData(Address.class).getColumnAliases();
-      String cAliasses = conn.getTableMetaData(Customer.class).getColumnAliases();
+      String aAliasses = String.join(",", conn.getTableMetaData(Address.class).getColumnAliases());
+      String cAliasses = String.join(",", conn.getTableMetaData(Customer.class).getColumnAliases());
       ParameterizedSql psql = ParameterizedSqlParser.parse(
           "select {?}, {?} from address join customer on address.name=customer.address", aAliasses,
           cAliasses);

@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.internal.util.logger;
 
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringUtils;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
@@ -33,63 +33,63 @@ public final class Slf4jSormLogger extends AbstractSormLogger implements SormLog
   @Override
   public void trace(String format, Object... params) {
     logger.trace(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
 
   @Override
   public void debug(String format, Object... params) {
     logger.debug(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void info(String format, Object... params) {
     logger.info(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void warn(String format, Object... params) {
     logger.warn(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void error(String format, Object... params) {
     logger.error(MethodInvokerInfoUtils.getInvokerInfo(1, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void trace(int depth, String format, Object... params) {
     logger.trace(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
 
   @Override
   public void debug(int depth, String format, Object... params) {
     logger.debug(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void info(int depth, String format, Object... params) {
     logger.info(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void warn(int depth, String format, Object... params) {
     logger.warn(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
   @Override
   public void error(int depth, String format, Object... params) {
     logger.error(MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-        + ParameterizedStringUtils.newString(format, params));
+        + ParameterizedStringFormat.DEFAULT.format(format, params));
   }
 
 }

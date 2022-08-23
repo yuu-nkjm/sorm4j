@@ -12,6 +12,7 @@ import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
@@ -481,9 +482,10 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.getTableMetaData(objectClass));
   }
 
+
   @Override
-  public TableMetaData getTableMetaData(String tableName) {
-    return applyAndClose(conn -> conn.getTableMetaData(tableName));
+  public JdbcTableMetaData getJdbcTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getJdbcTableMetaData(tableName));
   }
 
   @Override

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.result;
+package org.nkjmlab.sorm4j.result;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,23 +12,22 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
-import org.nkjmlab.sorm4j.result.RowMap;
 
-public final class RowMapImpl implements RowMap {
+public final class BasicRowMap implements RowMap {
 
-  private final Map<String, Object> map;
+  private final LinkedHashMap<String, Object> map;
 
-  public RowMapImpl() {
-    this(new LinkedHashMap<>());
+  public BasicRowMap() {
+    this.map = new LinkedHashMap<>();
   }
 
-  public RowMapImpl(Map<String, Object> map) {
+  public BasicRowMap(int initialCapacity, float loadFactor) {
+    this.map = new LinkedHashMap<>(initialCapacity, loadFactor);
+  }
+
+  public BasicRowMap(Map<String, Object> map) {
     this.map = map.entrySet().stream().collect(Collectors.toMap(en -> toKey(en.getKey()),
         en -> en.getValue(), (v1, v2) -> v1, LinkedHashMap::new));
-  }
-
-  public RowMapImpl(int initialCapacity, float loadFactor) {
-    this(new LinkedHashMap<>(initialCapacity, loadFactor));
   }
 
   private static String toKey(Object key) {
@@ -122,6 +121,9 @@ public final class RowMapImpl implements RowMap {
     if (val == null) {
       return null;
     }
+    if (val instanceof byte[]) {
+      return new String((byte[]) val);
+    }
     return val.toString();
   }
 
@@ -209,6 +211,12 @@ public final class RowMapImpl implements RowMap {
     }
     return ArrayUtils.convertToObjectArray(componentType, val);
   }
+
+  @Override
+  public Object getObject(String key) {
+    return get(key);
+  }
+
 
 
 }
