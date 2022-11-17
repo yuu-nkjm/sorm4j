@@ -17,9 +17,10 @@ class H2TcpServerProcessTest {
         .build();
 
 
-    H2TcpServerProcess tcpServer = new H2TcpServerProcess(prop);
-    tcpServer.awaitStart();
-    tcpServer.awaitShutdown();
+    H2TcpServerProcess server = new H2TcpServerProcess(prop);
+    server.awaitShutdown();
+    server.awaitStart();
+    server.awaitShutdown();
 
   }
 

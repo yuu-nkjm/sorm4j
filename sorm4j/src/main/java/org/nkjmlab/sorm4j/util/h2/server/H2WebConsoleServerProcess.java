@@ -30,9 +30,4 @@ public class H2WebConsoleServerProcess {
     return H2ServerProcess.awaitStartServer(properties, timeout, unit);
   }
 
-
-  public static H2WebConsoleServerProcess create(String password) {
-    return new H2WebConsoleServerProcess(
-        H2WebConsoleServerProperties.builder().setPassword(password).build());
-  }
 }

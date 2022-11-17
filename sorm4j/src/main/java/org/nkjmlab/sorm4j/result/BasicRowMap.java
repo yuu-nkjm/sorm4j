@@ -3,8 +3,10 @@ package org.nkjmlab.sorm4j.result;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -71,7 +73,7 @@ public final class BasicRowMap implements RowMap {
 
   @Override
   public void putAll(Map<? extends String, ? extends Object> m) {
-    map.putAll(m);
+    m.entrySet().forEach(en -> map.put(toKey(en.getKey()), en.getValue()));
   }
 
   @Override
@@ -215,6 +217,17 @@ public final class BasicRowMap implements RowMap {
   @Override
   public Object getObject(String key) {
     return get(key);
+  }
+
+  @Override
+  public List<Object> getObjectList(String... keys) {
+    return Arrays.stream(keys).map(key -> getObject(key)).collect(Collectors.toList());
+  }
+
+
+  @Override
+  public List<String> getStringList(String... keys) {
+    return Arrays.stream(keys).map(key -> getString(key)).collect(Collectors.toList());
   }
 
 

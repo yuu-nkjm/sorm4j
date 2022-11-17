@@ -3,11 +3,12 @@ package org.nkjmlab.sorm4j.result;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Map;
 
 /**
- * A instance represents a row in a table. This interface extends {@link Map<String, Object>}.
- *
+ * A instance represents a row in a table. This interface extends {@link Map<String, Object>}. The
+ * key is represented by canonical case defined by Sorm.
  *
  * @author yuu_nkjm
  *
@@ -70,6 +71,10 @@ public interface RowMap extends Map<String, Object> {
   Object getObject(String key);
 
   String getString(String key);
+
+  List<Object> getObjectList(String... key);
+
+  List<String> getStringList(String... keys);
 
 
 }

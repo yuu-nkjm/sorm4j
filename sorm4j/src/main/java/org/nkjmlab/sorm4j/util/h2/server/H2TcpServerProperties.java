@@ -20,12 +20,11 @@ public class H2TcpServerProperties extends H2ServerProperties {
     private static final int DEFAULT_TCP_PORT = 9092;
 
 
+    /**
+     * This constructor is for external libraries.
+     */
     public Builder() {
       super("TCP", DEFAULT_TCP_PORT, "");
-    }
-
-    public Builder(String password) {
-      super("TCP", DEFAULT_TCP_PORT, password);
     }
 
     @Override

@@ -15,10 +15,6 @@ public class H2WebBrowsingService {
   private static final SormLogger log = LoggerContext.getDefaultLoggerSupplier().get();
   private final WebServer webServer;
 
-  public static H2WebBrowsingService createKeepAlive() {
-    return new H2WebBrowsingService(true);
-  }
-
   /**
    *
    * @param dataSource

@@ -10,6 +10,8 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql.Condition;
 @Experimental
 public class JoinSql {
 
+  private JoinSql() {}
+
   @Experimental
   public static JoinSql.Builder builder(TableMappedOrm<?> firstTable) {
     return new Builder(firstTable);

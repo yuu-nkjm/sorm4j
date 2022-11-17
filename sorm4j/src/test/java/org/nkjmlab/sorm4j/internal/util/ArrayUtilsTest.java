@@ -8,6 +8,7 @@ class ArrayUtilsTest {
 
   @Test
   void testToObjectArrayBooleanArray() {
+    assertThat(SystemPropertyUtils.getJavaProperties().toString()).contains("java");
     assertThat(ArrayUtils.toObjectArray(new boolean[] {true, false}))
         .isEqualTo(new Boolean[] {true, false});
   }
@@ -60,8 +61,19 @@ class ArrayUtilsTest {
 
   @Test
   void testConvertToObjectArray() {
+    assertThat(ArrayUtils.convertToObjectArray(new boolean[] {true}))
+        .isEqualTo(new Boolean[] {true});
+    assertThat(ArrayUtils.convertToObjectArray(new byte[] {1})).isEqualTo(new Byte[] {1});
+    assertThat(ArrayUtils.convertToObjectArray(new char[] {1})).isEqualTo(new Character[] {1});
+    assertThat(ArrayUtils.convertToObjectArray(new short[] {1})).isEqualTo(new Short[] {1});
+
+
 
     assertThat(ArrayUtils.convertToObjectArray(new int[] {1})).isEqualTo(new Integer[] {1});
+    assertThat(ArrayUtils.convertToObjectArray(new long[] {1})).isEqualTo(new Long[] {1L});
+    assertThat(ArrayUtils.convertToObjectArray(new float[] {1})).isEqualTo(new Float[] {1f});
+    assertThat(ArrayUtils.convertToObjectArray(new double[] {1})).isEqualTo(new Double[] {1d});
+
     assertThat(ArrayUtils.convertToObjectArray(new int[][] {{1, 2, 3}, {4, 5, 6}}))
         .isEqualTo(new Integer[][] {{1, 2, 3}, {4, 5, 6}});
     assertThat(ArrayUtils

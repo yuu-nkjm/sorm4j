@@ -15,12 +15,10 @@ public abstract class H2ServerPropertiesBuilder<T extends H2ServerPropertiesBuil
   String password;
   String[] options = new String[0];
 
-  public H2ServerPropertiesBuilder() {};
-
   public H2ServerPropertiesBuilder(String serverType, int port, String password) {
-    this.serverType = serverType;
-    this.port = port;
-    this.password = password;
+    setServerType(serverType);
+    setPort(port);
+    setPassword(password);
   }
 
   public H2ServerPropertiesBuilder<T> setJavaCommand(String javaCommand) {

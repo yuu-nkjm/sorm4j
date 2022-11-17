@@ -43,9 +43,7 @@ public interface H2Table<T> extends TableWithDefinition<T> {
   }
 
   default File writeCsv(File toFile, String selectSql) {
-    getOrm().executeUpdate(
-        H2CsvFunctions.getCallCsvWriteSql(toFile, selectSql, StandardCharsets.UTF_8, ',', null));
-    return toFile;
+    return writeCsv(toFile, selectSql, StandardCharsets.UTF_8, ',', null);
   }
 
   default File writeCsv(File toFile, String selectSql, Charset charset, char fieldSeparator,
