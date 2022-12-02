@@ -238,7 +238,6 @@ public class H2LocalDataSourceFactory {
 
 
 
-
   @Override
   public String toString() {
     return "H2LocalDataSourceFactory [databaseDirectory=" + databaseDirectory + ", databaseName="
@@ -311,7 +310,12 @@ public class H2LocalDataSourceFactory {
 
   }
 
-  public static DataSource createInMemoryDataSource() {
+  /**
+   * Creates temporal an in memory data source.
+   *
+   * @return
+   */
+  public static DataSource createTemporalInMemoryDataSource() {
     return JdbcConnectionPool
         .create("jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;", "", "");
   }

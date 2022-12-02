@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
+/**
+ *
+ * @author nkjm
+ *
+ */
 @Experimental
 public class H2TcpServerProperties extends H2ServerProperties {
 
@@ -12,6 +17,11 @@ public class H2TcpServerProperties extends H2ServerProperties {
     super(serverType, port, password, args);
   }
 
+  /**
+   * Create a {@link H2TcpServerProperties} object.
+   *
+   * @return
+   */
   public static Builder builder() {
     return new Builder();
   }

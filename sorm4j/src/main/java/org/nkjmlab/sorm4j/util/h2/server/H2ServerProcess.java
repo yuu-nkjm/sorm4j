@@ -24,6 +24,8 @@ public abstract class H2ServerProcess {
   }
 
   /**
+   * Await to start the a H2 server process.
+   *
    * @see #awaitStart(long, TimeUnit)
    * @return
    */

@@ -353,34 +353,34 @@ public final class SormImpl implements Sorm {
 
 
   @Override
-  public <T> InsertResult<T> insertAndGet(List<T> objects) {
+  public <T> InsertResult insertAndGet(List<T> objects) {
     return applyAndClose(conn -> conn.insertAndGet(objects));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGet(T object) {
+  public <T> InsertResult insertAndGet(T object) {
     return applyAndClose(conn -> conn.insertAndGet(object));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
+  public <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertAndGet(objects));
   }
 
 
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName, List<T> objects) {
+  public <T> InsertResult insertAndGetIn(String tableName, List<T> objects) {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName, T object) {
+  public <T> InsertResult insertAndGetIn(String tableName, T object) {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, object));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName,
+  public <T> InsertResult insertAndGetIn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
   }

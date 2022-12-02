@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
+/**
+ * @see <a href="http://www.h2database.com/html/tutorial.html#console_settings">Settings of the H2
+ *      Console</a>
+ * @author nkjm
+ *
+ */
 @Experimental
 public class H2WebConsoleServerProperties extends H2ServerProperties {
 

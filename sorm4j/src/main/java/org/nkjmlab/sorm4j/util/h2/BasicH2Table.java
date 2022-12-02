@@ -30,5 +30,32 @@ public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Ta
     this(sorm, valueType, TableDefinition.builder(valueType).build());
   }
 
+  @Experimental
+  @Override
+  public BasicH2Table<T> createTableIfNotExists() {
+    H2Table.super.createTableIfNotExists();
+    return this;
+  }
+
+  @Experimental
+  @Override
+  public BasicH2Table<T> createIndexesIfNotExists() {
+    H2Table.super.createIndexesIfNotExists();
+    return this;
+  }
+
+  @Experimental
+  @Override
+  public BasicH2Table<T> dropTableIfExists() {
+    H2Table.super.dropTableIfExists();
+    return this;
+  }
+
+  @Experimental
+  @Override
+  public BasicH2Table<T> dropTableIfExistsCascade() {
+    H2Table.super.dropTableIfExistsCascade();
+    return this;
+  }
 
 }

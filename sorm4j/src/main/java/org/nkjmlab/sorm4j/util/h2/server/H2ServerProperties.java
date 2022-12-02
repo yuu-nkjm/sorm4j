@@ -2,6 +2,12 @@ package org.nkjmlab.sorm4j.util.h2.server;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
+/**
+ * This class represents H2 server properties.
+ *
+ * @author nkjm
+ *
+ */
 @Experimental
 public class H2ServerProperties {
 

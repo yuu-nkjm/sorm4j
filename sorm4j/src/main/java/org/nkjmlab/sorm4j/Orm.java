@@ -364,7 +364,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGet(List<T> objects);
+  <T> InsertResult insertAndGet(List<T> objects);
 
   /**
    * Inserts an object and get the result.
@@ -373,7 +373,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> InsertResult<T> insertAndGet(T object);
+  <T> InsertResult insertAndGet(T object);
 
   /**
    * Inserts objects and get the last insert result.
@@ -382,7 +382,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects);
+  <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects);
 
 
   /**
@@ -393,7 +393,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGetIn(String tableName, List<T> objects);
+  <T> InsertResult insertAndGetIn(String tableName, List<T> objects);
 
   /**
    * Inserts an object and get the insert result.
@@ -403,7 +403,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> InsertResult<T> insertAndGetIn(String tableName, T object);
+  <T> InsertResult insertAndGetIn(String tableName, T object);
 
   /**
    * Inserts objects and get the last insert result.
@@ -413,7 +413,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult<T> insertAndGetIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> InsertResult insertAndGetIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
    * This method is experimental.

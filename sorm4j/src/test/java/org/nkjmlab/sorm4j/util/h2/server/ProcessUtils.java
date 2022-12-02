@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
@@ -67,11 +68,46 @@ public class ProcessUtils {
     }
   }
 
+  /**
+   * If the process binding the the given port, it will be stopped.
+   *
+   * @param port
+   * @return
+   */
   public static boolean stopProcessBindingPortIfExists(int port) {
+    return stopProcessBindingPortIfExists(port, 10, TimeUnit.SECONDS);
+  }
+
+  public static boolean stopProcessBindingPortIfExists(int port, long timeout, TimeUnit unit) {
     return getProcessIdBidingPort(port).map(pid -> {
       try {
-        List<String> command =
-            isWindowsOs() ? List.of("taskkill", "/F", "/T", "/PID", pid) : List.of("kill", pid);
+        log.info("process [{}] is binding port [{}]. try killing by ProcessHandle.destory()", pid,
+            port);
+        ProcessHandle proc = ProcessHandle.of(Long.valueOf(pid)).orElseThrow();
+        proc.destroy();
+
+        long start = System.currentTimeMillis();
+
+        while (proc.isAlive()) {
+          long durationInMillis = System.currentTimeMillis() - start;
+          if (durationInMillis > TimeUnit.MICROSECONDS.convert(timeout, unit)) {
+            log.error("Process [{}] is active yet.");
+            return false;
+          }
+          TimeUnit.SECONDS.sleep(1);
+        }
+        return true;
+      } catch (InterruptedException e) {
+        throw Try.rethrow(e);
+      }
+    }).orElse(false);
+  }
+
+  public static boolean killForceProcessBindingPortIfExists(int port) {
+    return getProcessIdBidingPort(port).map(pid -> {
+      try {
+        List<String> command = isWindowsOs() ? List.of("taskkill", "/F", "/T", "/PID", pid)
+            : List.of("kill", "-9", pid);
         log.info("process [{}] is binding port [{}]. try killing {}", pid, port, command);
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.start().waitFor();

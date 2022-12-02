@@ -40,7 +40,7 @@ class H2LocalDataSourceFactoryTest {
     H2LocalDataSourceFactory.builder(factory.getDatabaseDirectory(), factory.getDatabaseName(),
         factory.getUsername(), factory.getPassword());
 
-    H2LocalDataSourceFactory.createInMemoryDataSource();
+    H2LocalDataSourceFactory.createTemporalInMemoryDataSource();
 
     factory.createEmbeddedModeDataSource().getConnection();
     factory.createInMemoryModeDataSource().getConnection();

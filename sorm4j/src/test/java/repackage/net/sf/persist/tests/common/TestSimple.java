@@ -129,13 +129,13 @@ public class TestSimple {
       long longCol = simpleInsert.getLongCol();
       String stringCol = simpleInsert.getStringCol();
 
-      InsertResult<Simple> result = ormConn.insertAndGet(simpleInsert);
+      InsertResult ret = ormConn.insertAndGet(simpleInsert);
 
       // insert with explicit auto generated keys and check result object data
       // InsertResult result = ormConn.executeUpdate(Simple.class,
       // "insert into simple (long_col,string_col) values(?,?)", intCol, stringCol);
-      assertEquals(2, result.getObject().getId());
-      assertEquals(1, result.getRowsModified()[0]);
+      assertEquals(2, ret.getGeneratedKeys().getLong("id"));
+      assertEquals(1, ret.getRowsModified()[0]);
 
       // read object and compare with inserted data
       Simple simpleRead = ormConn.readFirst(Simple.class,
@@ -158,15 +158,16 @@ public class TestSimple {
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
       Simple s = TestSimple.buildSimple();
-      InsertResult<Simple> result = ormConn.insertAndGet(s);
+      InsertResult ret = ormConn.insertAndGet(s);
       long id =
           ormConn.readFirst(long.class, "select id from simple where long_col=?", s.getLongCol());
 
-      assertEquals(id, result.getObject().getId());
+      assertEquals(id, ret.getGeneratedKeys().get("id"));
 
       // delete object by primary key and check it was removed
-      ormConn.delete(result.getObject());
-      Simple simpleRead = ormConn.selectByPrimaryKey(Simple.class, result.getObject().getId());
+      ormConn.deleteByPrimaryKey(Simple.class, ret.getGeneratedKeys().get("id"));
+      Simple simpleRead =
+          ormConn.selectByPrimaryKey(Simple.class, ret.getGeneratedKeys().get("id"));
       assertNull(simpleRead);
     }
   }
@@ -390,7 +391,7 @@ public class TestSimple {
       OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build());
       ormConn.insert(buildSimple());
       ormConn.selectByPrimaryKey(Simple03.class, 1);
-      //failBecauseExceptionWasNotThrown(Exception.class);
+      // failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("[LONG_COL] does not match any field");
     }
@@ -431,7 +432,7 @@ public class TestSimple {
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
       ormConn.insert(buildSimple());
       ormConn.selectByPrimaryKey(Simple06.class, 1);
-      //fail("Object without getter and setter did not trigger exception");
+      // fail("Object without getter and setter did not trigger exception");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not match any field");
     }
@@ -444,7 +445,7 @@ public class TestSimple {
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
       ormConn.insert(buildSimple());
       ormConn.selectByPrimaryKey(Simple07.class, 1);
-      //fail("Object without getter and setter did not trigger exception");
+      // fail("Object without getter and setter did not trigger exception");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("[STRING_COL] does not match any field");
     }
@@ -457,7 +458,7 @@ public class TestSimple {
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
       ormConn.insert(buildSimple());
       ormConn.selectByPrimaryKey(Simple08.class, 1);
-      //fail("Object with conflicting annotations did not trigger exception");
+      // fail("Object with conflicting annotations did not trigger exception");
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not match any field");
     }
@@ -506,7 +507,7 @@ public class TestSimple {
       // Simple09 has getter which returns void
       try {
         ormConn.selectByPrimaryKey(Simple09.class, id);
-        //fail("Object with getter returning void did not trigger exception");
+        // fail("Object with getter returning void did not trigger exception");
       } catch (Exception e) {
         assertThat(e.getMessage()).contains("does not match any field");
       }

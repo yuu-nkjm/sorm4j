@@ -122,7 +122,7 @@ public final class TableDefinition {
   }
 
 
-  private static String toTableName(Class<?> ormRecordClass) {
+  public static String toTableName(Class<?> ormRecordClass) {
     OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
     if (ann == null || ann.value().length() == 0) {
       return toUpperSnakeCase(ormRecordClass.getSimpleName() + "s");

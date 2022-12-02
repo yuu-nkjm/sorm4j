@@ -67,6 +67,11 @@ public final class FieldAccessor {
     return setter.getParameterType();
   }
 
+  public final Class<?> getGetterReturnType() {
+    return getter.getReturnType();
+  }
+
+
   @Override
   public String toString() {
     return "Accessor [getterAccessor=" + getter + ", setterAccessor=" + setter + ", columnName="
@@ -82,6 +87,8 @@ public final class FieldAccessor {
   private static interface GetterAccessor {
     Object get(Object object)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
+
+    Class<?> getReturnType();
   }
 
   private static final class GetterMethod implements GetterAccessor {
@@ -102,6 +109,11 @@ public final class FieldAccessor {
     public String toString() {
       return getter.getReturnType().getSimpleName() + " " + getter.getName() + "()";
     }
+
+    @Override
+    public Class<?> getReturnType() {
+      return getter.getReturnType();
+    }
   }
 
   private static final class EmptyGetter implements GetterAccessor {
@@ -115,6 +127,11 @@ public final class FieldAccessor {
     @Override
     public String toString() {
       return getClass().getSimpleName();
+    }
+
+    @Override
+    public Class<?> getReturnType() {
+      return Void.class;
     }
 
   }
@@ -135,6 +152,11 @@ public final class FieldAccessor {
     @Override
     public String toString() {
       return "field " + field.getType().getSimpleName() + " " + field.getName();
+    }
+
+    @Override
+    public Class<?> getReturnType() {
+      return field.getType();
     }
 
   }
