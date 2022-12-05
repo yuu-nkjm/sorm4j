@@ -1,5 +1,5 @@
 {
   "password": "password",
-  "port": 65432,
+  "port": 65431,
   "h2ClassPath": "~/tmp/h2/h2-2.1.214.jar"
  }

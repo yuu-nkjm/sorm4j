@@ -147,16 +147,16 @@ public interface TableMappedOrm<T> {
     return getOrm().insertMapIn(getTableName(), objects);
   }
 
-  default InsertResult<T> insertAndGet(List<T> objects) {
+  default InsertResult insertAndGet(List<T> objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
 
-  default InsertResult<T> insertAndGet(T object) {
+  default InsertResult insertAndGet(T object) {
     return getOrm().insertAndGetIn(getTableName(), object);
   }
 
 
-  default InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
+  default InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
 

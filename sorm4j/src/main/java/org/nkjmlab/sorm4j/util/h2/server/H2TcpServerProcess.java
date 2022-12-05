@@ -37,11 +37,6 @@ public class H2TcpServerProcess extends H2ServerProcess {
     return awaitShutdownTcpServer((H2TcpServerProperties) properties, timeout, unit);
   }
 
-  public static H2TcpServerProcess create() {
-    return new H2TcpServerProcess(H2TcpServerProperties.builder().build());
-  }
-
-
   private static boolean awaitShutdownTcpServer(H2TcpServerProperties props, long timeout,
       TimeUnit unit) {
     if (!isActive(props.port)) {
@@ -53,8 +48,7 @@ public class H2TcpServerProcess extends H2ServerProcess {
           props.serverType, props.port);
       Server.shutdownTcpServer("tcp://localhost:" + props.port, props.password, false, false);
     } catch (SQLException e) {
-      log.error(e.getMessage());
-      return false;
+      throw Try.rethrow(e);
     }
 
     try {

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SystemPropertyUtils {
+  private SystemPropertyUtils() {};
 
   public static String[] getClassPathElements() {
     return System.getProperty("java.class.path").split(File.pathSeparator);

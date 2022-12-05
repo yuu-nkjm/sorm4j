@@ -2,11 +2,13 @@ package org.nkjmlab.sorm4j.internal;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
@@ -18,6 +20,7 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 class OrmImplTest {
 
   private static final String PLAYERS1 = "players1";
+  private static final String GUEST = "guests";
 
   private Sorm sorm;
 
@@ -31,6 +34,10 @@ class OrmImplTest {
   void testReadAll() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
+
+    assertThatThrownBy(() -> sorm.readFirst(LocalDateTime.class,
+        ParameterizedSqlParser.parse("select count(*) from players limit 1")))
+            .isInstanceOf(SormException.class);
   }
 
 
@@ -167,38 +174,38 @@ class OrmImplTest {
 
   @Test
   void testInsertAndGetListOfT() {
-    InsertResult<Player> ret = sorm.insertAndGet(List.of(PLAYER_ALICE, PLAYER_BOB));
-    assertThat(ret.getObject().id).isEqualTo(2);
+    InsertResult ret = sorm.insertAndGet(List.of(GUEST_ALICE, GUEST_BOB));
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(2);
   }
 
   @Test
   void testInsertAndGetT() {
-    InsertResult<Player> ret = sorm.insertAndGet(PLAYER_ALICE);
-    assertThat(ret.getObject().id).isEqualTo(1);
+    InsertResult ret = sorm.insertAndGet(GUEST_ALICE);
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(1);
   }
 
   @Test
   void testInsertAndGetTArray() {
-    InsertResult<Player> ret = sorm.insertAndGet(PLAYER_ALICE, PLAYER_BOB);
-    assertThat(ret.getObject().id).isEqualTo(2);
+    InsertResult ret = sorm.insertAndGet(GUEST_ALICE, GUEST_BOB);
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(2);
   }
 
   @Test
   void testInsertAndGetOnStringListOfT() {
-    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
-    assertThat(ret.getObject().id).isEqualTo(2);
+    InsertResult ret = sorm.insertAndGetIn(GUEST, List.of(GUEST_ALICE, GUEST_BOB));
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(2);
   }
 
   @Test
   void testInsertAndGetOnStringT() {
-    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, PLAYER_ALICE);
-    assertThat(ret.getObject().id).isEqualTo(1);
+    InsertResult ret = sorm.insertAndGetIn(GUEST, GUEST_ALICE);
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(1);
   }
 
   @Test
   void testInsertAndGetOnStringTArray() {
-    InsertResult<Player> ret = sorm.insertAndGetIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
-    assertThat(ret.getObject().id).isEqualTo(2);
+    InsertResult ret = sorm.insertAndGetIn(GUEST, GUEST_ALICE, GUEST_BOB);
+    assertThat(ret.getGeneratedKeys().get("id")).isEqualTo(2);
   }
 
   @Test

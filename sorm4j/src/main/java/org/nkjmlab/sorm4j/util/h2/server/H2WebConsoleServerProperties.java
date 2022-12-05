@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
+/**
+ * @see <a href="http://www.h2database.com/html/tutorial.html#console_settings">Settings of the H2
+ *      Console</a>
+ * @author nkjm
+ *
+ */
 @Experimental
 public class H2WebConsoleServerProperties extends H2ServerProperties {
 
@@ -15,12 +21,12 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
   public static class Builder extends H2ServerPropertiesBuilder<Builder> {
     private static final int DEFAULT_WEBCONSOLE_PORT = 8082;
 
+    /**
+     * This constructor is for external libraries.
+     */
+
     public Builder() {
       super("WEB_CONSOLE", DEFAULT_WEBCONSOLE_PORT, "");
-    }
-
-    public Builder(String password) {
-      super("WEB_CONSOLE", DEFAULT_WEBCONSOLE_PORT, password);
     }
 
     @Override

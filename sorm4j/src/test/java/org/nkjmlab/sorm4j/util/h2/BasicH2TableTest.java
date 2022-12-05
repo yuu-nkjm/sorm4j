@@ -65,6 +65,7 @@ class BasicH2TableTest {
     table.insertMapIn(RowMap.of("id", "2", "name", "Bob"));
 
     table.writeCsv(tmpCsv);
+
     int s = table.readCsvWithHeader(tmpCsv).size();
     assertThat(s).isEqualTo(2);
     List<OrmRecordExample> rows = table.selectAll();

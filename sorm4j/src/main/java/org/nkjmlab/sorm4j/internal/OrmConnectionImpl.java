@@ -28,16 +28,17 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
+import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamOrmConnection;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
+import org.nkjmlab.sorm4j.result.BasicRowMap;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.result.BasicRowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
@@ -396,40 +397,42 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGet(List<T> objects) {
+  public <T> InsertResult insertAndGet(List<T> objects) {
     return applytoArray(objects, array -> insertAndGet(array));
   }
 
 
   @Override
-  public <T> InsertResult<T> insertAndGet(T object) {
+  public <T> InsertResult insertAndGet(T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(object.getClass());
     return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGet(@SuppressWarnings("unchecked") T... objects) {
+  public <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> null);
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.EMPTY_INSERT_RESULT);
   }
 
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName, List<T> objects) {
+  public <T> InsertResult insertAndGetIn(String tableName, List<T> objects) {
     return applytoArray(objects, array -> insertAndGetIn(tableName, array));
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName, T object) {
+  public <T> InsertResult insertAndGetIn(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
     return mapping.insertAndGet(getJdbcConnection(), object);
   }
 
   @Override
-  public <T> InsertResult<T> insertAndGetIn(String tableName,
+  public <T> InsertResult insertAndGetIn(String tableName,
       @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(tableName, objects,
-        mapping -> mapping.insertAndGet(getJdbcConnection(), objects), () -> null);
+        mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
+        () -> InsertResultImpl.EMPTY_INSERT_RESULT);
   }
 
 

@@ -78,7 +78,7 @@ public class H2CsvReadSql {
     }
 
 
-    public Builder() {}
+    private Builder() {}
 
     public H2CsvReadSql build() {
       List<String> selectedColumns = new ArrayList<>(columns);

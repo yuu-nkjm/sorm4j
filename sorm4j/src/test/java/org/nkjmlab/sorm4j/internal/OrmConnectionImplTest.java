@@ -38,12 +38,12 @@ class OrmConnectionImplTest {
   @Test
   void testDelete() {
     sorm.acceptHandler(conn -> {
-      conn.insert(GUEST_ALICE);
-      assertThat(conn.exists(GUEST_ALICE)).isTrue();
-      assertThat(conn.exists(GUEST_BOB)).isFalse();
-      assertThat(conn.exists("guests", GUEST_ALICE)).isTrue();
-      assertThat(conn.exists("guests", GUEST_BOB)).isFalse();
-      conn.readFirst(Guest.class, "select * from guests");
+      conn.insert(PLAYER_ALICE);
+      assertThat(conn.exists(PLAYER_ALICE)).isTrue();
+      assertThat(conn.exists(PLAYER_BOB)).isFalse();
+      assertThat(conn.exists("players", PLAYER_ALICE)).isTrue();
+      assertThat(conn.exists("players", PLAYER_BOB)).isFalse();
+      conn.readFirst(Guest.class, "select * from players");
     });
   }
 
@@ -136,8 +136,8 @@ class OrmConnectionImplTest {
 
     row = sorm.applyHandler(conn -> {
       NamedParameterSqlParser sql =
-          NamedParameterSqlParser.of("insert into players values(`id`, `name`, `address`)", '`', '`',
-              new DefaultColumnToFieldAccessorMapper());
+          NamedParameterSqlParser.of("insert into players values(`id`, `name`, `address`)", '`',
+              '`', new DefaultColumnToFieldAccessorMapper());
       sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
       return conn.executeUpdate(sql.parse());
     });
@@ -222,37 +222,36 @@ class OrmConnectionImplTest {
   void testInsertAndGetOnStringT() {
     Guest a = GUEST_ALICE;
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGet(new Guest[] {});
-      assertThat(g).isNull();
+      InsertResult g = m.insertAndGet(new Guest[] {});
+      assertThat(g.countRowsModified()).isEqualTo(0);
     });
 
 
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGet(a);
-      assertThat(g.getObject().getId()).isEqualTo(1);
+      InsertResult g = m.insertAndGet(a);
+      assertThat(g.getGeneratedKeys().get("id")).isEqualTo(1);
     });
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGetIn("players1", a);
-      assertThat(g.getObject().getId()).isEqualTo(1);
+      InsertResult g = m.insertAndGetIn("players1", a);
+      assertThat(g.getGeneratedKeys().get("id")).isNull();
     });
   }
 
   @Test
   void testInsertAndGetOnList() {
-
-
     Guest a = GUEST_ALICE;
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGetIn("players1", List.of());
-      assertThat(g).isNull();
+      InsertResult g = m.insertAndGetIn("players1", List.of());
+      assertThat(g.toString()).contains("InsertResult");
+      assertThat(g.countRowsModified()).isEqualTo(0);
     });
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGet(List.of(a));
-      assertThat(g.getObject().getId()).isEqualTo(1);
+      InsertResult g = m.insertAndGet(List.of(a));
+      assertThat(g.getGeneratedKeys().get("id")).isEqualTo(1);
     });
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGetIn("players1", List.of(a));
-      assertThat(g.getObject().getId()).isEqualTo(1);
+      InsertResult g = m.insertAndGetIn("guests", List.of(GUEST_BOB));
+      assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
     });
   }
 
@@ -261,8 +260,8 @@ class OrmConnectionImplTest {
     Guest a = GUEST_ALICE;
     Guest b = GUEST_BOB;
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGet(a, b);
-      assertThat(g.getObject().getId()).isEqualTo(2);
+      InsertResult g = m.insertAndGet(a, b);
+      assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
     });
   }
 
@@ -271,8 +270,8 @@ class OrmConnectionImplTest {
     Guest a = GUEST_ALICE;
     Guest b = GUEST_BOB;
     sorm.acceptHandler(m -> {
-      InsertResult<Guest> g = m.insertAndGetIn("players1", a, b);
-      assertThat(g.getObject().getId()).isEqualTo(2);
+      InsertResult g = m.insertAndGetIn("guests", a, b);
+      assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
     });
   }
 
@@ -435,9 +434,8 @@ class OrmConnectionImplTest {
       assertThat(m.readList(Player.class, "select * from players")).contains(a, b);
       assertThat(m.readList(Player.class, ParameterizedSql.of("select * from players"))).contains(a,
           b);
-      assertThat(
-          m.readOne(Player.class, OrderedParameterSqlParser.parse("select * from players where id=?", 1)))
-              .isEqualTo(a);
+      assertThat(m.readOne(Player.class,
+          OrderedParameterSqlParser.parse("select * from players where id=?", 1))).isEqualTo(a);
       assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
 
 
@@ -452,8 +450,8 @@ class OrmConnectionImplTest {
         Guest b = GUEST_BOB;
         m.insert(a);
         m.insert(b);
-        Guest g =
-            m.readOne(Guest.class, OrderedParameterSqlParser.parse("select * from guests where id=?", 1));
+        Guest g = m.readOne(Guest.class,
+            OrderedParameterSqlParser.parse("select * from guests where id=?", 1));
         assertThat(g.getAddress()).isEqualTo(a.getAddress());
         assertThat(g.getName()).isEqualTo(a.getName());
         g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));

@@ -23,6 +23,14 @@ class GeometryTest {
         .contains("GEO_STR geometry");
     table.createTableIfNotExists();
     GeometryString g = new GeometryString("POINT (30 10)");
+    GeometryString g1 = new GeometryString("POINT (30 10)");
+
+    assertThat(g.equals(g1)).isTrue();
+    assertThat(g.hashCode() == g1.hashCode()).isTrue();
+    assertThat(g.toString()).isEqualTo("POINT (30 10)");
+
+
+
     table.insert(new GeometryStringRecord(g));
 
     GeometryString ret = table.getOrm().readFirst(GeometryString.class,
@@ -46,6 +54,12 @@ class GeometryTest {
     GeometryFactory factory = new GeometryFactory();
     Point coordinate = factory.createPoint(new Coordinate(100, 200));
     GeometryJts g = new GeometryJts(coordinate);
+    GeometryJts g1 = new GeometryJts(coordinate);
+    assertThat(g.equals(g1)).isTrue();
+    assertThat(g.hashCode() == g1.hashCode()).isTrue();
+    assertThat(g.toString()).isEqualTo("POINT (100 200)");
+
+
     table.insert(new GeometryJtsRecord(g));
 
 

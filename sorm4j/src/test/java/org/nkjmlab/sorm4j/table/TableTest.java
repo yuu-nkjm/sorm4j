@@ -158,11 +158,16 @@ class TableTest {
     playersTable.insert(List.of(PLAYER_ALICE));
     playersTable.update(List.of(PLAYER_ALICE));
     playersTable.merge(List.of(PLAYER_ALICE));
+    playersTable.insertAndGet(List.of(PLAYER_BOB));
+
+    playersTable.updateByPrimaryKey(RowMap.of("name", "UPDATED_ALICE"), 1);
+    assertThat(playersTable.selectByPrimaryKey(1).getName()).isEqualTo("UPDATED_ALICE");
+
     playersTable.delete(List.of(PLAYER_ALICE));
     assertThat(
         playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(0);
-    playersTable.insertAndGet(List.of(PLAYER_BOB));
+            .isEqualTo(1);
+
   }
 
   @Test
@@ -175,6 +180,13 @@ class TableTest {
         playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
             .isEqualTo(0);
     playersTable.insertAndGet(PLAYER_BOB);
+    RowMap rm1 = RowMap.of("id", 111, "name", "name1", "address", "address1");
+    RowMap rm2 = RowMap.of("id", 112, "name", "name2", "address", "address2");
+    RowMap rm3 = RowMap.of("id", 113, "name", "name3", "address", "address3");
+    playersTable.insertMapIn(rm1);
+    assertThat(playersTable.exists(111)).isTrue();
+    playersTable.insertMapIn(List.of(rm2, rm3));
+
   }
 
   @Test
@@ -270,6 +282,15 @@ class TableTest {
     sportsTable.insert(TENNIS);
     assertThat(playersTable.joinOn(sportsTable, "players.id=sports.id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
+
+    assertThat(playersTable.joinUsing(sportsTable, "id").get(0).getT1().getId())
+        .isEqualTo(PLAYER_ALICE.getId());
+
+    assertThat(playersTable
+        .join(sportsTable, playersTable.createJoinSql().joinUsing(sportsTable, "id").build()).get(0)
+        .getT1().getId()).isEqualTo(PLAYER_ALICE.getId());
+
+
   }
 
   @Test

@@ -11,10 +11,10 @@ public class InsertAndGetExample {
 
     sorm.acceptHandler(conn -> {
       conn.executeUpdate(Guest.CREATE_TABLE_SQL); // column id is an auto incremented column.
-      InsertResult<Guest> customer = conn.insertAndGet(Guest.ALICE);
-      System.out.println(customer.getObject().getId()); // =>1
+      InsertResult customer = conn.insertAndGet(Guest.ALICE);
+      System.out.println(customer.getGeneratedKeys().getInteger("id")); // =>1
       customer = conn.insertAndGet(Guest.ALICE);
-      System.out.println(customer.getObject().getId()); // =>2
+      System.out.println(customer.getGeneratedKeys().getInteger("id")); // =>2
     });
   }
 }

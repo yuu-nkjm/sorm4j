@@ -173,14 +173,15 @@ public class H2LocalDataSourceFactory {
   /**
    * Make a new file database in not exists
    *
-   * @return
+   * @return true if and only if the directory was created,along with all necessary parent
+   *         directories; false otherwise
    */
   public boolean makeFileDatabaseIfNotExists() {
-    if (new File(databasePath + ".mv.db").exists()) {
-      return true;
-    }
-    if (!databaseDirectory.mkdirs()) {
+    if (getDatabaseFile().exists()) {
       return false;
+    }
+    if (!databaseDirectory.exists()) {
+      databaseDirectory.mkdirs();
     }
     try (Connection con =
         DriverManager.getConnection(getEmbeddedModeJdbcUrl(), getUsername(), getPassword())) {
@@ -188,6 +189,10 @@ public class H2LocalDataSourceFactory {
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
+  }
+
+  public File getDatabaseFile() {
+    return new File(databasePath + ".mv.db");
   }
 
   public String getUsername() {
@@ -235,12 +240,13 @@ public class H2LocalDataSourceFactory {
 
   @Override
   public String toString() {
-    return "LocalDataSourceFactory [databaseDirectory=" + databaseDirectory + ", databaseName="
-        + databaseName + ", username=" + username + ", password=****" + ", databasePath="
+    return "H2LocalDataSourceFactory [databaseDirectory=" + databaseDirectory + ", databaseName="
+        + databaseName + ", username=" + username + ", password=" + password + ", databasePath="
         + databasePath + ", inMemoryModeJdbcUrl=" + inMemoryModeJdbcUrl + ", serverModeJdbcUrl="
         + serverModeJdbcUrl + ", embeddedModeJdbcUrl=" + embeddedModeJdbcUrl + ", mixedModeJdbcUrl="
         + mixedModeJdbcUrl + "]";
   }
+
 
   public static class Builder {
     private File databaseDirectory = new File(System.getProperty("java.io.tmpdir"));
@@ -304,7 +310,12 @@ public class H2LocalDataSourceFactory {
 
   }
 
-  public static DataSource createInMemoryDataSource() {
+  /**
+   * Creates temporal an in memory data source.
+   *
+   * @return
+   */
+  public static DataSource createTemporalInMemoryDataSource() {
     return JdbcConnectionPool
         .create("jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;", "", "");
   }
