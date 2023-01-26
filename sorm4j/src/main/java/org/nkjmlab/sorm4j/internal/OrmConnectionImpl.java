@@ -669,14 +669,14 @@ public class OrmConnectionImpl implements OrmConnection {
           if (resultSet.next()) {
             ret = mapRowToObject(objectClass, resultSet);
           } else {
-            Object[] params = {objectClass, sql};
-            throw new SormException(ParameterizedStringFormat.DEFAULT
-                .format("Try to read an unique [{}] object but no result returned. [{}] ", params));
+            throw new SormException(ParameterizedStringFormat.DEFAULT.format(
+                "Try to read an unique [{}] object but no result returned. sql=[{}],params=[{}]",
+                objectClass.getName(), sql, parameters));
           }
           if (resultSet.next()) {
-            Object[] params = {objectClass, sql};
             throw new SormException(ParameterizedStringFormat.DEFAULT.format(
-                "Try to read an unique [{}] object but non-unique result returned. [{}] ", params));
+                "Try to read an unique [{}] object but non-unique result returned. sql=[{}],params=[{}]",
+                objectClass.getName(), sql, parameters));
           }
           return ret;
         });
