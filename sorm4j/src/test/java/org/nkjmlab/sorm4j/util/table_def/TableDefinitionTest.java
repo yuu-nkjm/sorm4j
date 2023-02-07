@@ -32,6 +32,18 @@ import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueColumns;
 
 class TableDefinitionTest {
 
+
+
+  @Test
+  void testEnum() {
+    Sorm sorm = SormTestUtils.createSormWithNewContext();
+    TableDefinition def = TableDefinition.builder(SimpleEnum.class).build();
+    def.createTableIfNotExists(sorm);
+    sorm.insert(new SimpleEnum(1, EnumExample.A));
+    assertThat(sorm.readFirst(SimpleEnum.class, "SELECT * FROM SIMPLE_ENUMS").enumCol)
+        .isInstanceOf(EnumExample.class);
+  }
+
   @Test
   void test() throws URISyntaxException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
@@ -57,6 +69,25 @@ class TableDefinitionTest {
     assertThat(sorm.selectAll(TableDefExample.class).get(0).phoneNumber).isEqualTo("000-000-0000");
     System.out.println(sorm.selectAll(TableDefExample.class));
   }
+
+  public static enum EnumExample {
+    A, B, C
+  }
+
+  @OrmRecord
+  public static class SimpleEnum {
+    public final long id;
+    @SuppressWarnings("exports")
+    public final EnumExample enumCol;
+
+    @SuppressWarnings("exports")
+    public SimpleEnum(long id, EnumExample en) {
+      this.id = id;
+      this.enumCol = en;
+    }
+  }
+
+
 
   @OrmRecord
   @IndexColumns({"boolean_col", "byte_col"})
