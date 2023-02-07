@@ -562,7 +562,13 @@ public final class TableDefinition {
       case "java.util.Map":
         return "json";
       default:
-        return type.isArray() ? toSqlDataType(type.getComponentType()) + " array" : "java_object";
+        if (type.isArray()) {
+          return toSqlDataType(type.getComponentType()) + " array";
+        } else if (type.isEnum()) {
+          return "varchar";
+        } else {
+          return "java_object";
+        }
     }
   }
 
