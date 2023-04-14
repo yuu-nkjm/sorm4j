@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
 /**
  * Default implementation of {@link TableNameMapper}
@@ -29,7 +29,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
     List<String> candidates = List.of(tableName);
     Object[] params = {tableName, OrmTable.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(
-        ParameterizedStringFormat.DEFAULT.format(ERROR_MESSAGE, params)));
+        ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
   }
 
 
@@ -38,7 +38,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
     List<String> candidates = guessTableNameCandidates(objectClass);
     Object[] params = {objectClass.getName(), OrmTable.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates)
-        .orElseThrow(() -> new SormException(ParameterizedStringFormat.DEFAULT.format(ERROR_MESSAGE, params)));
+        .orElseThrow(() -> new SormException(ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
   }
 
   /**

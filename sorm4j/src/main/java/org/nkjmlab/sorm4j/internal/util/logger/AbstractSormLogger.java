@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
@@ -20,7 +20,7 @@ public abstract class AbstractSormLogger implements SormLogger {
   @Override
   public void logBeforeSql(String tag, Connection connection, ParameterizedSql psql) {
     Object[] params = {tag, getOutsideInvokerOfLibrary(), psql.getBindedSql(), getDbUrl(connection)};
-    debug(ParameterizedStringFormat.DEFAULT.format("[{}] At {}, Execute SQL [{}] to [{}]", params));
+    debug(ParameterizedStringFormatter.LENGTH_256.format("[{}] At {}, Execute SQL [{}] to [{}]", params));
   }
 
 
@@ -28,27 +28,27 @@ public abstract class AbstractSormLogger implements SormLogger {
   public void logBeforeMultiRow(String tag, Connection connection, Class<?> clazz, int length,
       String tableName) {
     Object[] params = {tag, getOutsideInvokerOfLibrary(), length, clazz, tableName, getDbUrl(connection)};
-    debug(ParameterizedStringFormat.DEFAULT.format("[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]", params));
+    debug(ParameterizedStringFormatter.LENGTH_256.format("[{}] At {}, Execute multirow insert with [{}] objects of [{}] into [{}] on [{}]", params));
   }
 
 
   @Override
   public void logAfterQuery(String tag, long elapsedTime, Object ret) {
     Object[] params = {getTagAndElapsedTime(tag, elapsedTime), ret instanceof Collection ? ((Collection<?>) ret).size() : 1};
-    debug(ParameterizedStringFormat.DEFAULT.format("{} Read [{}] objects", params));
+    debug(ParameterizedStringFormatter.LENGTH_256.format("{} Read [{}] objects", params));
   }
 
   @Override
   public void logAfterUpdate(String tag, long elapsedTime, int ret) {
     Object[] params = {getTagAndElapsedTime(tag, elapsedTime), ret};
-    debug(ParameterizedStringFormat.DEFAULT.format("{} Affect [{}] rows", params));
+    debug(ParameterizedStringFormatter.LENGTH_256.format("{} Affect [{}] rows", params));
   }
 
 
   @Override
   public void logAfterMultiRow(String tag, long elapsedTime, int[] result) {
     Object[] params = {getTagAndElapsedTime(tag, elapsedTime), IntStream.of(result).sum()};
-    debug(ParameterizedStringFormat.DEFAULT.format("{} Affect [{}] objects", params));
+    debug(ParameterizedStringFormatter.LENGTH_256.format("{} Affect [{}] objects", params));
   }
 
   @Override

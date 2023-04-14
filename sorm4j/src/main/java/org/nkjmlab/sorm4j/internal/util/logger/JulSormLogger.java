@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal.util.logger;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public final class JulSormLogger extends AbstractSormLogger implements SormLogger {
@@ -30,28 +30,28 @@ public final class JulSormLogger extends AbstractSormLogger implements SormLogge
 
   @Override
   public void trace(String format, Object... params) {
-    this.logger.finer(ParameterizedStringFormat.DEFAULT.format(format, params));
+    this.logger.finer(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
 
   @Override
   public void debug(String format, Object... params) {
-    this.logger.fine(ParameterizedStringFormat.DEFAULT.format(format, params));
+    this.logger.fine(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
   @Override
   public void info(String format, Object... params) {
-    this.logger.info(ParameterizedStringFormat.DEFAULT.format(format, params));
+    this.logger.info(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
   @Override
   public void warn(String format, Object... params) {
-    this.logger.warning(ParameterizedStringFormat.DEFAULT.format(format, params));
+    this.logger.warning(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
   @Override
   public void error(String format, Object... params) {
-    this.logger.severe(ParameterizedStringFormat.DEFAULT.format(format, params));
+    this.logger.severe(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
   @Override

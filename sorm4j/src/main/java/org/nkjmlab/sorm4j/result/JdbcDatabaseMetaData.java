@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
 public final class JdbcDatabaseMetaData {
 
@@ -150,7 +150,7 @@ public final class JdbcDatabaseMetaData {
       return new JdbcDatabaseMetaData(metaData.getDatabaseProductName(),
           metaData.getDatabaseProductVersion(), metaData.getDriverName(),
           metaData.getDriverVersion(),
-          ParameterizedStringFormat.DEFAULT.format("{}.{}", params),
+          ParameterizedStringFormatter.LENGTH_256.format("{}.{}", params),
           metaData.getDefaultTransactionIsolation(), metaData.getMaxConnections(),
           metaData.getURL(), metaData.getUserName(), metaData.getSearchStringEscape(), tables,
           indexes);

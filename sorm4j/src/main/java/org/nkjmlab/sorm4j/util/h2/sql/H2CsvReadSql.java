@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
@@ -87,7 +87,7 @@ public class H2CsvReadSql {
         int index = selectedColumns.indexOf(en.getKey());
         if (index == -1) {
           Object[] params = {en.getKey(), columns};
-          throw new IllegalStateException(ParameterizedStringFormat.DEFAULT.format("{} is not found in Columns {}", params));
+          throw new IllegalStateException(ParameterizedStringFormatter.LENGTH_256.format("{} is not found in Columns {}", params));
         }
         selectedColumns.set(index, en.getValue());
       });
