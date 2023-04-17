@@ -309,6 +309,12 @@ public final class Try {
     }).run();
   }
 
+
+  public static <T, X extends RuntimeException> void runOrElseRethrow(ThrowableRunnable onTry)
+      throws X {
+    runOrElseThrow(onTry, e -> Try.rethrow(e));
+  }
+
   private Try() {}
 
 

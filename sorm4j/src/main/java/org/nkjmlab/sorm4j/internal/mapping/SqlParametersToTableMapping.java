@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.internal.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.BasicRowMap;
 import org.nkjmlab.sorm4j.result.InsertResult;
@@ -91,7 +91,7 @@ public final class SqlParametersToTableMapping<T> {
   public Object[] getParameters(Object object, List<String> columns) {
     if (object == null) {
       Object[] params = {objectClass};
-      throw new SormException(ParameterizedStringFormat.DEFAULT
+      throw new SormException(ParameterizedStringFormatter.LENGTH_256
           .format("Fail to get value from a instance of [{}] but it is null.", params));
     }
     final Object[] ret = new Object[columns.size()];

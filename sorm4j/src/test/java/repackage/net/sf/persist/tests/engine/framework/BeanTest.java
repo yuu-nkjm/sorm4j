@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormat;
+import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.slf4j.Logger;
 
@@ -180,7 +180,7 @@ public class BeanTest {
           Object retConverted = DynamicBean.convertToType(fieldValue.getClass(), ret);
           if (!DynamicBean.compareValues(fieldValue, retConverted)) {
             Object[] params = {fieldValue, fieldValue.getClass(), retConverted, retConverted.getClass(), ret, ret.getClass(), sql};
-            throw new AssertionError(ParameterizedStringFormat.DEFAULT.format("Expected [{}]({}) but actual [{}]({}) converted from [{}]({}) as result of [{}]", params));
+            throw new AssertionError(ParameterizedStringFormatter.LENGTH_256.format("Expected [{}]({}) but actual [{}]({}) converted from [{}]({}) as result of [{}]", params));
           }
         }
       }
