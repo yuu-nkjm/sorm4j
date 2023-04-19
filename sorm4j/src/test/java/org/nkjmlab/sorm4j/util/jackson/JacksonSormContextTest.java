@@ -88,7 +88,7 @@ class JacksonSormContextTest {
   }
 
 
-  @SuppressWarnings("exports")
+  // @SuppressWarnings("exports")
   @OrmRecord
   public static class HasJsonColumn {
     public int id;

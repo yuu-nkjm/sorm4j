@@ -12,6 +12,7 @@ class H2WebBrowsingServiceTest {
 
   @Test
   void test() throws StreamReadException, DatabindException, IOException, SQLException {
+    @SuppressWarnings("unused")
     DriverManagerDataSource ds = SormTestUtils.createNewDatabaseDataSource();
     H2WebBrowsingService server = new H2WebBrowsingService(true);
     // server.open(ds);
