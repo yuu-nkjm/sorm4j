@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
  * @param <K>
  * @param <V>
  */
+@SuppressWarnings("serial")
 public class ConcurrentCache<K, V> extends ConcurrentHashMap<K, V> {
 
   private final int maxSize;

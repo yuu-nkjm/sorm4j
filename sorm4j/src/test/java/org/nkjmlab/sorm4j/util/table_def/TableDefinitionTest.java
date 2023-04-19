@@ -77,10 +77,10 @@ class TableDefinitionTest {
   @OrmRecord
   public static class SimpleEnum {
     public final long id;
-    @SuppressWarnings("exports")
+    // @SuppressWarnings("exports")
     public final EnumExample enumCol;
 
-    @SuppressWarnings("exports")
+    // @SuppressWarnings("exports")
     public SimpleEnum(long id, EnumExample en) {
       this.id = id;
       this.enumCol = en;

@@ -1,4 +1,5 @@
 /.settings
+/.metadata
 /target
 /tmp
 .classpath
