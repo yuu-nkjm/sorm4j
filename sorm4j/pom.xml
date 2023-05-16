@@ -158,7 +158,7 @@
             <ignoreVersions>
               <ignoreVersion>
                 <type>regex</type>
-                <version>.+-(alpha|beta|SNAPSHOT|M|rc)\d*$</version>
+                <version>.*(alpha|beta|SNAPSHOT|M|rc).*</version>
               </ignoreVersion>
             </ignoreVersions>
           </ruleSet>
