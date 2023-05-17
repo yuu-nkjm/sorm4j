@@ -1,6 +1,10 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.FROM;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.JOIN;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.LEFT;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.ON;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.SELECT;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -488,24 +492,37 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String t1T2OnCondition, String t2T3OnCondition) {
-    return readTupleList(t1, t2, t3,
-        joinHelper(JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters) {
+    return readTupleList(t1, t2, sql, parameters);
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String sql, Object... parameters) {
+    return readTupleList(t1, t2, t3, sql, parameters);
   }
 
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return readTupleList(t1, t2, joinHelper(JOIN, t1, t2, ON + onCondition));
+    return join(t1, t2, joinSql(JOIN, t1, t2, ON + onCondition));
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns) {
-    return readTupleList(t1, t2,
-        joinHelper(JOIN, t1, t2, " using (" + SelectSql.joinCommaAndSpace(columns) + ")"));
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String t1T2OnCondition, String t2T3OnCondition) {
+    return join(t1, t2, t3, joinSql(JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
 
-  private <T1, T2, T3> String joinHelper(String joinType, Class<T1> t1, Class<T2> t2,
+
+  @Override
+  public <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns) {
+    return join(t1, t2,
+        joinSql(JOIN, t1, t2, " using (" + SelectSql.joinCommaAndSpace(columns) + ")"));
+  }
+
+
+  private <T1, T2, T3> String joinSql(String joinType, Class<T1> t1, Class<T2> t2,
       String joinCondition) {
     TableMetaData t1m = getTableMapping(t1).getTableMetaData();
     TableMetaData t2m = getTableMapping(t2).getTableMetaData();
@@ -515,28 +532,35 @@ public class OrmConnectionImpl implements OrmConnection {
     return sql;
   }
 
-  private <T1, T2, T3> String joinHelper(String joinType, Class<T1> t1, Class<T2> t2,
+  private <T1, T2, T3> String joinSql(String joinType, Class<T1> t1, Class<T2> t2,
       String t1T2OnCondition, Class<T3> t3, String t2T3OnCondition) {
+    TableMetaData t2m = getTableMapping(t2).getTableMetaData();
+    TableMetaData t3m = getTableMapping(t3).getTableMetaData();
+    String joinCondition = joinType + t2m.getTableName() + ON + t1T2OnCondition + joinType
+        + t3m.getTableName() + ON + t2T3OnCondition;
+    return joinSql(joinType, t1, t2, t3, joinCondition);
+  }
+
+  private <T1, T2, T3> String joinSql(String joinType, Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String joinCondition) {
     TableMetaData t1m = getTableMapping(t1).getTableMetaData();
     TableMetaData t2m = getTableMapping(t2).getTableMetaData();
     TableMetaData t3m = getTableMapping(t3).getTableMetaData();
     String sql = SELECT + String.join(",", t1m.getColumnAliases()) + ", "
         + String.join(",", t2m.getColumnAliases()) + ", " + String.join(",", t3m.getColumnAliases())
-        + FROM + t1m.getTableName() + joinType + t2m.getTableName() + ON + t1T2OnCondition
-        + joinType + t3m.getTableName() + ON + t2T3OnCondition;
+        + FROM + t1m.getTableName() + joinCondition;
     return sql;
   }
 
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return readTupleList(t1, t2, joinHelper(LEFT + JOIN, t1, t2, ON + onCondition));
+    return join(t1, t2, joinSql(LEFT + JOIN, t1, t2, ON + onCondition));
   }
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
       String t1T2OnCondition, String t2T3OnCondition) {
-    return readTupleList(t1, t2, t3,
-        joinHelper(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+    return join(t1, t2, t3, joinSql(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
 
   public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {
