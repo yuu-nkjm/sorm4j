@@ -211,6 +211,18 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql,
+      Object... parameters) {
+    return applyAndClose(conn -> conn.join(t1, t2, sql, parameters));
+  }
+
+  @Override
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
+      String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.join(t1, t2, t3, sql, parameters));
+  }
+
+  @Override
   public <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
     return applyAndClose(conn -> conn.joinOn(t1, t2, onCondition));
   }

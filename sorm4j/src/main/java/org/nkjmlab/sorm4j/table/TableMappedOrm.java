@@ -330,18 +330,18 @@ public interface TableMappedOrm<T> {
 
   @Experimental
   default <S> List<Tuple2<T, S>> join(TableMappedOrm<S> second, String sql, Object... parameters) {
-    return getOrm().readTupleList(getValueType(), second.getValueType(), sql, parameters);
+    return getOrm().join(getValueType(), second.getValueType(), sql, parameters);
   }
 
   @Experimental
   default <S, U> List<Tuple3<T, S, U>> join(TableMappedOrm<S> second, TableMappedOrm<U> third,
       String sql, Object... parameters) {
-    return getOrm().readTupleList(getValueType(), second.getValueType(), third.getValueType(), sql,
+    return getOrm().join(getValueType(), second.getValueType(), third.getValueType(), sql,
         parameters);
   }
 
   @Experimental
-  default JoinSql.Builder createJoinSql() {
+  default JoinSql.Builder joinSqlBuilder() {
     return JoinSql.builder(this);
   }
 

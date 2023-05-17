@@ -13,6 +13,7 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
+import org.nkjmlab.sorm4j.util.sql.JoinSql;
 import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 class TableTest {
@@ -286,9 +287,10 @@ class TableTest {
     assertThat(playersTable.joinUsing(sportsTable, "id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
 
+    JoinSql.builder(playersTable.getOrm().getTableMetaData(Player.class));
     assertThat(playersTable
-        .join(sportsTable, playersTable.createJoinSql().joinUsing(sportsTable, "id").build()).get(0)
-        .getT1().getId()).isEqualTo(PLAYER_ALICE.getId());
+        .join(sportsTable, playersTable.joinSqlBuilder().joinUsing(sportsTable, "id").build())
+        .get(0).getT1().getId()).isEqualTo(PLAYER_ALICE.getId());
 
 
   }

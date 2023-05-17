@@ -17,9 +17,12 @@ public class JoinSql {
     return new Builder(firstTable);
   }
 
+  public static JoinSql.Builder builder(TableMetaData firstTable) {
+    return new Builder(firstTable);
+  }
+
   public static class Builder {
     private final List<String> columns = new ArrayList<>();
-
     private final List<String> froms = new ArrayList<>();
 
     private boolean distinct;
@@ -27,43 +30,68 @@ public class JoinSql {
     private String orderBy;
     private String limit;
 
-
-    private Builder(TableMappedOrm<?> first) {
-      this.columns.addAll(first.getTableMetaData().getColumnAliases());
-      this.froms.add(first.getTableName());
+    private Builder(TableMetaData tableMetaData) {
+      this.columns.addAll(tableMetaData.getColumnAliases());
+      this.froms.add(tableMetaData.getTableName());
     }
 
 
-    public JoinSql.Builder joinUsing(TableMappedOrm<?> other, String... columnsForJoin) {
+    private Builder(TableMappedOrm<?> first) {
+      this(first.getTableMetaData());
+    }
+
+
+    public JoinSql.Builder joinUsing(TableMetaData other, String... columnsForJoin) {
       return joinUsing("join", other, columnsForJoin);
     }
 
-    public JoinSql.Builder leftJoinUsing(TableMappedOrm<?> other, String... columnsForJoin) {
+    public JoinSql.Builder joinUsing(TableMappedOrm<?> other, String... columnsForJoin) {
+      return joinUsing(other.getTableMetaData(), columnsForJoin);
+    }
+
+    public JoinSql.Builder leftJoinUsing(TableMetaData other, String... columnsForJoin) {
       return joinUsing("left join", other, columnsForJoin);
     }
 
-    public JoinSql.Builder joinOn(TableMappedOrm<?> other, String onCondition) {
+    public JoinSql.Builder leftJoinUsing(TableMappedOrm<?> other, String... columnsForJoin) {
+      return leftJoinUsing(other.getTableMetaData(), columnsForJoin);
+    }
+
+    public JoinSql.Builder joinOn(TableMetaData other, String onCondition) {
       return joinOn("join", other, onCondition);
     }
 
-    public JoinSql.Builder leftJoinOn(TableMappedOrm<?> other, String onCondition) {
+    public JoinSql.Builder joinOn(TableMappedOrm<?> other, String onCondition) {
+      return joinOn(other.getTableMetaData(), onCondition);
+    }
+
+    public JoinSql.Builder leftJoinOn(TableMetaData other, String onCondition) {
       return joinOn("left join", other, onCondition);
     }
 
-    private JoinSql.Builder joinUsing(String joinType, TableMappedOrm<?> other,
-        String... columnsForJoin) {
-      return join(joinType, other, "using (" + String.join(",", columnsForJoin) + ")");
+    public JoinSql.Builder leftJoinOn(TableMappedOrm<?> other, String onCondition) {
+      return leftJoinOn(other.getTableMetaData(), onCondition);
     }
 
-    private JoinSql.Builder joinOn(String joinType, TableMappedOrm<?> other, String onCondition) {
-      return join(joinType, other, "on " + onCondition);
+    private JoinSql.Builder joinUsing(String joinType, TableMetaData tableMetaData,
+        String... columnsForJoin) {
+      return join(joinType, tableMetaData, "using (" + String.join(",", columnsForJoin) + ")");
+    }
+
+    private JoinSql.Builder joinOn(String joinType, TableMetaData tableMetaData,
+        String onCondition) {
+      return join(joinType, tableMetaData, "on " + onCondition);
+    }
+
+    public JoinSql.Builder join(String joinType, TableMetaData otherTableMetaData,
+        String joinCondition) {
+      columns.addAll(otherTableMetaData.getColumnAliases());
+      froms.add(String.join(" ", joinType, otherTableMetaData.getTableName(), joinCondition));
+      return this;
     }
 
     public JoinSql.Builder join(String joinType, TableMappedOrm<?> other, String joinCondition) {
-      TableMetaData otherMeta = other.getTableMetaData();
-      columns.addAll(other.getTableMetaData().getColumnAliases());
-      froms.add(String.join(" ", joinType, otherMeta.getTableName(), joinCondition));
-      return this;
+      return join(joinType, other.getTableMetaData(), joinCondition);
     }
 
     /**
