@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 /**
  * A instance represents a row in a table. This interface extends {@link Map<String, Object>}. The
@@ -51,6 +52,15 @@ public interface RowMap extends Map<String, Object> {
     return create(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
   }
 
+  /**
+   * Key to canonical key
+   *
+   * @param key
+   * @return
+   */
+  static String toKey(String key) {
+    return StringCache.toCanonicalCase(key);
+  }
 
   <T> T[] getArray(String key, Class<T> componentType);
 

@@ -13,9 +13,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 
-public final class BasicRowMap implements RowMap {
+public class BasicRowMap implements RowMap {
 
   private final LinkedHashMap<String, Object> map;
 
@@ -28,12 +27,12 @@ public final class BasicRowMap implements RowMap {
   }
 
   public BasicRowMap(Map<String, Object> map) {
-    this.map = map.entrySet().stream().collect(Collectors.toMap(en -> toKey(en.getKey()),
-        en -> en.getValue(), (v1, v2) -> v1, LinkedHashMap::new));
+    this.map = List.copyOf(map.entrySet()).stream().collect(LinkedHashMap::new,
+        (m, v) -> m.put(toKey(v.getKey()), v.getValue()), LinkedHashMap::putAll);
   }
 
-  private static String toKey(Object key) {
-    return StringCache.toCanonicalCase(key.toString());
+  private static String toKey(String key) {
+    return RowMap.toKey(key);
   }
 
   @Override
@@ -48,7 +47,7 @@ public final class BasicRowMap implements RowMap {
 
   @Override
   public boolean containsKey(Object key) {
-    return map.containsKey(toKey(key));
+    return map.containsKey(toKey(key.toString()));
   }
 
   @Override
@@ -58,7 +57,7 @@ public final class BasicRowMap implements RowMap {
 
   @Override
   public Object get(Object key) {
-    return map.get(toKey(key));
+    return map.get(toKey(key.toString()));
   }
 
   @Override
@@ -68,7 +67,7 @@ public final class BasicRowMap implements RowMap {
 
   @Override
   public Object remove(Object key) {
-    return map.remove(toKey(key));
+    return map.remove(toKey(key.toString()));
   }
 
   @Override
