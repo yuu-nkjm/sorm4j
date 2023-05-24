@@ -205,6 +205,12 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
+  public boolean execute(ParameterizedSql sql) {
+    return executeAndClose(getLoggerContext(), getJdbcConnection(), getPreparedStatementSupplier(),
+        getSqlParametersSetter(), sql.getSql(), sql.getParameters());
+  }
+
+  @Override
   public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
       ResultSetTraverser<T> traverser) {
     return executeQueryAndClose(connection, traverser, statementSupplier);
@@ -929,6 +935,18 @@ public class OrmConnectionImpl implements OrmConnection {
         ResultSet resultSet = stmt.executeQuery()) {
       return resultSetTraverser.traverseAndMap(resultSet);
     } catch (Exception e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  private static <R> boolean executeAndClose(LoggerContext loggerContext, Connection connection,
+      PreparedStatementSupplier statementSupplier, SqlParametersSetter sqlParametersSetter,
+      String sql, Object[] parameters) {
+    try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
+      sqlParametersSetter.setParameters(stmt, parameters);
+      boolean ret = stmt.execute();
+      return ret;
+    } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
