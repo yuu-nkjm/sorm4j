@@ -206,9 +206,16 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public boolean execute(ParameterizedSql sql) {
-    return executeAndClose(getLoggerContext(), getJdbcConnection(), getPreparedStatementSupplier(),
-        getSqlParametersSetter(), sql.getSql(), sql.getParameters());
+    return execute(sql.getSql(), sql.getParameters());
+
   }
+
+  @Override
+  public boolean execute(String sql, Object... parameters) {
+    return executeAndClose(getLoggerContext(), getJdbcConnection(), getPreparedStatementSupplier(),
+        getSqlParametersSetter(), sql, parameters);
+  }
+
 
   @Override
   public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,

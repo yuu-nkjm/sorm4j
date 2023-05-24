@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 /**
@@ -58,6 +59,7 @@ public interface RowMap extends Map<String, Object> {
    * @param key
    * @return
    */
+  @Experimental
   static String toKey(String key) {
     return StringCache.toCanonicalCase(key);
   }
