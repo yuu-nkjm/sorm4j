@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.nkjmlab</groupId>
     <artifactId>sorm4j-parent</artifactId>
-    <version>1.4.15</version>
+    <version>1.4.16</version>
   </parent>
   <properties>
     <javassist-version>3.27.0-GA</javassist-version>
