@@ -170,10 +170,27 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<!--
+				https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 			<plugin>
-				<!-- configured in pluginManagement -->
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.7</version>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<!--
 			https://mvnrepository.com/artifact/org.codehaus.mojo/cobertura-maven-plugin -->
@@ -186,6 +203,22 @@
 					<maxmem>256m</maxmem>
 					<aggregate>true</aggregate>
 				</configuration>
+			</plugin>
+			<!--
+				https://mvnrepository.com/artifact/org.eluder.coveralls/coveralls-maven-plugin -->
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>4.3.0</version>
+				<dependencies>
+					<!--
+						https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+					<dependency>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+						<version>${jaxb-api-version-in-plugin}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<!--
 			https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
@@ -214,153 +247,111 @@
 					</additionalClasspathElements>
 				</configuration>
 			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--
-				https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.7</version>
-					<executions>
-						<execution>
-							<id>jacoco-initialize</id>
-							<goals>
-								<goal>prepare-agent</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>jacoco-site</id>
-							<phase>test</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<!--
-				https://mvnrepository.com/artifact/org.eluder.coveralls/coveralls-maven-plugin -->
-				<plugin>
-					<groupId>org.eluder.coveralls</groupId>
-					<artifactId>coveralls-maven-plugin</artifactId>
-					<version>4.3.0</version>
-					<dependencies>
-						<!--
-						https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-						<dependency>
-							<groupId>javax.xml.bind</groupId>
-							<artifactId>jaxb-api</artifactId>
-							<version>${jaxb-api-version-in-plugin}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<!--
-				https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.11.0</version>
-					<configuration>
-						<release>17</release>
-					</configuration>
-				</plugin>
-				<!--
+			<!--
+			https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
+			<!--
 				https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>versions-maven-plugin</artifactId>
-					<version>2.15.0</version>
-					<configuration>
-						<ruleSet>
-							<ignoreVersions>
-								<ignoreVersion>
-									<type>regex</type>
-									<version>
-										(?i).*(alpha|beta|snapshot|pre|rc|M\d).*</version>
-								</ignoreVersion>
-							</ignoreVersions>
-						</ruleSet>
-					</configuration>
-				</plugin>
-				<!-- from
-				https://central.sonatype.org/pages/apache-maven.html#distribution-management-and-authentication -->
-				<!--
-				https://mvnrepository.com/artifact/org.sonatype.plugins/nexus-staging-maven-plugin -->
-				<plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>1.6.13</version>
-					<extensions>true</extensions>
-					<configuration>
-						<serverId>ossrh</serverId>
-						<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-						<autoReleaseAfterClose>false</autoReleaseAfterClose>
-					</configuration>
-				</plugin>
-				<!-- from
-				https://central.sonatype.org/pages/apache-maven.html#javadoc-and-sources-attachments -->
-				<!--
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.15.0</version>
+				<configuration>
+					<ruleSet>
+						<ignoreVersions>
+							<ignoreVersion>
+								<type>regex</type>
+								<version>
+									(?i).*(alpha|beta|snapshot|pre|rc|M\d).*</version>
+							</ignoreVersion>
+						</ignoreVersions>
+					</ruleSet>
+				</configuration>
+			</plugin>
+			<!-- from
+			https://central.sonatype.org/pages/apache-maven.html#distribution-management-and-authentication -->
+			<!--
+			https://mvnrepository.com/artifact/org.sonatype.plugins/nexus-staging-maven-plugin -->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.13</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>false</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<!-- from
+			https://central.sonatype.org/pages/apache-maven.html#javadoc-and-sources-attachments -->
+			<!--
 				https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>3.2.0</version>
-					<executions>
-						<execution>
-							<phase>package</phase>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>attach-sources</id>
-							<goals>
-								<goal>jar-no-fork</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<!--
-				https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.5.0</version>
-					<configuration>
-						<excludePackageNames>
-							org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
-						<quiet>true</quiet>
-						<doclint>none</doclint>
-					</configuration>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<phase>package</phase>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<!-- from
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
+			https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.5.0</version>
+				<configuration>
+					<excludePackageNames>
+						org.nkjmlab.sorm4j.internal:org.nkjmlab.sorm4j.internal.*</excludePackageNames>
+					<quiet>true</quiet>
+					<doclint>none</doclint>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- from
 				https://central.sonatype.org/pages/apache-maven.html#gpg-signed-components -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.1.0</version>
-					<executions>
-						<execution>
-							<id>sign-artifacts</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>sign</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
