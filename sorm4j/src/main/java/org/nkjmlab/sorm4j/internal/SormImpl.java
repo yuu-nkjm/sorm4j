@@ -511,6 +511,16 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
+  public boolean execute(ParameterizedSql sql) {
+    return applyAndClose(conn -> conn.execute(sql));
+  }
+
+  @Override
+  public boolean execute(String sql, Object... parameters) {
+    return applyAndClose(conn -> conn.execute(sql, parameters));
+  }
+
+  @Override
   public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
       ResultSetTraverser<T> traverser) {
     return applyAndClose(conn -> conn.executeQuery(statementSupplier, traverser));

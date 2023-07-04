@@ -145,6 +145,13 @@ public interface Orm {
    */
   <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
+  @Experimental
+  boolean execute(ParameterizedSql sql);
+
+  @Experimental
+  boolean execute(String sql, Object... parameters);
+
+
   /**
    * Executes the query with the given PreparedStatement and applies the given
    * {@link ResultSetTraverser}. If you want to set parameters to a PreparedStatement object by
