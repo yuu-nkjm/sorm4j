@@ -41,8 +41,6 @@ public class TestSimple {
     }
   }
 
-
-
   @BeforeEach
   void beforeEach() throws SQLException {
     dropAndCreateSimpleTable();
@@ -74,7 +72,6 @@ public class TestSimple {
     }
   }
 
-
   @Test
   public void testExecuteUpdate() throws SQLException {
 
@@ -84,14 +81,20 @@ public class TestSimple {
       Simple createdSimple = buildSimple();
 
       // insert and check count of rows returned
-      int n = ormConn.executeUpdate("insert into simple (long_col, string_col) values(?,?)",
-          createdSimple.getLongCol(), createdSimple.getStringCol());
+      int n =
+          ormConn.executeUpdate(
+              "insert into simple (long_col, string_col) values(?,?)",
+              createdSimple.getLongCol(),
+              createdSimple.getStringCol());
       assertEquals(1, n);
 
       // read object and compare with inserted data
       Simple simpleRead =
-          ormConn.readFirst(Simple.class, "select * from simple where long_col=? and string_col=?",
-              createdSimple.getLongCol(), createdSimple.getStringCol());
+          ormConn.readFirst(
+              Simple.class,
+              "select * from simple where long_col=? and string_col=?",
+              createdSimple.getLongCol(),
+              createdSimple.getStringCol());
 
       assertNotNull(simpleRead);
       assertEquals(createdSimple.getLongCol(), simpleRead.getLongCol());
@@ -100,8 +103,11 @@ public class TestSimple {
       // delete object and check it was removed
       ormConn.delete(simpleRead);
       simpleRead =
-          ormConn.readFirst(Simple.class, "select * from simple where long_col=? and string_col=?",
-              createdSimple.getLongCol(), createdSimple.getStringCol());
+          ormConn.readFirst(
+              Simple.class,
+              "select * from simple where long_col=? and string_col=?",
+              createdSimple.getLongCol(),
+              createdSimple.getStringCol());
       assertNull(simpleRead);
     }
   }
@@ -138,16 +144,24 @@ public class TestSimple {
       assertEquals(1, ret.getRowsModified()[0]);
 
       // read object and compare with inserted data
-      Simple simpleRead = ormConn.readFirst(Simple.class,
-          "select * from simple where long_col=? and string_col=?", longCol, stringCol);
+      Simple simpleRead =
+          ormConn.readFirst(
+              Simple.class,
+              "select * from simple where long_col=? and string_col=?",
+              longCol,
+              stringCol);
       assertNotNull(simpleRead);
       assertEquals(longCol, simpleRead.getLongCol());
       assertEquals(stringCol, simpleRead.getStringCol());
 
       // delete object and check it was removed
       ormConn.delete(simpleRead);
-      simpleRead = ormConn.readFirst(Simple.class,
-          "select * from simple where long_col=? and string_col=?", longCol, stringCol);
+      simpleRead =
+          ormConn.readFirst(
+              Simple.class,
+              "select * from simple where long_col=? and string_col=?",
+              longCol,
+              stringCol);
       assertNull(simpleRead);
     }
   }
@@ -179,10 +193,12 @@ public class TestSimple {
 
       Simple simple = buildSimple();
       ormConn.insert(simple);
-      long longCol = ormConn.readFirst(long.class, "select long_col from simple where long_col=?",
-          simple.getLongCol());
-      String stringCol = ormConn.readFirst(String.class,
-          "select string_col from simple where long_col=?", simple.getLongCol());
+      long longCol =
+          ormConn.readFirst(
+              long.class, "select long_col from simple where long_col=?", simple.getLongCol());
+      String stringCol =
+          ormConn.readFirst(
+              String.class, "select string_col from simple where long_col=?", simple.getLongCol());
 
       assertEquals(simple.getLongCol(), longCol);
       assertEquals(simple.getStringCol(), stringCol);
@@ -192,7 +208,7 @@ public class TestSimple {
   @Test
   public void testBatch() throws SQLException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build());) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build()); ) {
 
       Simple simple1 = buildSimple();
       Simple simple2 = buildSimple();
@@ -267,7 +283,6 @@ public class TestSimple {
     return String.valueOf(ThreadLocalRandom.current().nextInt(i));
   }
 
-
   @Test
   public void testObjectList() throws SQLException {
     try (Connection conn = dataSource.getConnection();
@@ -295,7 +310,6 @@ public class TestSimple {
     }
   }
 
-
   @Test
   public void testMap() throws SQLException {
     try (Connection conn = dataSource.getConnection();
@@ -306,8 +320,9 @@ public class TestSimple {
 
       long id = ormConn.readFirst(long.class, "select id from simple limit 1");
 
-      Map<String, Object> simpleMap1 = ormConn.readFirst(RowMap.class,
-          "select id, long_col, string_col from simple where id=?", id);
+      Map<String, Object> simpleMap1 =
+          ormConn.readFirst(
+              RowMap.class, "select id, long_col, string_col from simple where id=?", id);
       assertEquals(id, simpleMap1.get("id"));
       assertEquals(simple.getLongCol(), simpleMap1.get("long_col"));
       assertEquals(simple.getStringCol(), simpleMap1.get("string_col"));
@@ -319,7 +334,7 @@ public class TestSimple {
   @Test
   public void testMapList() throws SQLException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection ormConn = OrmConnection.of(conn)) {
+        OrmConnection ormConn = OrmConnection.of(conn, SormContext.getDefaultContext())) {
 
       ormConn.executeUpdate("DELETE FROM SIMPLE");
       Simple simple1 = buildSimple();
@@ -335,8 +350,12 @@ public class TestSimple {
       simple3.setId(ids.get(2));
 
       List<RowMap> simpleList =
-          ormConn.readList(RowMap.class, "select * from simple where id in (?,?,?)",
-              simple1.getId(), simple2.getId(), simple3.getId());
+          ormConn.readList(
+              RowMap.class,
+              "select * from simple where id in (?,?,?)",
+              simple1.getId(),
+              simple2.getId(),
+              simple3.getId());
       assertEquals(simple1.getId(), simpleList.get(0).get("id"));
       assertEquals(simple1.getLongCol(), simpleList.get(0).get("long_col"));
       assertEquals(simple1.getStringCol(), simpleList.get(0).get("string_col"));
@@ -354,7 +373,6 @@ public class TestSimple {
       ormConn.delete(simple3);
     }
   }
-
 
   @Test
   public void testMappingSimple01() {
@@ -380,7 +398,6 @@ public class TestSimple {
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not match any existing table");
-
     }
   }
 
@@ -397,7 +414,6 @@ public class TestSimple {
     }
   }
 
-
   @Test
   public void testMappingSimple04() {
     // Simple04 has incompatible setter
@@ -410,7 +426,6 @@ public class TestSimple {
       org.assertj.core.api.Assertions.assertThat(e.getMessage()).contains("Could not set a value");
     }
   }
-
 
   @Test
   public void testMappingSimple05() {
@@ -513,6 +528,4 @@ public class TestSimple {
       }
     }
   }
-
-
 }

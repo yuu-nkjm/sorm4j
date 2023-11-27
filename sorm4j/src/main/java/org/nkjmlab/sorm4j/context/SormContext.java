@@ -2,14 +2,14 @@ package org.nkjmlab.sorm4j.context;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
+import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /**
- * A context for a {@link Sorm} instance. An instance of this class could be built by
- * {{@link Builder#build()}. The instance of this class should be thread-safe.
+ * A context for a {@link Sorm} instance. An instance of this class could be built by {{@link
+ * Builder#build()}. The instance of this class should be thread-safe.
  *
  * @author yuu_nkjm
- *
  */
 public interface SormContext {
 
@@ -23,13 +23,12 @@ public interface SormContext {
 
   LoggerContext getLoggerContext();
 
-
   /**
    * Returns new {@link Builder} which has set values from the given {@link SormContext}
    *
    * @return
    */
-  public static Builder builder(SormContext context) {
+  static Builder builder(SormContext context) {
     SormContextImpl ctx = (SormContextImpl) context;
     return ctx.builder();
   }
@@ -39,8 +38,12 @@ public interface SormContext {
    *
    * @return
    */
-  public static Builder builder() {
+  static Builder builder() {
     return new Builder();
+  }
+
+  static SormContext getDefaultContext() {
+    return SormImpl.DEFAULT_CONTEXT;
   }
 
   public static class Builder {
@@ -57,8 +60,8 @@ public interface SormContext {
     private static final ColumnValueToJavaObjectConverters DEFAULT_RESULT_SET_CONVERTERS =
         new DefaultColumnValueToJavaObjectConverters();
 
-    public static final ColumnValueToMapValueConverters DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTERS =
-        new DefaultColumnValueToMapValueConverters();
+    public static final ColumnValueToMapValueConverters
+        DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTERS = new DefaultColumnValueToMapValueConverters();
 
     private static final TableNameMapper DEFAULT_TABLE_NAME_MAPPER = new DefaultTableNameMapper();
 
@@ -84,28 +87,30 @@ public interface SormContext {
 
     private PreparedStatementSupplier statementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
-
-
     private Builder() {}
 
     public SormContext build() {
-      return new SormContextImpl(loggerContext, columnFieldMapper, tableNameMapper,
-          columnValueToJavaObjectConverters, columnValueToMapValueConverter, sqlParametersSetter,
-          statementSupplier, tableSqlFactory, multiRowProcessorFactory);
+      return new SormContextImpl(
+          loggerContext,
+          columnFieldMapper,
+          tableNameMapper,
+          columnValueToJavaObjectConverters,
+          columnValueToMapValueConverter,
+          sqlParametersSetter,
+          statementSupplier,
+          tableSqlFactory,
+          multiRowProcessorFactory);
     }
-
 
     public Builder setColumnToFieldAccessorMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
       this.columnFieldMapper = fieldNameMapper;
       return this;
     }
 
-
     public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
       this.tableNameMapper = tableNameMapper;
       return this;
     }
-
 
     public Builder setColumnValueToJavaObjectConverters(
         ColumnValueToJavaObjectConverters converters) {
@@ -129,7 +134,6 @@ public interface SormContext {
       return this;
     }
 
-
     public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
       this.tableSqlFactory = tableSqlFactory;
       return this;
@@ -140,12 +144,9 @@ public interface SormContext {
       return this;
     }
 
-
     public Builder setLoggerContext(LoggerContext loggerContext) {
       this.loggerContext = loggerContext;
       return this;
     }
-
   }
-
 }

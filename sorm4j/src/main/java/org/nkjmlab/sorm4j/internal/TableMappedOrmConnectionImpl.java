@@ -20,7 +20,6 @@ public class TableMappedOrmConnectionImpl<T> implements TableMappedOrmConnection
    *
    * @param sorm
    * @param valueType
-   *
    */
   public TableMappedOrmConnectionImpl(OrmConnection ormConn, Class<T> valueType) {
     this(ormConn, valueType, ormConn.getTableName(valueType));
@@ -40,5 +39,4 @@ public class TableMappedOrmConnectionImpl<T> implements TableMappedOrmConnection
   public Class<T> getValueType() {
     return valueType;
   }
-
 }

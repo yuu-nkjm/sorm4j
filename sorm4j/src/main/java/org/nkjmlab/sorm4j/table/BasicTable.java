@@ -20,7 +20,6 @@ public class BasicTable<T> implements Table<T>, SqlKeyword {
    *
    * @param sorm
    * @param valueType
-   *
    */
   public BasicTable(Sorm sorm, Class<T> valueType) {
     this(sorm, valueType, sorm.getTableName(valueType));

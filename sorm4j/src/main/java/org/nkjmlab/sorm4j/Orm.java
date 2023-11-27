@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
@@ -22,12 +23,10 @@ import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-
 /**
  * Main API for object relation mapping.
  *
  * @author nkjm
- *
  */
 public interface Orm {
 
@@ -47,6 +46,18 @@ public interface Orm {
   Connection getJdbcConnection();
 
   /**
+   * Create a {@link OrmConnection} wrapping a JDBC Connection.
+   *
+   * <p>You should always use try-with-resources block to ensure the database connection is
+   * released.
+   *
+   * @return
+   */
+  default OrmConnection getOrmConnection() {
+    return OrmConnection.of(getJdbcConnection(), getContext());
+  }
+
+  /**
    * Deletes objects from the table corresponding to the class of the given objects.
    *
    * @param <T> the object's element type which is mapped to the unique table.
@@ -54,7 +65,6 @@ public interface Orm {
    * @return the number of affected rows
    */
   <T> int[] delete(List<T> objects);
-
 
   /**
    * Deletes an object from the table corresponding to the class of the given objects.
@@ -65,7 +75,6 @@ public interface Orm {
    */
   <T> int delete(T object);
 
-
   /**
    * Deletes objects.
    *
@@ -74,7 +83,6 @@ public interface Orm {
    * @return
    */
   <T> int[] delete(@SuppressWarnings("unchecked") T... objects);
-
 
   /**
    * Deletes all objects in the table corresponding to the given class.
@@ -134,7 +142,6 @@ public interface Orm {
    */
   <T> int deleteIn(String tableName, T object);
 
-
   /**
    * Deletes objects in the table of the given table name.
    *
@@ -151,12 +158,11 @@ public interface Orm {
   @Experimental
   boolean execute(String sql, Object... parameters);
 
-
   /**
-   * Executes the query with the given PreparedStatement and applies the given
-   * {@link ResultSetTraverser}. If you want to set parameters to a PreparedStatement object by
-   * yourself, you can use this method. You can use your {@link ResultSetTraverser} or the object
-   * getting by {@link Orm#getResultSetTraverser(Class)};
+   * Executes the query with the given PreparedStatement and applies the given {@link
+   * ResultSetTraverser}. If you want to set parameters to a PreparedStatement object by yourself,
+   * you can use this method. You can use your {@link ResultSetTraverser} or the object getting by
+   * {@link Orm#getResultSetTraverser(Class)};
    *
    * @param <T>
    * @param statementSupplier initialize and supplies PreparedStatement
@@ -164,7 +170,8 @@ public interface Orm {
    * @return
    */
   @Experimental
-  <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+  <T> T executeQuery(
+      FunctionHandler<Connection, PreparedStatement> statementSupplier,
       ResultSetTraverser<T> traverser);
 
   /**
@@ -178,16 +185,16 @@ public interface Orm {
    * @return
    */
   @Experimental
-  <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
-      RowMapper<T> rowMapper);
+  <T> List<T> executeQuery(
+      FunctionHandler<Connection, PreparedStatement> statementSupplier, RowMapper<T> rowMapper);
 
   /**
    * Executes a query and apply the given {@link ResultSetTraverser} to the returned result set.
-   * <p>
-   * This method wraps {@link PreparedStatement#executeQuery(String)}
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
+   *
+   * <p>This method wraps {@link PreparedStatement#executeQuery(String)}
+   *
+   * <p>Parameters will be set according with the correspondence defined in {@link
+   * SqlParametersSetter#setParameters(PreparedStatement, Object...)}
    *
    * @param <T>
    * @param sql SQL code to be executed.
@@ -216,17 +223,16 @@ public interface Orm {
 
   /**
    * Executes an update and returns the number of rows modified.
-   * <p>
-   * This method wraps {@link PreparedStatement#executeUpdate(String)}
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object...)}
+   *
+   * <p>This method wraps {@link PreparedStatement#executeUpdate(String)}
+   *
+   * <p>Parameters will be set according with the correspondence defined in {@link
+   * SqlParametersSetter#setParameters(PreparedStatement, Object...)}
    *
    * @param sql SQL code to be executed.
    * @param parameters Parameters to be used in the PreparedStatement.
    */
   int executeUpdate(String sql, Object... parameters);
-
 
   /**
    * Returns the object which has same primary key exists or not.
@@ -248,7 +254,6 @@ public interface Orm {
   <T> boolean exists(T object);
 
   /**
-   *
    * @param <T>
    * @param tableName
    * @param primaryKeyValues the order should be the same as the column order.
@@ -257,7 +262,6 @@ public interface Orm {
   <T> boolean exists(String tableName, Object... primaryKeyValues);
 
   /**
-   *
    * @param <T>
    * @param type
    * @param primaryKeyValues the order should be the same as the column order.
@@ -275,7 +279,6 @@ public interface Orm {
    */
   <T> ResultSetTraverser<List<T>> getResultSetTraverser(Class<T> type);
 
-
   /**
    * Gets a function which maps one row in the resultSet to an object. The method does not call
    * {@link ResultSet#next()}.
@@ -285,8 +288,6 @@ public interface Orm {
    * @return
    */
   <T> RowMapper<T> getRowMapper(Class<T> type);
-
-
 
   /**
    * Gets table metadata corresponding to the given object class.
@@ -303,7 +304,6 @@ public interface Orm {
    * @return
    */
   JdbcTableMetaData getJdbcTableMetaData(String tableName);
-
 
   /**
    * Gets table metadata corresponding to the given object class.
@@ -363,7 +363,6 @@ public interface Orm {
    */
   <T> int[] insert(@SuppressWarnings("unchecked") T... objects);
 
-
   /**
    * Inserts objects and get the last insert result.
    *
@@ -390,7 +389,6 @@ public interface Orm {
    * @return
    */
   <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects);
-
 
   /**
    * Inserts objects and get the last insert result.
@@ -433,7 +431,6 @@ public interface Orm {
   int[] insertMapIn(String tableName, List<RowMap> result);
 
   /**
-   *
    * @param tableName
    * @param object
    * @return
@@ -485,9 +482,8 @@ public interface Orm {
   <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql,
-      Object... parameters);
-
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters);
 
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition);
@@ -496,15 +492,15 @@ public interface Orm {
   <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String t1T2OnCondition, String t2T3OnCondition);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition);
 
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String t1T2OnCondition, String t2T3OnCondition);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition);
 
   /**
    * Merges by objects in the table corresponding to the class of the given objects.
@@ -518,13 +514,12 @@ public interface Orm {
 
   /**
    * Merges by an object in the table corresponding to the class of the given object.
-   * <p>
-   * Merge methods execute a SQL sentence as MERGE INTO of the H2 grammar. This operation may be not
-   * working the other database system.
    *
-   * See, <a href="http://www.h2database.com/html/commands.html#merge_into">MERGE INTO -
+   * <p>Merge methods execute a SQL sentence as MERGE INTO of the H2 grammar. This operation may be
+   * not working the other database system.
+   *
+   * <p>See, <a href="http://www.h2database.com/html/commands.html#merge_into">MERGE INTO -
    * Commands</a>
-   * </p>
    *
    * @param <T>
    * @param object
@@ -541,8 +536,6 @@ public interface Orm {
    * @see #merge(Object)
    */
   <T> int[] merge(@SuppressWarnings("unchecked") T... objects);
-
-
 
   /**
    * Merges by objects in the table corresponding to the given table name.
@@ -584,26 +577,24 @@ public interface Orm {
    */
   <T> T readFirst(Class<T> type, ParameterizedSql sql);
 
-
   /**
    * Reads an object from the database.
    *
    * @param <T>
    * @param type
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
+   *     parameter) could not be used.
    * @param parameters are ordered parameter.
    * @return
    */
   <T> T readFirst(Class<T> type, String sql, Object... parameters);
-
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
    * into instances of the given object class. Only the columns returned from the SQL query will be
    * set into the object instance.
    *
-   * <b>Example: </b>
+   * <p><b>Example: </b>
    *
    * <pre>
    * ParameterizedSql sql = ParameterizedSql.from("select * from customer");
@@ -615,21 +606,17 @@ public interface Orm {
    * @param sql
    * @return
    */
-
   <T> List<T> readList(Class<T> type, ParameterizedSql sql);
 
   /**
    * Reads a list of objects from the database by mapping the results of the parameterized SQL query
    * into instances of the given object class. Only the columns returned from the SQL query will be
    * set into the object instance.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement, Object[])}
    *
+   * <p>Parameters will be set according with the correspondence defined in {@link
+   * SqlParametersSetter#setParameters(PreparedStatement, Object[])}
    */
   <T> List<T> readList(Class<T> type, String sql, Object... parameters);
-
-
 
   /**
    * Reads only one object from the database.
@@ -647,7 +634,7 @@ public interface Orm {
    * @param <T> the type to map the result set rows to
    * @param type the type to map the result set rows to
    * @param sql with ordered parameter. The other type parameters (e.g. named parameter, list
-   *        parameter) could not be used.
+   *     parameter) could not be used.
    * @param parameters are ordered parameter.
    * @return
    */
@@ -657,7 +644,6 @@ public interface Orm {
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param <T3>
@@ -668,14 +654,13 @@ public interface Orm {
    * @return
    */
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      ParameterizedSql sql);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, ParameterizedSql sql);
 
   /**
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param t1
@@ -684,16 +669,14 @@ public interface Orm {
    * @param parameters
    * @return
    */
-
   @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String sql, Object... parameters);
+  <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters);
 
   /**
    * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param t1
@@ -708,7 +691,6 @@ public interface Orm {
    * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param t1
@@ -718,8 +700,8 @@ public interface Orm {
    * @return
    */
   @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
-      Object... parameters);
+  <T1, T2> List<Tuple2<T1, T2>> readTupleList(
+      Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
 
   /**
    * Reads all rows from the table indicated by object class.
@@ -741,7 +723,6 @@ public interface Orm {
   <T> T selectByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
-   *
    * Updates by objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
@@ -769,7 +750,6 @@ public interface Orm {
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
 
   /**
-   *
    * @param <T>
    * @param clazz
    * @param object
@@ -780,7 +760,6 @@ public interface Orm {
   <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues);
 
   /**
-   *
    * @param tableName
    * @param object
    * @param primaryKeyValues the order should be the same as the column order.
@@ -840,9 +819,9 @@ public interface Orm {
 
   /**
    * Returns an {@link ResultSetStream}. It is able to convert to Stream, List, and so on.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement,Object[])} *
+   *
+   * <p>Parameters will be set according with the correspondence defined in {@link
+   * SqlParametersSetter#setParameters(PreparedStatement,Object[])} *
    *
    * @param <T>
    * @param type
@@ -851,6 +830,4 @@ public interface Orm {
    * @return
    */
   <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters);
-
-
 }
