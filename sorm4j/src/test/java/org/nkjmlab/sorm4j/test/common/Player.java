@@ -20,17 +20,14 @@ public class Player {
     this.address = address;
   }
 
-
   public int getId() {
     return id;
   }
-
 
   // not match address field
   public String readAddress() {
     return address;
   }
-
 
   public String getName() {
     return name;
@@ -52,14 +49,11 @@ public class Player {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof Player))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof Player)) return false;
     Player other = (Player) obj;
-    return Objects.equals(address, other.address) && id == other.id
+    return Objects.equals(address, other.address)
+        && id == other.id
         && Objects.equals(name, other.name);
   }
-
-
 }

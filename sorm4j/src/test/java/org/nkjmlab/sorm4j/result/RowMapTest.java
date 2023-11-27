@@ -13,8 +13,6 @@ class RowMapTest {
   @Test
   void testOf() {
 
-
-
     RowMap rm = RowMap.create();
     rm.put("key1", "value");
     RowMap rm1 = RowMap.create();
@@ -24,14 +22,12 @@ class RowMapTest {
 
     assertThat(rm.equals(rm1)).isTrue();
 
-
     assertThat(rm.containsKey("key1")).isTrue();
     assertThat(rm.containsValue("value")).isTrue();
     assertThat(rm.get("key1")).isEqualTo("value");
     assertThat(rm.keySet()).containsExactlyInAnyOrder("KEY1");
     assertThat(rm.values()).containsExactlyInAnyOrder("value");
     assertThat(rm.entrySet().toString()).isEqualTo("[KEY1=value]");
-
 
     assertThat(rm.size()).isEqualTo(1);
     assertThat(rm.isEmpty()).isFalse();
@@ -58,7 +54,6 @@ class RowMapTest {
     rm.put("arr", arr);
     assertThat(rm.get("arr").equals(arr)).isTrue();
 
-
     LocalDate ld = LocalDate.parse("2022-11-16");
     LocalTime lt = LocalTime.parse("12:01:02");
     LocalDateTime ldt = LocalDateTime.parse("2022-11-16T12:01:02");
@@ -70,10 +65,8 @@ class RowMapTest {
     assertThat(rm.getLocalTime("local_time")).isEqualTo(lt);
     assertThat(rm.getLocalDate("local_date")).isEqualTo(ld);
 
-
     byte[] by = "aaa".getBytes();
     rm.put("by", by);
     assertThat(rm.getString("by").equals("aaa")).isTrue();
   }
-
 }

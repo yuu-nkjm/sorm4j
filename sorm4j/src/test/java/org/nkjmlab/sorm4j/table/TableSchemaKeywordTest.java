@@ -20,5 +20,4 @@ class TableSchemaKeywordTest {
   void testDecimalIntInt() {
     assertThat(decimal(1, 2)).isEqualTo(" decimal(1,2) ");
   }
-
 }

@@ -5,16 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Defines indexes.
- */
+/** Defines indexes. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface CheckConstraint {
 
-  /**
-   * Name of the index
-   */
+  /** Name of the index */
   String value();
-
 }

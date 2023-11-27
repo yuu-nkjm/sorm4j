@@ -1,4 +1,3 @@
-
 // $Id: Simple.java 7 2007-08-17 19:32:18Z jcamaia $
 
 package repackage.net.sf.persist.tests.common;
@@ -35,14 +34,8 @@ public class SimpleNoTable {
     this.longCol = intCol;
   }
 
-
-
   @Override
   public String toString() {
     return "id=" + id + " longCol=" + longCol + " stringCol=" + stringCol;
   }
-
-
-
 }
-

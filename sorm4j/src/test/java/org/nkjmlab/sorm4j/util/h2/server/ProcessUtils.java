@@ -22,7 +22,6 @@ public class ProcessUtils {
     return Locale.getDefault() == Locale.JAPANESE || Locale.getDefault() == Locale.JAPAN;
   }
 
-
   /**
    * Reads read standard output after process finish.
    *
@@ -32,8 +31,8 @@ public class ProcessUtils {
   private static String readStandardOutputAfterProcessFinish(Process process) {
     try {
       byte[] b = process.getInputStream().readAllBytes();
-      return new String(b,
-          isWindowsOs() && isJapaneseOs() ? "MS932" : StandardCharsets.UTF_8.toString());
+      return new String(
+          b, isWindowsOs() && isJapaneseOs() ? "MS932" : StandardCharsets.UTF_8.toString());
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
@@ -41,8 +40,10 @@ public class ProcessUtils {
 
   public static Optional<String> getProcessIdBidingPort(int port) {
     try {
-      List<String> command = isWindowsOs() ? List.of("cmd", "/c", "netstat", "-ano")
-          : List.of("lsof", "-nPi", ":" + port);
+      List<String> command =
+          isWindowsOs()
+              ? List.of("cmd", "/c", "netstat", "-ano")
+              : List.of("lsof", "-nPi", ":" + port);
 
       ProcessBuilder pb = new ProcessBuilder(command);
       pb.redirectErrorStream(true);
@@ -50,18 +51,24 @@ public class ProcessUtils {
       String lines = readStandardOutputAfterProcessFinish(proc);
       if (isWindowsOs()) {
         return Arrays.stream(lines.split(System.lineSeparator()))
-            .filter(l -> l.contains(":" + port + " ")).findAny().map(l -> {
-              String[] t = l.split("\\s+");
-              return t[t.length - 1];
-            });
+            .filter(l -> l.contains(":" + port + " "))
+            .findAny()
+            .map(
+                l -> {
+                  String[] t = l.split("\\s+");
+                  return t[t.length - 1];
+                });
       } else {
         log.debug("comannd {} result ={}", command, lines);
         return Arrays.stream(lines.split(System.lineSeparator()))
-            .filter(l -> l.contains(String.valueOf(port))).findAny().map(l -> {
-              String[] t = l.split("\\s+");
-              log.debug("{}", Arrays.toString(t));
-              return t[1];
-            });
+            .filter(l -> l.contains(String.valueOf(port)))
+            .findAny()
+            .map(
+                l -> {
+                  String[] t = l.split("\\s+");
+                  log.debug("{}", Arrays.toString(t));
+                  return t[1];
+                });
       }
     } catch (Exception e) {
       throw Try.rethrow(e);
@@ -79,44 +86,53 @@ public class ProcessUtils {
   }
 
   public static boolean stopProcessBindingPortIfExists(int port, long timeout, TimeUnit unit) {
-    return getProcessIdBidingPort(port).map(pid -> {
-      try {
-        log.info("process [{}] is binding port [{}]. try killing by ProcessHandle.destory()", pid,
-            port);
-        ProcessHandle proc = ProcessHandle.of(Long.valueOf(pid)).orElseThrow();
-        proc.destroy();
+    return getProcessIdBidingPort(port)
+        .map(
+            pid -> {
+              try {
+                log.info(
+                    "process [{}] is binding port [{}]. try killing by ProcessHandle.destory()",
+                    pid,
+                    port);
+                ProcessHandle proc = ProcessHandle.of(Long.valueOf(pid)).orElseThrow();
+                proc.destroy();
 
-        long start = System.currentTimeMillis();
+                long start = System.currentTimeMillis();
 
-        while (proc.isAlive()) {
-          long durationInMillis = System.currentTimeMillis() - start;
-          if (durationInMillis > TimeUnit.MICROSECONDS.convert(timeout, unit)) {
-            log.error("Process [{}] is active yet.");
-            return false;
-          }
-          TimeUnit.SECONDS.sleep(1);
-        }
-        return true;
-      } catch (InterruptedException e) {
-        throw Try.rethrow(e);
-      }
-    }).orElse(false);
+                while (proc.isAlive()) {
+                  long durationInMillis = System.currentTimeMillis() - start;
+                  if (durationInMillis > TimeUnit.MICROSECONDS.convert(timeout, unit)) {
+                    log.error("Process [{}] is active yet.");
+                    return false;
+                  }
+                  TimeUnit.SECONDS.sleep(1);
+                }
+                return true;
+              } catch (InterruptedException e) {
+                throw Try.rethrow(e);
+              }
+            })
+        .orElse(false);
   }
 
   public static boolean killForceProcessBindingPortIfExists(int port) {
-    return getProcessIdBidingPort(port).map(pid -> {
-      try {
-        List<String> command = isWindowsOs() ? List.of("taskkill", "/F", "/T", "/PID", pid)
-            : List.of("kill", "-9", pid);
-        log.info("process [{}] is binding port [{}]. try killing {}", pid, port, command);
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.start().waitFor();
-      } catch (InterruptedException | IOException e) {
-        throw Try.rethrow(e);
-      }
-      // log.info("Success to stop the process [{}] biding port :[{}].", pid, port);
-      return true;
-    }).orElse(false);
+    return getProcessIdBidingPort(port)
+        .map(
+            pid -> {
+              try {
+                List<String> command =
+                    isWindowsOs()
+                        ? List.of("taskkill", "/F", "/T", "/PID", pid)
+                        : List.of("kill", "-9", pid);
+                log.info("process [{}] is binding port [{}]. try killing {}", pid, port, command);
+                ProcessBuilder pb = new ProcessBuilder(command);
+                pb.start().waitFor();
+              } catch (InterruptedException | IOException e) {
+                throw Try.rethrow(e);
+              }
+              // log.info("Success to stop the process [{}] biding port :[{}].", pid, port);
+              return true;
+            })
+        .orElse(false);
   }
-
 }

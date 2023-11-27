@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
  *
  * @author nkjm
  * @see <a href="https://en.wikipedia.org/wiki/SQL_reserved_words">SQL reserved words -
- *      Wikipedia</a>
+ *     Wikipedia</a>
  */
 @Experimental
 public interface SqlKeyword {
@@ -87,8 +87,9 @@ public interface SqlKeyword {
   public static final String IS_NULL = wrapSpace("is null");
   public static final String IS_NOT_NULL = wrapSpace("is not null");
 
-  /** Data type **/
+  /** Data type * */
   public static final String ARRAY = wrapSpace("array");
+
   public static final String BIGINT = wrapSpace("bigint");
   public static final String BOOLEAN = wrapSpace("boolean");
   public static final String CHAR = wrapSpace("char");
@@ -108,10 +109,10 @@ public interface SqlKeyword {
   public static final String NOT_NULL = wrapSpace("not null");
   public static final String PRIMARY_KEY = wrapSpace("primary key");
 
-  /** util **/
+  /** util * */
   public static final String STAR = wrapSpace("*");
-  public static final String SELECT_STAR = wrapSpace("select *");
 
+  public static final String SELECT_STAR = wrapSpace("select *");
 
   public static String chars(int num) {
     return wrapSpace("char(" + num + ")");
@@ -125,10 +126,7 @@ public interface SqlKeyword {
     return wrapSpace("decimal(" + precision + "," + scale + ")");
   }
 
-
   private static String wrapSpace(String str) {
     return " " + (str == null ? "null" : str.toString()) + " ";
   }
-
-
 }

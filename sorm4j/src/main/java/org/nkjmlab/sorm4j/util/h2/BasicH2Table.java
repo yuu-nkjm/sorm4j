@@ -8,7 +8,6 @@ import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 @Experimental
 public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Table<T> {
 
-
   /**
    * This table instance is bind to the table name defined in the given {@link TableDefinition}.
    *
@@ -57,5 +56,4 @@ public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Ta
     H2Table.super.dropTableIfExistsCascade();
     return this;
   }
-
 }

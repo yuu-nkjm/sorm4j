@@ -2,14 +2,11 @@ package org.nkjmlab.sorm4j.sql;
 
 import org.nkjmlab.sorm4j.internal.sql.ParameterizedSqlImpl;
 
-
 /**
  * This class represents a SQL statement with ordered parameters.
  *
  * @author nkjm
- *
  */
-
 public interface ParameterizedSql {
 
   /**
@@ -49,12 +46,10 @@ public interface ParameterizedSql {
    *
    * @param sql
    * @param parameters ordered parameters without special parameters (e.g. named parameter, list
-   *        parameter and embedded parameter)
+   *     parameter and embedded parameter)
    * @return
    */
   static ParameterizedSql of(String sql, Object... parameters) {
     return ParameterizedSqlImpl.of(sql, parameters);
   }
-
-
 }

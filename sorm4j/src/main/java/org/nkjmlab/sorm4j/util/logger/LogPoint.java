@@ -16,7 +16,6 @@ public final class LogPoint {
     this.logger = logger;
   }
 
-
   private long getElapsedTime() {
     return System.nanoTime() - startTime;
   }
@@ -29,38 +28,31 @@ public final class LogPoint {
     logger.logAfterMultiRow(name, getElapsedTime(), result);
   }
 
-
   public void logAfterQuery(Object ret) {
     logger.logAfterQuery(getTag(), getElapsedTime(), ret);
   }
-
 
   public void logAfterUpdate(int ret) {
     logger.logAfterUpdate(name, getElapsedTime(), ret);
   }
 
-  public void logBeforeMultiRow(Connection con, Class<?> objectClass, int length,
-      String tableName) {
+  public void logBeforeMultiRow(
+      Connection con, Class<?> objectClass, int length, String tableName) {
     logger.logBeforeMultiRow(getTag(), con, objectClass, length, tableName);
     this.startTime = System.nanoTime();
   }
-
 
   public void logBeforeSql(Connection connection, ParameterizedSql sql) {
     logger.logBeforeSql(getTag(), connection, sql);
     this.startTime = System.nanoTime();
   }
 
-
   public void logBeforeSql(Connection connection, String sql, Object... parameters) {
     logger.logBeforeSql(getTag(), connection, sql, parameters);
     this.startTime = System.nanoTime();
   }
 
-
   public void logMapping(String mappingInfo) {
     logger.logMapping(getTag(), mappingInfo);
   }
-
-
 }

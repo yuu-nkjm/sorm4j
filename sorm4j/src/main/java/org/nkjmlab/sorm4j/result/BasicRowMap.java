@@ -27,8 +27,12 @@ public class BasicRowMap implements RowMap {
   }
 
   public BasicRowMap(Map<String, Object> map) {
-    this.map = List.copyOf(map.entrySet()).stream().collect(LinkedHashMap::new,
-        (m, v) -> m.put(toKey(v.getKey()), v.getValue()), LinkedHashMap::putAll);
+    this.map =
+        List.copyOf(map.entrySet()).stream()
+            .collect(
+                LinkedHashMap::new,
+                (m, v) -> m.put(toKey(v.getKey()), v.getValue()),
+                LinkedHashMap::putAll);
   }
 
   private static String toKey(String key) {
@@ -102,10 +106,8 @@ public class BasicRowMap implements RowMap {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof Map))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof Map)) return false;
     Map<?, ?> other = (Map<?, ?>) obj;
     return Objects.equals(map, other);
   }
@@ -114,7 +116,6 @@ public class BasicRowMap implements RowMap {
   public String toString() {
     return map.toString();
   }
-
 
   @Override
   public String getString(String key) {
@@ -130,34 +131,50 @@ public class BasicRowMap implements RowMap {
 
   @Override
   public Integer getInteger(String key) {
-    return getNumberHelper(key, Integer.class,
-        (clazz, val) -> Number.class.isAssignableFrom(clazz) ? ((Number) val).intValue()
-            : Integer.valueOf(val.toString()));
+    return getNumberHelper(
+        key,
+        Integer.class,
+        (clazz, val) ->
+            Number.class.isAssignableFrom(clazz)
+                ? ((Number) val).intValue()
+                : Integer.valueOf(val.toString()));
   }
 
   @Override
   public Long getLong(String key) {
-    return getNumberHelper(key, Long.class,
-        (clazz, val) -> Number.class.isAssignableFrom(clazz) ? ((Number) val).longValue()
-            : Long.valueOf(val.toString()));
+    return getNumberHelper(
+        key,
+        Long.class,
+        (clazz, val) ->
+            Number.class.isAssignableFrom(clazz)
+                ? ((Number) val).longValue()
+                : Long.valueOf(val.toString()));
   }
 
   @Override
   public Float getFloat(String key) {
-    return getNumberHelper(key, Float.class,
-        (clazz, val) -> Number.class.isAssignableFrom(clazz) ? ((Number) val).floatValue()
-            : Float.valueOf(val.toString()));
+    return getNumberHelper(
+        key,
+        Float.class,
+        (clazz, val) ->
+            Number.class.isAssignableFrom(clazz)
+                ? ((Number) val).floatValue()
+                : Float.valueOf(val.toString()));
   }
 
   @Override
   public Double getDouble(String key) {
-    return getNumberHelper(key, Double.class,
-        (clazz, val) -> Number.class.isAssignableFrom(clazz) ? ((Number) val).doubleValue()
-            : Double.valueOf(val.toString()));
+    return getNumberHelper(
+        key,
+        Double.class,
+        (clazz, val) ->
+            Number.class.isAssignableFrom(clazz)
+                ? ((Number) val).doubleValue()
+                : Double.valueOf(val.toString()));
   }
 
-  private <T> T getNumberHelper(String key, Class<T> toType,
-      BiFunction<Class<?>, Object, T> function) {
+  private <T> T getNumberHelper(
+      String key, Class<T> toType, BiFunction<Class<?>, Object, T> function) {
     Object val = get(key);
     if (val == null) {
       return null;
@@ -178,7 +195,6 @@ public class BasicRowMap implements RowMap {
     return LocalDate.parse(val.toString());
   }
 
-
   @Override
   public LocalTime getLocalTime(String key) {
     Object val = get(key);
@@ -190,7 +206,6 @@ public class BasicRowMap implements RowMap {
     }
     return LocalTime.parse(val.toString());
   }
-
 
   @Override
   public LocalDateTime getLocalDateTime(String key) {
@@ -223,12 +238,8 @@ public class BasicRowMap implements RowMap {
     return Arrays.stream(keys).map(key -> getObject(key)).collect(Collectors.toList());
   }
 
-
   @Override
   public List<String> getStringList(String... keys) {
     return Arrays.stream(keys).map(key -> getString(key)).collect(Collectors.toList());
   }
-
-
-
 }

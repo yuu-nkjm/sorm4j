@@ -3,9 +3,7 @@ package repackage.net.sf.persist.tests.engine.framework;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Holds all data necessary to build a bean during runtime and metadata to test it
- */
+/** Holds all data necessary to build a bean during runtime and metadata to test it */
 public class BeanMap {
 
   private final String className;
@@ -31,11 +29,8 @@ public class BeanMap {
 
   public FieldMap getField(String fieldName) {
     for (FieldMap fieldMap : fields) {
-      if (fieldMap.getFieldName().equals(fieldName))
-        return fieldMap;
+      if (fieldMap.getFieldName().equals(fieldName)) return fieldMap;
     }
     return null;
   }
-
-
 }

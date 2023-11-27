@@ -39,5 +39,4 @@ public class BasicTable<T> implements Table<T>, SqlKeyword {
   public String getTableName() {
     return tableName;
   }
-
 }

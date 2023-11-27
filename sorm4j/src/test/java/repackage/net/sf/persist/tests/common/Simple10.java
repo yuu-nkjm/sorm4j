@@ -31,6 +31,4 @@ public class Simple10 {
   public void setLongCol(long longCol) {
     this.longCol = longCol;
   }
-
 }
-

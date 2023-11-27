@@ -21,18 +21,21 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
 
   private final Map<Class<?>, Boolean> ormJsonContainer = new ConcurrentHashMap<>();
 
-  public JacksonColumnValueToJavaObjectConverter(ObjectMapper objectMapper,
-      Class<?>... ormJsonColumnContainerClasses) {
+  public JacksonColumnValueToJavaObjectConverter(
+      ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
     this.objectMapper = objectMapper;
     Arrays.stream(ormJsonColumnContainerClasses).forEach(c -> ormJsonContainer.put(c, true));
   }
 
   private boolean isOrmJsonContainer(Class<?> type) {
-    return ormJsonContainer.computeIfAbsent(type,
-        key -> ArrayUtils.getInternalComponentType(type)
-            .getAnnotation(OrmJsonColumnContainer.class) != null
-            || List.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
-            || ormJsonContainer.getOrDefault(ArrayUtils.getInternalComponentType(type), false));
+    return ormJsonContainer.computeIfAbsent(
+        type,
+        key ->
+            ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonColumnContainer.class)
+                    != null
+                || List.class.isAssignableFrom(type)
+                || Map.class.isAssignableFrom(type)
+                || ormJsonContainer.getOrDefault(ArrayUtils.getInternalComponentType(type), false));
   }
 
   @Override

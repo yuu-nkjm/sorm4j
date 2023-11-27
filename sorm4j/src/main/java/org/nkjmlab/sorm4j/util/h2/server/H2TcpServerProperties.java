@@ -5,11 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
-/**
- *
- * @author nkjm
- *
- */
+/** @author nkjm */
 @Experimental
 public class H2TcpServerProperties extends H2ServerProperties {
 
@@ -29,10 +25,7 @@ public class H2TcpServerProperties extends H2ServerProperties {
   public static class Builder extends H2ServerPropertiesBuilder<Builder> {
     private static final int DEFAULT_TCP_PORT = 9092;
 
-
-    /**
-     * This constructor is for external libraries.
-     */
+    /** This constructor is for external libraries. */
     public Builder() {
       super("TCP", DEFAULT_TCP_PORT, "");
     }
@@ -53,6 +46,4 @@ public class H2TcpServerProperties extends H2ServerProperties {
       return this;
     }
   }
-
-
 }

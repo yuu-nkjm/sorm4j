@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  * An transaction with object relation mapping.
  *
  * @author nkjm
- *
  */
 public final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTransaction {
 
@@ -18,9 +17,8 @@ public final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTr
    *
    * @param connection
    * @param context
-   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED},
-   *        {@link Connection#TRANSACTION_READ_UNCOMMITTED} and so on.
-   *
+   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED}, {@link
+   *     Connection#TRANSACTION_READ_UNCOMMITTED} and so on.
    */
   public OrmTransactionImpl(Connection connection, SormContextImpl context, int isolationLevel) {
     super(connection, context);
@@ -43,7 +41,4 @@ public final class OrmTransactionImpl extends OrmConnectionImpl implements OrmTr
       super.close();
     }
   }
-
-
-
 }

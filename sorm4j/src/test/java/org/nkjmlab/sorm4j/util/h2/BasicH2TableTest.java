@@ -85,10 +85,10 @@ class BasicH2TableTest {
   public static class Item {
     @CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
     public LocalDate deliveryDate;
+
     @CsvColumn("`price/prices`")
     public int price;
   }
-
 
   @OrmRecord
   public static class OrmRecordExample {
@@ -118,12 +118,9 @@ class BasicH2TableTest {
     public String toString() {
       return "OrmRecordExample [id=" + id + ", name=" + name + ", jsonCol=" + jsonCol + "]";
     }
-
-
   }
 
   public static File getTempDirectory() {
     return new File(System.getProperty("java.io.tmpdir"));
   }
-
 }

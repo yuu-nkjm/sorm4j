@@ -53,7 +53,6 @@ public abstract class H2ServerProcess {
     }
   }
 
-
   /**
    * Starts H2 server process and wait for start server.
    *
@@ -65,17 +64,27 @@ public abstract class H2ServerProcess {
   static boolean awaitStartServer(H2ServerProperties props, long timeout, TimeUnit unit) {
 
     if (isActive(props.port)) {
-      log.info("H2 {} server has been already active at http://localhost:{}", props.serverType,
+      log.info(
+          "H2 {} server has been already active at http://localhost:{}",
+          props.serverType,
           props.port);
       return true;
     }
     try {
-      log.info("H2 {} Server will be start => {}", props.serverType, Stream.of(props.args)
-          .filter(arg -> !arg.equals(props.password)).collect(Collectors.toList()));
+      log.info(
+          "H2 {} Server will be start => {}",
+          props.serverType,
+          Stream.of(props.args)
+              .filter(arg -> !arg.equals(props.password))
+              .collect(Collectors.toList()));
       ProcessBuilder pb = new ProcessBuilder(props.args);
       pb.redirectErrorStream(true);
-      log.info("Wait up [{} {}] for H2 {} server starts at port {}.", timeout, unit,
-          props.serverType, props.port);
+      log.info(
+          "Wait up [{} {}] for H2 {} server starts at port {}.",
+          timeout,
+          unit,
+          props.serverType,
+          props.port);
       pb.start();
     } catch (IOException e) {
       throw Try.rethrow(e);
@@ -92,15 +101,14 @@ public abstract class H2ServerProcess {
         }
         TimeUnit.SECONDS.sleep(1);
       }
-      log.info("[{} msec] H2 {} server is active at http://localhost:{}",
-          System.currentTimeMillis() - start, props.serverType, props.port);
+      log.info(
+          "[{} msec] H2 {} server is active at http://localhost:{}",
+          System.currentTimeMillis() - start,
+          props.serverType,
+          props.port);
       return true;
     } catch (InterruptedException e) {
       throw Try.rethrow(e);
     }
-
   }
-
-
-
 }

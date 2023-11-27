@@ -12,12 +12,11 @@ class StringUtilsTest {
     assertThat(containsAsCanonical(List.of("a", "b"), null));
   }
 
-
   @Test
   void testFormat() {
     Object[] params = {};
     assertThat(ParameterizedStringFormatter.LENGTH_256.format("{}", params)).isEqualTo("{}");
-    assertThat(ParameterizedStringFormatter.LENGTH_256.format("{}", (Object[]) null)).isEqualTo("{}");
+    assertThat(ParameterizedStringFormatter.LENGTH_256.format("{}", (Object[]) null))
+        .isEqualTo("{}");
   }
-
 }

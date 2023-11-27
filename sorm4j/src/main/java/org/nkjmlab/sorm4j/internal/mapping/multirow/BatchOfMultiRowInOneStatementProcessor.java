@@ -19,7 +19,6 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  * {@link SormContext}
  *
  * @author nkjm
- *
  * @param <T>
  */
 public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
@@ -27,9 +26,13 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   private final int multiRowSize;
   private final int batchSizeWithMultiRow;
 
-  public BatchOfMultiRowInOneStatementProcessor(LoggerContext loggerContext,
-      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping, int batchSize, int multiRowSize,
+  public BatchOfMultiRowInOneStatementProcessor(
+      LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<T> tableMapping,
+      int batchSize,
+      int multiRowSize,
       int batchSizeWithMultiRow) {
     super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
@@ -38,18 +41,28 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
 
   @Override
   public final int[] multiRowInsert(Connection con, T[] objects) {
-    return execMultiRowProcIfValidObjects(con, objects,
-        nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
-            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+    return execMultiRowProcIfValidObjects(
+        con,
+        objects,
+        nonNullObjects ->
+            procMultiRowOneStatementAndBatch(
+                con,
+                num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
+                (stmt, objs) -> setPrametersOfMultiRow(stmt, objs),
+                nonNullObjects));
   }
 
   @Override
   public final int[] multiRowMerge(Connection con, T[] objects) {
-    return execMultiRowProcIfValidObjects(con, objects,
-        nonNullObjects -> procMultiRowOneStatementAndBatch(con,
-            num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
-            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+    return execMultiRowProcIfValidObjects(
+        con,
+        objects,
+        nonNullObjects ->
+            procMultiRowOneStatementAndBatch(
+                con,
+                num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
+                (stmt, objs) -> setPrametersOfMultiRow(stmt, objs),
+                nonNullObjects));
   }
 
   /**
@@ -60,9 +73,11 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
    * @param objects
    * @return
    */
-  private final int[] procMultiRowOneStatementAndBatch(Connection con,
+  private final int[] procMultiRowOneStatementAndBatch(
+      Connection con,
       ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
-      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter, T[] objects) {
+      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter,
+      T[] objects) {
 
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);
     final int[] result = new int[objsPartitions.size()];
@@ -95,9 +110,5 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
       OrmConnectionImpl.commitOrRollback(con, origAutoCommit);
       OrmConnectionImpl.setAutoCommit(con, origAutoCommit);
     }
-
   }
-
-
-
 }

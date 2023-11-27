@@ -1,4 +1,3 @@
-
 package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.stream.Stream;
@@ -16,8 +15,8 @@ public final class ResultSetStreamSorm<T> extends AbstractResultSetStream<T> {
 
   private final SormImpl sorm;
 
-  public ResultSetStreamSorm(SormImpl sorm, Class<T> objectClass, String sql,
-      Object... parameters) {
+  public ResultSetStreamSorm(
+      SormImpl sorm, Class<T> objectClass, String sql, Object... parameters) {
     super(objectClass, sql, parameters);
     this.sorm = sorm;
   }
@@ -30,5 +29,4 @@ public final class ResultSetStreamSorm<T> extends AbstractResultSetStream<T> {
       throw Try.rethrow(e);
     }
   }
-
 }

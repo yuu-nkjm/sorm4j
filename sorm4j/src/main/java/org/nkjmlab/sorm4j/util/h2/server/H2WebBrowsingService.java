@@ -16,7 +16,6 @@ public class H2WebBrowsingService {
   private final WebServer webServer;
 
   /**
-   *
    * @param dataSource
    * @param keepAlive is false, the Web console server shutdown after the main thread finishes.
    */
@@ -28,11 +27,13 @@ public class H2WebBrowsingService {
     return webServer;
   }
 
-
   private static WebServer startTemporalWebConsoleServer(boolean keepAlive) {
     try {
-      Server server = Server.createWebServer(keepAlive ? new String[] {"-webPort", "0"}
-          : new String[] {"-webPort", "0", "-webDaemon"});
+      Server server =
+          Server.createWebServer(
+              keepAlive
+                  ? new String[] {"-webPort", "0"}
+                  : new String[] {"-webPort", "0", "-webDaemon"});
       server.start();
       log.info("H2 temporal Web console server started at {}", server.getURL());
       WebServer webServer = (WebServer) server.getService();
@@ -46,12 +47,9 @@ public class H2WebBrowsingService {
    * Open a new browser tab or window.
    *
    * @param conn
-   *
    * @see #startTemporalWebConsoleServer(boolean)
-   *
    * @return
    */
-
   public void open(Connection conn) {
     try {
       webServer.addSession(conn);
@@ -68,12 +66,9 @@ public class H2WebBrowsingService {
    *
    * @param dataSource
    * @return
-   *
    * @see #startTemporalWebConsoleServer(boolean)
    */
   public void open(DataSource dataSource) {
     Try.runOrElseThrow(() -> open(dataSource.getConnection()), Try::rethrow);
   }
-
-
 }

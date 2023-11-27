@@ -8,5 +8,4 @@ class StringCacheTest {
   void testClearAll() {
     StringCache.toCanonicalCase("hoge");
   }
-
 }

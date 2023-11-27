@@ -25,12 +25,16 @@ final class SormConfig {
   private final TableSqlFactory tableSqlFactory;
   private final TableMetaDataParser tableMetaDataReader = new DefaultTableMetaDataParser();
 
-  SormConfig(LoggerContext loggerContext, ColumnToFieldAccessorMapper columnFieldMapper,
+  SormConfig(
+      LoggerContext loggerContext,
+      ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
       ColumnValueToMapValueConverters columnValueToMapValueConverter,
-      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier preparedStatementSupplier,
-      TableSqlFactory tableSqlFactory, MultiRowProcessorFactory multiRowProcessorFactory) {
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier preparedStatementSupplier,
+      TableSqlFactory tableSqlFactory,
+      MultiRowProcessorFactory multiRowProcessorFactory) {
     this.loggerContext = loggerContext;
     this.tableNameMapper = tableNameMapper;
     this.columnFieldMapper = columnFieldMapper;
@@ -41,7 +45,6 @@ final class SormConfig {
     this.preparedStatementSupplier = preparedStatementSupplier;
     this.tableSqlFactory = tableSqlFactory;
   }
-
 
   TableMetaDataParser getTableMetaDataReader() {
     return this.tableMetaDataReader;
@@ -54,7 +57,6 @@ final class SormConfig {
   ColumnValueToMapValueConverters getColumnValueToMapValueConverter() {
     return columnValueToMapValueConverter;
   }
-
 
   SqlParametersSetter getSqlParametersSetter() {
     return sqlParametersSetter;
@@ -72,7 +74,6 @@ final class SormConfig {
     return columnFieldMapper;
   }
 
-
   TableNameMapper getTableNameMapper() {
     return tableNameMapper;
   }
@@ -81,22 +82,28 @@ final class SormConfig {
     return tableSqlFactory;
   }
 
-
   MultiRowProcessorFactory getMultiRowProcessorFactory() {
     return multiRowProcessorFactory;
   }
 
-
   @Override
   public String toString() {
-    return "SormConfig [tableNameMapper=" + tableNameMapper + ", columnFieldMapper="
-        + columnFieldMapper + ", multiRowProcessorFactory=" + multiRowProcessorFactory
-        + ", columnValueToJavaObjectConverter=" + columnValueToJavaObjectConverter
-        + ", columnValueToMapValueConverter=" + columnValueToMapValueConverter
-        + ", sqlParametersSetter=" + sqlParametersSetter + ", loggerContext=" + loggerContext
-        + ", tableSqlFactory=" + tableSqlFactory + "]";
+    return "SormConfig [tableNameMapper="
+        + tableNameMapper
+        + ", columnFieldMapper="
+        + columnFieldMapper
+        + ", multiRowProcessorFactory="
+        + multiRowProcessorFactory
+        + ", columnValueToJavaObjectConverter="
+        + columnValueToJavaObjectConverter
+        + ", columnValueToMapValueConverter="
+        + columnValueToMapValueConverter
+        + ", sqlParametersSetter="
+        + sqlParametersSetter
+        + ", loggerContext="
+        + loggerContext
+        + ", tableSqlFactory="
+        + tableSqlFactory
+        + "]";
   }
-
-
-
 }

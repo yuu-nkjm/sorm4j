@@ -29,11 +29,10 @@ public final class StringCache {
     return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1").replace("__", "_"));
   }
 
-
   /**
    * Converts the given string to string in canonical case.
    *
-   * <b>Example</b>
+   * <p><b>Example</b>
    *
    * <pre>
    * STUDENT_ID = &gt; STUDENTID
@@ -44,8 +43,8 @@ public final class StringCache {
    * @return
    */
   public static String toCanonicalCase(String str) {
-    return canonicalCaseCaches.computeIfAbsent(str,
-        key -> str.replaceAll("[_/\\s]", "").toUpperCase(Locale.ENGLISH));
+    return canonicalCaseCaches.computeIfAbsent(
+        str, key -> str.replaceAll("[_/\\s]", "").toUpperCase(Locale.ENGLISH));
   }
 
   /**
@@ -69,5 +68,4 @@ public final class StringCache {
   }
 
   private StringCache() {}
-
 }

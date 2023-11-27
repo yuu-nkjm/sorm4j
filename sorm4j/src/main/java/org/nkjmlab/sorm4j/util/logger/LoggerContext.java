@@ -17,16 +17,15 @@ import org.nkjmlab.sorm4j.internal.util.logger.Slf4jSormLogger;
  * Logger for Sorm4j.
  *
  * @author nkjm
- *
  */
 public final class LoggerContext {
 
-  /**
-   * Logging Categories
-   *
-   */
+  /** Logging Categories */
   public enum Category {
-    MAPPING, EXECUTE_QUERY, MULTI_ROW, EXECUTE_UPDATE;
+    MAPPING,
+    EXECUTE_QUERY,
+    MULTI_ROW,
+    EXECUTE_UPDATE;
   }
 
   public static Builder builder() {
@@ -39,15 +38,16 @@ public final class LoggerContext {
 
   private final Map<Class<?>, SormLogger> loggers = new ConcurrentHashMap<>();
 
-  private LoggerContext(Supplier<SormLogger> loggerSupplier,
-      Set<LoggerContext.Category> enabledCategories) {
+  private LoggerContext(
+      Supplier<SormLogger> loggerSupplier, Set<LoggerContext.Category> enabledCategories) {
     this.loggerSupplier = loggerSupplier;
     this.enabledCategories =
         enabledCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(enabledCategories);
   }
 
   public Optional<LogPoint> createLogPoint(LoggerContext.Category category, Class<?> callerClass) {
-    return isEnable(category) ? Optional.of(new LogPoint(category.name(), getLogger(callerClass)))
+    return isEnable(category)
+        ? Optional.of(new LogPoint(category.name(), getLogger(callerClass)))
         : Optional.empty();
   }
 
@@ -61,17 +61,20 @@ public final class LoggerContext {
 
   @Override
   public String toString() {
-    return "LoggerContext [enabledCategories=" + enabledCategories + ", logger="
-        + getLogger(LoggerContext.class) + "]";
+    return "LoggerContext [enabledCategories="
+        + enabledCategories
+        + ", logger="
+        + getLogger(LoggerContext.class)
+        + "]";
   }
 
   public static Supplier<SormLogger> getDefaultLoggerSupplier() {
-    return Log4jSormLogger.enableLogger ? Log4jSormLogger::getLogger
+    return Log4jSormLogger.enableLogger
+        ? Log4jSormLogger::getLogger
         : (Slf4jSormLogger.enableLogger ? Slf4jSormLogger::getLogger : JulSormLogger::getLogger);
   }
 
   public static class Builder {
-
 
     private Supplier<SormLogger> loggerSupplier;
 
@@ -94,9 +97,7 @@ public final class LoggerContext {
       return this;
     }
 
-    /**
-     * Disables logging all categories. See {@link LoggerContext.Category}.
-     */
+    /** Disables logging all categories. See {@link LoggerContext.Category}. */
     public Builder disableAll() {
       disable(LoggerContext.Category.values());
       return this;
@@ -112,9 +113,7 @@ public final class LoggerContext {
       return this;
     }
 
-    /**
-     * Enables logging all categories. See {@link LoggerContext.Category}.
-     */
+    /** Enables logging all categories. See {@link LoggerContext.Category}. */
     public Builder enableAll() {
       enable(LoggerContext.Category.values());
       return this;
@@ -125,6 +124,4 @@ public final class LoggerContext {
       return this;
     }
   }
-
-
 }

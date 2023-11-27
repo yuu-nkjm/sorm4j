@@ -28,12 +28,16 @@ class OrmConfigStoreTest {
   void testOrmConfigFail() {
 
     try {
-      SormContext.builder().setMultiRowProcessorFactory(MultiRowProcessorFactory.builder()
-          .setBatchSize(10).setMultiRowSize(20).setBatchSizeWithMultiRow(30).build());
+      SormContext.builder()
+          .setMultiRowProcessorFactory(
+              MultiRowProcessorFactory.builder()
+                  .setBatchSize(10)
+                  .setMultiRowSize(20)
+                  .setBatchSizeWithMultiRow(30)
+                  .build());
     } catch (Exception e) {
       assertThat(e).isInstanceOf(NullPointerException.class);
     }
-
   }
 
   @Test
@@ -41,15 +45,18 @@ class OrmConfigStoreTest {
 
     ColumnValueToJavaObjectConverters rsc = DEFAULT_RESULT_SET_CONVERTER;
 
-    SormContext.builder().setColumnToFieldAccessorMapper(DEFAULT_COLUMN_FIELD_MAPPER)
-        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER).setColumnValueToJavaObjectConverters(rsc)
+    SormContext.builder()
+        .setColumnToFieldAccessorMapper(DEFAULT_COLUMN_FIELD_MAPPER)
+        .setTableNameMapper(DEFAULT_TABLE_NAME_MAPPER)
+        .setColumnValueToJavaObjectConverters(rsc)
         .setSqlParametersSetter(DEFAULT_SQL_PARAMETER_SETTER)
         .setTableSqlFactory(new DefaultTableSqlFactory())
-        .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder().setBatchSize(10)
-            .setMultiRowSize(20).setBatchSizeWithMultiRow(30).build())
+        .setMultiRowProcessorFactory(
+            MultiRowProcessorFactory.builder()
+                .setBatchSize(10)
+                .setMultiRowSize(20)
+                .setBatchSizeWithMultiRow(30)
+                .build())
         .build();
   }
-
-
-
 }

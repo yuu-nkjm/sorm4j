@@ -47,12 +47,17 @@ public interface ParameterizedSqlParser {
    */
   @Experimental
   public static String embedParameter(String sql, Object... parameters) {
-    String ret = ParameterizedStringFormatter.newString(sql, "{?}", parameters.length,
-        index -> parameters[index] == null ? null : parameters[index].toString());
+    String ret =
+        ParameterizedStringFormatter.newString(
+            sql,
+            "{?}",
+            parameters.length,
+            index -> parameters[index] == null ? null : parameters[index].toString());
     if (ret.contains("{?}")) {
       Object[] params = {sql, parameters};
-      throw new SormException(ParameterizedStringFormatter.LENGTH_256
-          .format("Could not embed all parameters. sql={},parameters={}", params));
+      throw new SormException(
+          ParameterizedStringFormatter.LENGTH_256.format(
+              "Could not embed all parameters. sql={},parameters={}", params));
     } else {
       return ret;
     }
@@ -72,18 +77,18 @@ public interface ParameterizedSqlParser {
     // Ordered by position in the sentence
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
 
-    parameters.keySet().stream().forEach(key -> {
-      int pos = sql.indexOf("{:" + key + "}");
-      if (pos == -1) {
-        return;
-      }
-      orderdParams.put(pos, parameters.get(key));
-    });
+    parameters.keySet().stream()
+        .forEach(
+            key -> {
+              int pos = sql.indexOf("{:" + key + "}");
+              if (pos == -1) {
+                return;
+              }
+              orderdParams.put(pos, parameters.get(key));
+            });
     String _sql = sql.replaceAll("\\{:.*?\\}", "{?}");
     Object[] _parameters = orderdParams.values().toArray();
 
     return embedParameter(_sql, _parameters);
   }
-
-
 }

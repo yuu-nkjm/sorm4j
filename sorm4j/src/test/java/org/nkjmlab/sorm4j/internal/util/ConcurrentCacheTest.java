@@ -17,7 +17,5 @@ class ConcurrentCacheTest {
     assertThat(m.size()).isEqualTo(10);
     m.putAll(Map.of("b", "b"));
     assertThat(m.size()).isEqualTo(1);
-
   }
-
 }

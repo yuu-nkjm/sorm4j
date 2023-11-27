@@ -31,8 +31,8 @@ public interface SormLogger {
 
   void logBeforeSql(String tag, Connection connection, ParameterizedSql psql);
 
-  void logBeforeMultiRow(String tag, Connection connection, Class<?> objectClass, int length,
-      String tableName);
+  void logBeforeMultiRow(
+      String tag, Connection connection, Class<?> objectClass, int length, String tableName);
 
   void logAfterQuery(String tag, long elapsedTime, Object ret);
 
@@ -41,5 +41,4 @@ public interface SormLogger {
   void logAfterMultiRow(String tag, long elapsedTime, int[] result);
 
   void logMapping(String tag, String mappingInfo);
-
 }

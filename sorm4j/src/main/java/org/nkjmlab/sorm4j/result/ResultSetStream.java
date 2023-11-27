@@ -11,6 +11,4 @@ public interface ResultSetStream<T> {
   void accept(ConsumerHandler<Stream<T>> handler);
 
   <R> R apply(FunctionHandler<Stream<T>, R> handler);
-
-
 }

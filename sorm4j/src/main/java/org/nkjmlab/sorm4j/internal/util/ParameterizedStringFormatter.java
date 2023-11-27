@@ -29,7 +29,6 @@ public final class ParameterizedStringFormatter {
   private final String placeholder;
   private final int maxLength;
 
-
   private ParameterizedStringFormatter(int maxLength) {
     this(DEFAULT_PLACEHOLDER, maxLength);
   }
@@ -69,15 +68,13 @@ public final class ParameterizedStringFormatter {
     return newStringWithPlaceHolder(msg, placeholder, maxLength, params);
   }
 
-  private static String newStringWithPlaceHolder(String msg, String placeholder, int maxLength,
-      Object... params) {
+  private static String newStringWithPlaceHolder(
+      String msg, String placeholder, int maxLength, Object... params) {
     if (params == null || params.length == 0) {
       return msg;
     }
     return newString(msg, placeholder, params.length, index -> toString(maxLength, params[index]));
   }
-
-
 
   private static String trim(String string, int maxLength) {
     if (string.length() <= maxLength) {
@@ -86,7 +83,10 @@ public final class ParameterizedStringFormatter {
     return string.substring(0, maxLength) + "...";
   }
 
-  public static String newString(String msg, String placeholder, int numOfParameter,
+  public static String newString(
+      String msg,
+      String placeholder,
+      int numOfParameter,
       Function<Integer, String> parameterReplacer) {
     final StringBuilder sbuf = new StringBuilder(msg.length() + 50);
     int i = 0;
@@ -115,6 +115,4 @@ public final class ParameterizedStringFormatter {
       return trim(param.toString(), maxLength);
     }
   }
-
-
 }

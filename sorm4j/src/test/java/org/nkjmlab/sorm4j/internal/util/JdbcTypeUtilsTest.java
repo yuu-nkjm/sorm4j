@@ -10,5 +10,4 @@ class JdbcTypeUtilsTest {
   void test() {
     assertThat(JdbcTypeUtils.convert(new int[] {4}).get(0)).isEqualTo(JDBCType.INTEGER);
   }
-
 }

@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -33,6 +32,4 @@ public class Simple05 {
   public void setLongCol(long intCol) {
     this.longCol = intCol;
   }
-
 }
-

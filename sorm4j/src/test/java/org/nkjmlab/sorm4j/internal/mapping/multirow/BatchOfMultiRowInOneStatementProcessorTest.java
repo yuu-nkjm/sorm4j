@@ -23,16 +23,21 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   private static final Player b = SormTestUtils.PLAYER_BOB;
   private static final Player c = SormTestUtils.PLAYER_CAROL;
 
-
-
   @BeforeAll
   static void setUp() {
-    SormContext context = SormContext.builder()
-        .setMultiRowProcessorFactory(MultiRowProcessorFactory.builder()
-            .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH).build())
-        .setLoggerContext(LoggerContext.builder().enableAll().disableAll()
-            .setLoggerSupplier(() -> Log4jSormLogger.getLogger()).build())
-        .build();
+    SormContext context =
+        SormContext.builder()
+            .setMultiRowProcessorFactory(
+                MultiRowProcessorFactory.builder()
+                    .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+                    .build())
+            .setLoggerContext(
+                LoggerContext.builder()
+                    .enableAll()
+                    .disableAll()
+                    .setLoggerSupplier(() -> Log4jSormLogger.getLogger())
+                    .build())
+            .build();
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
     assertThat(sorm.getContext().toString())
         .contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
@@ -42,8 +47,6 @@ class BatchOfMultiRowInOneStatementProcessorTest {
   void setUpEach() {
     sorm = createSormWithNewDatabaseAndCreateTables();
   }
-
-
 
   @Test
   void testMultiRowInsert() {
@@ -68,15 +71,17 @@ class BatchOfMultiRowInOneStatementProcessorTest {
 
   @Test
   void testMultiRowInsertMany() {
-    sorm.acceptHandler(conn -> conn
-        .insert(Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
+    sorm.acceptHandler(
+        conn ->
+            conn.insert(
+                Stream.generate(() -> GUEST_ALICE).limit(3000).collect(Collectors.toList())));
   }
 
   @Test
   void testMultiRowMerge() {
-    sorm.acceptHandler(conn -> conn
-        .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
+    sorm.acceptHandler(
+        conn ->
+            conn.merge(
+                Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
-
-
 }

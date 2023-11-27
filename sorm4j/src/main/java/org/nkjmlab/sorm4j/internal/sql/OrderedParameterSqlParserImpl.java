@@ -10,7 +10,6 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  * An implementation of {@link OrderedParameterSqlParser}
  *
  * @author nkjm
- *
  */
 public final class OrderedParameterSqlParserImpl implements OrderedParameterSqlParser {
 
@@ -37,6 +36,4 @@ public final class OrderedParameterSqlParserImpl implements OrderedParameterSqlP
   public ParameterizedSql parse() {
     return ParameterizedSqlImpl.parse(sql, parameters.toArray());
   }
-
-
 }

@@ -16,21 +16,19 @@ import org.nkjmlab.sorm4j.table.Table;
  * the function, after that closes the connection immediately.
  *
  * @author nkjm
- *
  */
 public interface Sorm extends Orm {
 
   /**
    * Create a {@link Sorm} object which uses {@link DataSource}.
    *
-   * <p>
-   * For example,
+   * <p>For example,
    *
    * <pre>
    *  *   <code>
    *  *  *  *    * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
-         * Sorm.create(dataSource);
-         *</pre></code>
+   * Sorm.create(dataSource);
+   * </pre></code>
    *
    * @param dataSource
    * @return
@@ -54,11 +52,10 @@ public interface Sorm extends Orm {
   /**
    * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSource}.
    *
-   * If you want specified more precise configuration of database access, create {@link DataSource}
-   * yourself and use {@link #create(DataSource)} method.
+   * <p>If you want specified more precise configuration of database access, create {@link
+   * DataSource} yourself and use {@link #create(DataSource)} method.
    *
-   * <p>
-   * For example,
+   * <p>For example,
    *
    * <pre>
    * <code>
@@ -76,7 +73,7 @@ public interface Sorm extends Orm {
   /**
    * Creates an instance of {@link DriverManagerDataSource}
    *
-   * Example:
+   * <p>Example:
    *
    * <pre>
    * Sorm.createDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", null, null);
@@ -87,11 +84,10 @@ public interface Sorm extends Orm {
    * @param password
    * @return
    */
-  static DriverManagerDataSource createDataSource(String jdbcUrl, String username,
-      String password) {
+  static DriverManagerDataSource createDataSource(
+      String jdbcUrl, String username, String password) {
     return DriverManagerDataSource.create(jdbcUrl, username, password);
   }
-
 
   /**
    * Gets the default {@link SormContext} instance.
@@ -101,7 +97,6 @@ public interface Sorm extends Orm {
   static SormContext getDefaultContext() {
     return SormImpl.DEFAULT_CONTEXT;
   }
-
 
   /**
    * Accepts a {@link OrmConnection} handler for a task with object-relation mapping. The connection
@@ -114,8 +109,7 @@ public interface Sorm extends Orm {
   /**
    * Accepts a {@link OrmTransaction} handler for a task with object-relation mapping.
    *
-   * <p>
-   * Note: The transaction will be closed after the process of handler. The transaction will be
+   * <p>Note: The transaction will be closed after the process of handler. The transaction will be
    * rolled back if the transaction closes before commit. When an exception throws in the
    * transaction, the transaction will be rollback.
    *
@@ -123,7 +117,6 @@ public interface Sorm extends Orm {
    * @param transactionHandler
    */
   void acceptHandler(int isolationLevel, ConsumerHandler<OrmTransaction> transactionHandler);
-
 
   /**
    * Applies a {@link OrmConnection} handler for a task with object-relation mapping and gets the
@@ -135,18 +128,16 @@ public interface Sorm extends Orm {
    */
   <R> R applyHandler(FunctionHandler<OrmConnection, R> connectionHandler);
 
-
   /**
    * Applies a {@link OrmTransaction} handler for a task with object-relation mapping and gets the
    * result.
-   * <p>
-   * Note: The transaction will be closed after the process of handler. The transaction will be
+   *
+   * <p>Note: The transaction will be closed after the process of handler. The transaction will be
    * rolled back if the transaction closes before commit. When an exception throws in the
    * transaction, the transaction will be rolled back.
    *
    * @param isolationLevel
    * @param transactionHandler
-   *
    * @param <R>
    * @return
    */
@@ -159,14 +150,12 @@ public interface Sorm extends Orm {
    */
   DataSource getDataSource();
 
-
   /**
    * Open {@link OrmConnection}. You should always use <code>try-with-resources</code> block to
    * ensure the database connection is released.
    *
-   * <p>
-   * You cold also use {@link Sorm#acceptHandler(ConsumerHandler)} or
-   * {@link Sorm#applyHandler(FunctionHandler)} .
+   * <p>You cold also use {@link Sorm#acceptHandler(ConsumerHandler)} or {@link
+   * Sorm#applyHandler(FunctionHandler)} .
    *
    * @return
    */
@@ -176,17 +165,14 @@ public interface Sorm extends Orm {
    * Open {@link OrmTransaction}. You should always use try-with-resources block to ensure the
    * database connection is released.
    *
-   * <p>
-   * You could also use {@link Sorm#acceptHandler(int, ConsumerHandler)} or
-   * {@link Sorm#applyHandler(int, FunctionHandler)}.
+   * <p>You could also use {@link Sorm#acceptHandler(int, ConsumerHandler)} or {@link
+   * Sorm#applyHandler(int, FunctionHandler)}.
    *
-   * <p>
-   * <strong>Note:</strong> If you do not explicitly commit in a opened transaction, it will be
+   * <p><strong>Note:</strong> If you do not explicitly commit in a opened transaction, it will be
    * rolled back.
    *
-   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED},
-   *        {@link Connection#TRANSACTION_READ_UNCOMMITTED}, ...,and so on.
-   *
+   * @param isolationLevel {@link Connection#TRANSACTION_READ_COMMITTED}, {@link
+   *     Connection#TRANSACTION_READ_UNCOMMITTED}, ...,and so on.
    * @return
    */
   OrmTransaction open(int isolationLevel);
@@ -211,5 +197,4 @@ public interface Sorm extends Orm {
    */
   @Experimental
   <T> Table<T> getTable(Class<T> type, String tableName);
-
 }

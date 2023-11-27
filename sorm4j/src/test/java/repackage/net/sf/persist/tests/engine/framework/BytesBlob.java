@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.engine.framework;
@@ -29,8 +28,7 @@ public class BytesBlob implements Blob {
   @Override
   public byte[] getBytes(long pos, int length) throws SQLException {
     byte[] ret = new byte[length];
-    for (int i = (int) pos - 1; i < pos + length - 1; i++)
-      ret[i] = b[i + (int) pos - 1];
+    for (int i = (int) pos - 1; i < pos + length - 1; i++) ret[i] = b[i + (int) pos - 1];
     return ret;
   }
 
@@ -78,5 +76,4 @@ public class BytesBlob implements Blob {
   public InputStream getBinaryStream(long pos, long length) throws SQLException {
     throw new RuntimeException("getBinaryStream(long, long) not implemented");
   }
-
 }

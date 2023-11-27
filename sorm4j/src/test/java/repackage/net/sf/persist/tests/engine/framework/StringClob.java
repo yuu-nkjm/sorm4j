@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.engine.framework;
@@ -93,5 +92,4 @@ public class StringClob implements Clob {
   public Reader getCharacterStream(long pos, long length) throws SQLException {
     throw new RuntimeException("getCharacterStream(long, long) not implemented");
   }
-
 }

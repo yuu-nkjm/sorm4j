@@ -15,5 +15,4 @@ public final class JdbcTypeUtils {
   public static JDBCType convert(int sqlTypes) {
     return JDBCType.valueOf(sqlTypes);
   }
-
 }

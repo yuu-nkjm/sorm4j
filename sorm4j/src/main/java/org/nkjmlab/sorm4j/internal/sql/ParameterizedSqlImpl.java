@@ -14,7 +14,6 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql;
  * This class represents a sql statement with ordered parameters.
  *
  * @author nkjm
- *
  */
 public final class ParameterizedSqlImpl implements ParameterizedSql {
 
@@ -28,11 +27,14 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     this.parameters = parameters;
   }
 
-
   @Override
   public String toString() {
-    return "sql=[" + sql + "]" + ((parameters == null || parameters.length == 0) ? ""
-        : ", parameters=" + Arrays.toString(parameters) + "");
+    return "sql=["
+        + sql
+        + "]"
+        + ((parameters == null || parameters.length == 0)
+            ? ""
+            : ", parameters=" + Arrays.toString(parameters) + "");
   }
 
   @Override
@@ -58,14 +60,14 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     }
 
     ParameterizedSql embeddedSql =
-        sql.contains(EMBEDDED_PLACEHOLDER) ? parseEmbeddedPlaceholder(sql, parameters)
+        sql.contains(EMBEDDED_PLACEHOLDER)
+            ? parseEmbeddedPlaceholder(sql, parameters)
             : new ParameterizedSqlImpl(sql, parameters);
 
     return sql.contains(LIST_PLACEHOLDER)
         ? parseListPlaceholder(embeddedSql.getSql(), embeddedSql.getParameters())
         : embeddedSql;
   }
-
 
   private static ParameterizedSql parseListPlaceholder(String sql, Object[] parameters) {
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '<', '?', '>');
@@ -89,15 +91,17 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
         flattenListParams.add(parameters[i]);
       }
     }
-    String _sql = ParameterizedStringFormatter.newString(sql, LIST_PLACEHOLDER,
-        specialParameterIndexes.size(), index -> {
-          int parameterLength = getSize(parameters[specialParameterIndexes.get(index)]);
-          return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
-        });
+    String _sql =
+        ParameterizedStringFormatter.newString(
+            sql,
+            LIST_PLACEHOLDER,
+            specialParameterIndexes.size(),
+            index -> {
+              int parameterLength = getSize(parameters[specialParameterIndexes.get(index)]);
+              return "?,".repeat(parameterLength).substring(0, 2 * parameterLength - 1);
+            });
     return new ParameterizedSqlImpl(_sql, flattenListParams.toArray());
-
   }
-
 
   private static int getSize(Object object) {
     if (object instanceof Collection) {
@@ -109,7 +113,6 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     }
   }
 
-
   public static ParameterizedSql parseEmbeddedPlaceholder(String sql, Object... parameters) {
 
     final List<Integer> specialParameterIndexes = createSpecialParameterIndexes(sql, '{', '?', '}');
@@ -120,17 +123,21 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
         removedEmbeddedParams.add(parameters[i]);
       }
     }
-    String _sql = ParameterizedStringFormatter.newString(sql, EMBEDDED_PLACEHOLDER,
-        specialParameterIndexes.size(),
-        index -> parameters[specialParameterIndexes.get(index)] == null ? "null"
-            : parameters[specialParameterIndexes.get(index)].toString());
+    String _sql =
+        ParameterizedStringFormatter.newString(
+            sql,
+            EMBEDDED_PLACEHOLDER,
+            specialParameterIndexes.size(),
+            index ->
+                parameters[specialParameterIndexes.get(index)] == null
+                    ? "null"
+                    : parameters[specialParameterIndexes.get(index)].toString());
 
     return new ParameterizedSqlImpl(_sql, removedEmbeddedParams.toArray());
   }
 
-
-  private static List<Integer> createSpecialParameterIndexes(String str, char prefix,
-      char normalPlaceholder, char suffix) {
+  private static List<Integer> createSpecialParameterIndexes(
+      String str, char prefix, char normalPlaceholder, char suffix) {
     final char[] arry = str.toCharArray();
 
     final List<Integer> ret = new ArrayList<>();
@@ -138,7 +145,10 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
 
     for (int i = 0; i < arry.length; i++) {
       char c = arry[i];
-      if (c == normalPlaceholder && i - 1 >= 0 && arry[i - 1] == prefix && i + 1 < arry.length
+      if (c == normalPlaceholder
+          && i - 1 >= 0
+          && arry[i - 1] == prefix
+          && i + 1 < arry.length
           && arry[i + 1] == suffix) {
         ret.add(parameterIndex);
         parameterIndex++;
@@ -149,7 +159,6 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     return ret;
   }
 
-
   @Override
   public String getBindedSql() {
     String sql = this.sql;
@@ -158,5 +167,4 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     }
     return sql;
   }
-
 }

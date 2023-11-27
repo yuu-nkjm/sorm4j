@@ -4,11 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- *
  * Maps a row in a {@link ResultSet} to a object.
  *
  * @author nkjm
- *
  * @param <T>
  * @see {@link ResultSetTraverser}
  */

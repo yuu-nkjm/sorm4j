@@ -30,7 +30,6 @@ class TableTest {
     playersTable = createPlayersTable(sorm);
     sportsTable = createSportsTable(sorm);
     createGuestsTable(sorm);
-
   }
 
   @Test
@@ -166,9 +165,10 @@ class TableTest {
 
     playersTable.delete(List.of(PLAYER_ALICE));
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(1);
-
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(1);
   }
 
   @Test
@@ -178,8 +178,10 @@ class TableTest {
     playersTable.merge(PLAYER_ALICE);
     playersTable.delete(PLAYER_ALICE);
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(0);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(0);
     playersTable.insertAndGet(PLAYER_BOB);
     RowMap rm1 = RowMap.of("id", 111, "name", "name1", "address", "address1");
     RowMap rm2 = RowMap.of("id", 112, "name", "name2", "address", "address2");
@@ -187,7 +189,6 @@ class TableTest {
     playersTable.insertMapIn(rm1);
     assertThat(playersTable.exists(111)).isTrue();
     playersTable.insertMapIn(List.of(rm2, rm3));
-
   }
 
   @Test
@@ -195,12 +196,16 @@ class TableTest {
     playersTable.insert(PLAYER_ALICE);
     playersTable.insert(PLAYER_BOB);
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(2);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(2);
     playersTable.deleteByPrimaryKey(PLAYER_ALICE.id);
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(1);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(1);
   }
 
   @Test
@@ -214,20 +219,22 @@ class TableTest {
     assertThat(playersTable.selectByPrimaryKey(PLAYER_BOB.id).getName()).isEqualTo("bbb");
   }
 
-
   @Test
   void testDeleteByPrimaryKeyIn() {
     playersTable.insert(PLAYER_ALICE);
     playersTable.insert(PLAYER_BOB);
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(2);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(2);
     playersTable.deleteByPrimaryKeyIn(playersTable.getTableName(), PLAYER_ALICE.id);
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(1);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(1);
   }
-
 
   @Test
   void testDeleteTArray() {
@@ -236,8 +243,10 @@ class TableTest {
     playersTable.merge(new Player[] {PLAYER_ALICE});
     playersTable.delete(new Player[] {PLAYER_ALICE});
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(0);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(0);
     playersTable.insertAndGet(new Player[] {PLAYER_BOB});
   }
 
@@ -246,8 +255,10 @@ class TableTest {
     playersTable.insert(PLAYER_ALICE);
     playersTable.deleteAll();
     assertThat(
-        playersTable.getOrm().readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
-            .isEqualTo(0);
+            playersTable
+                .getOrm()
+                .readOne(Integer.class, selectCountFrom(playersTable.getTableName())))
+        .isEqualTo(0);
   }
 
   @Test
@@ -276,7 +287,6 @@ class TableTest {
         .isEqualTo(PLAYER_ALICE.getId());
   }
 
-
   @Test
   void testJoin() {
     playersTable.insert(PLAYER_ALICE);
@@ -288,11 +298,14 @@ class TableTest {
         .isEqualTo(PLAYER_ALICE.getId());
 
     JoinSql.builder(playersTable.getOrm().getTableMetaData(Player.class));
-    assertThat(playersTable
-        .join(sportsTable, playersTable.joinSqlBuilder().joinUsing(sportsTable, "id").build())
-        .get(0).getT1().getId()).isEqualTo(PLAYER_ALICE.getId());
-
-
+    assertThat(
+            playersTable
+                .join(
+                    sportsTable, playersTable.joinSqlBuilder().joinUsing(sportsTable, "id").build())
+                .get(0)
+                .getT1()
+                .getId())
+        .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
@@ -310,9 +323,9 @@ class TableTest {
 
     int ret = playersTable.streamAll().apply(stream -> stream.collect(Collectors.toList())).size();
     assertThat(ret).isEqualTo(1);
-    List<Player> ret1 = playersTable.stream(ParameterizedSql.of("select * from players"))
-        .apply(stream -> stream.collect(Collectors.toList()));
+    List<Player> ret1 =
+        playersTable.stream(ParameterizedSql.of("select * from players"))
+            .apply(stream -> stream.collect(Collectors.toList()));
     assertThat(ret1.size()).isEqualTo(1);
-
   }
 }

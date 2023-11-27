@@ -12,9 +12,7 @@ import javax.sql.DataSource;
  * A database connection source wrapped a {@link DriverManager}
  *
  * @author nkjm
- *
  */
-
 public final class DriverManagerDataSource implements DataSource {
 
   private final String jdbcUrl;
@@ -33,7 +31,8 @@ public final class DriverManagerDataSource implements DataSource {
 
   @Override
   public Connection getConnection() throws SQLException {
-    return username != null ? DriverManager.getConnection(jdbcUrl, username, password)
+    return username != null
+        ? DriverManager.getConnection(jdbcUrl, username, password)
         : DriverManager.getConnection(jdbcUrl);
   }
 
@@ -76,5 +75,4 @@ public final class DriverManagerDataSource implements DataSource {
   public int getLoginTimeout() throws SQLException {
     return DriverManager.getLoginTimeout();
   }
-
 }

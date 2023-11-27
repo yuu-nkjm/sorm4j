@@ -19,6 +19,4 @@ public interface BasicCommand extends Command {
   static BasicCommand from(OrmConnection conn, String sql) {
     return new BasicCommandImpl(conn, sql);
   }
-
-
 }

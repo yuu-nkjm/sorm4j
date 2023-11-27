@@ -32,10 +32,11 @@ abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
 
   @Override
   public void accept(ConsumerHandler<Stream<T>> handler) {
-    apply(stream -> {
-      handler.accept(stream);
-      return null;
-    });
+    apply(
+        stream -> {
+          handler.accept(stream);
+          return null;
+        });
   }
 
   public <R> R apply(OrmConnectionImpl ormConn, FunctionHandler<Stream<T>, R> handler) {
@@ -53,10 +54,11 @@ abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
       lp.ifPresent(_lp -> _lp.logBeforeSql(ormConn.getJdbcConnection(), sql, parameters));
 
       try (ResultSet resultSet = stmt.executeQuery()) {
-        Stream<T> stream = StreamSupport.stream(
-            Spliterators.spliteratorUnknownSize(
-                new ResultSetIterator<T>(ormConn, objectClass, resultSet), Spliterator.ORDERED),
-            false);
+        Stream<T> stream =
+            StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                    new ResultSetIterator<T>(ormConn, objectClass, resultSet), Spliterator.ORDERED),
+                false);
         R ret = handler.apply(stream);
         lp.ifPresent(_lp -> _lp.logAfterQuery(ret));
         return ret;
@@ -65,6 +67,4 @@ abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
       throw Try.rethrow(e);
     }
   }
-
-
 }

@@ -19,6 +19,4 @@ class H2WebBrowsingServiceTest {
     // server.open(ds.getConnection());
     server.getWebServer().stop();
   }
-
-
 }

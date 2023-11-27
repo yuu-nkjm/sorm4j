@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.Sorm;
 /**
  * Interface for handling without a return value.
  *
- * This interface is only designed for {@link Sorm} interface.
+ * <p>This interface is only designed for {@link Sorm} interface.
  *
  * @param <T>
  */

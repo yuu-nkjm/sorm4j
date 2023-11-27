@@ -16,13 +16,11 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  * A factory of local data source with h2 database.
  *
  * <ul>
- * <li><a href="http://www.h2database.com/html/cheatSheet.html">H2 Database Engine</a></li>
- * <li><a href="http://h2database.com/html/features.html#database_url">Database URL
- * Overview</a></li>
+ *   <li><a href="http://www.h2database.com/html/cheatSheet.html">H2 Database Engine</a>
+ *   <li><a href="http://h2database.com/html/features.html#database_url">Database URL Overview</a>
  * </ul>
  *
  * @author nkjm
- *
  */
 @Experimental
 public class H2LocalDataSourceFactory {
@@ -37,9 +35,8 @@ public class H2LocalDataSourceFactory {
   private final String embeddedModeJdbcUrl;
   private final String mixedModeJdbcUrl;
 
-
-  private H2LocalDataSourceFactory(File databaseDirectory, String databaseName, String username,
-      String password) {
+  private H2LocalDataSourceFactory(
+      File databaseDirectory, String databaseName, String username, String password) {
     this.username = username;
     this.password = password;
     this.databaseName = databaseName;
@@ -80,7 +77,6 @@ public class H2LocalDataSourceFactory {
   public String getMixedModeJdbcUrl() {
     return getMixedModeJdbcUrl(new String[0]);
   }
-
 
   public String getInMemoryModeJdbcUrl(String... options) {
     return inMemoryModeJdbcUrl + toUrlOption(options);
@@ -174,7 +170,7 @@ public class H2LocalDataSourceFactory {
    * Make a new file database in not exists
    *
    * @return true if and only if the directory was created,along with all necessary parent
-   *         directories; false otherwise
+   *     directories; false otherwise
    */
   public boolean makeFileDatabaseIfNotExists() {
     if (getDatabaseFile().exists()) {
@@ -219,7 +215,6 @@ public class H2LocalDataSourceFactory {
     return new Builder();
   }
 
-
   /**
    * Initializes a newly created {@link H2LocalDataSourceFactory.Builder} object; you can get
    * {{@code LocalDataSourceFactory} object via build method. "~/" or "~\" in the database directory
@@ -230,23 +225,33 @@ public class H2LocalDataSourceFactory {
    * @param username
    * @param password
    */
-
-  public static Builder builder(File databaseDirectory, String databaseName, String username,
-      String password) {
+  public static Builder builder(
+      File databaseDirectory, String databaseName, String username, String password) {
     return new Builder(databaseDirectory, databaseName, username, password);
   }
 
-
-
   @Override
   public String toString() {
-    return "H2LocalDataSourceFactory [databaseDirectory=" + databaseDirectory + ", databaseName="
-        + databaseName + ", username=" + username + ", password=" + password + ", databasePath="
-        + databasePath + ", inMemoryModeJdbcUrl=" + inMemoryModeJdbcUrl + ", serverModeJdbcUrl="
-        + serverModeJdbcUrl + ", embeddedModeJdbcUrl=" + embeddedModeJdbcUrl + ", mixedModeJdbcUrl="
-        + mixedModeJdbcUrl + "]";
+    return "H2LocalDataSourceFactory [databaseDirectory="
+        + databaseDirectory
+        + ", databaseName="
+        + databaseName
+        + ", username="
+        + username
+        + ", password="
+        + password
+        + ", databasePath="
+        + databasePath
+        + ", inMemoryModeJdbcUrl="
+        + inMemoryModeJdbcUrl
+        + ", serverModeJdbcUrl="
+        + serverModeJdbcUrl
+        + ", embeddedModeJdbcUrl="
+        + embeddedModeJdbcUrl
+        + ", mixedModeJdbcUrl="
+        + mixedModeJdbcUrl
+        + "]";
   }
-
 
   public static class Builder {
     private File databaseDirectory = new File(System.getProperty("java.io.tmpdir"));
@@ -286,8 +291,11 @@ public class H2LocalDataSourceFactory {
 
       if (!allowPrefixes.contains(prefix) && !databaseDirectoryPath.isAbsolute()) {
         throw new IllegalArgumentException(
-            "the databaseDirectory path should be startWith " + allowPrefixes
-                + " or absolute path. The given is [" + databaseDirectoryPath.getPath() + "]");
+            "the databaseDirectory path should be startWith "
+                + allowPrefixes
+                + " or absolute path. The given is ["
+                + databaseDirectoryPath.getPath()
+                + "]");
       }
       this.databaseDirectory =
           new File(SystemPropertyUtils.getTildeExpandAbsolutePath(databaseDirectoryPath));
@@ -307,7 +315,6 @@ public class H2LocalDataSourceFactory {
     public H2LocalDataSourceFactory build() {
       return new H2LocalDataSourceFactory(databaseDirectory, databaseName, username, password);
     }
-
   }
 
   /**
@@ -316,10 +323,7 @@ public class H2LocalDataSourceFactory {
    * @return
    */
   public static DataSource createTemporalInMemoryDataSource() {
-    return JdbcConnectionPool
-        .create("jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;", "", "");
+    return JdbcConnectionPool.create(
+        "jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;", "", "");
   }
-
-
-
 }

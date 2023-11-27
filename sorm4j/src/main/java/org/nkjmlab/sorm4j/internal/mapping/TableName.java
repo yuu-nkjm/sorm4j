@@ -6,7 +6,6 @@ import java.util.Objects;
  * Value object of table name.
  *
  * @author nkjm
- *
  */
 public final class TableName {
 
@@ -18,10 +17,8 @@ public final class TableName {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof TableName))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof TableName)) return false;
     TableName other = (TableName) obj;
     return Objects.equals(name, other.name);
   }
@@ -31,7 +28,6 @@ public final class TableName {
    *
    * @return
    */
-
   public String getName() {
     return name;
   }
@@ -41,12 +37,9 @@ public final class TableName {
     return Objects.hash(name);
   }
 
-  /**
-   * Uses {@link #getName()} when you want to get name.
-   */
+  /** Uses {@link #getName()} when you want to get name. */
   @Override
   public String toString() {
     return name;
   }
-
 }

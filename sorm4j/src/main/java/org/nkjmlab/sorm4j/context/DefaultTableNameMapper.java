@@ -15,30 +15,32 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
  * Default implementation of {@link TableNameMapper}
  *
  * @author nkjm
- *
  */
-
 public final class DefaultTableNameMapper implements TableNameMapper {
 
   private static final String ERROR_MESSAGE =
       "[{}] does not match any existing table in the database. Use @{} annotation or rename the class. Table name candidates were {}";
 
-
   @Override
   public String getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
     Object[] params = {tableName, OrmTable.class.getSimpleName(), candidates};
-    return convertToExactTableName(metaData, candidates).orElseThrow(() -> new SormException(
-        ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
+    return convertToExactTableName(metaData, candidates)
+        .orElseThrow(
+            () ->
+                new SormException(
+                    ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
   }
-
 
   @Override
   public String getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
     Object[] params = {objectClass.getName(), OrmTable.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates)
-        .orElseThrow(() -> new SormException(ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
+        .orElseThrow(
+            () ->
+                new SormException(
+                    ParameterizedStringFormatter.LENGTH_256.format(ERROR_MESSAGE, params)));
   }
 
   /**
@@ -59,16 +61,19 @@ public final class DefaultTableNameMapper implements TableNameMapper {
     String className = objectClass.getSimpleName();
     String cannonicalClassName = toCanonicalCase(className);
 
-    List<String> candidates = new ArrayList<>(List.of(cannonicalClassName,
-        toCanonicalCase(cannonicalClassName + "S"), toCanonicalCase(cannonicalClassName + "ES")));
+    List<String> candidates =
+        new ArrayList<>(
+            List.of(
+                cannonicalClassName,
+                toCanonicalCase(cannonicalClassName + "S"),
+                toCanonicalCase(cannonicalClassName + "ES")));
     if (cannonicalClassName.endsWith("Y")) {
-      candidates.add(toCanonicalCase(
-          cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES"));
+      candidates.add(
+          toCanonicalCase(
+              cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES"));
     }
     return candidates;
-
   }
-
 
   /**
    * Convert from the given table name candidates to the exact table name on the database.
@@ -77,13 +82,12 @@ public final class DefaultTableNameMapper implements TableNameMapper {
    * @param tableNameCandidates
    * @return
    * @throws SQLException
-   *
    * @see {@link java.sql.DatabaseMetaData#getTables}
    */
-  private Optional<String> convertToExactTableName(DatabaseMetaData metaData,
-      List<String> tableNameCandidates) {
-    try (
-        ResultSet resultSet = metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
+  private Optional<String> convertToExactTableName(
+      DatabaseMetaData metaData, List<String> tableNameCandidates) {
+    try (ResultSet resultSet =
+        metaData.getTables(null, null, "%", new String[] {"TABLE", "VIEW"})) {
       while (resultSet.next()) {
         // 3. TABLE_NAME String => table name
         String tableNameOnDb = resultSet.getString(3);
@@ -96,7 +100,4 @@ public final class DefaultTableNameMapper implements TableNameMapper {
       return Optional.empty();
     }
   }
-
-
-
 }

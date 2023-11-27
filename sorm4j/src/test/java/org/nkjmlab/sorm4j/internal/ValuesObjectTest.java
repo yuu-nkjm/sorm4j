@@ -14,7 +14,6 @@ class ValuesObjectTest {
     TableName v1 = new TableName("test");
     TableName v2 = new TableName("test");
     verify(v1, v2);
-
   }
 
   private void verify(Object v1, Object v2) {
@@ -23,7 +22,6 @@ class ValuesObjectTest {
     assertThat(v1.equals(v2)).isTrue();
     assertThat(v1.equals("test")).isFalse();
     assertThat(v1.hashCode()).isEqualTo(v2.hashCode());
-
   }
 
   @Test
@@ -31,7 +29,6 @@ class ValuesObjectTest {
     ColumnName v1 = new ColumnName("test");
     ColumnName v2 = new ColumnName("test");
     verify(v1, v2);
-
   }
 
   @Test
@@ -39,7 +36,5 @@ class ValuesObjectTest {
     ColumnName v1 = new ColumnName("2test");
     ColumnName v2 = new ColumnName("1test");
     assertThat(List.of(v1, v2).stream().sorted().collect(Collectors.toList()).get(0)).isEqualTo(v2);
-
   }
-
 }

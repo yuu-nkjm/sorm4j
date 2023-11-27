@@ -29,5 +29,4 @@ public class BasicTableWithDefinition<T> extends BasicTable<T> implements TableW
   public TableDefinition getTableDefinition() {
     return tableDefinition;
   }
-
 }

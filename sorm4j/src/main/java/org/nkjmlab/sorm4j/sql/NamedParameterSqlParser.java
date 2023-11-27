@@ -8,8 +8,7 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlParserImpl;
 /**
  * SQL parser for named parameters.
  *
- * <p>
- * Following characters could be used for named parameters.
+ * <p>Following characters could be used for named parameters.
  *
  * <pre>
  * <code>
@@ -18,7 +17,6 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlParserImpl;
  * </pre>
  *
  * @author yuu_nkjm
- *
  */
 @Experimental
 public interface NamedParameterSqlParser extends ParameterizedSqlParser {
@@ -59,13 +57,12 @@ public interface NamedParameterSqlParser extends ParameterizedSqlParser {
    * @return
    */
   @Experimental
-  static NamedParameterSqlParser of(String sql, char prefix, char suffix,
-      ColumnToFieldAccessorMapper columnFieldMapper) {
+  static NamedParameterSqlParser of(
+      String sql, char prefix, char suffix, ColumnToFieldAccessorMapper columnFieldMapper) {
     return new NamedParameterSqlParserImpl(sql, prefix, suffix, columnFieldMapper);
   }
 
   /**
-   *
    * @param sql
    * @param columnFieldMapper
    * @return
@@ -75,14 +72,12 @@ public interface NamedParameterSqlParser extends ParameterizedSqlParser {
     return of(sql, ':', Character.MIN_VALUE, columnFieldMapper);
   }
 
-
   /**
    * Creates {@link NamedParameterSqlParser} object.
    *
    * @param sql
    * @return
    */
-
   static NamedParameterSqlParser of(String sql) {
     return new NamedParameterSqlParserImpl(sql);
   }
@@ -97,6 +92,4 @@ public interface NamedParameterSqlParser extends ParameterizedSqlParser {
   static ParameterizedSql parse(String sql, Map<String, Object> namedParameters) {
     return NamedParameterSqlParser.of(sql).bindAll(namedParameters).parse();
   }
-
-
 }

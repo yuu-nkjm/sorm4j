@@ -10,10 +10,9 @@ class MethodInvokerInfoUtilsTest {
     assertThat(MethodInvokerInfoUtils.getInvokerInfo(-1, new Throwable().getStackTrace()))
         .contains(MethodInvokerInfoUtilsTest.class.getName());
     assertThat(
-        MethodInvokerInfoUtils.getInvokerInfo(Integer.MAX_VALUE, new Throwable().getStackTrace()))
-            .isNotNull();
+            MethodInvokerInfoUtils.getInvokerInfo(
+                Integer.MAX_VALUE, new Throwable().getStackTrace()))
+        .isNotNull();
     System.out.println(MethodInvokerInfoUtils.getOutsideInvoker(""));
-
   }
-
 }

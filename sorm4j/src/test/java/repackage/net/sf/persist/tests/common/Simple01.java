@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -14,8 +13,4 @@ public class Simple01 {
   // field name annotation
   @OrmColumn("LONG_COL")
   public long intCol;
-
-
-
 }
-

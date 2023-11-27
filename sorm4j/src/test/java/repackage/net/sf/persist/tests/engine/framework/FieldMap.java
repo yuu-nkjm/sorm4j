@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.engine.framework;
@@ -6,9 +5,7 @@ package repackage.net.sf.persist.tests.engine.framework;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Holds data related to a field from a bean, including metadata to test it
- */
+/** Holds data related to a field from a bean, including metadata to test it */
 public class FieldMap {
 
   private final String fieldName;
@@ -27,15 +24,12 @@ public class FieldMap {
    */
   private boolean supportsCompareMapValue = true;
 
-  /**
-   * Used for string types
-   */
+  /** Used for string types */
   private int size = 250;
 
-  /**
-   * Used for numeric types
-   */
+  /** Used for numeric types */
   private double min = -1;
+
   private double max = -1;
 
   private List<Class<?>> types = new ArrayList<>();
@@ -54,8 +48,7 @@ public class FieldMap {
 
   public FieldMap setTypes(Class<?>... types) {
     this.types = new ArrayList<>();
-    for (Class<?> type : types)
-      this.types.add(type);
+    for (Class<?> type : types) this.types.add(type);
     return this;
   }
 
@@ -99,5 +92,4 @@ public class FieldMap {
     this.supportsCompareMapValue = supportsCompareMapValue;
     return this;
   }
-
 }

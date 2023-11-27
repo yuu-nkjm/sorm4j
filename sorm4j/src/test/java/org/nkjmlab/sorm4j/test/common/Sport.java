@@ -6,7 +6,8 @@ import org.nkjmlab.sorm4j.annotation.OrmRecord;
 public class Sport {
 
   public enum Sports {
-    TENNIS, SOCCER
+    TENNIS,
+    SOCCER
   }
 
   private int id;
@@ -16,7 +17,6 @@ public class Sport {
     this.id = id;
     this.name = name;
   }
-
 
   public int getId() {
     return id;
@@ -30,5 +30,4 @@ public class Sport {
   public String toString() {
     return "Sport [id=" + id + ", name=" + name + "]";
   }
-
 }

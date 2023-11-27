@@ -34,7 +34,6 @@ import org.nkjmlab.sorm4j.table.Table;
  * An entry point of object-relation mapping.
  *
  * @author nkjm
- *
  */
 public final class SormImpl implements Sorm {
 
@@ -44,7 +43,6 @@ public final class SormImpl implements Sorm {
   private final DataSource dataSource;
   private final SormContextImpl sormContext;
   private final ConcurrentMap<String, Table<?>> tables;
-
 
   public static Sorm create(DataSource dataSource, SormContext context) {
     return new SormImpl(dataSource, (SormContextImpl) context);
@@ -71,8 +69,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <R> R applyHandler(int isolationLevel,
-      FunctionHandler<OrmTransaction, R> transactionHandler) {
+  public <R> R applyHandler(
+      int isolationLevel, FunctionHandler<OrmTransaction, R> transactionHandler) {
     try (OrmTransaction transaction = open(isolationLevel)) {
       R ret = transactionHandler.apply(transaction);
       transaction.rollback();
@@ -82,10 +80,9 @@ public final class SormImpl implements Sorm {
     }
   }
 
-
   @Override
-  public void acceptHandler(int isolationLevel,
-      ConsumerHandler<OrmTransaction> transactionHandler) {
+  public void acceptHandler(
+      int isolationLevel, ConsumerHandler<OrmTransaction> transactionHandler) {
     try (OrmTransaction transaction = open(isolationLevel)) {
       transactionHandler.accept(transaction);
     } catch (Exception e) {
@@ -117,8 +114,6 @@ public final class SormImpl implements Sorm {
     }
   }
 
-
-
   @Override
   public void acceptHandler(ConsumerHandler<OrmConnection> handler) {
     try (OrmConnection conn = open()) {
@@ -128,13 +123,10 @@ public final class SormImpl implements Sorm {
     }
   }
 
-
-
   @Override
   public String toString() {
     return "Sorm [dataSource=" + dataSource + ", sormContext=" + sormContext + "]";
   }
-
 
   private <R> R applyAndClose(FunctionHandler<OrmConnection, R> handler) {
     try (OrmConnection conn = open()) {
@@ -148,7 +140,6 @@ public final class SormImpl implements Sorm {
   public <T> List<T> selectAll(Class<T> objectClass) {
     return applyAndClose(conn -> conn.selectAll(objectClass));
   }
-
 
   @Override
   public <T> T selectByPrimaryKey(Class<T> objectClass, Object... primaryKeyValues) {
@@ -164,7 +155,6 @@ public final class SormImpl implements Sorm {
   public <T> T readFirst(Class<T> objectClass, String sql, Object... parameters) {
     return applyAndClose(conn -> conn.readFirst(objectClass, sql, parameters));
   }
-
 
   @Override
   public <T> List<T> readList(Class<T> objectClass, ParameterizedSql sql) {
@@ -187,38 +177,38 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, ParameterizedSql sql) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, ParameterizedSql sql) {
     return readTupleList(t1, t2, t3, sql.getSql(), sql.getParameters());
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3, String sql, Object... parameters) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters) {
     return applyAndClose(conn -> conn.readTupleList(t1, t2, t3, sql, parameters));
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2,
-      ParameterizedSql sql) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(
+      Class<T1> t1, Class<T2> t2, ParameterizedSql sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, String sql,
-      Object... parameters) {
+  public <T1, T2> List<Tuple2<T1, T2>> readTupleList(
+      Class<T1> t1, Class<T2> t2, String sql, Object... parameters) {
     return applyAndClose(conn -> conn.readTupleList(t1, t2, sql, parameters));
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql,
-      Object... parameters) {
+  public <T1, T2> List<Tuple2<T1, T2>> join(
+      Class<T1> t1, Class<T2> t2, String sql, Object... parameters) {
     return applyAndClose(conn -> conn.join(t1, t2, sql, parameters));
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String sql, Object... parameters) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters) {
     return applyAndClose(conn -> conn.join(t1, t2, t3, sql, parameters));
   }
 
@@ -233,8 +223,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String t1t2OnCondition, String t2t3OnCondition) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1t2OnCondition, String t2t3OnCondition) {
     return applyAndClose(conn -> conn.joinOn(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
 
@@ -244,11 +234,10 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(Class<T1> t1, Class<T2> t2, Class<T3> t3,
-      String t1t2OnCondition, String t2t3OnCondition) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1t2OnCondition, String t2t3OnCondition) {
     return applyAndClose(conn -> conn.leftJoinOn(t1, t2, t3, t1t2OnCondition, t2t3OnCondition));
   }
-
 
   @Override
   public <T> RowMapper<T> getRowMapper(Class<T> objectClass) {
@@ -294,7 +283,6 @@ public final class SormImpl implements Sorm {
   public <T> int[] delete(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.delete(objects));
   }
-
 
   @Override
   public <T> int[] deleteIn(String tableName, List<T> objects) {
@@ -356,13 +344,10 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.insertMapIn(tableName, objects));
   }
 
-
-
   @Override
   public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insert(objects));
   }
-
 
   @Override
   public <T> InsertResult insertAndGet(List<T> objects) {
@@ -379,8 +364,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.insertAndGet(objects));
   }
 
-
-
   @Override
   public <T> InsertResult insertAndGetIn(String tableName, List<T> objects) {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
@@ -392,8 +375,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> InsertResult insertAndGetIn(String tableName,
-      @SuppressWarnings("unchecked") T... objects) {
+  public <T> InsertResult insertAndGetIn(
+      String tableName, @SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.insertAndGetIn(tableName, objects));
   }
 
@@ -426,7 +409,6 @@ public final class SormImpl implements Sorm {
   public <T> int[] merge(@SuppressWarnings("unchecked") T... objects) {
     return applyAndClose(conn -> conn.merge(objects));
   }
-
 
   @Override
   public <T> int[] mergeIn(String tableName, List<T> objects) {
@@ -483,7 +465,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.updateIn(tableName, objects));
   }
 
-
   @Override
   public String getTableName(Class<?> objectClass) {
     return applyAndClose(conn -> conn.getTableName(objectClass));
@@ -493,7 +474,6 @@ public final class SormImpl implements Sorm {
   public TableMetaData getTableMetaData(Class<?> objectClass) {
     return applyAndClose(conn -> conn.getTableMetaData(objectClass));
   }
-
 
   @Override
   public JdbcTableMetaData getJdbcTableMetaData(String tableName) {
@@ -521,14 +501,15 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> T executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
+  public <T> T executeQuery(
+      FunctionHandler<Connection, PreparedStatement> statementSupplier,
       ResultSetTraverser<T> traverser) {
     return applyAndClose(conn -> conn.executeQuery(statementSupplier, traverser));
   }
 
   @Override
-  public <T> List<T> executeQuery(FunctionHandler<Connection, PreparedStatement> statementSupplier,
-      RowMapper<T> rowMapper) {
+  public <T> List<T> executeQuery(
+      FunctionHandler<Connection, PreparedStatement> statementSupplier, RowMapper<T> rowMapper) {
     return applyAndClose(conn -> conn.executeQuery(statementSupplier, rowMapper));
   }
 
@@ -552,7 +533,6 @@ public final class SormImpl implements Sorm {
     return applyAndClose(conn -> conn.executeUpdate(sql));
   }
 
-
   @Override
   public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {
     return applyAndClose(conn -> conn.getJdbcDatabaseMetaData());
@@ -567,8 +547,9 @@ public final class SormImpl implements Sorm {
   @Override
   @SuppressWarnings("unchecked")
   public <T> Table<T> getTable(Class<T> type, String tableName) {
-    return (Table<T>) tables.computeIfAbsent(type.getName() + "-" + tableName,
-        key -> new BasicTable<>(this, type, tableName));
+    return (Table<T>)
+        tables.computeIfAbsent(
+            type.getName() + "-" + tableName, key -> new BasicTable<>(this, type, tableName));
   }
 
   @Override
@@ -585,5 +566,4 @@ public final class SormImpl implements Sorm {
   public <T> ResultSetStream<T> stream(Class<T> type, String sql, Object... parameters) {
     return new ResultSetStreamSorm<T>(this, type, sql, parameters);
   }
-
 }

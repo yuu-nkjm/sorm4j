@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -24,7 +23,9 @@ public class Simple07 {
     return "hello world";
   }
 
-  public void setHelloWorld(String stringCol) { /* do nothing */ }
+  public void setHelloWorld(String stringCol) {
+    /* do nothing */
+  }
 
   public long getLongCol() {
     return longCol;
@@ -39,7 +40,7 @@ public class Simple07 {
     return "foo";
   }
 
-  public void setFoo(String foo) { /* do nothing */ }
-
+  public void setFoo(String foo) {
+    /* do nothing */
+  }
 }
-

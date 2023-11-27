@@ -16,10 +16,13 @@ public interface H2Table<T> extends TableWithDefinition<T> {
     return H2CsvReadSql.builder(csvFile, getValueType());
   }
 
-  default String getReadCsvWithHeaderSql(File csvFile, Charset charset, char fieldSeparator,
-      Character fieldDelimiter) {
-    H2CsvReadSql.Builder builder = csvReadSqlBuilder(csvFile).setCharset(charset)
-        .setFieldSeparator(fieldSeparator).setFieldDelimiter(fieldDelimiter);
+  default String getReadCsvWithHeaderSql(
+      File csvFile, Charset charset, char fieldSeparator, Character fieldDelimiter) {
+    H2CsvReadSql.Builder builder =
+        csvReadSqlBuilder(csvFile)
+            .setCharset(charset)
+            .setFieldSeparator(fieldSeparator)
+            .setFieldDelimiter(fieldDelimiter);
     return builder.build().getCsvReadAndSelectSql();
   }
 
@@ -27,14 +30,18 @@ public interface H2Table<T> extends TableWithDefinition<T> {
     return readCsvWithHeader(csvFile, StandardCharsets.UTF_8, ',', null);
   }
 
-  default List<T> readCsvWithHeader(File csvFile, Charset charset, char fieldSeparator,
-      Character fieldDelimiter) {
+  default List<T> readCsvWithHeader(
+      File csvFile, Charset charset, char fieldSeparator, Character fieldDelimiter) {
     try {
-      return getOrm().readList(getValueType(),
-          getReadCsvWithHeaderSql(csvFile, charset, fieldSeparator, fieldDelimiter));
+      return getOrm()
+          .readList(
+              getValueType(),
+              getReadCsvWithHeaderSql(csvFile, charset, fieldSeparator, fieldDelimiter));
     } catch (Exception e) {
-      throw new IllegalArgumentException("Error occurs in: "
-          + getReadCsvWithHeaderSql(csvFile, charset, fieldSeparator, fieldDelimiter), e);
+      throw new IllegalArgumentException(
+          "Error occurs in: "
+              + getReadCsvWithHeaderSql(csvFile, charset, fieldSeparator, fieldDelimiter),
+          e);
     }
   }
 
@@ -46,11 +53,16 @@ public interface H2Table<T> extends TableWithDefinition<T> {
     return writeCsv(toFile, selectSql, StandardCharsets.UTF_8, ',', null);
   }
 
-  default File writeCsv(File toFile, String selectSql, Charset charset, char fieldSeparator,
+  default File writeCsv(
+      File toFile,
+      String selectSql,
+      Charset charset,
+      char fieldSeparator,
       Character fieldDelimiter) {
-    getOrm().executeUpdate(H2CsvFunctions.getCallCsvWriteSql(toFile, selectSql, charset,
-        fieldSeparator, fieldDelimiter));
+    getOrm()
+        .executeUpdate(
+            H2CsvFunctions.getCallCsvWriteSql(
+                toFile, selectSql, charset, fieldSeparator, fieldDelimiter));
     return toFile;
   }
-
 }

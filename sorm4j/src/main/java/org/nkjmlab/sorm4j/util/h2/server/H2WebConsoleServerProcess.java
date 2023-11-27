@@ -15,7 +15,6 @@ public class H2WebConsoleServerProcess {
     this.properties = properties;
   }
 
-
   public boolean awaitStart() {
     return awaitStart(DEFAULT_TIMEOUT, DEFAULT_TIMEUNIT);
   }
@@ -25,9 +24,7 @@ public class H2WebConsoleServerProcess {
    *
    * @param props
    */
-
   public boolean awaitStart(long timeout, TimeUnit unit) {
     return H2ServerProcess.awaitStartServer(properties, timeout, unit);
   }
-
 }

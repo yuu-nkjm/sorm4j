@@ -9,5 +9,4 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.PARAMETER, ElementType.FIELD})
 @Experimental
-public @interface OrmJsonColumnContainer {
-}
+public @interface OrmJsonColumnContainer {}

@@ -20,7 +20,5 @@ class TableMetaDataImplTest {
 
     assertThat(metaData.getColumns()).containsAll(List.of("ID", "NAME", "ADDRESS"));
     assertThat(metaData.getPrimaryKeys()).containsAll(List.of("ID"));
-
   }
-
 }

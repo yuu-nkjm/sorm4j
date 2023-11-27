@@ -12,12 +12,11 @@ class ResultSetIterator<T> implements Iterator<T> {
   private final Class<T> objectClass;
   private final ResultSet resultSet;
 
-  public ResultSetIterator(OrmConnectionImpl connection, Class<T> objectClass,
-      ResultSet resultSet) {
+  public ResultSetIterator(
+      OrmConnectionImpl connection, Class<T> objectClass, ResultSet resultSet) {
     this.ormConnection = connection;
     this.objectClass = objectClass;
     this.resultSet = resultSet;
-
   }
 
   @Override
@@ -29,9 +28,7 @@ class ResultSetIterator<T> implements Iterator<T> {
     }
   }
 
-  /**
-   * This iterator is closed if hasNext is false.
-   */
+  /** This iterator is closed if hasNext is false. */
   @Override
   public T next() {
     try {
@@ -45,5 +42,4 @@ class ResultSetIterator<T> implements Iterator<T> {
   public void remove() {
     throw new UnsupportedOperationException();
   }
-
 }

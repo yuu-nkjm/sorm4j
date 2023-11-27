@@ -24,31 +24,34 @@ class SimpleBatchProcessorTest {
   @BeforeAll
   static void setUp() {
     DataSource ds = SormTestUtils.createNewDatabaseDataSource();
-    SormContext context = SormContext.builder().setMultiRowProcessorFactory(MultiRowProcessorFactory
-        .builder().setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH).build()).build();
+    SormContext context =
+        SormContext.builder()
+            .setMultiRowProcessorFactory(
+                MultiRowProcessorFactory.builder()
+                    .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH)
+                    .build())
+            .build();
     sorm = Sorm.create(ds, context);
   }
-
 
   @BeforeEach
   void setUpEach() {
     sorm = createSormWithNewDatabaseAndCreateTables();
   }
 
-
   @Test
   void testMultiRowInsert() {
     sorm.acceptHandler(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
-    sorm.acceptHandler(TRANSACTION_READ_COMMITTED, tr -> {
-      try {
-        tr.insert(PLAYER_ALICE, null);
-        failBecauseExceptionWasNotThrown(Exception.class);
-      } catch (Exception e) {
-        assertThat(e.getMessage()).contains("it is null");
-      }
-
-    });
-
+    sorm.acceptHandler(
+        TRANSACTION_READ_COMMITTED,
+        tr -> {
+          try {
+            tr.insert(PLAYER_ALICE, null);
+            failBecauseExceptionWasNotThrown(Exception.class);
+          } catch (Exception e) {
+            assertThat(e.getMessage()).contains("it is null");
+          }
+        });
   }
 
   @Test
@@ -59,9 +62,9 @@ class SimpleBatchProcessorTest {
 
   @Test
   void testMultiRowMerge() {
-    sorm.acceptHandler(conn -> conn
-        .merge(Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
+    sorm.acceptHandler(
+        conn ->
+            conn.merge(
+                Stream.generate(() -> PLAYER_ALICE).limit(3000).collect(Collectors.toList())));
   }
-
-
 }

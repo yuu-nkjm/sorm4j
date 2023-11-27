@@ -28,15 +28,13 @@ class ColumnMetaDataTest {
     // c1 and c4 are diffrent
     assertThat(c1.equals(c4)).isFalse();
 
-
     // c1 and c3 are different
     assertThat(c1.equals(c3)).isFalse();
     assertThat(c1.compareTo(c3)).isLessThan(0);
 
-
-    assertThat(new ColumnMetaData("a", 0, "b", 0, "c", "d", "e")
-        .equals(new ColumnMetaData("a", 0, "b", 0, "c", "d", "e"))).isTrue();
-
+    assertThat(
+            new ColumnMetaData("a", 0, "b", 0, "c", "d", "e")
+                .equals(new ColumnMetaData("a", 0, "b", 0, "c", "d", "e")))
+        .isTrue();
   }
-
 }

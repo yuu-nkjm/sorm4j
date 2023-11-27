@@ -7,9 +7,8 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  * @see <a href="http://www.h2database.com/html/tutorial.html#console_settings">Settings of the H2
- *      Console</a>
+ *     Console</a>
  * @author nkjm
- *
  */
 @Experimental
 public class H2WebConsoleServerProperties extends H2ServerProperties {
@@ -21,10 +20,7 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
   public static class Builder extends H2ServerPropertiesBuilder<Builder> {
     private static final int DEFAULT_WEBCONSOLE_PORT = 8082;
 
-    /**
-     * This constructor is for external libraries.
-     */
-
+    /** This constructor is for external libraries. */
     public Builder() {
       super("WEB_CONSOLE", DEFAULT_WEBCONSOLE_PORT, "");
     }
@@ -37,8 +33,8 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
       args.addAll(Arrays.asList(options));
       args.add("-webAdminPassword");
       args.add(password);
-      return new H2WebConsoleServerProperties(serverType, port, password,
-          args.toArray(String[]::new));
+      return new H2WebConsoleServerProperties(
+          serverType, port, password, args.toArray(String[]::new));
     }
 
     @Override

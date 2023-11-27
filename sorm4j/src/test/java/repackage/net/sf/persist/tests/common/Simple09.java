@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -23,7 +22,9 @@ public class Simple09 {
   // getter returns void -- will blow
   public void getStringCol() {}
 
-  public void setStringCol(String stringCol) { /* this.stringCol = stringCol; */ }
+  public void setStringCol(String stringCol) {
+    /* this.stringCol = stringCol; */
+  }
 
   public long getIntCol() {
     return intCol;
@@ -32,6 +33,4 @@ public class Simple09 {
   public void setIntCol(long intCol) {
     this.intCol = intCol;
   }
-
 }
-

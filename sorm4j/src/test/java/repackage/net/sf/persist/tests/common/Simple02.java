@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -12,7 +11,4 @@ public class Simple02 {
   private long id;
   private String stringCol;
   private long longCol;
-
-
 }
-

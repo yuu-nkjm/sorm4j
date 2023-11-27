@@ -14,9 +14,7 @@ public interface Table<T> extends TableMappedOrm<T> {
   @Override
   Sorm getOrm();
 
-
   static <T> Table<T> create(Sorm sorm, Class<T> objectClass) {
     return new BasicTable<>(sorm, objectClass);
   }
-
 }

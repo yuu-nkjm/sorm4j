@@ -24,5 +24,4 @@ public class JsonByte {
   public String toString() {
     return new String(bytes, StandardCharsets.UTF_8);
   }
-
 }

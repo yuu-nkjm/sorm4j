@@ -30,5 +30,4 @@ class JdbcDatabaseMetaDataTest {
     assertThat(md.getUserName()).isEqualTo("SA");
     assertThat(md.getJdbcDriverVersion()).isEqualTo("4.2");
   }
-
 }

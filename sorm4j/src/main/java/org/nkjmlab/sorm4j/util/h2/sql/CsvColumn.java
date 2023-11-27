@@ -8,17 +8,18 @@ import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
 
 /**
  * Mapping a csv column to a table column.
+ *
  * <h5>Example.</h5>
  *
  * <pre>
  * <code>
  *   @OrmRecord
-  public static class Item {
-    &#64;CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
-    public LocalDate deliveryDate;
-    &#64;CsvColumn("`price/prices`")
-    public int price;
-  }
+ * public static class Item {
+ * &#64;CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
+ * public LocalDate deliveryDate;
+ * &#64;CsvColumn("`price/prices`")
+ * public int price;
+ * }
  * </code>
  * </pre>
  *
@@ -34,5 +35,4 @@ import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
 public @interface CsvColumn {
 
   String value();
-
 }

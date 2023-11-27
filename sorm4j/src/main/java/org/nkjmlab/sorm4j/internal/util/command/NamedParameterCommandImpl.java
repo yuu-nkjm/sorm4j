@@ -6,7 +6,8 @@ import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
 
-public final class NamedParameterCommandImpl extends AbstractCommand implements NamedParameterCommand {
+public final class NamedParameterCommandImpl extends AbstractCommand
+    implements NamedParameterCommand {
 
   private final NamedParameterSqlParser sql;
 
@@ -37,5 +38,4 @@ public final class NamedParameterCommandImpl extends AbstractCommand implements 
     sql.bindBean(bean);
     return this;
   }
-
 }

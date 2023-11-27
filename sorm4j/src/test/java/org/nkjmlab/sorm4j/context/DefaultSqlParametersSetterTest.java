@@ -58,7 +58,6 @@ class DefaultSqlParametersSetterTest {
       assertThat(toSqlArray("java.lang.Long", conn, TestUtils.LONG_ARRAY).getBaseType())
           .isEqualTo(JDBCType.BIGINT.getVendorTypeNumber());
 
-
       assertThat(toSqlArray("float", conn, TestUtils.PRIMITIVE_FLOAT_ARRAY).getBaseType())
           .isEqualTo(JDBCType.REAL.getVendorTypeNumber());
 
@@ -71,14 +70,12 @@ class DefaultSqlParametersSetterTest {
       assertThat(toSqlArray("java.lang.Double", conn, TestUtils.DOUBLE_ARRAY).getBaseType())
           .isEqualTo(JDBCType.DOUBLE.getVendorTypeNumber());
 
-
       assertThat(toSqlArray("java.lang.String", conn, TestUtils.STRING_ARRAY).getBaseType())
           .isEqualTo(JDBCType.VARCHAR.getVendorTypeNumber());
 
       assertThat(
-          toSqlArray("java.math.BigDecimal", conn, TestUtils.BIG_DECIMAL_ARRAY).getBaseType())
-              .isEqualTo(JDBCType.NUMERIC.getVendorTypeNumber());
-
+              toSqlArray("java.math.BigDecimal", conn, TestUtils.BIG_DECIMAL_ARRAY).getBaseType())
+          .isEqualTo(JDBCType.NUMERIC.getVendorTypeNumber());
 
       assertThat(toSqlArray("java.sql.Date", conn, TestUtils.DATE_ARRAY).getBaseType())
           .isEqualTo(JDBCType.DATE.getVendorTypeNumber());
@@ -94,11 +91,13 @@ class DefaultSqlParametersSetterTest {
           .isEqualTo(JDBCType.TIMESTAMP_WITH_TIMEZONE.getVendorTypeNumber());
 
       assertThat(
-          toSqlArray("java.time.OffsetTime", conn, TestUtils.OFFSET_TIME_ARRAY).getBaseType())
-              .isEqualTo(JDBCType.TIME_WITH_TIMEZONE.getVendorTypeNumber());
+              toSqlArray("java.time.OffsetTime", conn, TestUtils.OFFSET_TIME_ARRAY).getBaseType())
+          .isEqualTo(JDBCType.TIME_WITH_TIMEZONE.getVendorTypeNumber());
 
-      assertThat(toSqlArray("java.time.OffsetDateTime", conn, TestUtils.OFFSET_DATE_TIME_ARRAY)
-          .getBaseType()).isEqualTo(JDBCType.TIMESTAMP_WITH_TIMEZONE.getVendorTypeNumber());
+      assertThat(
+              toSqlArray("java.time.OffsetDateTime", conn, TestUtils.OFFSET_DATE_TIME_ARRAY)
+                  .getBaseType())
+          .isEqualTo(JDBCType.TIMESTAMP_WITH_TIMEZONE.getVendorTypeNumber());
 
       assertThat(toSqlArray("java.time.LocalDate", conn, TestUtils.LOCAL_DATE_ARRAY).getBaseType())
           .isEqualTo(JDBCType.DATE.getVendorTypeNumber());
@@ -106,13 +105,13 @@ class DefaultSqlParametersSetterTest {
       assertThat(toSqlArray("java.time.LocalTime", conn, TestUtils.LOCAL_TIME_ARRAY).getBaseType())
           .isEqualTo(JDBCType.TIME.getVendorTypeNumber());
 
-      assertThat(toSqlArray("java.time.LocalDateTime", conn, TestUtils.LOCAL_DATE_TIME_ARRAY)
-          .getBaseType()).isEqualTo(JDBCType.TIMESTAMP.getVendorTypeNumber());
-
+      assertThat(
+              toSqlArray("java.time.LocalDateTime", conn, TestUtils.LOCAL_DATE_TIME_ARRAY)
+                  .getBaseType())
+          .isEqualTo(JDBCType.TIMESTAMP.getVendorTypeNumber());
 
       assertThat(toSqlArray("java.lang.Object", conn, TestUtils.OBJECT_ARRAY).getBaseType())
           .isEqualTo(JDBCType.JAVA_OBJECT.getVendorTypeNumber());
-
 
     } catch (SQLException e) {
       throw Try.rethrow(e);
@@ -127,8 +126,8 @@ class DefaultSqlParametersSetterTest {
         "CREATE TABLE TA (id int auto_increment primary key, arry " + "INTEGER" + " ARRAY[10])");
 
     sorm.readFirst(RowMap.class, "select * from TA where arry=?", new boolean[] {true, false});
-    sorm.readFirst(RowMap.class, "select * from TA where arry=?",
-        (Object) new Boolean[] {true, false});
+    sorm.readFirst(
+        RowMap.class, "select * from TA where arry=?", (Object) new Boolean[] {true, false});
     sorm.readFirst(RowMap.class, "select * from TA where arry=?", new double[] {0.1d});
     sorm.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
 
@@ -140,8 +139,8 @@ class DefaultSqlParametersSetterTest {
       setter.setParameters(pstmt, new Object[] {});
 
       setter.setParameters(pstmt, Instant.now());
-      setter.setParameters(pstmt,
-          DefaultSqlParametersSetterTest.class.getResourceAsStream("log4j2.xml"));
+      setter.setParameters(
+          pstmt, DefaultSqlParametersSetterTest.class.getResourceAsStream("log4j2.xml"));
       setter.setParameters(pstmt, new StringReader("a"));
 
     } catch (SQLException e) {
