@@ -1,4 +1,3 @@
-
 package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.stream.Stream;
@@ -14,16 +13,14 @@ public final class ResultSetStreamOrmConnection<T> extends AbstractResultSetStre
 
   private final OrmConnectionImpl ormConn;
 
-  public ResultSetStreamOrmConnection(OrmConnectionImpl ormConn, Class<T> objectClass, String sql,
-      Object... parameters) {
+  public ResultSetStreamOrmConnection(
+      OrmConnectionImpl ormConn, Class<T> objectClass, String sql, Object... parameters) {
     super(objectClass, sql, parameters);
     this.ormConn = ormConn;
   }
-
 
   @Override
   public <R> R apply(FunctionHandler<Stream<T>, R> handler) {
     return apply(ormConn, handler);
   }
-
 }

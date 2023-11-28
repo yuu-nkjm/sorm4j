@@ -29,11 +29,16 @@ class DefaultResultSetValueGetterTest {
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
     sorm.acceptHandler(con -> con.insert(a));
 
-    LocalDateTimeSample r = sorm.applyHandler(
-        con -> con.readFirst(LocalDateTimeSample.class, "select * from LocalDateTimeSample"));
+    LocalDateTimeSample r =
+        sorm.applyHandler(
+            con -> con.readFirst(LocalDateTimeSample.class, "select * from LocalDateTimeSample"));
     assertThat(r).isEqualTo(a);
-    sorm.acceptHandler(con -> con.insert(Stream.generate(() -> LocalDateTimeSample.buildRandom())
-        .limit(10000).toArray(LocalDateTimeSample[]::new)));
+    sorm.acceptHandler(
+        con ->
+            con.insert(
+                Stream.generate(() -> LocalDateTimeSample.buildRandom())
+                    .limit(10000)
+                    .toArray(LocalDateTimeSample[]::new)));
 
     try {
       sorm.acceptHandler(con -> con.update(a));
@@ -45,16 +50,24 @@ class DefaultResultSetValueGetterTest {
     RowMap map = sorm.readFirst(RowMap.class, "select * from LocalDateTimeSample");
 
     assertThat(Arrays.asList(map.getArray("arry", String.class))).isEqualTo(List.of("a", "1"));
-
   }
 
   @Test
   void testGetValueBySqlType() {
-    List.of(java.sql.Types.ROWID, java.sql.Types.REF, java.sql.Types.ROWID, java.sql.Types.REF,
-        java.sql.Types.NUMERIC, java.sql.Types.NULL, java.sql.Types.LONGVARCHAR,
-        java.sql.Types.LONGVARBINARY, java.sql.Types.JAVA_OBJECT, java.sql.Types.FLOAT,
-        java.sql.Types.DATALINK, java.sql.Types.BIT, java.sql.Types.ARRAY);
-
+    List.of(
+        java.sql.Types.ROWID,
+        java.sql.Types.REF,
+        java.sql.Types.ROWID,
+        java.sql.Types.REF,
+        java.sql.Types.NUMERIC,
+        java.sql.Types.NULL,
+        java.sql.Types.LONGVARCHAR,
+        java.sql.Types.LONGVARBINARY,
+        java.sql.Types.JAVA_OBJECT,
+        java.sql.Types.FLOAT,
+        java.sql.Types.DATALINK,
+        java.sql.Types.BIT,
+        java.sql.Types.ARRAY);
   }
 
   @Test
@@ -67,8 +80,7 @@ class DefaultResultSetValueGetterTest {
     public String[] arry;
     public Float fl;
 
-    @OrmIgnore
-    int ignoreCol;
+    @OrmIgnore int ignoreCol;
 
     @OrmIgnore
     public int getIgnoreCol() {
@@ -96,8 +108,15 @@ class DefaultResultSetValueGetterTest {
 
     @Override
     public String toString() {
-      return "LocalDateTimeSample [time=" + time + ", date=" + date + ", dateTime=" + dateTime
-          + ", arry=" + Arrays.toString(arry) + "]";
+      return "LocalDateTimeSample [time="
+          + time
+          + ", date="
+          + date
+          + ", dateTime="
+          + dateTime
+          + ", arry="
+          + Arrays.toString(arry)
+          + "]";
     }
 
     @Override
@@ -109,19 +128,15 @@ class DefaultResultSetValueGetterTest {
       return result;
     }
 
-
     // without array
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (!(obj instanceof LocalDateTimeSample))
-        return false;
+      if (this == obj) return true;
+      if (!(obj instanceof LocalDateTimeSample)) return false;
       LocalDateTimeSample other = (LocalDateTimeSample) obj;
-      return Arrays.deepEquals(arry, other.arry) && Objects.equals(date, other.date)
+      return Arrays.deepEquals(arry, other.arry)
+          && Objects.equals(date, other.date)
           && Objects.equals(dateTime, other.dateTime);
     }
-
   }
-
 }

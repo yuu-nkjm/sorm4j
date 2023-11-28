@@ -31,7 +31,6 @@ public abstract class H2ServerPropertiesBuilder<T extends H2ServerPropertiesBuil
     return getThisBuilder();
   }
 
-
   public H2ServerPropertiesBuilder<T> setServerType(String serverType) {
     this.serverType = serverType;
     return getThisBuilder();
@@ -59,7 +58,4 @@ public abstract class H2ServerPropertiesBuilder<T extends H2ServerPropertiesBuil
   }
 
   public abstract H2ServerProperties build();
-
-
-
 }

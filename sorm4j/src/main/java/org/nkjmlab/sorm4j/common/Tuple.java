@@ -6,7 +6,6 @@ import java.util.Objects;
  * Represents a tuple of objects
  *
  * @author yuu_nkjm
- *
  */
 public final class Tuple {
   private Tuple() {}
@@ -40,7 +39,6 @@ public final class Tuple {
       return t1;
     }
 
-
     @Override
     public String toString() {
       return "(" + getT1() + ")";
@@ -53,15 +51,11 @@ public final class Tuple {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (!(obj instanceof Tuple1))
-        return false;
+      if (this == obj) return true;
+      if (!(obj instanceof Tuple1)) return false;
       Tuple1<?> other = (Tuple1<?>) obj;
       return Objects.equals(t1, other.t1);
     }
-
-
   }
 
   /**
@@ -103,22 +97,17 @@ public final class Tuple {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (!super.equals(obj))
-        return false;
-      if (!(obj instanceof Tuple2))
-        return false;
+      if (this == obj) return true;
+      if (!super.equals(obj)) return false;
+      if (!(obj instanceof Tuple2)) return false;
       Tuple2<?, ?> other = (Tuple2<?, ?>) obj;
       return Objects.equals(t2, other.t2);
     }
-
   }
   /**
    * Represents a tuple of three objects
    *
    * @author yuu_nkjm
-   *
    * @param <T1>
    * @param <T2>
    * @param <T3>
@@ -132,7 +121,6 @@ public final class Tuple {
       this.t3 = t3;
     }
 
-
     /**
      * Gets a t3.
      *
@@ -142,12 +130,10 @@ public final class Tuple {
       return t3;
     }
 
-
     @Override
     public String toString() {
       return "(" + getT1() + ", " + getT2() + ", " + getT3() + ")";
     }
-
 
     @Override
     public int hashCode() {
@@ -157,18 +143,13 @@ public final class Tuple {
       return result;
     }
 
-
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (!super.equals(obj))
-        return false;
-      if (!(obj instanceof Tuple3))
-        return false;
+      if (this == obj) return true;
+      if (!super.equals(obj)) return false;
+      if (!(obj instanceof Tuple3)) return false;
       Tuple3<?, ?, ?> other = (Tuple3<?, ?, ?>) obj;
       return Objects.equals(t3, other.t3);
     }
-
   }
 }

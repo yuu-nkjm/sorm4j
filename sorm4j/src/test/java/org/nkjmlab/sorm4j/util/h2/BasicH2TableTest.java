@@ -29,7 +29,7 @@ class BasicH2TableTest {
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
-    try (Connection con = sorm.getJdbcConnection()) {
+    try (Connection con = sorm.openJdbcConnection()) {
       PreparedStatement ps =
           con.prepareStatement("insert into ORM_RECORD_EXAMPLES VALUES(?,?,? format json)");
       ps.setInt(1, 3);
@@ -85,10 +85,10 @@ class BasicH2TableTest {
   public static class Item {
     @CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
     public LocalDate deliveryDate;
+
     @CsvColumn("`price/prices`")
     public int price;
   }
-
 
   @OrmRecord
   public static class OrmRecordExample {
@@ -118,12 +118,9 @@ class BasicH2TableTest {
     public String toString() {
       return "OrmRecordExample [id=" + id + ", name=" + name + ", jsonCol=" + jsonCol + "]";
     }
-
-
   }
 
   public static File getTempDirectory() {
     return new File(System.getProperty("java.io.tmpdir"));
   }
-
 }

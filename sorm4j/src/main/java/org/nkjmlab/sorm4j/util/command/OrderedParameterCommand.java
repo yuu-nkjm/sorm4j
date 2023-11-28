@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
  * An executable request with ordered parameters.
  *
  * @author nkjm
- *
  */
 @Experimental
 public interface OrderedParameterCommand extends OrderedParameterSqlParser, Command {
@@ -30,5 +29,4 @@ public interface OrderedParameterCommand extends OrderedParameterSqlParser, Comm
   static OrderedParameterCommand of(OrmConnection conn, String sql) {
     return new OrderedParameterCommandImpl(conn, sql);
   }
-
 }

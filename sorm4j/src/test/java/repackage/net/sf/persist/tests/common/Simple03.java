@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -28,7 +27,4 @@ public class Simple03 {
   public void setStringCol(String stringCol) {
     this.stringCol = stringCol;
   }
-
-
 }
-

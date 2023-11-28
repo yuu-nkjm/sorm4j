@@ -8,13 +8,19 @@ public final class ClassUtils {
   private ClassUtils() {}
 
   private static final Map<Class<?>, Class<?>> primitiveToWrapperMap =
-      Map.ofEntries(entry(Boolean.TYPE, Boolean.class), entry(Byte.TYPE, Byte.class),
-          entry(Character.TYPE, Character.class), entry(Short.TYPE, Short.class),
-          entry(Integer.TYPE, Integer.class), entry(Long.TYPE, Long.class),
-          entry(Double.TYPE, Double.class), entry(Float.TYPE, Float.class));
+      Map.ofEntries(
+          entry(Boolean.TYPE, Boolean.class),
+          entry(Byte.TYPE, Byte.class),
+          entry(Character.TYPE, Character.class),
+          entry(Short.TYPE, Short.class),
+          entry(Integer.TYPE, Integer.class),
+          entry(Long.TYPE, Long.class),
+          entry(Double.TYPE, Double.class),
+          entry(Float.TYPE, Float.class));
 
-  private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = primitiveToWrapperMap
-      .entrySet().stream().collect(Collectors.toMap(en -> en.getValue(), en -> en.getKey()));
+  private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap =
+      primitiveToWrapperMap.entrySet().stream()
+          .collect(Collectors.toMap(en -> en.getValue(), en -> en.getKey()));
 
   public static Class<?> primitiveToWrapper(Class<?> clazz) {
     return primitiveToWrapperMap.get(clazz);

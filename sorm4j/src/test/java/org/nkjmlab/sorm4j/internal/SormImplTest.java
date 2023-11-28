@@ -23,7 +23,6 @@ import org.nkjmlab.sorm4j.test.common.Sport;
 
 class SormImplTest {
 
-
   private Sorm sorm;
 
   @BeforeEach
@@ -43,21 +42,25 @@ class SormImplTest {
         sorm.leftJoinOn(Guest.class, Player.class, "guests.id=players.id");
     assertThat(ret.size()).isEqualTo(sorm.selectAll(Guest.class).size());
 
-    List<Tuple3<Guest, Player, Sport>> ret1 = sorm.leftJoinOn(Guest.class, Player.class, Sport.class,
-        "guests.id=players.id", "players.id=sports.id");
+    List<Tuple3<Guest, Player, Sport>> ret1 =
+        sorm.leftJoinOn(
+            Guest.class, Player.class, Sport.class, "guests.id=players.id", "players.id=sports.id");
     assertThat(ret1.size()).isEqualTo(sorm.selectAll(Guest.class).size());
-
 
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
 
-
-    sorm.readTupleList(Guest.class, Player.class,
+    sorm.readTupleList(
+        Guest.class,
+        Player.class,
         ParameterizedSql.of("select * from guests join players on guests.id=players.id"));
 
-    sorm.readTupleList(Guest.class, Player.class, Sport.class, ParameterizedSql.of(
-        "select * from guests join players on guests.id=players.id join sports on players.id=sports.id"));
-
+    sorm.readTupleList(
+        Guest.class,
+        Player.class,
+        Sport.class,
+        ParameterizedSql.of(
+            "select * from guests join players on guests.id=players.id join sports on players.id=sports.id"));
   }
 
   @Test
@@ -65,16 +68,14 @@ class SormImplTest {
     sorm.insert(SormTestUtils.GUEST_ALICE);
 
     Table.create(sorm, Guest.class);
-    try (Connection conn = sorm.getJdbcConnection()) {
+    try (Connection conn = sorm.openJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("CsvColumn");
     } catch (SQLException e) {
     }
 
     assertThat(sorm.getJdbcDatabaseMetaData().toString()).contains("jdbc");
-
   }
-
 
   @Test
   void testAutoRollback() throws SQLException {
@@ -87,7 +88,6 @@ class SormImplTest {
 
     sorm.applyHandler(Connection.TRANSACTION_READ_COMMITTED, conn -> conn.insert(a));
     assertThat(sorm.selectAll(Guest.class).size() == 0);
-
   }
 
   @Test
@@ -98,10 +98,9 @@ class SormImplTest {
     // Mockito.doThrow(new SQLException("Mock close exception")).when(conMock).close();
     // Mockito.when(dsMock.getConnection()).thenReturn(conMock);
 
-
     Sorm sorm = Sorm.create(dsMock);
     try {
-      sorm.getJdbcConnection();
+      sorm.openJdbcConnection();
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
@@ -110,18 +109,19 @@ class SormImplTest {
   @Test
   void testException1() throws SQLException {
 
-
     try {
-      sorm.applyHandler(con -> {
-        throw new RuntimeException("");
-      });
+      sorm.applyHandler(
+          con -> {
+            throw new RuntimeException("");
+          });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
     try {
-      sorm.acceptHandler(con -> {
-        throw new RuntimeException("");
-      });
+      sorm.acceptHandler(
+          con -> {
+            throw new RuntimeException("");
+          });
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }
@@ -132,7 +132,6 @@ class SormImplTest {
     assertThat(sorm.toString()).contains("Sorm");
 
     Sorm.create(SormTestUtils.createNewDatabaseDataSource()).getDataSource();
-
   }
 
   private static Guest a = SormTestUtils.GUEST_ALICE;
@@ -144,5 +143,4 @@ class SormImplTest {
       // auto-rollback
     }
   }
-
 }

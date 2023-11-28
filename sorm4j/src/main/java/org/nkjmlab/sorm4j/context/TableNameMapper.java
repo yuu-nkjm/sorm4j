@@ -6,7 +6,6 @@ import java.sql.DatabaseMetaData;
  * A mapper from a class or candidates of table name to a valid table name exists on database.
  *
  * @author nkjm
- *
  */
 public interface TableNameMapper {
 
@@ -27,5 +26,4 @@ public interface TableNameMapper {
    * @return table name exists in database.
    */
   String getTableName(String tableName, DatabaseMetaData metaData);
-
 }

@@ -10,7 +10,5 @@ class ParameterizedStringUtilsTest {
     Object[] params = {null, new Object[] {"a", null, new Object[] {1, null}}};
     assertThat(ParameterizedStringFormatter.LENGTH_256.format("{},{}", params))
         .isEqualTo("null,[a, null, [1, null]]]");
-
   }
-
 }

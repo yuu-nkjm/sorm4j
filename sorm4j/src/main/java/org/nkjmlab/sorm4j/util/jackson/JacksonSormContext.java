@@ -11,14 +11,15 @@ public class JacksonSormContext {
 
   private JacksonSormContext() {}
 
-  public static SormContext.Builder builder(ObjectMapper objectMapper,
-      Class<?>... ormJsonColumnContainerClasses) {
+  public static SormContext.Builder builder(
+      ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
     return SormContext.builder()
-        .setColumnValueToJavaObjectConverters(new DefaultColumnValueToJavaObjectConverters(
-            new JacksonColumnValueToJavaObjectConverter(objectMapper,
-                ormJsonColumnContainerClasses)))
-        .setSqlParametersSetter(new DefaultSqlParametersSetter(
-            new JacksonSqlParameterSetter(objectMapper, ormJsonColumnContainerClasses)));
+        .setColumnValueToJavaObjectConverters(
+            new DefaultColumnValueToJavaObjectConverters(
+                new JacksonColumnValueToJavaObjectConverter(
+                    objectMapper, ormJsonColumnContainerClasses)))
+        .setSqlParametersSetter(
+            new DefaultSqlParametersSetter(
+                new JacksonSqlParameterSetter(objectMapper, ormJsonColumnContainerClasses)));
   }
-
 }

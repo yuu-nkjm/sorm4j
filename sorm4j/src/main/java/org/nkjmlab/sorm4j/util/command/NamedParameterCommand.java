@@ -6,16 +6,13 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.command.NamedParameterCommandImpl;
 import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 
-
 /**
  * An executable request with named parameters.
  *
  * @author nkjm
- *
  */
 @Experimental
 public interface NamedParameterCommand extends NamedParameterSqlParser, Command {
-
 
   @Override
   NamedParameterCommand bindAll(Map<String, Object> keyValuePairOfNamedParameters);
@@ -36,5 +33,4 @@ public interface NamedParameterCommand extends NamedParameterSqlParser, Command 
   static NamedParameterCommand of(OrmConnection conn, String sql) {
     return new NamedParameterCommandImpl(conn, sql);
   }
-
 }

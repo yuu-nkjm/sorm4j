@@ -48,8 +48,6 @@ class ParameterizedSqlTest {
     Object[] params = {1};
     assertThat(ParameterizedSqlParser.embedParameter(sql, params))
         .contains("select * from guest where id=1");
-
-
   }
 
   @Test
@@ -65,9 +63,10 @@ class ParameterizedSqlTest {
   void testEmbeddedOrderFail() {
     String sql = "select * from guest where id={?}";
 
-    assertThatThrownBy(() -> ParameterizedSqlParser.embedParameter(sql)).isInstanceOfSatisfying(
-        SormException.class,
-        e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
+    assertThatThrownBy(() -> ParameterizedSqlParser.embedParameter(sql))
+        .isInstanceOfSatisfying(
+            SormException.class,
+            e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
   }
 
   @Test
@@ -75,11 +74,9 @@ class ParameterizedSqlTest {
 
     String sql = "select * from guest where name={:name} and id={:id}";
 
-
     assertThatThrownBy(() -> ParameterizedSqlParser.embedParameter(sql, Map.of("name1", 1)))
-        .isInstanceOfSatisfying(SormException.class,
+        .isInstanceOfSatisfying(
+            SormException.class,
             e -> assertThat(e.getMessage()).contains("Could not embed all parameters"));
-
   }
-
 }

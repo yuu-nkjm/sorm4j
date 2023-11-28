@@ -13,9 +13,6 @@ import java.lang.annotation.Target;
 @Experimental
 public @interface OrmConstructor {
 
-  /**
-   * Name of the columns.
-   */
+  /** Name of the columns. */
   String[] value();
-
 }

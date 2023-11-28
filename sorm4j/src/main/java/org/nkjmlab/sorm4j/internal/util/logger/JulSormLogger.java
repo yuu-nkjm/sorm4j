@@ -33,7 +33,6 @@ public final class JulSormLogger extends AbstractSormLogger implements SormLogge
     this.logger.finer(ParameterizedStringFormatter.LENGTH_256.format(format, params));
   }
 
-
   @Override
   public void debug(String format, Object... params) {
     this.logger.fine(ParameterizedStringFormatter.LENGTH_256.format(format, params));
@@ -78,6 +77,4 @@ public final class JulSormLogger extends AbstractSormLogger implements SormLogge
   public void error(int depth, String format, Object... params) {
     error(format, params);
   }
-
-
 }

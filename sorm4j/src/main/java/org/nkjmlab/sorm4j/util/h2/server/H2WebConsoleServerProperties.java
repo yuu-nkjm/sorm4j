@@ -3,13 +3,13 @@ package org.nkjmlab.sorm4j.util.h2.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
  * @see <a href="http://www.h2database.com/html/tutorial.html#console_settings">Settings of the H2
- *      Console</a>
+ *     Console</a>
  * @author nkjm
- *
  */
 @Experimental
 public class H2WebConsoleServerProperties extends H2ServerProperties {
@@ -21,10 +21,7 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
   public static class Builder extends H2ServerPropertiesBuilder<Builder> {
     private static final int DEFAULT_WEBCONSOLE_PORT = 8082;
 
-    /**
-     * This constructor is for external libraries.
-     */
-
+    /** This constructor is for external libraries. */
     public Builder() {
       super("WEB_CONSOLE", DEFAULT_WEBCONSOLE_PORT, "");
     }
@@ -35,10 +32,10 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
           new ArrayList<>(List.of(javaCommand, "-cp", getH2ClassPath(), "org.h2.tools.Server"));
       args.addAll(List.of("-web", "-webPort", port + ""));
       args.addAll(Arrays.asList(options));
-      args.add("-webAdminPassword");
-      args.add(password);
-      return new H2WebConsoleServerProperties(serverType, port, password,
-          args.toArray(String[]::new));
+      //      args.add("-webAdminPassword");
+      //      args.add(password);
+      return new H2WebConsoleServerProperties(
+          serverType, port, password, args.toArray(String[]::new));
     }
 
     @Override

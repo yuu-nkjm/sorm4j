@@ -11,17 +11,13 @@ import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 
-
 /**
  * An executable request
  *
  * @author nkjm
- *
  */
 @Experimental
 public interface Command {
-
-
 
   /**
    * Creates a {@link Command} from SQL string.
@@ -29,11 +25,9 @@ public interface Command {
    * @param sql
    * @return
    */
-
   static Command create(OrmConnection conn, ParameterizedSql sql) {
     return BasicCommand.from(conn, sql.getSql()).addParameter(sql.getParameters());
   }
-
 
   /**
    * Creates a {@link BasicCommand} from SQL string.
@@ -41,11 +35,9 @@ public interface Command {
    * @param sql
    * @return
    */
-
   static BasicCommand create(OrmConnection conn, String sql) {
     return BasicCommand.from(conn, sql);
   }
-
 
   /**
    * Creates a {@link NamedParameterCommand} from SQL string.
@@ -54,11 +46,10 @@ public interface Command {
    * @param parameters
    * @return
    */
-  static NamedParameterCommand create(OrmConnection conn, String sql,
-      Map<String, Object> parameters) {
+  static NamedParameterCommand create(
+      OrmConnection conn, String sql, Map<String, Object> parameters) {
     return NamedParameterCommand.of(conn, sql).bindAll(parameters);
   }
-
 
   /**
    * Creates a {@link OrderedParameterCommand} from SQL string.
@@ -80,7 +71,6 @@ public interface Command {
    */
   <T> T executeQuery(ResultSetTraverser<T> resultSetTraverser);
 
-
   /**
    * Executes a query and apply the given mapper to the each row in returned result set.
    *
@@ -96,7 +86,6 @@ public interface Command {
    * @return
    */
   int executeUpdate();
-
 
   /**
    * Reads an object from the database.
@@ -133,7 +122,6 @@ public interface Command {
    * Reads results as List of {@link Tuple2} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param t1
@@ -147,17 +135,12 @@ public interface Command {
    * Reads results as List of {@link Tuple3} for reading JOIN SQL results typically.
    *
    * @see {@link OrmColumnAliasPrefix} for use column alias prefix.
-   *
    * @param <T1>
    * @param <T2>
    * @param t1
    * @param t2
    * @return
    */
-
   @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2, Class<T3> t3);
-
-
-
 }

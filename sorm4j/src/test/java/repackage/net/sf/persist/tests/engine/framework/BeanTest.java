@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.engine.framework;
@@ -11,32 +10,27 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.slf4j.Logger;
 
-
 public class BeanTest {
 
   private static final Logger log = org.slf4j.LoggerFactory.getLogger(BeanTest.class);
 
-
-  public static void test(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
-      Consumer<Object> tester) {
+  public static void test(
+      Class<?> caller, OrmConnection ormConn, BeanMap beanMap, Consumer<Object> tester) {
     ormConn.deleteAllIn(dbName(beanMap.getClassName()));
     Object obj =
         DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, false);
     tester.accept(obj);
   }
 
-
-  public static void testNull(Class<?> caller, OrmConnection ormConn, BeanMap beanMap,
-      Consumer<Object> tester) {
+  public static void testNull(
+      Class<?> caller, OrmConnection ormConn, BeanMap beanMap, Consumer<Object> tester) {
     ormConn.deleteAllIn(dbName(beanMap.getClassName()));
     Object objNull =
         DynamicBean.createInstance(DynamicBean.getBeanClass(caller, beanMap), beanMap, true);
     tester.accept(objNull);
   }
 
-  /**
-   * tests insertion of a bean
-   */
+  /** tests insertion of a bean */
   public static void testInsert(OrmConnection persist, Object obj, BeanMap beanMap) {
     Class<?> cls = obj.getClass();
     String tableName = dbName(obj.getClass().getSimpleName());
@@ -55,11 +49,16 @@ public class BeanTest {
 
     // check if the bean read is the same as inserted
     if (!obj.equals(read.get(0))) {
-      throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
-          + DynamicBean.toString(read.get(0)) + "] as result of [" + sql + "]");
+      throw new AssertionError(
+          "Expected ["
+              + DynamicBean.toString(obj)
+              + "] but got ["
+              + DynamicBean.toString(read.get(0))
+              + "] as result of ["
+              + sql
+              + "]");
     }
   }
-
 
   /**
    * For each field and each field type, execute a query in the format select * from tableName where
@@ -93,14 +92,30 @@ public class BeanTest {
           if (ret == null) {
             List<? extends Object> all = persist.selectAll(obj.getClass());
             log.error("{}, {}", fieldValueConverted, all);
-            throw new AssertionError("Expected not null value but got null as result of [" + sql
-                + "] with parameter [" + fieldValue + "] , converted = [" + fieldValueConverted
-                + "] type [" + (fieldValue == null ? "null" : fieldValue.getClass())
-                + "] converted [" + fieldType + "]" + System.lineSeparator() + all);
+            throw new AssertionError(
+                "Expected not null value but got null as result of ["
+                    + sql
+                    + "] with parameter ["
+                    + fieldValue
+                    + "] , converted = ["
+                    + fieldValueConverted
+                    + "] type ["
+                    + (fieldValue == null ? "null" : fieldValue.getClass())
+                    + "] converted ["
+                    + fieldType
+                    + "]"
+                    + System.lineSeparator()
+                    + all);
           }
           if (!obj.equals(ret)) {
-            throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
-                + DynamicBean.toString(ret) + "] as result of [" + sql + "]");
+            throw new AssertionError(
+                "Expected ["
+                    + DynamicBean.toString(obj)
+                    + "] but got ["
+                    + DynamicBean.toString(ret)
+                    + "] as result of ["
+                    + sql
+                    + "]");
           }
         }
       }
@@ -132,8 +147,14 @@ public class BeanTest {
               "Expected not null value but got null as result of [" + sql + "]");
         }
         if (!obj.equals(ret)) {
-          throw new AssertionError("Expected [" + DynamicBean.toString(obj) + "] but got ["
-              + DynamicBean.toString(ret) + "] as result of [" + sql + "]");
+          throw new AssertionError(
+              "Expected ["
+                  + DynamicBean.toString(obj)
+                  + "] but got ["
+                  + DynamicBean.toString(ret)
+                  + "] as result of ["
+                  + sql
+                  + "]");
         }
       }
     }
@@ -143,8 +164,8 @@ public class BeanTest {
    * for each field, and for each field type perform a query in the form select columnName from
    * tableName
    */
-  public static void testSelectFields(OrmConnection persist, Object obj, BeanMap beanMap,
-      boolean useNulls) {
+  public static void testSelectFields(
+      OrmConnection persist, Object obj, BeanMap beanMap, boolean useNulls) {
     String tableName = dbName(obj.getClass().getSimpleName());
 
     // for each field in the bean
@@ -179,17 +200,26 @@ public class BeanTest {
           // (eg char[]-String, double-BigDecimal, etc)
           Object retConverted = DynamicBean.convertToType(fieldValue.getClass(), ret);
           if (!DynamicBean.compareValues(fieldValue, retConverted)) {
-            Object[] params = {fieldValue, fieldValue.getClass(), retConverted, retConverted.getClass(), ret, ret.getClass(), sql};
-            throw new AssertionError(ParameterizedStringFormatter.LENGTH_256.format("Expected [{}]({}) but actual [{}]({}) converted from [{}]({}) as result of [{}]", params));
+            Object[] params = {
+              fieldValue,
+              fieldValue.getClass(),
+              retConverted,
+              retConverted.getClass(),
+              ret,
+              ret.getClass(),
+              sql
+            };
+            throw new AssertionError(
+                ParameterizedStringFormatter.LENGTH_256.format(
+                    "Expected [{}]({}) but actual [{}]({}) converted from [{}]({}) as result of [{}]",
+                    params));
           }
         }
       }
     }
   }
 
-  /**
-   * perform [select * from tableName] and get the results as a map
-   */
+  /** perform [select * from tableName] and get the results as a map */
   public static void testSelectMap(OrmConnection persist, Object obj, BeanMap beanMap) {
     String tableName = dbName(obj.getClass().getSimpleName());
 
@@ -226,24 +256,28 @@ public class BeanTest {
         // (eg char[]-String, double-BigDecimal, etc)
         if (!DynamicBean.compareValues(fieldValue, mapValueU)
             && !DynamicBean.compareValues(fieldValue, mapValueL)) {
-          throw new AssertionError("Map entry [" + columnName + "]=[" + mapValueU
-              + "] does not match field [" + fieldMap.getFieldName() + "]=[" + fieldValue
-              + "] as result of sql [" + sql + "]");
+          throw new AssertionError(
+              "Map entry ["
+                  + columnName
+                  + "]=["
+                  + mapValueU
+                  + "] does not match field ["
+                  + fieldMap.getFieldName()
+                  + "]=["
+                  + fieldValue
+                  + "] as result of sql ["
+                  + sql
+                  + "]");
         }
       }
     }
   }
 
-
-
   // ---------- helpers ----------
 
-  /**
-   * Returned the database table/column name related with a given bean/field name
-   */
+  /** Returned the database table/column name related with a given bean/field name */
   private static String dbName(String s) {
     String name = s.replaceAll("([A-Z])", "_$1").toLowerCase();
     return (name.charAt(0) == '_' ? name.substring(1) : name).toLowerCase();
   }
-
 }

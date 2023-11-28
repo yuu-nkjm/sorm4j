@@ -7,8 +7,11 @@ import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
-  public SimpleBatchProcessor(LoggerContext loggerContext, SqlParametersSetter sqlParametersSetter,
-      PreparedStatementSupplier statementSupplier, SqlParametersToTableMapping<T> tableMapping,
+  public SimpleBatchProcessor(
+      LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<T> tableMapping,
       int batchSize) {
     super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
   }
@@ -22,5 +25,4 @@ final class SimpleBatchProcessor<T> extends MultiRowProcessor<T> {
   public final int[] multiRowMerge(Connection con, T[] objects) {
     return batch(con, getSql().getMergeSql(), obj -> getMergeParameters(obj), objects);
   }
-
 }

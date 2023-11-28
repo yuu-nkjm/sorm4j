@@ -19,7 +19,6 @@ import org.nkjmlab.sorm4j.sql.ParameterizedSql;
  * class could treat {@link List} parameter.
  *
  * @author nkjm
- *
  */
 public final class NamedParameterSqlParserImpl implements NamedParameterSqlParser {
 
@@ -39,15 +38,14 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   private final Map<String, Object> parameters;
   private Object bean;
 
-  public NamedParameterSqlParserImpl(String sql, char prefix, char suffix,
-      NameToFieldAccessorMapper nameToFieldMapper) {
+  public NamedParameterSqlParserImpl(
+      String sql, char prefix, char suffix, NameToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
     this.nameToFieldMapper = nameToFieldMapper;
     this.parameters = new HashMap<>();
   }
-
 
   public NamedParameterSqlParserImpl(String sql) {
     this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_COLUMN_FIELD_MAPPER);
@@ -70,7 +68,6 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
     this.bean = bean;
     return this;
   }
-
 
   @Override
   public ParameterizedSql parse() {
@@ -141,5 +138,4 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
         .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
         .get(toCanonicalCase(parameterName));
   }
-
 }

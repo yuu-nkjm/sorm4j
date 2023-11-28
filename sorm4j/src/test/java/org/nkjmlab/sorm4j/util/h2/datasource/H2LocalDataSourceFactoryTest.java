@@ -13,10 +13,12 @@ class H2LocalDataSourceFactoryTest {
 
   @Test
   void test() throws StreamReadException, DatabindException, IOException, SQLException {
-    H2LocalDataSourceFactory factory = new ObjectMapper()
-        .readValue(H2LocalDataSourceFactoryTest.class.getResourceAsStream("h2.json.sample"),
-            H2LocalDataSourceFactory.Builder.class)
-        .build();
+    H2LocalDataSourceFactory factory =
+        new ObjectMapper()
+            .readValue(
+                H2LocalDataSourceFactoryTest.class.getResourceAsStream("h2.json.sample"),
+                H2LocalDataSourceFactory.Builder.class)
+            .build();
     factory.getDatabaseFile().delete();
     factory.makeFileDatabaseIfNotExists();
     factory.makeFileDatabaseIfNotExists();
@@ -37,8 +39,11 @@ class H2LocalDataSourceFactoryTest {
         .contains("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
 
     H2LocalDataSourceFactory.builder();
-    H2LocalDataSourceFactory.builder(factory.getDatabaseDirectory(), factory.getDatabaseName(),
-        factory.getUsername(), factory.getPassword());
+    H2LocalDataSourceFactory.builder(
+        factory.getDatabaseDirectory(),
+        factory.getDatabaseName(),
+        factory.getUsername(),
+        factory.getPassword());
 
     H2LocalDataSourceFactory.createTemporalInMemoryDataSource();
 
@@ -51,11 +56,9 @@ class H2LocalDataSourceFactoryTest {
     factory.createMixedModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
     // factory.createServerModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
 
-
   }
 
   private String userHomeDir() {
     return SystemPropertyUtils.getUserHomeDirectory().getPath().replace("\\", "/");
   }
-
 }

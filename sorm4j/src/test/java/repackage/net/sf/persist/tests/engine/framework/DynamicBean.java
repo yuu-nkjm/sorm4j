@@ -27,9 +27,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 
-/**
- * Set of helpers to build and manipulate beans at runtime.
- */
+/** Set of helpers to build and manipulate beans at runtime. */
 public class DynamicBean {
 
   private static final String DYNAMICBEAN_CLASS = DynamicBean.class.getName();
@@ -37,10 +35,14 @@ public class DynamicBean {
   private static Map<String, Class<?>> beanClasses = new HashMap<>();
 
   public static Class<?> getBeanClass(Class<?> caller, BeanMap beanMap) {
-    String className = DynamicBean.class.getPackageName() + "." + caller.getSimpleName() + "."
-        + beanMap.getClassName();
-    return DynamicBean.beanClasses.computeIfAbsent(className,
-        k -> createBeanClass(className, beanMap));
+    String className =
+        DynamicBean.class.getPackageName()
+            + "."
+            + caller.getSimpleName()
+            + "."
+            + beanMap.getClassName();
+    return DynamicBean.beanClasses.computeIfAbsent(
+        className, k -> createBeanClass(className, beanMap));
   }
 
   public static Class<?> createBeanClass(String className, BeanMap beanMap) {
@@ -62,8 +64,18 @@ public class DynamicBean {
             "public " + fieldTypeName + " get" + fieldNameU + "() { return " + fieldName + "; }";
         cc.addMethod(CtNewMethod.make(getterCode, cc));
 
-        String setterCode = "public void set" + fieldNameU + "(" + fieldTypeName + " " + fieldName
-            + ") { this." + fieldName + "=" + fieldName + "; }";
+        String setterCode =
+            "public void set"
+                + fieldNameU
+                + "("
+                + fieldTypeName
+                + " "
+                + fieldName
+                + ") { this."
+                + fieldName
+                + "="
+                + fieldName
+                + "; }";
         cc.addMethod(CtNewMethod.make(setterCode, cc));
       }
 
@@ -74,8 +86,10 @@ public class DynamicBean {
         cc.addMethod(cm);
       }
       {
-        String equalsCode = "public boolean equals(Object obj) { return " + DYNAMICBEAN_CLASS
-            + " .compareBeans(this,obj); }";
+        String equalsCode =
+            "public boolean equals(Object obj) { return "
+                + DYNAMICBEAN_CLASS
+                + " .compareBeans(this,obj); }";
         CtMethod cm = CtNewMethod.make(equalsCode, cc);
         cc.addMethod(cm);
       }
@@ -109,26 +123,21 @@ public class DynamicBean {
 
     Object value = null;
 
-    if (fieldType == Boolean.class)
-      value = useNull ? null : Boolean.valueOf(randomBoolean());
-    else if (fieldType == boolean.class)
-      value = useNull ? false : randomBoolean();
+    if (fieldType == Boolean.class) value = useNull ? null : Boolean.valueOf(randomBoolean());
+    else if (fieldType == boolean.class) value = useNull ? false : randomBoolean();
     else if (fieldType == Byte.class)
       value = useNull ? null : Byte.valueOf(randomByte((byte) min, (byte) max));
     else if (fieldType == byte.class)
       value = useNull ? (byte) 0 : randomByte((byte) min, (byte) max);
-    else if (fieldType == Byte[].class)
-      value = useNull ? null : randomByteObjArray(size);
-    else if (fieldType == byte[].class)
-      value = useNull ? null : randomByteArray(size);
+    else if (fieldType == Byte[].class) value = useNull ? null : randomByteObjArray(size);
+    else if (fieldType == byte[].class) value = useNull ? null : randomByteArray(size);
     else if (fieldType == Short.class)
       value = useNull ? null : Short.valueOf(randomShort((short) min, (short) max));
     else if (fieldType == short.class)
       value = useNull ? (short) 0 : randomShort((short) min, (short) max);
     else if (fieldType == Integer.class)
       value = useNull ? null : Integer.valueOf(randomInt((int) min, (int) max));
-    else if (fieldType == int.class)
-      value = useNull ? (int) 0 : randomInt((int) min, (int) max);
+    else if (fieldType == int.class) value = useNull ? (int) 0 : randomInt((int) min, (int) max);
     else if (fieldType == Long.class)
       value = useNull ? null : Long.valueOf(randomLong((long) min, (long) max));
     else if (fieldType == long.class)
@@ -139,18 +148,12 @@ public class DynamicBean {
       value = useNull ? (float) 0 : randomFloat((float) min, (float) max);
     else if (fieldType == Double.class)
       value = useNull ? null : Double.valueOf(randomDouble(min, max));
-    else if (fieldType == double.class)
-      value = useNull ? (double) 0 : randomDouble(min, max);
-    else if (fieldType == Character.class)
-      value = useNull ? null : Character.valueOf(randomChar());
-    else if (fieldType == char.class)
-      value = useNull ? ' ' : randomChar();
-    else if (fieldType == Character[].class)
-      value = useNull ? null : randomCharObjArray(size);
-    else if (fieldType == char[].class)
-      value = useNull ? null : randomCharArray(size);
-    else if (fieldType == String.class)
-      value = useNull ? null : randomString(size);
+    else if (fieldType == double.class) value = useNull ? (double) 0 : randomDouble(min, max);
+    else if (fieldType == Character.class) value = useNull ? null : Character.valueOf(randomChar());
+    else if (fieldType == char.class) value = useNull ? ' ' : randomChar();
+    else if (fieldType == Character[].class) value = useNull ? null : randomCharObjArray(size);
+    else if (fieldType == char[].class) value = useNull ? null : randomCharArray(size);
+    else if (fieldType == String.class) value = useNull ? null : randomString(size);
     else if (fieldType == BigDecimal.class)
       value = useNull ? null : new BigDecimal(randomLong((long) min, (long) max));
     else if (fieldType == java.io.Reader.class)
@@ -179,8 +182,7 @@ public class DynamicBean {
       value =
           useNull ? null : OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).toLocalDateTime();
     else {
-      if (useNull)
-        value = null;
+      if (useNull) value = null;
       else {
         Map<String, String> m = new HashMap<>();
         m.put(randomString(3), randomString(32));
@@ -198,7 +200,6 @@ public class DynamicBean {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
@@ -212,8 +213,7 @@ public class DynamicBean {
   }
 
   public static String toString(Object obj) {
-    if (obj == null)
-      return "null";
+    if (obj == null) return "null";
     StringBuffer sb = new StringBuffer();
     sb.append("{ ");
     for (Field field : obj.getClass().getDeclaredFields()) {
@@ -221,8 +221,7 @@ public class DynamicBean {
 
       Object value = getFieldValue(obj, fieldName);
       String s = value == null ? "null" : value.toString();
-      if (s.length() > 32)
-        s = s.substring(0, 32) + "...";
+      if (s.length() > 32) s = s.substring(0, 32) + "...";
 
       sb.append(fieldName + "=" + s + ", ");
     }
@@ -238,35 +237,37 @@ public class DynamicBean {
    */
   public static boolean isNull(Class<?> cls, Object obj) {
 
-    if (obj == null)
-      return true;
+    if (obj == null) return true;
 
     if (cls == boolean.class || cls == Boolean.class)
       return ((Boolean) obj).booleanValue() == false;
-    else if (cls == byte.class || cls == Byte.class || cls == short.class || cls == Short.class
-        || cls == int.class || cls == Integer.class || cls == long.class || cls == Long.class
-        || cls == float.class || cls == Float.class || cls == double.class || cls == Double.class
+    else if (cls == byte.class
+        || cls == Byte.class
+        || cls == short.class
+        || cls == Short.class
+        || cls == int.class
+        || cls == Integer.class
+        || cls == long.class
+        || cls == Long.class
+        || cls == float.class
+        || cls == Float.class
+        || cls == double.class
+        || cls == Double.class
         || cls == BigDecimal.class) {
 
       // first cast to Number
       Number n = (Number) obj;
       return n.longValue() == 0;
-    } else
-      return false;
+    } else return false;
   }
 
   public static boolean compareBeans(Object o1, Object o2) {
 
-    if (o1 == null && o2 == null)
-      return true;
-    if (o1 == o2)
-      return true;
-    if (o1 == null && o2 != null)
-      return false;
-    if (o1 != null && o2 == null)
-      return false;
-    if (o1.getClass() != o2.getClass())
-      return false;
+    if (o1 == null && o2 == null) return true;
+    if (o1 == o2) return true;
+    if (o1 == null && o2 != null) return false;
+    if (o1 != null && o2 == null) return false;
+    if (o1.getClass() != o2.getClass()) return false;
 
     try {
 
@@ -274,8 +275,7 @@ public class DynamicBean {
         field.setAccessible(true);
         Object v1 = field.get(o1);
         Object v2 = field.get(o2);
-        if (!compareValues(v1, v2))
-          return false;
+        if (!compareValues(v1, v2)) return false;
       }
 
     } catch (Exception e) {
@@ -285,17 +285,12 @@ public class DynamicBean {
     return true;
   }
 
-
   public static boolean compareBeansFromDifferentClasses(Object o1, Object o2) {
 
-    if (o1 == null && o2 == null)
-      return true;
-    if (o1 == o2)
-      return true;
-    if (o1 == null && o2 != null)
-      return false;
-    if (o1 != null && o2 == null)
-      return false;
+    if (o1 == null && o2 == null) return true;
+    if (o1 == o2) return true;
+    if (o1 == null && o2 != null) return false;
+    if (o1 != null && o2 == null) return false;
 
     try {
 
@@ -312,8 +307,7 @@ public class DynamicBean {
         f2.setAccessible(true);
         Object v2 = f2.get(o2);
 
-        if (!compareValues(v1, v2))
-          return false;
+        if (!compareValues(v1, v2)) return false;
       }
 
     } catch (Exception e) {
@@ -323,121 +317,89 @@ public class DynamicBean {
     return true;
   }
 
-
-
-  /**
-   * Compare values trying to convert types if they are found to be compatible
-   */
+  /** Compare values trying to convert types if they are found to be compatible */
   public static boolean compareValues(Object v1, Object v2) {
 
-    if (v1 == null && v2 == null)
-      return true;
-    if (v1 == v2)
-      return true;
-    if (v1 == null && v2 != null)
-      return false;
-    if (v1 != null && v2 == null)
-      return false;
+    if (v1 == null && v2 == null) return true;
+    if (v1 == v2) return true;
+    if (v1 == null && v2 != null) return false;
+    if (v1 != null && v2 == null) return false;
 
     // try to convert v2 into v1 type
     v2 = convertToType(v1.getClass(), v2);
 
-    if (v1.getClass() != v2.getClass())
-      return false;
+    if (v1.getClass() != v2.getClass()) return false;
 
     Class<?> type = v1.getClass();
 
     try {
 
       if (type == Boolean.class || type == boolean.class) {
-        if (!((Boolean) v1).equals((Boolean) v2))
-          return false;
+        if (!((Boolean) v1).equals((Boolean) v2)) return false;
       } else if (type == Byte.class || type == byte.class) {
-        if (!((Byte) v1).equals((Byte) v2))
-          return false;
+        if (!((Byte) v1).equals((Byte) v2)) return false;
       } else if (type == Byte[].class) {
-        if (!Arrays.equals((Byte[]) v1, (Byte[]) v2))
-          return false;
+        if (!Arrays.equals((Byte[]) v1, (Byte[]) v2)) return false;
       } else if (type == byte[].class) {
-        if (!Arrays.equals((byte[]) v1, (byte[]) v2))
-          return false;
+        if (!Arrays.equals((byte[]) v1, (byte[]) v2)) return false;
       } else if (type == Short.class || type == short.class) {
-        if (!((Short) v1).equals((Short) v2))
-          return false;
+        if (!((Short) v1).equals((Short) v2)) return false;
       } else if (type == Integer.class || type == int.class) {
-        if (!((Integer) v1).equals((Integer) v2))
-          return false;
+        if (!((Integer) v1).equals((Integer) v2)) return false;
       } else if (type == Long.class || type == long.class) {
-        if (!((Long) v1).equals((Long) v2))
-          return false;
+        if (!((Long) v1).equals((Long) v2)) return false;
       } else if (type == Float.class || type == float.class) {
         Float v1f = (Float) v1;
         Float v2f = (Float) v2;
-        if (Float.floatToIntBits(v1f) != Float.floatToIntBits(v2f))
-          return false;
+        if (Float.floatToIntBits(v1f) != Float.floatToIntBits(v2f)) return false;
       } else if (type == Double.class || type == double.class) {
         Double v1d = (Double) v1;
         Double v2d = (Double) v2;
-        if (Double.doubleToLongBits(v1d) != Double.doubleToLongBits(v2d))
-          return false;
+        if (Double.doubleToLongBits(v1d) != Double.doubleToLongBits(v2d)) return false;
       } else if (type == Character.class || type == char.class) {
-        if (!((Character) v1).equals((Character) v2))
-          return false;
+        if (!((Character) v1).equals((Character) v2)) return false;
       } else if (type == Character[].class) {
-        if (!Arrays.equals((Character[]) v1, (Character[]) v2))
-          return false;
+        if (!Arrays.equals((Character[]) v1, (Character[]) v2)) return false;
       } else if (type == char[].class) {
-        if (!Arrays.equals((char[]) v1, (char[]) v2))
-          return false;
+        if (!Arrays.equals((char[]) v1, (char[]) v2)) return false;
       } else if (type == String.class) {
-        if (!((String) v1).equals((String) v2))
-          return false;
+        if (!((String) v1).equals((String) v2)) return false;
       } else if (type == BigDecimal.class) {
-        if (!((BigDecimal) v1).equals((BigDecimal) v2))
-          return false;
+        if (!((BigDecimal) v1).equals((BigDecimal) v2)) return false;
       } else if (type == Reader.class) {
         Reader r1 = (Reader) v1;
         Reader r2 = (Reader) v2;
-        if (!compareReaders(r1, r2))
-          return false;
+        if (!compareReaders(r1, r2)) return false;
       } else if (v1 == InputStream.class) {
         InputStream i1 = (InputStream) v1;
         InputStream i2 = (InputStream) v2;
-        if (!compareInputStreams(i1, i2))
-          return false;
+        if (!compareInputStreams(i1, i2)) return false;
       } else if (v1 instanceof Clob) {
         Clob c1 = (Clob) v1;
         Clob c2 = (Clob) v2;
-        if (!compareReaders(c1.getCharacterStream(), c2.getCharacterStream()))
-          return false;
+        if (!compareReaders(c1.getCharacterStream(), c2.getCharacterStream())) return false;
       } else if (v1 instanceof Blob) {
         Blob b1 = (Blob) v1;
         Blob b2 = (Blob) v2;
-        if (!compareInputStreams(b1.getBinaryStream(), b2.getBinaryStream()))
-          return false;
+        if (!compareInputStreams(b1.getBinaryStream(), b2.getBinaryStream())) return false;
       } else if (type == java.util.Date.class) {
         java.util.Date d1 = (java.util.Date) v1;
         java.util.Date d2 = (java.util.Date) v2;
-        if (!d1.toString().substring(0, 19).equals(d2.toString().substring(0, 19)))
-          return false;
+        if (!d1.toString().substring(0, 19).equals(d2.toString().substring(0, 19))) return false;
       } else if (type == java.sql.Date.class) {
         java.sql.Date d1 = (java.sql.Date) v1;
         java.sql.Date d2 = (java.sql.Date) v2;
-        if (!d1.toString().equals(d2.toString()))
-          return false;
+        if (!d1.toString().equals(d2.toString())) return false;
       } else if (type == java.sql.Time.class) {
         java.sql.Time d1 = (java.sql.Time) v1;
         java.sql.Time d2 = (java.sql.Time) v2;
-        if (!d1.toString().equals(d2.toString()))
-          return false;
+        if (!d1.toString().equals(d2.toString())) return false;
       } else if (type == java.sql.Timestamp.class) {
         java.sql.Timestamp d1 = (java.sql.Timestamp) v1;
         java.sql.Timestamp d2 = (java.sql.Timestamp) v2;
         // quick fix for smalldatetimes is to compare up to 15, instead of 19
-        if (!d1.toString().substring(0, 15).equals(d2.toString().substring(0, 15)))
-          return false;
-      } else if (!v1.equals(v2))
-        return false;
+        if (!d1.toString().substring(0, 15).equals(d2.toString().substring(0, 15))) return false;
+      } else if (!v1.equals(v2)) return false;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -454,8 +416,7 @@ public class DynamicBean {
    */
   public static Object convertToType(Class<?> cls, Object value) {
 
-    if (cls == value.getClass())
-      return value;
+    if (cls == value.getClass()) return value;
 
     if (cls == OffsetDateTime.class) {
       if (value instanceof Instant) {
@@ -473,11 +434,10 @@ public class DynamicBean {
       if (value instanceof Timestamp) {
         return ((Timestamp) value).toLocalDateTime();
       } else if (value instanceof java.util.Date) {
-        return LocalDateTime.ofInstant(((java.util.Date) value).toInstant(),
-            ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(
+            ((java.util.Date) value).toInstant(), ZoneId.systemDefault());
       }
     }
-
 
     // if cls implements Clob or Blob, upcast
     for (Class<?> iface : cls.getInterfaces()) {
@@ -492,8 +452,13 @@ public class DynamicBean {
 
     Class<?> clsValue = value.getClass();
 
-    if (cls == String.class || cls == char.class || cls == Character.class || cls == char[].class
-        || cls == Character[].class || cls == Reader.class || cls == Clob.class) {
+    if (cls == String.class
+        || cls == char.class
+        || cls == Character.class
+        || cls == char[].class
+        || cls == Character[].class
+        || cls == Reader.class
+        || cls == Clob.class) {
 
       // first convert it to string
 
@@ -508,8 +473,7 @@ public class DynamicBean {
       } else if (clsValue == Character[].class) {
         Character[] a = (Character[]) value;
         char[] ac = new char[a.length];
-        for (int i = 0; i < a.length; i++)
-          ac[i] = a[i];
+        for (int i = 0; i < a.length; i++) ac[i] = a[i];
         s = String.copyValueOf(ac);
       } else if (value instanceof Reader) {
         Reader r2 = (Reader) value;
@@ -530,30 +494,25 @@ public class DynamicBean {
       if (cls == String.class) {
         return s;
       } else if (cls == char.class) {
-        if (s.length() == 1)
-          return s.charAt(0);
-        else
-          return value;
+        if (s.length() == 1) return s.charAt(0);
+        else return value;
       } else if (cls == Character.class) {
-        if (s.length() == 1)
-          return Character.valueOf(s.charAt(0));
-        else
-          return value;
+        if (s.length() == 1) return Character.valueOf(s.charAt(0));
+        else return value;
       } else if (cls == char[].class) {
         return s.toCharArray();
       } else if (cls == Character[].class) {
         Character[] ret = new Character[s.length()];
-        for (int i = 0; i < s.length(); i++)
-          ret[i] = Character.valueOf(s.charAt(i));
+        for (int i = 0; i < s.length(); i++) ret[i] = Character.valueOf(s.charAt(i));
         return ret;
       } else if (cls == Reader.class) {
         return new StringReader(s);
       } else if (cls == Clob.class) {
         return new StringClob(s);
       }
-    }
-
-    else if (cls == byte[].class || cls == Byte[].class || cls == InputStream.class
+    } else if (cls == byte[].class
+        || cls == Byte[].class
+        || cls == InputStream.class
         || cls == Blob.class) {
 
       // first convert to byte[]
@@ -564,8 +523,7 @@ public class DynamicBean {
       } else if (clsValue == Byte[].class) {
         Byte[] ba = (Byte[]) value;
         a = new byte[ba.length];
-        for (int i = 0; i < ba.length; i++)
-          a[i] = ba[i];
+        for (int i = 0; i < ba.length; i++) a[i] = ba[i];
       } else if (value instanceof InputStream) {
         InputStream is = (InputStream) value;
         a = readInputStream(is);
@@ -576,8 +534,7 @@ public class DynamicBean {
         } catch (SQLException e) {
           throw new RuntimeException(e);
         }
-      } else
-        return value;
+      } else return value;
 
       // now convert to target class
 
@@ -585,17 +542,14 @@ public class DynamicBean {
         return a;
       } else if (cls == Byte[].class) {
         Byte[] ba = new Byte[a.length];
-        for (int i = 0; i < a.length; i++)
-          ba[i] = a[i];
+        for (int i = 0; i < a.length; i++) ba[i] = a[i];
         return ba;
       } else if (cls == InputStream.class) {
         return new ByteArrayInputStream(a);
       } else if (cls == Blob.class) {
         return new BytesBlob(a);
       }
-    }
-
-    else if (clsValue == java.util.Date.class) {
+    } else if (clsValue == java.util.Date.class) {
       java.util.Date d = (java.util.Date) value;
       if (cls == java.sql.Date.class) {
         return new java.sql.Date(d.getTime());
@@ -605,11 +559,8 @@ public class DynamicBean {
       }
       if (cls == java.sql.Timestamp.class) {
         return new java.sql.Timestamp(d.getTime());
-      } else
-        return value;
-    }
-
-    else if (cls == java.util.Date.class) {
+      } else return value;
+    } else if (cls == java.util.Date.class) {
       if (clsValue == java.sql.Date.class) {
         return new java.util.Date(((java.sql.Date) value).getTime());
       }
@@ -618,57 +569,43 @@ public class DynamicBean {
       }
       if (clsValue == java.sql.Timestamp.class) {
         return new java.util.Date(((java.util.Date) value).getTime());
-      } else
-        return value;
-    }
-
-    else if (clsValue == boolean.class || clsValue == Boolean.class) {
+      } else return value;
+    } else if (clsValue == boolean.class || clsValue == Boolean.class) {
       Boolean b = (Boolean) value;
-      if (cls == boolean.class)
-        return b.booleanValue();
-      else if (cls == Boolean.class)
-        return b;
-      else
-        return value;
-    }
-
-    else if (clsValue == byte.class || clsValue == Byte.class || clsValue == short.class
-        || clsValue == Short.class || clsValue == int.class || clsValue == Integer.class
-        || clsValue == long.class || clsValue == Long.class || clsValue == float.class
-        || clsValue == Float.class || clsValue == double.class || clsValue == Double.class
+      if (cls == boolean.class) return b.booleanValue();
+      else if (cls == Boolean.class) return b;
+      else return value;
+    } else if (clsValue == byte.class
+        || clsValue == Byte.class
+        || clsValue == short.class
+        || clsValue == Short.class
+        || clsValue == int.class
+        || clsValue == Integer.class
+        || clsValue == long.class
+        || clsValue == Long.class
+        || clsValue == float.class
+        || clsValue == Float.class
+        || clsValue == double.class
+        || clsValue == Double.class
         || clsValue == BigDecimal.class) {
 
       // first cast to Number
       Number n = (Number) value;
 
-      if (cls == byte.class)
-        return n.byteValue();
-      else if (cls == Byte.class)
-        return Byte.valueOf(n.byteValue());
-      else if (cls == short.class)
-        return n.shortValue();
-      else if (cls == Short.class)
-        return Short.valueOf(n.shortValue());
-      else if (cls == int.class)
-        return n.intValue();
-      else if (cls == Integer.class)
-        return Integer.valueOf(n.intValue());
-      else if (cls == long.class)
-        return n.longValue();
-      else if (cls == Long.class)
-        return Long.valueOf(n.longValue());
-      else if (cls == float.class)
-        return n.floatValue();
-      else if (cls == Float.class)
-        return Float.valueOf(n.floatValue());
-      else if (cls == double.class)
-        return n.doubleValue();
-      else if (cls == Double.class)
-        return Double.valueOf(n.doubleValue());
-      else if (cls == BigDecimal.class)
-        return BigDecimal.valueOf(n.doubleValue());
-      else
-        return value;
+      if (cls == byte.class) return n.byteValue();
+      else if (cls == Byte.class) return Byte.valueOf(n.byteValue());
+      else if (cls == short.class) return n.shortValue();
+      else if (cls == Short.class) return Short.valueOf(n.shortValue());
+      else if (cls == int.class) return n.intValue();
+      else if (cls == Integer.class) return Integer.valueOf(n.intValue());
+      else if (cls == long.class) return n.longValue();
+      else if (cls == Long.class) return Long.valueOf(n.longValue());
+      else if (cls == float.class) return n.floatValue();
+      else if (cls == Float.class) return Float.valueOf(n.floatValue());
+      else if (cls == double.class) return n.doubleValue();
+      else if (cls == Double.class) return Double.valueOf(n.doubleValue());
+      else if (cls == BigDecimal.class) return BigDecimal.valueOf(n.doubleValue());
+      else return value;
     }
 
     return value;
@@ -679,11 +616,9 @@ public class DynamicBean {
     try {
       byte[] buf = new byte[65535];
       int n = is.read(buf);
-      if (n < 0)
-        n = 0;
+      if (n < 0) n = 0;
       byte[] ret = new byte[n];
-      for (int i = 0; i < n; i++)
-        ret[i] = buf[i];
+      for (int i = 0; i < n; i++) ret[i] = buf[i];
       return ret;
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -740,15 +675,13 @@ public class DynamicBean {
 
   public static byte[] randomByteArray(int size) {
     byte[] a = new byte[size];
-    for (int i = 0; i < size; i++)
-      a[i] = randomByte(Byte.MIN_VALUE, Byte.MAX_VALUE);
+    for (int i = 0; i < size; i++) a[i] = randomByte(Byte.MIN_VALUE, Byte.MAX_VALUE);
     return a;
   }
 
   public static Byte[] randomByteObjArray(int size) {
     Byte[] a = new Byte[size];
-    for (int i = 0; i < size; i++)
-      a[i] = Byte.valueOf(randomByte(Byte.MIN_VALUE, Byte.MAX_VALUE));
+    for (int i = 0; i < size; i++) a[i] = Byte.valueOf(randomByte(Byte.MIN_VALUE, Byte.MAX_VALUE));
     return a;
   }
 
@@ -825,6 +758,4 @@ public class DynamicBean {
   public static long randomTimestamp() {
     return (long) (Math.random() * System.currentTimeMillis());
   }
-
-
 }

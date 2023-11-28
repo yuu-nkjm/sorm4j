@@ -7,29 +7,27 @@ import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 
-/**
- *
- * @author yuu_nkjm
- *
- */
+/** @author yuu_nkjm */
 public interface OrmConnection extends Orm, AutoCloseable {
 
   /**
    * Create a {@link OrmConnection} wrapping the given JDBC Connection.
    *
-   * You should always use try-with-resources block to ensure the database connection is released.
+   * <p>You should always use try-with-resources block to ensure the database connection is
+   * released.
    *
    * @param connection
    * @return
    */
   static OrmConnection of(Connection connection) {
-    return new OrmConnectionImpl(connection, SormImpl.DEFAULT_CONTEXT);
+    return of(connection, SormImpl.DEFAULT_CONTEXT);
   }
 
   /**
    * Create a {@link OrmConnection} wrapping the given JDBC Connection and the given context.
    *
-   * You should always use try-with-resources block to ensure the database connection is released.
+   * <p>You should always use try-with-resources block to ensure the database connection is
+   * released.
    *
    * @param connection
    * @param sormContext
@@ -39,12 +37,17 @@ public interface OrmConnection extends Orm, AutoCloseable {
     return new OrmConnectionImpl(connection, SormContextImpl.class.cast(sormContext));
   }
 
+  /**
+   * Gets JDBC {@link Connection}.
+   *
+   * @return
+   */
+  Connection getJdbcConnection();
 
   /**
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#close()
-   *
    */
   @Override
   void close();
@@ -53,7 +56,6 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * Commits the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#commit()
-   *
    */
   void commit();
 
@@ -61,7 +63,6 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * Roll back the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#rollback()
-   *
    */
   void rollback();
 
@@ -70,7 +71,6 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * this instance.
    *
    * @see java.sql.Connection#setAutoCommit(boolean)
-   *
    */
   void setAutoCommit(boolean autoCommit);
 
@@ -93,5 +93,4 @@ public interface OrmConnection extends Orm, AutoCloseable {
    * @return
    */
   <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName);
-
 }

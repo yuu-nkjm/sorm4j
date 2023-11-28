@@ -15,9 +15,9 @@ class NamedParameterSqlTest {
   private Map<String, Object> namedParams = Map.of("name", "foo", "id", 1, "idid", 2);
 
   private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
+
   static {
     sorm.applyHandler(conn -> conn.insert(GUEST_ALICE, GUEST_BOB, GUEST_CAROL, GUEST_DAVE));
-
   }
 
   @Test
@@ -29,9 +29,10 @@ class NamedParameterSqlTest {
       sorm.readList(Guest.class, statement);
     }
     {
-      ParameterizedSql statement = NamedParameterSqlParser.parse(
-          "select * from guests where name like {:name} and address in(<:address>) and id=:id",
-          Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
+      ParameterizedSql statement =
+          NamedParameterSqlParser.parse(
+              "select * from guests where name like {:name} and address in(<:address>) and id=:id",
+              Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
       sorm.applyHandler(conn -> conn.readList(Customer.class, statement));
     }
   }
@@ -72,22 +73,27 @@ class NamedParameterSqlTest {
   @Test
   void testBindList() {
 
-    ParameterizedSql sp = NamedParameterSqlParser.of("select * from where ID in(<:player_names_1>)")
-        .bind("player_names_1", List.of("foo", "bar")).parse();
+    ParameterizedSql sp =
+        NamedParameterSqlParser.of("select * from where ID in(<:player_names_1>)")
+            .bind("player_names_1", List.of("foo", "bar"))
+            .parse();
 
     assertThat(sp.getSql()).contains("?,?");
     assertThat(sp.getParameters()[0]).isEqualTo("foo");
     assertThat(sp.getParameters()[1]).isEqualTo("bar");
-
   }
 
   @Test
   void testBindListFail() {
-    assertThatThrownBy(() -> NamedParameterSqlParser
-        .of("select * from where ID in(<:names>)")
-        .bind("names", "foo").parse()).isInstanceOfSatisfying(SormException.class,
-            e -> assertThat(e.getMessage())
-                .isEqualTo("<?> parameter should be bind Collection or Array"));
+    assertThatThrownBy(
+            () ->
+                NamedParameterSqlParser.of("select * from where ID in(<:names>)")
+                    .bind("names", "foo")
+                    .parse())
+        .isInstanceOfSatisfying(
+            SormException.class,
+            e ->
+                assertThat(e.getMessage())
+                    .isEqualTo("<?> parameter should be bind Collection or Array"));
   }
-
 }

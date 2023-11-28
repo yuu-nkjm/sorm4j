@@ -1,7 +1,8 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
-import static java.lang.String.*;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static java.lang.String.join;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.toUpperSnakeCase;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -17,8 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.Orm;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -43,7 +44,6 @@ import org.nkjmlab.sorm4j.util.table_def.annotation.UniqueColumns;
  *
  * @see {@link TableMetaData}
  * @author nkjm
- *
  */
 @Experimental
 public final class TableDefinition {
@@ -57,35 +57,37 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
-
   public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
 
     Builder builder = TableDefinition.builder(toTableName(ormRecordClass));
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class)).map(a -> a.value())
+    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class))
+        .map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
 
     Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexColumns.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class)).ifPresent(
-        vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
+    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class))
+        .ifPresent(
+            vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
     Optional.ofNullable(ormRecordClass.getAnnotationsByType(CheckConstraint.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
+    Annotation[][] parameterAnnotationsOfConstructor =
+        getCanonicalConstructor(ormRecordClass)
+            .map(constructor -> constructor.getParameterAnnotations())
+            .orElse(null);
 
-    Annotation[][] parameterAnnotationsOfConstructor = getCanonicalConstructor(ormRecordClass)
-        .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
-
-    Field[] fields = Stream.of(ormRecordClass.getDeclaredFields())
-        .filter(f -> !Modifier.isStatic(f.getModifiers())).toArray(Field[]::new);
-
+    Field[] fields =
+        Stream.of(ormRecordClass.getDeclaredFields())
+            .filter(f -> !Modifier.isStatic(f.getModifiers()))
+            .toArray(Field[]::new);
 
     for (int i = 0; i < fields.length; i++) {
       Field field = fields[i];
       List<String> opt = new ArrayList<>();
-
 
       Set<Annotation> anns = new LinkedHashSet<>();
       Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
@@ -95,7 +97,8 @@ public final class TableDefinition {
       }
 
       opt.add(
-          anns.stream().filter(ann -> ann instanceof OrmJsonColumnContainer).count() > 0 ? "json"
+          anns.stream().filter(ann -> ann instanceof OrmJsonColumnContainer).count() > 0
+              ? "json"
               : TableDefinition.toSqlDataType(field.getType()));
 
       for (Annotation ann : anns) {
@@ -114,13 +117,11 @@ public final class TableDefinition {
         } else if (ann instanceof Default) {
           opt.add("default " + ((Default) ann).value());
         }
-
       }
       builder.addColumnDefinition(toUpperSnakeCase(field.getName()), opt.toArray(String[]::new));
     }
     return builder;
   }
-
 
   public static String toTableName(Class<?> ormRecordClass) {
     OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
@@ -133,9 +134,11 @@ public final class TableDefinition {
 
   public static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
     try {
-      Class<?>[] componentTypes = Arrays.stream(recordClass.getDeclaredFields())
-          .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers())).map(f -> f.getType())
-          .toArray(Class[]::new);
+      Class<?>[] componentTypes =
+          Arrays.stream(recordClass.getDeclaredFields())
+              .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+              .map(f -> f.getType())
+              .toArray(Class[]::new);
       return Optional.of(recordClass.getDeclaredConstructor(componentTypes));
     } catch (NoSuchMethodException | SecurityException e) {
       return Optional.empty();
@@ -153,9 +156,13 @@ public final class TableDefinition {
 
   private final List<String> createIndexStatements;
 
-
-  private TableDefinition(String tableName, String tableSchema, List<String> columnNames,
-      String createTableStatement, String dropTableStatement, List<String> createIndexStatements) {
+  private TableDefinition(
+      String tableName,
+      String tableSchema,
+      List<String> columnNames,
+      String createTableStatement,
+      String dropTableStatement,
+      List<String> createIndexStatements) {
     this.tableName = tableName;
     this.tableNameAndColumnDefinitions = tableSchema;
     this.columnNames = Collections.unmodifiableList(columnNames);
@@ -166,10 +173,19 @@ public final class TableDefinition {
 
   @Override
   public String toString() {
-    return "TableDefinition [tableName=" + tableName + ", tableNameAndColumnDefinitions="
-        + tableNameAndColumnDefinitions + ", columnNames=" + columnNames + ", createTableStatement="
-        + createTableStatement + ", dropTableStatement=" + dropTableStatement
-        + ", createIndexStatements=" + createIndexStatements + "]";
+    return "TableDefinition [tableName="
+        + tableName
+        + ", tableNameAndColumnDefinitions="
+        + tableNameAndColumnDefinitions
+        + ", columnNames="
+        + columnNames
+        + ", createTableStatement="
+        + createTableStatement
+        + ", dropTableStatement="
+        + dropTableStatement
+        + ", createIndexStatements="
+        + createIndexStatements
+        + "]";
   }
 
   public TableDefinition createIndexesIfNotExists(Orm orm) {
@@ -187,10 +203,9 @@ public final class TableDefinition {
     return this;
   }
 
-  public void dropTableIfExistsCascade(Sorm orm) {
+  public void dropTableIfExistsCascade(Orm orm) {
     orm.executeUpdate(getDropTableIfExistsStatement() + " cascade");
   }
-
 
   public List<String> getColumnNames() {
     return columnNames;
@@ -267,46 +282,78 @@ public final class TableDefinition {
 
   public static class Builder {
     private static String createPrimaryKeyConstraint(String[] primaryKeys) {
-      return (primaryKeys == null || primaryKeys.length == 0) ? ""
+      return (primaryKeys == null || primaryKeys.length == 0)
+          ? ""
           : ", primary key" + "(" + join(", ", primaryKeys) + ")";
     }
 
     private static String createUniqueConstraint(List<String[]> uniqueColumnPairs) {
-      return (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0) ? ""
-          : ", " + String.join(", ", uniqueColumnPairs.stream()
-              .map(u -> "unique" + "(" + join(", ", u) + ")").toArray(String[]::new));
+      return (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0)
+          ? ""
+          : ", "
+              + String.join(
+                  ", ",
+                  uniqueColumnPairs.stream()
+                      .map(u -> "unique" + "(" + join(", ", u) + ")")
+                      .toArray(String[]::new));
     }
 
     private static String createCheckConstraint(List<String> checkConditions) {
-      return (checkConditions == null || checkConditions.size() == 0) ? ""
-          : ", " + String.join(", ",
-              checkConditions.stream().map(u -> "check" + "(" + u + ")").toArray(String[]::new));
+      return (checkConditions == null || checkConditions.size() == 0)
+          ? ""
+          : ", "
+              + String.join(
+                  ", ",
+                  checkConditions.stream()
+                      .map(u -> "check" + "(" + u + ")")
+                      .toArray(String[]::new));
     }
 
     private static List<String> getColumunNames(Map<String, String[]> columnDefinitions) {
-      return columnDefinitions.entrySet().stream().map(e -> e.getKey())
+      return columnDefinitions.entrySet().stream()
+          .map(e -> e.getKey())
           .collect(Collectors.toList());
     }
 
     private static List<String> getColumuns(Map<String, String[]> columnDefinisions) {
       return columnDefinisions.keySet().stream()
-          .map(columnName -> columnName + " "
-              + join(" ", Arrays.stream(columnDefinisions.get(columnName)).map(s -> s.trim())
-                  .collect(Collectors.toList())))
+          .map(
+              columnName ->
+                  columnName
+                      + " "
+                      + join(
+                          " ",
+                          Arrays.stream(columnDefinisions.get(columnName))
+                              .map(s -> s.trim())
+                              .collect(Collectors.toList())))
           .collect(Collectors.toList());
     }
 
-    private static String getCreateIndexOnStatement(String indexName, String tableName,
-        String... columns) {
-      return "create index if not exists " + indexName + " on " + tableName + "("
-          + String.join(", ", columns) + ")";
+    private static String getCreateIndexOnStatement(
+        String indexName, String tableName, String... columns) {
+      return "create index if not exists "
+          + indexName
+          + " on "
+          + tableName
+          + "("
+          + String.join(", ", columns)
+          + ")";
     }
 
-    private static String getTableSchema(String tableName, Map<String, String[]> columns,
-        String[] primaryKeys, List<String[]> uniqueColumnPairs, List<String> checkConditions) {
-      String schema = tableName + "(" + join(", ", getColumuns(columns))
-          + createPrimaryKeyConstraint(primaryKeys) + createUniqueConstraint(uniqueColumnPairs)
-          + createCheckConstraint(checkConditions) + ")";
+    private static String getTableSchema(
+        String tableName,
+        Map<String, String[]> columns,
+        String[] primaryKeys,
+        List<String[]> uniqueColumnPairs,
+        List<String> checkConditions) {
+      String schema =
+          tableName
+              + "("
+              + join(", ", getColumuns(columns))
+              + createPrimaryKeyConstraint(primaryKeys)
+              + createUniqueConstraint(uniqueColumnPairs)
+              + createCheckConstraint(checkConditions)
+              + ")";
       return schema;
     }
 
@@ -322,12 +369,9 @@ public final class TableDefinition {
 
     private final List<String[]> uniqueColumnPairs;
 
-
     private final List<String[]> indexColumns;
 
     private final List<String> checkConditions;
-
-
 
     private Builder(String tableName) {
       this.columnDefinitions = new LinkedHashMap<>();
@@ -351,8 +395,7 @@ public final class TableDefinition {
     /**
      * Adds an column definition.
      *
-     * <p>
-     * For example,
+     * <p>For example,
      *
      * <pre>
      * addUniqueConstraint("id","name")  converted to "UNIQUE (id, name)"
@@ -376,7 +419,6 @@ public final class TableDefinition {
       addIndexDefinition(toStringArray(indexColumnPair));
       return this;
     }
-
 
     /**
      * Adds a column pair for an index key. The name of index is automatically generated.
@@ -406,8 +448,7 @@ public final class TableDefinition {
     /**
      * Adds an unique constraint.
      *
-     * <p>
-     * For example,
+     * <p>For example,
      *
      * <pre>
      * addUniqueConstraint("id","name")  converted to "UNIQUE (id, name)"
@@ -425,7 +466,6 @@ public final class TableDefinition {
       return this;
     }
 
-
     /**
      * Builds a {@link TableDefinition}.
      *
@@ -433,15 +473,21 @@ public final class TableDefinition {
      */
     public TableDefinition build() {
       if (columnDefinitions.isEmpty()) {
-        return new TableDefinition(tableName, "", Collections.emptyList(), "", "",
-            Collections.emptyList());
+        return new TableDefinition(
+            tableName, "", Collections.emptyList(), "", "", Collections.emptyList());
       } else {
-        String tableSchema = getTableSchema(tableName, columnDefinitions, primaryKeys,
-            uniqueColumnPairs, checkConditions);
+        String tableSchema =
+            getTableSchema(
+                tableName, columnDefinitions, primaryKeys, uniqueColumnPairs, checkConditions);
         String createTableStatement = "create table if not exists " + tableSchema;
         String dropTableStatement = "drop table if exists " + tableName;
-        return new TableDefinition(tableName, tableSchema, getColumunNames(), createTableStatement,
-            dropTableStatement, getCreateIndexIfNotExistsStatements());
+        return new TableDefinition(
+            tableName,
+            tableSchema,
+            getColumunNames(),
+            createTableStatement,
+            dropTableStatement,
+            getCreateIndexIfNotExistsStatements());
       }
     }
 
@@ -451,11 +497,12 @@ public final class TableDefinition {
 
     private List<String> getCreateIndexIfNotExistsStatements() {
       return indexColumns.stream()
-          .map(columns -> getCreateIndexOnStatement(
-              "index_in_" + tableName + "_on_" + join("_", columns), tableName, columns))
+          .map(
+              columns ->
+                  getCreateIndexOnStatement(
+                      "index_in_" + tableName + "_on_" + join("_", columns), tableName, columns))
           .collect(Collectors.toList());
     }
-
 
     public Builder setPrimaryKey(Enum<?>... attributes) {
       setPrimaryKey(toStringArray(attributes));
@@ -465,8 +512,7 @@ public final class TableDefinition {
     /**
      * Sets attributes as primary key attributes.
      *
-     * <p>
-     * For example,
+     * <p>For example,
      *
      * <pre>
      * setPrimaryKey("id","name")  converted to "PRIMARY KEY (id, name)"
@@ -491,17 +537,14 @@ public final class TableDefinition {
     }
   }
 
-
   public static String toSqlDataType(Class<?> type) {
     if (type.getAnnotation(OrmJsonColumnContainer.class) != null) {
       return "json";
-
     }
-    if (ArrayUtils.getInternalComponentType(type)
-        .getAnnotation(OrmJsonColumnContainer.class) != null) {
+    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonColumnContainer.class)
+        != null) {
       return "json";
     }
-
 
     switch (type.getName()) {
       case "int":
@@ -571,5 +614,4 @@ public final class TableDefinition {
         }
     }
   }
-
 }

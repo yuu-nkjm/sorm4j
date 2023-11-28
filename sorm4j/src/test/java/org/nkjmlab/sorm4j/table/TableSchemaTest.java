@@ -17,45 +17,66 @@ class TableSchemaTest {
   static class TempGuestTable {
 
     public static enum Column {
-      ID, NAME, TEL
+      ID,
+      NAME,
+      TEL
     }
 
     private final TableDefinition schema;
 
     public TempGuestTable() {
-      this.schema = TableDefinition.builder("temp_guests").addColumnDefinition(ID, INT)
-          .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
-          .addUniqueConstraint(TEL).addIndexDefinition(TEL).setPrimaryKey(ID).build();
+      this.schema =
+          TableDefinition.builder("temp_guests")
+              .addColumnDefinition(ID, INT)
+              .addColumnDefinition(NAME, VARCHAR)
+              .addColumnDefinition(TEL, VARCHAR)
+              .addUniqueConstraint(TEL)
+              .addIndexDefinition(TEL)
+              .setPrimaryKey(ID)
+              .build();
     }
-
   }
 
   @Test
   void testSchemeBuilder() {
-    TableDefinition schema1 = TableDefinition.builder("temp_guests")
-        .addColumnDefinition(ID.name(), INT).addColumnDefinition(NAME.name(), VARCHAR)
-        .addColumnDefinition(TEL.name(), VARCHAR).addUniqueConstraint(TEL.name())
-        .addIndexDefinition(TEL.name()).setPrimaryKey(ID.name()).build();
+    TableDefinition schema1 =
+        TableDefinition.builder("temp_guests")
+            .addColumnDefinition(ID.name(), INT)
+            .addColumnDefinition(NAME.name(), VARCHAR)
+            .addColumnDefinition(TEL.name(), VARCHAR)
+            .addUniqueConstraint(TEL.name())
+            .addIndexDefinition(TEL.name())
+            .setPrimaryKey(ID.name())
+            .build();
 
-    TableDefinition schema2 = TableDefinition.builder("temp_guests").addColumnDefinition(ID, INT)
-        .addColumnDefinition(NAME, VARCHAR).addColumnDefinition(TEL, VARCHAR)
-        .addUniqueConstraint(TEL).addIndexDefinition(TEL).setPrimaryKey(ID).build();
+    TableDefinition schema2 =
+        TableDefinition.builder("temp_guests")
+            .addColumnDefinition(ID, INT)
+            .addColumnDefinition(NAME, VARCHAR)
+            .addColumnDefinition(TEL, VARCHAR)
+            .addUniqueConstraint(TEL)
+            .addIndexDefinition(TEL)
+            .setPrimaryKey(ID)
+            .build();
 
-    assertThat(schema1.getTableNameAndColumnDefinitions()).isEqualTo(schema2.getTableNameAndColumnDefinitions());
-
+    assertThat(schema1.getTableNameAndColumnDefinitions())
+        .isEqualTo(schema2.getTableNameAndColumnDefinitions());
   }
 
   @Test
   void testSchemeBuilder2() {
-    TableDefinition.builder("temp_guests").addColumnDefinition(ID.name(), INT)
-        .addUniqueConstraint(new String[0]).setPrimaryKey(new String[0]).build();
+    TableDefinition.builder("temp_guests")
+        .addColumnDefinition(ID.name(), INT)
+        .addUniqueConstraint(new String[0])
+        .setPrimaryKey(new String[0])
+        .build();
   }
-
 
   @Test
   void testGetColumnNames() {
-    assertThat(tempGuestTable.schema.getColumnNames()).containsExactlyInAnyOrder(
-        Stream.of(ID, NAME, TEL).map(e -> e.name()).toArray(String[]::new));
+    assertThat(tempGuestTable.schema.getColumnNames())
+        .containsExactlyInAnyOrder(
+            Stream.of(ID, NAME, TEL).map(e -> e.name()).toArray(String[]::new));
   }
 
   @Test
@@ -65,8 +86,9 @@ class TableSchemaTest {
 
   @Test
   void testGetTableSchema() {
-    assertThat(tempGuestTable.schema.getTableNameAndColumnDefinitions()).isEqualToIgnoringCase(
-        "temp_guests(id int, name varchar, tel varchar, primary key(id), unique(tel))");
+    assertThat(tempGuestTable.schema.getTableNameAndColumnDefinitions())
+        .isEqualToIgnoringCase(
+            "temp_guests(id int, name varchar, tel varchar, primary key(id), unique(tel))");
   }
 
   @Test
@@ -76,7 +98,6 @@ class TableSchemaTest {
             "CREATE INDEX IF NOT EXISTS index_in_temp_guests_on_tel ON temp_guests(tel)");
   }
 
-
   @Test
   void testCreate() {
     tempGuestTable.schema.createTableIfNotExists(sorm);
@@ -85,6 +106,4 @@ class TableSchemaTest {
     tempGuestTable.schema.dropTableIfExists(sorm);
     tempGuestTable.schema.createTableIfNotExists(sorm).createIndexesIfNotExists(sorm);
   }
-
-
 }

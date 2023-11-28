@@ -17,14 +17,11 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  * Default implementation of {@link SqlParametersSetter}
  *
  * @author nkjm
- *
  */
-
 public final class DefaultSqlParametersSetter implements SqlParametersSetter {
 
   private final List<SqlParameterSetter> setters;
   private final Map<Class<?>, SqlParameterSetter> settersHitCache;
-
 
   private static final DummySetter DUMMY_SETTER = new DummySetter();
 
@@ -36,14 +33,10 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       return false;
     }
 
-
     @Override
     public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
         throws SQLException {}
-
   }
-
-
 
   public DefaultSqlParametersSetter(SqlParameterSetter... setters) {
     this.setters = Arrays.asList(setters);
@@ -64,18 +57,16 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
   /**
    * Sets a parameter into the given prepared statement. i.e. Convert from java objects to SQL.
    *
-   * <strong>TIME</strong>
-   * <p>
-   * In JDBC this data type is mapped to java.sql.Time. java.time.LocalTime is also supported and
+   * <p><strong>TIME</strong>
+   *
+   * <p>In JDBC this data type is mapped to java.sql.Time. java.time.LocalTime is also supported and
    * recommended. See <a href=
    * "https://www.h2database.com/html/datatypes.html?highlight=datatype&search=DataType#time_type">Data
    * Types</a>.
    *
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameter parameters values
-   *
    * @throws SQLException
-   *
    */
   private void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
       throws SQLException {
@@ -88,20 +79,26 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
     final Class<?> type = parameter.getClass();
     if (!setters.isEmpty()) {
       final SqlParameterSetter setter =
-          settersHitCache.computeIfAbsent(type, key -> setters.stream().filter(_setter -> {
-            try {
-              return _setter.test(stmt, parameterIndex, parameter);
-            } catch (SQLException e) {
-              throw Try.rethrow(e);
-            }
-          }).findFirst().orElse(DUMMY_SETTER));
+          settersHitCache.computeIfAbsent(
+              type,
+              key ->
+                  setters.stream()
+                      .filter(
+                          _setter -> {
+                            try {
+                              return _setter.test(stmt, parameterIndex, parameter);
+                            } catch (SQLException e) {
+                              throw Try.rethrow(e);
+                            }
+                          })
+                      .findFirst()
+                      .orElse(DUMMY_SETTER));
 
       if (!setter.equals(DUMMY_SETTER)) {
         setter.setParameter(stmt, parameterIndex, parameter);
         return;
       }
     }
-
 
     switch (type.getName()) {
       case "java.lang.Boolean":
@@ -162,11 +159,12 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         stmt.setObject(parameterIndex, parameter);
         return;
       case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
-        stmt.setObject(parameterIndex,
-            ((org.nkjmlab.sorm4j.util.datatype.JsonByte) parameter).getBytes());
+        stmt.setObject(
+            parameterIndex, ((org.nkjmlab.sorm4j.util.datatype.JsonByte) parameter).getBytes());
         return;
       case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
-        stmt.setString(parameterIndex,
+        stmt.setString(
+            parameterIndex,
             ((org.nkjmlab.sorm4j.util.datatype.GeometryString) parameter).getText());
         return;
       default:
@@ -187,9 +185,7 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
           stmt.setObject(parameterIndex, parameter);
         }
     }
-
   }
-
 
   /**
    * Treats array.
@@ -199,20 +195,21 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
    * @param parameter
    * @throws SQLException
    */
-  private void procArray(Class<?> compType, PreparedStatement stmt, int parameterIndex,
-      Object parameter) throws SQLException {
+  private void procArray(
+      Class<?> compType, PreparedStatement stmt, int parameterIndex, Object parameter)
+      throws SQLException {
     String typeName = compType.getName();
     if (typeName.equals("byte")) {
       stmt.setBytes(parameterIndex, (byte[]) parameter);
     } else if (typeName.contains("[")) {
-      stmt.setArray(parameterIndex, stmt.getConnection().createArrayOf("java_object",
-          convertToObjectArray((Object[]) parameter)));
+      stmt.setArray(
+          parameterIndex,
+          stmt.getConnection()
+              .createArrayOf("java_object", convertToObjectArray((Object[]) parameter)));
     } else {
       stmt.setArray(parameterIndex, toSqlArray(typeName, stmt.getConnection(), parameter));
     }
   }
-
-
 
   static java.sql.Array toSqlArray(String typeName, Connection conn, Object parameter)
       throws SQLException {
@@ -240,6 +237,4 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         return conn.createArrayOf("java_object", (Object[]) parameter);
     }
   }
-
-
 }

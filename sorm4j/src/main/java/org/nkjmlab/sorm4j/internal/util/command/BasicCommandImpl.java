@@ -45,6 +45,4 @@ public final class BasicCommandImpl extends AbstractCommand implements BasicComm
   protected ParameterizedSql parse() {
     return ParameterizedSql.of(sql);
   }
-
-
 }

@@ -5,9 +5,7 @@ import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.RowMap;
 
-/**
- * Represents a result from an insert operation with auto-generated keys.
- */
+/** Represents a result from an insert operation with auto-generated keys. */
 public final class InsertResultImpl implements InsertResult {
 
   public static final InsertResult EMPTY_INSERT_RESULT =
@@ -17,7 +15,6 @@ public final class InsertResultImpl implements InsertResult {
   private final int countRowsModified;
 
   /**
-   *
    * @param rowsModified Returns the row count by executing a insert statement
    * @param generatedKeys auto-generated keys by executing a insert statement
    */
@@ -28,8 +25,8 @@ public final class InsertResultImpl implements InsertResult {
   }
 
   /**
-   * Returns the row count by executing a insert statement
-   * {@link java.sql.PreparedStatement#executeUpdate()}.
+   * Returns the row count by executing a insert statement {@link
+   * java.sql.PreparedStatement#executeUpdate()}.
    */
   @Override
   public int[] getRowsModified() {
@@ -48,13 +45,15 @@ public final class InsertResultImpl implements InsertResult {
 
   @Override
   public String toString() {
-    return "InsertResultImpl [rowsModified=" + Arrays.toString(rowsModified) + ", generatedKeys="
-        + generatedKeys + "]";
+    return "InsertResultImpl [rowsModified="
+        + Arrays.toString(rowsModified)
+        + ", generatedKeys="
+        + generatedKeys
+        + "]";
   }
 
   @Override
   public int countRowsModified() {
     return countRowsModified;
   }
-
 }

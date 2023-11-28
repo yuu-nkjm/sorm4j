@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -26,7 +25,9 @@ public class Simple08 {
     return "hello world";
   }
 
-  public void setHelloWorld(String stringCol) { /* do nothing */ }
+  public void setHelloWorld(String stringCol) {
+    /* do nothing */
+  }
 
   // conflicting annotations -- will blow
   public long getIntCol() {
@@ -45,6 +46,4 @@ public class Simple08 {
   public void setStringCol(String stringCol) {
     this.stringCol = stringCol;
   }
-
 }
-

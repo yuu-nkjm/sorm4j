@@ -10,10 +10,10 @@ public interface ColumnValueToMapValueConverters {
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
    * instance of the specified Java {@link SQLType} containing the values read.
    *
-   * This method is mainly used for "SEARCH SQL AND READ TO MAP". i.e. Convert from SQL to Java by
-   * the SQL type.
+   * <p>This method is mainly used for "SEARCH SQL AND READ TO MAP". i.e. Convert from SQL to Java
+   * by the SQL type.
    *
-   * This method is used while converting {@link java.sql.ResultSet} rows to Map.
+   * <p>This method is used while converting {@link java.sql.ResultSet} rows to Map.
    *
    * @param resultSet
    * @param column
@@ -22,5 +22,4 @@ public interface ColumnValueToMapValueConverters {
    * @throws SQLException
    */
   Object convertToValue(ResultSet resultSet, int column, int sqlType) throws SQLException;
-
 }

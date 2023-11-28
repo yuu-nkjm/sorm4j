@@ -35,11 +35,9 @@ public class JoinSql {
       this.froms.add(tableMetaData.getTableName());
     }
 
-
     private Builder(TableMappedOrm<?> first) {
       this(first.getTableMetaData());
     }
-
 
     public JoinSql.Builder joinUsing(TableMetaData other, String... columnsForJoin) {
       return joinUsing("join", other, columnsForJoin);
@@ -73,18 +71,18 @@ public class JoinSql {
       return leftJoinOn(other.getTableMetaData(), onCondition);
     }
 
-    private JoinSql.Builder joinUsing(String joinType, TableMetaData tableMetaData,
-        String... columnsForJoin) {
+    private JoinSql.Builder joinUsing(
+        String joinType, TableMetaData tableMetaData, String... columnsForJoin) {
       return join(joinType, tableMetaData, "using (" + String.join(",", columnsForJoin) + ")");
     }
 
-    private JoinSql.Builder joinOn(String joinType, TableMetaData tableMetaData,
-        String onCondition) {
+    private JoinSql.Builder joinOn(
+        String joinType, TableMetaData tableMetaData, String onCondition) {
       return join(joinType, tableMetaData, "on " + onCondition);
     }
 
-    public JoinSql.Builder join(String joinType, TableMetaData otherTableMetaData,
-        String joinCondition) {
+    public JoinSql.Builder join(
+        String joinType, TableMetaData otherTableMetaData, String joinCondition) {
       columns.addAll(otherTableMetaData.getColumnAliases());
       froms.add(String.join(" ", joinType, otherTableMetaData.getTableName(), joinCondition));
       return this;
@@ -104,7 +102,6 @@ public class JoinSql {
       where(condition.toString());
       return this;
     }
-
 
     /**
      * Creates where clause.
@@ -128,7 +125,6 @@ public class JoinSql {
       orderBy = String.join(" ", order);
       return this;
     }
-
 
     /**
      * Creates limit clause.
@@ -169,9 +165,6 @@ public class JoinSql {
         sql.append("limit " + limit);
       }
       return sql.toString();
-
     }
   }
-
-
 }

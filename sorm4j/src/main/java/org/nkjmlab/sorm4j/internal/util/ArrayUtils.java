@@ -144,9 +144,7 @@ public final class ArrayUtils {
     return result;
   }
 
-
   /**
-   *
    * @param <T>
    * @param toComponentType
    * @param srcArray
@@ -184,9 +182,12 @@ public final class ArrayUtils {
 
   public static <T> T[] convertToObjectArray(Class<?> componentType, Object srcArray) {
     final int length = Array.getLength(srcArray);
-    Object destArray = Array.newInstance(
-        componentType.isPrimitive() ? ClassUtils.primitiveToWrapper(componentType) : componentType,
-        length);
+    Object destArray =
+        Array.newInstance(
+            componentType.isPrimitive()
+                ? ClassUtils.primitiveToWrapper(componentType)
+                : componentType,
+            length);
     for (int i = 0; i < length; i++) {
       Object v = Array.get(srcArray, i);
       Array.set(destArray, i, v);
@@ -222,9 +223,10 @@ public final class ArrayUtils {
     }
     Object o = Array.get(srcArray, 0);
     final int length = Array.getLength(srcArray);
-    Object destArray = Array.newInstance(
-        Array.newInstance(convertToObjectArray(o).getClass().getComponentType(), 0).getClass(),
-        length);
+    Object destArray =
+        Array.newInstance(
+            Array.newInstance(convertToObjectArray(o).getClass().getComponentType(), 0).getClass(),
+            length);
     for (int i = 0; i < length; i++) {
       Object v = Array.get(srcArray, i);
       Array.set(destArray, i, convertToObjectArray(v));
@@ -239,6 +241,4 @@ public final class ArrayUtils {
     }
     return ret;
   }
-
-
 }

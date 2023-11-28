@@ -31,7 +31,11 @@ public class H2CsvReadSql {
   }
 
   public String getCsvReadAndInsertSql(String tableName) {
-    return "insert into " + tableName + "(" + String.join(",", columns) + ") "
+    return "insert into "
+        + tableName
+        + "("
+        + String.join(",", columns)
+        + ") "
         + getCsvReadAndSelectSql();
   }
 
@@ -52,16 +56,14 @@ public class H2CsvReadSql {
   }
 
   public static class Builder {
-    /**
-     * Columns for SQL. null or empty means the all columns.
-     */
+    /** Columns for SQL. null or empty means the all columns. */
     private List<String> columns = new ArrayList<>();
+
     private Map<String, String> aliases = new HashMap<>();
 
-    /**
-     * Columns in CSV files. null or empty means using the first row as the header.
-     */
+    /** Columns in CSV files. null or empty means using the first row as the header. */
     private List<String> csvColumns = new ArrayList<>();
+
     private File csvFile;
     private Charset charset = StandardCharsets.UTF_8;
     private char fieldSeparator = ',';
@@ -76,24 +78,29 @@ public class H2CsvReadSql {
       setOrmRecordClass(ormRecordClass);
     }
 
-
     private Builder() {}
 
     public H2CsvReadSql build() {
       List<String> selectedColumns = new ArrayList<>(columns);
 
-      aliases.entrySet().forEach(en -> {
-        int index = selectedColumns.indexOf(en.getKey());
-        if (index == -1) {
-          Object[] params = {en.getKey(), columns};
-          throw new IllegalStateException(ParameterizedStringFormatter.LENGTH_256
-              .format("{} is not found in Columns {}", params));
-        }
-        selectedColumns.set(index, en.getValue());
-      });
+      aliases
+          .entrySet()
+          .forEach(
+              en -> {
+                int index = selectedColumns.indexOf(en.getKey());
+                if (index == -1) {
+                  Object[] params = {en.getKey(), columns};
+                  throw new IllegalStateException(
+                      ParameterizedStringFormatter.LENGTH_256.format(
+                          "{} is not found in Columns {}", params));
+                }
+                selectedColumns.set(index, en.getValue());
+              });
 
-      return new H2CsvReadSql(columns, H2CsvFunctions.getCsvReadAndSelectSql(selectedColumns,
-          csvFile, csvColumns, charset, fieldSeparator, fieldDelimiter));
+      return new H2CsvReadSql(
+          columns,
+          H2CsvFunctions.getCsvReadAndSelectSql(
+              selectedColumns, csvFile, csvColumns, charset, fieldSeparator, fieldDelimiter));
     }
 
     public Builder setCsvFile(File csvFile) {
@@ -115,7 +122,6 @@ public class H2CsvReadSql {
       this.fieldDelimiter = fieldDelimiter;
       return this;
     }
-
 
     public Builder setCharset(String charset) {
       return setCharset(Charset.forName(charset));
@@ -139,30 +145,41 @@ public class H2CsvReadSql {
       return setCsvColumns(Arrays.asList(csvColumns));
     }
 
-
     public Builder mapCsvColumnToTableColumn(String expression, String column) {
       aliases.put(column, expression + " as " + column);
       return this;
     }
 
-
-
     @Override
     public String toString() {
-      return "Builder [columns=" + columns + ", aliases=" + aliases + ", csvColumns=" + csvColumns
-          + ", csvFile=" + csvFile + ", charset=" + charset + ", fieldSeparator=" + fieldSeparator
-          + ", fieldDelimiter=" + fieldDelimiter + "]";
+      return "Builder [columns="
+          + columns
+          + ", aliases="
+          + aliases
+          + ", csvColumns="
+          + csvColumns
+          + ", csvFile="
+          + csvFile
+          + ", charset="
+          + charset
+          + ", fieldSeparator="
+          + fieldSeparator
+          + ", fieldDelimiter="
+          + fieldDelimiter
+          + "]";
     }
 
     public Builder setOrmRecordClass(Class<?> ormRecordClass) {
 
       Annotation[][] parameterAnnotationsOfConstructor =
           TableDefinition.getCanonicalConstructor(ormRecordClass)
-              .map(constructor -> constructor.getParameterAnnotations()).orElse(null);
+              .map(constructor -> constructor.getParameterAnnotations())
+              .orElse(null);
 
-      Field[] fields = Stream.of(ormRecordClass.getDeclaredFields())
-          .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
-          .toArray(Field[]::new);
+      Field[] fields =
+          Stream.of(ormRecordClass.getDeclaredFields())
+              .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+              .toArray(Field[]::new);
 
       List<Field> csvSkipColumns = new ArrayList<>();
 
@@ -178,24 +195,24 @@ public class H2CsvReadSql {
         }
         for (Annotation ann : anns) {
           if (ann instanceof CsvColumn) {
-            mapCsvColumnToTableColumn(((CsvColumn) ann).value(),
-                StringCache.toUpperSnakeCase(field.getName()));
+            mapCsvColumnToTableColumn(
+                ((CsvColumn) ann).value(), StringCache.toUpperSnakeCase(field.getName()));
           } else if (ann instanceof SkipCsvRead) {
             csvSkipColumns.add(field);
           }
-
         }
       }
-      setTableColumns(Stream.of(fields).map(f -> {
-        return csvSkipColumns.contains(f) ? "null as " + StringCache.toUpperSnakeCase(f.getName())
-            : StringCache.toUpperSnakeCase(f.getName());
-      }).toArray(String[]::new));
+      setTableColumns(
+          Stream.of(fields)
+              .map(
+                  f -> {
+                    return csvSkipColumns.contains(f)
+                        ? "null as " + StringCache.toUpperSnakeCase(f.getName())
+                        : StringCache.toUpperSnakeCase(f.getName());
+                  })
+              .toArray(String[]::new));
 
       return this;
     }
-
-
   }
-
-
 }

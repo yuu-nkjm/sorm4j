@@ -6,16 +6,18 @@ import java.util.Optional;
 
 public final class MethodInvokerInfoUtils {
 
-
   public static String getInvokerInfo(int depth, StackTraceElement[] stackTraceElements) {
     StackTraceElement e = getStackTraceElement(depth, stackTraceElements);
-    return e.getClassName() + " ("
-        + (e.getFileName() != null ? new File(e.getFileName()).getName() : "") + ":"
-        + e.getLineNumber() + ") ";
+    return e.getClassName()
+        + " ("
+        + (e.getFileName() != null ? new File(e.getFileName()).getName() : "")
+        + ":"
+        + e.getLineNumber()
+        + ") ";
   }
 
-  private static StackTraceElement getStackTraceElement(int index,
-      StackTraceElement[] stackTraceElements) {
+  private static StackTraceElement getStackTraceElement(
+      int index, StackTraceElement[] stackTraceElements) {
     if (index < 0) {
       return stackTraceElements[0];
     } else if (index >= stackTraceElements.length) {
@@ -29,10 +31,14 @@ public final class MethodInvokerInfoUtils {
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
 
     {
-      Optional<StackTraceElement> c = Arrays.stream(stackTrace)
-          .filter(s -> !s.getClassName().startsWith(libPrefix)
-              && !s.getClassName().startsWith("java.") && !s.getClassName().startsWith("jdk."))
-          .findFirst();
+      Optional<StackTraceElement> c =
+          Arrays.stream(stackTrace)
+              .filter(
+                  s ->
+                      !s.getClassName().startsWith(libPrefix)
+                          && !s.getClassName().startsWith("java.")
+                          && !s.getClassName().startsWith("jdk."))
+              .findFirst();
 
       if (c.isPresent()) {
         return c.map(se -> getInvoker(se)).get();
@@ -40,8 +46,10 @@ public final class MethodInvokerInfoUtils {
     }
 
     {
-      Optional<StackTraceElement> c = Arrays.stream(stackTrace)
-          .filter(s -> !s.getClassName().startsWith(libPrefix)).findFirst();
+      Optional<StackTraceElement> c =
+          Arrays.stream(stackTrace)
+              .filter(s -> !s.getClassName().startsWith(libPrefix))
+              .findFirst();
 
       if (c.isPresent()) {
         return c.map(se -> getInvoker(se)).get();
@@ -51,7 +59,13 @@ public final class MethodInvokerInfoUtils {
   }
 
   public static String getInvoker(StackTraceElement se) {
-    return se.getClassName() + "." + se.getMethodName() + "(" + se.getFileName() + ":"
-        + se.getLineNumber() + ")";
+    return se.getClassName()
+        + "."
+        + se.getMethodName()
+        + "("
+        + se.getFileName()
+        + ":"
+        + se.getLineNumber()
+        + ")";
   }
 }

@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.engine;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,63 +54,60 @@ public class TestPostgreSQLSqlMapper {
 
   @BeforeAll
   static void beforAll() {
-    dataSource = DbEngineTestUtils.getDataSource(TestPostgreSQLSqlMapper.class,
-        "jdbc:h2:mem:postgre;MODE=PostgreSQL");
+    dataSource =
+        DbEngineTestUtils.getDataSource(
+            TestPostgreSQLSqlMapper.class, "jdbc:h2:mem:postgre;MODE=PostgreSQL");
     DbEngineTestUtils.executeSql(dataSource, TestPostgreSQLSqlMapper.class, "sql-mapper-test.sql");
 
+    ColumnValueToJavaObjectConverter columnValueConverter =
+        new ColumnValueToJavaObjectConverter() {
 
+          @Override
+          public boolean test(Class<?> toType) {
+            return toType.equals(PGobject.class);
+          }
 
-    ColumnValueToJavaObjectConverter columnValueConverter = new ColumnValueToJavaObjectConverter() {
+          @Override
+          public Object convertTo(
+              ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+              throws SQLException {
+            return PGobject.class.cast(resultSet.getObject(columnIndex));
+          }
+        };
 
-      @Override
-      public boolean test(Class<?> toType) {
-        return toType.equals(PGobject.class);
-      }
+    SqlParameterSetter parameterSetter =
+        new SqlParameterSetter() {
 
-      @Override
-      public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
-          throws SQLException {
-        return PGobject.class.cast(resultSet.getObject(columnIndex));
-      }
+          @Override
+          public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
+              throws SQLException {
+            return parameter.getClass().equals(java.net.InetAddress.class);
+          }
 
-    };
+          @Override
+          public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
+              throws SQLException {
+            PGobject pg = new PGobject();
+            pg.setType("inet");
+            pg.setValue(((InetAddress) parameter).getHostAddress());
+            stmt.setObject(parameterIndex, pg);
+          }
+        };
 
-
-
-    SqlParameterSetter parameterSetter = new SqlParameterSetter() {
-
-      @Override
-      public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
-          throws SQLException {
-        return parameter.getClass().equals(java.net.InetAddress.class);
-      }
-
-      @Override
-      public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
-          throws SQLException {
-        PGobject pg = new PGobject();
-        pg.setType("inet");
-        pg.setValue(((InetAddress) parameter).getHostAddress());
-        stmt.setObject(parameterIndex, pg);
-      }
-    };
-
-
-
-    context = SormContext.builder()
-        .setColumnValueToJavaObjectConverters(
-            new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
-        .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter)).build();
-
+    context =
+        SormContext.builder()
+            .setColumnValueToJavaObjectConverters(
+                new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
+            .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter))
+            .build();
   }
-
 
   /**
    * @see https://github.com/orangain/compare-sql-mappers/
-   *
    * @throws SQLException
    */
   private static final ZoneOffset JST_OFFSET = ZoneOffset.of("+09:00");
+
   private static final LocalDate LOCAL_DATE = LocalDate.of(2019, 9, 27);
   private static final LocalTime LOCAL_TIME = LocalTime.of(13, 23);
   private static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.of(LOCAL_DATE, LOCAL_TIME);
@@ -123,7 +119,7 @@ public class TestPostgreSQLSqlMapper {
   @Test
   public void testMapTest() throws SQLException, MalformedURLException, UnknownHostException {
     try (Connection conn = dataSource.getConnection();
-        OrmConnection c = OrmConnection.of(conn, context);) {
+        OrmConnection c = OrmConnection.of(conn, context); ) {
 
       // log.debug(c.readFirst(RowMap.class, "select * from sql_mapper_test"));
       doTest(c, "c_boolean by boolean", "c_boolean", true);
@@ -135,10 +131,17 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "testName", "c_varchar", "varchar");
       doTest(c, "testName", "c_text", "long long text");
       doTest(c, "testName", "c_text", new StringReader("long long text"));
-      doTest(c, "c_bytea by byte[]", "c_bytea",
+      doTest(
+          c,
+          "c_bytea by byte[]",
+          "c_bytea",
           new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF});
-      doTest(c, "c_bytea by byte[]", "c_bytea", new ByteArrayInputStream(
-          new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF}));
+      doTest(
+          c,
+          "c_bytea by byte[]",
+          "c_bytea",
+          new ByteArrayInputStream(
+              new byte[] {(byte) 0xde, (byte) 0xAD, (byte) 0xBE, (byte) 0xEF}));
       doTest(c, "testName", "c_uuid", UUID.fromString("33ee757a-19b3-45dc-be79-f1d65ac5d1a4"));
       doTest(c, "testName", "c_date", LOCAL_DATE);
       doTest(c, "testName", "c_date", Date.valueOf(LOCAL_DATE));
@@ -161,14 +164,13 @@ public class TestPostgreSQLSqlMapper {
       doTest(c, "c_varchar_array by String[]", "c_varchar_array", new String[] {"A", "B", "C"});
       // doTest(c, "c_varchar_array by List", "c_varchar_array", List.of("A", "B", "C"));
 
-
       log.debug("Array test --------");
       // doTestInClause(c, "c integer by List", "c_integer", List.of(1, 2, 3));
       doTestInClause(c, "c integer by Integer[]", "c_integer", new Integer[] {1, 2, 3});
       doTestInClause(c, "c integer by int[]", "c_integer", new int[] {1, 2, 3});
       // doTestInClause(c, "c_varchar by List", "c_varchar", List.of("integer", "varchar", "text"));
-      doTestInClause(c, "c_varchar by String[]", "c_varchar",
-          new String[] {"integer", "varchar", "text"});
+      doTestInClause(
+          c, "c_varchar by String[]", "c_varchar", new String[] {"integer", "varchar", "text"});
     }
   }
 
@@ -177,8 +179,8 @@ public class TestPostgreSQLSqlMapper {
     convertResultSetToJavaObjectTest(c, testName, column, param);
   }
 
-  private void convertResultSetToJavaObjectTest(OrmConnection c, String testName, String column,
-      Object param) {
+  private void convertResultSetToJavaObjectTest(
+      OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "map: " + column + "(" + param.getClass() + ") ";
     try {
       Class<?> clazz = toClass(param.getClass());
@@ -186,8 +188,15 @@ public class TestPostgreSQLSqlMapper {
       if (equals(retFromDb, param)) {
         // log.debug("[" + testName + "] " + messagePrefix + "success ret =>" + retFromDb);
       } else {
-        log.error("[" + testName + "] " + messagePrefix + "fail ret => " + retFromDb + ", param => "
-            + param);
+        log.error(
+            "["
+                + testName
+                + "] "
+                + messagePrefix
+                + "fail ret => "
+                + retFromDb
+                + ", param => "
+                + param);
       }
     } catch (Exception e) {
       log.error("Exception [" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
@@ -257,7 +266,9 @@ public class TestPostgreSQLSqlMapper {
     }
     if (!arr1.getClass().isArray() || !arr2.getClass().isArray()) {
       Object[] params = {arr1.getClass(), arr2.getClass()};
-      throw new IllegalArgumentException(ParameterizedStringFormatter.LENGTH_256.format("args should be array. arr1={}, arr2={}", params));
+      throw new IllegalArgumentException(
+          ParameterizedStringFormatter.LENGTH_256.format(
+              "args should be array. arr1={}, arr2={}", params));
     }
     int l1 = Array.getLength(arr1);
 
@@ -278,8 +289,11 @@ public class TestPostgreSQLSqlMapper {
   private void bindToSqlTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "bind: " + column + "(" + param.getClass() + ") ";
     try {
-      Map<String, Object> ret = c.readFirst(RowMap.class,
-          "SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?", param);
+      Map<String, Object> ret =
+          c.readFirst(
+              RowMap.class,
+              "SELECT " + column + " FROM sql_mapper_test WHERE " + column + "=?",
+              param);
       if (ret != null) {
         // log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
       } else {
@@ -289,7 +303,6 @@ public class TestPostgreSQLSqlMapper {
       log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
       // e.printStackTrace();
     }
-
   }
 
   private void doTestInClause(OrmConnection c, String testName, String column, Object param) {
@@ -299,9 +312,11 @@ public class TestPostgreSQLSqlMapper {
   private void bindInClauseTest(OrmConnection c, String testName, String column, Object param) {
     String messagePrefix = "bindIn: " + column + "(" + param.getClass() + ") ";
     try {
-      ParameterizedSql statement = OrderedParameterSqlParser
-          .of("SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
-          .addParameter(param).parse();
+      ParameterizedSql statement =
+          OrderedParameterSqlParser.of(
+                  "SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
+              .addParameter(param)
+              .parse();
       Map<String, Object> ret = c.readFirst(RowMap.class, statement);
       if (ret != null) {
         // log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);
@@ -312,7 +327,4 @@ public class TestPostgreSQLSqlMapper {
       log.error("[" + testName + "] " + messagePrefix + "fail => " + e.getMessage());
     }
   }
-
-
-
 }

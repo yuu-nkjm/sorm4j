@@ -13,7 +13,6 @@ public interface TableWithDefinition<T> extends Table<T> {
    */
   TableDefinition getTableDefinition();
 
-
   default TableWithDefinition<T> createTableIfNotExists() {
     getTableDefinition().createTableIfNotExists(getOrm());
     return this;
@@ -38,5 +37,4 @@ public interface TableWithDefinition<T> extends Table<T> {
   default String getTableName() {
     return getTableDefinition().getTableName();
   }
-
 }

@@ -27,8 +27,5 @@ class OrmStreamTest {
     int ret = sorm.streamAll(Guest.class).apply(strm -> strm.collect(Collectors.toList()).size());
 
     assertThat(ret).isEqualTo(1);
-
-
   }
-
 }

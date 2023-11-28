@@ -29,17 +29,18 @@ class OrmImplTest {
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
 
-
   @Test
   void testReadAll() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
 
-    assertThatThrownBy(() -> sorm.readFirst(LocalDateTime.class,
-        ParameterizedSqlParser.parse("select count(*) from players limit 1")))
-            .isInstanceOf(SormException.class);
+    assertThatThrownBy(
+            () ->
+                sorm.readFirst(
+                    LocalDateTime.class,
+                    ParameterizedSqlParser.parse("select count(*) from players limit 1")))
+        .isInstanceOf(SormException.class);
   }
-
 
   @Test
   void testReadByPrimaryKey() {
@@ -51,8 +52,9 @@ class OrmImplTest {
   void testReadFirstClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-        sorm.readFirst(Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
-            .isEqualTo(PLAYER_ALICE);
+            sorm.readFirst(
+                Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
+        .isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -62,13 +64,14 @@ class OrmImplTest {
         .isEqualTo(PLAYER_ALICE);
   }
 
-
   @Test
   void testReadListClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-        sorm.readList(Player.class, ParameterizedSqlParser.parse("select * from players limit 1"))
-            .get(0)).isEqualTo(PLAYER_ALICE);
+            sorm.readList(
+                    Player.class, ParameterizedSqlParser.parse("select * from players limit 1"))
+                .get(0))
+        .isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -82,8 +85,9 @@ class OrmImplTest {
   void testReadOneClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-        sorm.readOne(Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
-            .isEqualTo(PLAYER_ALICE);
+            sorm.readOne(
+                Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
+        .isEqualTo(PLAYER_ALICE);
   }
 
   @Test
@@ -106,7 +110,6 @@ class OrmImplTest {
     assertThat(sorm.getTable(Player.class).count()).isEqualTo(2);
     sorm.delete(List.of(PLAYER_ALICE, PLAYER_BOB));
     assertThat(sorm.getTable(Player.class).count()).isEqualTo(0);
-
   }
 
   @Test
@@ -170,7 +173,6 @@ class OrmImplTest {
     sorm.insert(List.of(PLAYER_ALICE, PLAYER_BOB));
     assertThat(sorm.getTable(Player.class).count()).isEqualTo(2);
   }
-
 
   @Test
   void testInsertAndGetListOfT() {
@@ -325,28 +327,25 @@ class OrmImplTest {
 
   @Test
   void testOpenMapStream() {
-    sorm.acceptHandler(conn -> {
-      conn.insert(PLAYER_ALICE);
-      ResultSetStream<RowMap> stream =
-          conn.stream(RowMap.class, ParameterizedSql.of("select * from players"));
-      int ret = stream.apply(strm -> strm.collect(Collectors.toList()).size());
-      assertThat(ret).isEqualTo(1);
+    sorm.acceptHandler(
+        conn -> {
+          conn.insert(PLAYER_ALICE);
+          ResultSetStream<RowMap> stream =
+              conn.stream(RowMap.class, ParameterizedSql.of("select * from players"));
+          int ret = stream.apply(strm -> strm.collect(Collectors.toList()).size());
+          assertThat(ret).isEqualTo(1);
 
-      ResultSetStream<Player> strm1 = conn.streamAll(Player.class);
-      int ret1 = strm1.apply(strm -> strm.collect(Collectors.toList()).size());
-      assertThat(ret1).isEqualTo(1);
+          ResultSetStream<Player> strm1 = conn.streamAll(Player.class);
+          int ret1 = strm1.apply(strm -> strm.collect(Collectors.toList()).size());
+          assertThat(ret1).isEqualTo(1);
 
-      assertThat(conn.getTableSql(PLAYERS1).toString()).contains("PLAYERS1");
+          assertThat(conn.getTableSql(PLAYERS1).toString()).contains("PLAYERS1");
 
-      assertThat(conn.mapToTable(Player.class).count()).isEqualTo(1);
-      conn.mapToTable(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
+          assertThat(conn.mapToTable(Player.class).count()).isEqualTo(1);
+          conn.mapToTable(Player.class, PLAYERS1).insert(PLAYER_ALICE, PLAYER_BOB, PLAYER_CAROL);
 
-      assertThat(conn.mapToTable(Player.class, PLAYERS1).count()).isEqualTo(3);
-
-    });
-
-
-
+          assertThat(conn.mapToTable(Player.class, PLAYERS1).count()).isEqualTo(3);
+        });
   }
 
   @Test
@@ -362,28 +361,31 @@ class OrmImplTest {
 
   @Test
   void testAcceptPreparedStatementHandler() {
-    sorm.executeQuery(con -> con.prepareStatement("select * from players"),
-        sorm.getRowMapper(Player.class));
+    sorm.executeQuery(
+        con -> con.prepareStatement("select * from players"), sorm.getRowMapper(Player.class));
   }
 
   @Test
   void testApplyPreparedStatementHandler() {
-    sorm.executeQuery(con -> con.prepareStatement("select * from players"),
+    sorm.executeQuery(
+        con -> con.prepareStatement("select * from players"),
         sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
   void testExecuteQueryParameterizedSqlResultSetTraverserOfT() {
-    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
+    sorm.executeQuery(
+        ParameterizedSqlParser.parse("select * from players"),
         sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
-    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
-        sorm.getRowMapper(Player.class));
+    sorm.executeQuery(
+        ParameterizedSqlParser.parse("select * from players"), sorm.getRowMapper(Player.class));
 
-    sorm.executeQuery(ParameterizedSqlParser.parse("select * from players"),
+    sorm.executeQuery(
+        ParameterizedSqlParser.parse("select * from players"),
         sorm.getResultSetTraverser(Player.class));
   }
 
@@ -397,5 +399,4 @@ class OrmImplTest {
     sorm.executeUpdate(
         ParameterizedSqlParser.parse("insert into players values(?,?,?)", 9, "A", "B"));
   }
-
 }

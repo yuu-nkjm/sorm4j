@@ -10,7 +10,6 @@ public class Customer {
   public static final Customer CAROL = new Customer(3, "Carol", "Kyoto");
   public static final Customer DAVE = new Customer(4, "Dave", "Nara");
 
-
   public static final String CREATE_TABLE_SQL =
       "CREATE TABLE IF NOT EXISTS customer (id INT PRIMARY KEY, name VARCHAR, address VARCHAR)";
 
@@ -26,7 +25,6 @@ public class Customer {
     this.name = name;
     this.address = address;
   }
-
 
   public String getAddress() {
     return address;
@@ -44,6 +42,4 @@ public class Customer {
   public void setName(String name) {
     this.name = name;
   }
-
-
 }

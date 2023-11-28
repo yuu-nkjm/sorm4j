@@ -16,5 +16,4 @@ public class JtsSormContext {
             new DefaultColumnValueToJavaObjectConverters(new JtsColumnValueToJavaObjectConverter()))
         .setSqlParametersSetter(new DefaultSqlParametersSetter(new JtsSqlParameterSetter()));
   }
-
 }

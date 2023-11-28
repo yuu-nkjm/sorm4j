@@ -26,16 +26,13 @@ public class Guest {
     this.address = address;
   }
 
-
   public int getId() {
     return id;
   }
 
-
   public String getAddress() {
     return address;
   }
-
 
   public String getName() {
     return name;
@@ -53,18 +50,15 @@ public class Guest {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof Guest))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof Guest)) return false;
     Guest other = (Guest) obj;
-    return Objects.equals(address, other.address) && id == other.id
+    return Objects.equals(address, other.address)
+        && id == other.id
         && Objects.equals(name, other.name);
   }
 
   public void setId(int id) {
     this.id = id;
   }
-
-
 }

@@ -1,8 +1,6 @@
 package org.nkjmlab.sorm4j.common;
 
-/**
- * Represents an exception thrown by Sorm4j.
- */
+/** Represents an exception thrown by Sorm4j. */
 public final class SormException extends RuntimeException {
 
   private static final long serialVersionUID = -3645955311944195665L;
@@ -15,4 +13,3 @@ public final class SormException extends RuntimeException {
     super(message, cause);
   }
 }
-

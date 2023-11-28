@@ -9,7 +9,6 @@ import java.util.List;
  * Traverses {@link ResultSet} and maps to T.
  *
  * @author nkjm
- *
  * @param <T>
  */
 @FunctionalInterface
@@ -42,5 +41,4 @@ public interface ResultSetTraverser<T> {
       return ret;
     };
   }
-
 }

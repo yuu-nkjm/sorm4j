@@ -55,9 +55,8 @@ public abstract class AbstractCommand implements Command {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(Class<T1> t1, Class<T2> t2,
-      Class<T3> t3) {
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
+      Class<T1> t1, Class<T2> t2, Class<T3> t3) {
     return conn.readTupleList(t1, t2, t3, parse());
   }
-
 }

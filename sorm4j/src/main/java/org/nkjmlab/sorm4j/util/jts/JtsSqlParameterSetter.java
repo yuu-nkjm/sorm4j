@@ -13,10 +13,12 @@ public class JtsSqlParameterSetter implements SqlParameterSetter {
   private final Map<Class<?>, Boolean> jtsContainer = new ConcurrentHashMap<>();
 
   private boolean isJtsContainer(Class<?> type) {
-    return jtsContainer.computeIfAbsent(type,
-        key -> org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(type)
-            || org.nkjmlab.sorm4j.util.jts.GeometryJts.class
-                .isAssignableFrom(ArrayUtils.getInternalComponentType(type)));
+    return jtsContainer.computeIfAbsent(
+        type,
+        key ->
+            org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(type)
+                || org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(
+                    ArrayUtils.getInternalComponentType(type)));
   }
 
   @Override

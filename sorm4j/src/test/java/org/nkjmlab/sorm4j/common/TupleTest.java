@@ -37,5 +37,4 @@ class TupleTest {
     assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
     assertThat(t1.toString()).isEqualTo("(t1, t2, t3)");
   }
-
 }

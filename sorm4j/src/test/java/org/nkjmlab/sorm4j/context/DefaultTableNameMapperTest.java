@@ -17,20 +17,21 @@ class DefaultTableNameMapperTest {
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
   }
 
-
   @Test
   void testToValidTableName() {
-    sorm.acceptHandler(m -> {
-      assertThat(
-          new DefaultTableNameMapper().getTableName("guests", m.getJdbcConnection().getMetaData()))
+    sorm.acceptHandler(
+        m -> {
+          assertThat(
+                  new DefaultTableNameMapper()
+                      .getTableName("guests", m.getJdbcConnection().getMetaData()))
               .isEqualTo("GUESTS");
-
-    });
+        });
     try {
-      sorm.acceptHandler(m -> {
-        new DefaultTableNameMapper().getTableName("aaa", m.getJdbcConnection().getMetaData());
-        failBecauseExceptionWasNotThrown(Exception.class);
-      });
+      sorm.acceptHandler(
+          m -> {
+            new DefaultTableNameMapper().getTableName("aaa", m.getJdbcConnection().getMetaData());
+            failBecauseExceptionWasNotThrown(Exception.class);
+          });
     } catch (Exception e) {
       assertThat(e.getMessage()).contains("does not match any existing table");
     }
@@ -38,12 +39,12 @@ class DefaultTableNameMapperTest {
 
   @Test
   void testGetTableName() {
-    sorm.acceptHandler(m -> {
-      String name = new DefaultTableNameMapper().getTableName(Guest.class,
-          m.getJdbcConnection().getMetaData());
-      assertThat(name).isEqualTo(new TableName("GUESTS").getName());
-    });
+    sorm.acceptHandler(
+        m -> {
+          String name =
+              new DefaultTableNameMapper()
+                  .getTableName(Guest.class, m.getJdbcConnection().getMetaData());
+          assertThat(name).isEqualTo(new TableName("GUESTS").getName());
+        });
   }
-
-
 }

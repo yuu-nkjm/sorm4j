@@ -20,18 +20,24 @@ class ResultSetMapperTest {
     sorm.acceptHandler(conn -> conn.insert(PLAYER_ALICE, PLAYER_BOB));
   }
 
-
   @Test
   void testMapRowsClassOfTResultSet() {
-    sorm.applyHandler(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-        conn.getResultSetTraverser(Player.class)));
+    sorm.applyHandler(
+        conn ->
+            conn.executeQuery(
+                ParameterizedSql.of("select * from players"),
+                conn.getResultSetTraverser(Player.class)));
   }
 
   @Test
   void testMapRowsResultSet() {
     assertThat(
-        sorm.applyHandler(conn -> conn.executeQuery(ParameterizedSql.of("select * from players"),
-            conn.getResultSetTraverser(RowMap.class))).size()).isEqualTo(2);
+            sorm.applyHandler(
+                    conn ->
+                        conn.executeQuery(
+                            ParameterizedSql.of("select * from players"),
+                            conn.getResultSetTraverser(RowMap.class)))
+                .size())
+        .isEqualTo(2);
   }
-
 }

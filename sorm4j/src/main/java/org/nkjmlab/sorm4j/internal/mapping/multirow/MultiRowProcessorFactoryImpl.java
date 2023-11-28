@@ -12,8 +12,11 @@ public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
   private final int batchSizeWithMultiRow;
   private final int multiRowSize;
 
-  public MultiRowProcessorFactoryImpl(MultiRowProcessorType multiRowProcessorType, int batchSize,
-      int multiRowSize, int batchSizeWithMultiRow) {
+  public MultiRowProcessorFactoryImpl(
+      MultiRowProcessorType multiRowProcessorType,
+      int batchSize,
+      int multiRowSize,
+      int batchSizeWithMultiRow) {
     this.multiRowProcessorType = multiRowProcessorType;
     this.batchSize = batchSize;
     this.multiRowSize = multiRowSize;
@@ -21,19 +24,33 @@ public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
   }
 
   @Override
-  public <T> MultiRowProcessor<T> getMultiRowProcessor(LoggerContext loggerContext,
-      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
-      Class<T> objectClass, SqlParametersToTableMapping<T> tableMapping) {
+  public <T> MultiRowProcessor<T> getMultiRowProcessor(
+      LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier statementSupplier,
+      Class<T> objectClass,
+      SqlParametersToTableMapping<T> tableMapping) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
-        return new SimpleBatchProcessor<>(loggerContext, sqlParametersSetter, statementSupplier,
-            tableMapping, batchSize);
+        return new SimpleBatchProcessor<>(
+            loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
       case MULTI_ROW:
-        return new MultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
-            statementSupplier, tableMapping, batchSize, multiRowSize);
+        return new MultiRowInOneStatementProcessor<>(
+            loggerContext,
+            sqlParametersSetter,
+            statementSupplier,
+            tableMapping,
+            batchSize,
+            multiRowSize);
       case MULTI_ROW_AND_BATCH:
-        return new BatchOfMultiRowInOneStatementProcessor<>(loggerContext, sqlParametersSetter,
-            statementSupplier, tableMapping, batchSize, multiRowSize, batchSizeWithMultiRow);
+        return new BatchOfMultiRowInOneStatementProcessor<>(
+            loggerContext,
+            sqlParametersSetter,
+            statementSupplier,
+            tableMapping,
+            batchSize,
+            multiRowSize,
+            batchSizeWithMultiRow);
       default:
         throw new IllegalStateException(multiRowProcessorType + " is invalid");
     }
@@ -41,9 +58,14 @@ public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
 
   @Override
   public String toString() {
-    return "MultiRowProcessorFactory [multiRowProcessorType=" + multiRowProcessorType
-        + ", batchSize=" + batchSize + ", batchSizeWithMultiRow=" + batchSizeWithMultiRow
-        + ", multiRowSize=" + multiRowSize + "]";
+    return "MultiRowProcessorFactory [multiRowProcessorType="
+        + multiRowProcessorType
+        + ", batchSize="
+        + batchSize
+        + ", batchSizeWithMultiRow="
+        + batchSizeWithMultiRow
+        + ", multiRowSize="
+        + multiRowSize
+        + "]";
   }
-
 }

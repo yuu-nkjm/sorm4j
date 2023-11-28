@@ -10,5 +10,4 @@ public interface NameToFieldAccessorMapper {
    * @return Keys in map is written in the canonical case.
    */
   Map<String, FieldAccessor> createMapping(Class<?> objectClass);
-
 }

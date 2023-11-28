@@ -69,5 +69,4 @@ class DriverManagerDataSourceTest {
       fail();
     }
   }
-
 }

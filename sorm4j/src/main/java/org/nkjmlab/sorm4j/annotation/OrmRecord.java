@@ -5,13 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Defines a record for mapping.
- */
+/** Defines a record for mapping. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Experimental
-public @interface OrmRecord {
-
-
-}
+public @interface OrmRecord {}

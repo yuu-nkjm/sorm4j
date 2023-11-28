@@ -7,7 +7,6 @@ import java.sql.SQLException;
  * A setter for given {@link PreparedStatement}.
  *
  * @author nkjm
- *
  */
 public interface SqlParametersSetter {
 
@@ -16,9 +15,6 @@ public interface SqlParametersSetter {
    *
    * @param stmt {@link java.sql.PreparedStatement} to have parameters set into
    * @param parameters parameters values
-   *
    */
   void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException;
-
-
 }

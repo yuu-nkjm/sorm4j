@@ -6,7 +6,6 @@ import java.util.Objects;
  * Value object of column.
  *
  * @author nkjm
- *
  */
 public class ColumnName implements Comparable<ColumnName> {
 
@@ -23,10 +22,8 @@ public class ColumnName implements Comparable<ColumnName> {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof ColumnName))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof ColumnName)) return false;
     ColumnName other = (ColumnName) obj;
     return Objects.equals(name, other.name);
   }
@@ -45,12 +42,9 @@ public class ColumnName implements Comparable<ColumnName> {
     return Objects.hash(name);
   }
 
-  /**
-   * Uses {@link #getName()} when you want to get name.
-   */
+  /** Uses {@link #getName()} when you want to get name. */
   @Override
   public String toString() {
     return name;
   }
-
 }

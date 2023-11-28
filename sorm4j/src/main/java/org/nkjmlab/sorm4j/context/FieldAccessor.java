@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.common.SormException;
  * Field accessor mapping to the columnName.
  *
  * @author nkjm
- *
  */
 public final class FieldAccessor {
 
@@ -20,15 +19,17 @@ public final class FieldAccessor {
   private final SetterAccessor setter;
   private final String columnName;
 
-
   public FieldAccessor(String columnName, Field field, Method getter, Method setter) {
     this.columnName = columnName;
-    this.getter = getter != null ? new GetterMethod(getter)
-        : field != null ? new FieldGetter(field) : EMPTY_GETTER;
-    this.setter = setter != null ? new SetterMethod(setter)
-        : field != null ? new FieldSetter(field) : EMPTY_SETTER;
+    this.getter =
+        getter != null
+            ? new GetterMethod(getter)
+            : field != null ? new FieldGetter(field) : EMPTY_GETTER;
+    this.setter =
+        setter != null
+            ? new SetterMethod(setter)
+            : field != null ? new FieldSetter(field) : EMPTY_SETTER;
   }
-
 
   /**
    * Gets the value from the corresponding field by getter method/field access.
@@ -71,18 +72,20 @@ public final class FieldAccessor {
     return getter.getReturnType();
   }
 
-
   @Override
   public String toString() {
-    return "Accessor [getterAccessor=" + getter + ", setterAccessor=" + setter + ", columnName="
-        + columnName + "]";
+    return "Accessor [getterAccessor="
+        + getter
+        + ", setterAccessor="
+        + setter
+        + ", columnName="
+        + columnName
+        + "]";
   }
-
 
   public String getFormattedString() {
     return "getter=[" + getter + "], setter=[" + setter + "]";
   }
-
 
   private static interface GetterAccessor {
     Object get(Object object)
@@ -133,7 +136,6 @@ public final class FieldAccessor {
     public Class<?> getReturnType() {
       return Void.class;
     }
-
   }
 
   private static final class FieldGetter implements GetterAccessor {
@@ -158,7 +160,6 @@ public final class FieldAccessor {
     public Class<?> getReturnType() {
       return field.getType();
     }
-
   }
 
   private static interface SetterAccessor {
@@ -167,7 +168,6 @@ public final class FieldAccessor {
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 
     Class<?> getParameterType();
-
   }
 
   private static final class EmptySetter implements SetterAccessor {
@@ -187,7 +187,6 @@ public final class FieldAccessor {
     public String toString() {
       return getClass().getSimpleName();
     }
-
   }
 
   private static final class SetterMethod implements SetterAccessor {
@@ -214,9 +213,7 @@ public final class FieldAccessor {
     public String toString() {
       return setter.getName() + "(" + setter.getParameterTypes()[0].getSimpleName() + ")";
     }
-
   }
-
 
   private static final class FieldSetter implements SetterAccessor {
 
@@ -242,8 +239,5 @@ public final class FieldAccessor {
     public String toString() {
       return "field " + field.getType().getSimpleName() + " " + field.getName();
     }
-
   }
-
-
 }

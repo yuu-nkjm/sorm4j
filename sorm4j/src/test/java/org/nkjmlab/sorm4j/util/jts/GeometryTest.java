@@ -29,15 +29,14 @@ class GeometryTest {
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
     assertThat(g.toString()).isEqualTo("POINT (30 10)");
 
-
-
     table.insert(new GeometryStringRecord(g));
 
-    GeometryString ret = table.getOrm().readFirst(GeometryString.class,
-        "select geo_str from geometry_string_records");
+    GeometryString ret =
+        table
+            .getOrm()
+            .readFirst(GeometryString.class, "select geo_str from geometry_string_records");
 
     assertThat(ret).isEqualTo(g);
-
   }
 
   @Test
@@ -59,15 +58,11 @@ class GeometryTest {
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
     assertThat(g.toString()).isEqualTo("POINT (100 200)");
 
-
     table.insert(new GeometryJtsRecord(g));
-
 
     GeometryJts ret =
         table.getOrm().readFirst(GeometryJts.class, "select geo_jts from geometry_jts_records");
     assertThat(ret).isEqualTo(g);
-
-
   }
 
   @OrmRecord
@@ -85,7 +80,6 @@ class GeometryTest {
     }
   }
 
-
   @OrmRecord
   public static class GeometryJtsRecord {
 
@@ -100,5 +94,4 @@ class GeometryTest {
       return "GeometryJtsRecord [geoJts=" + geoJts + "]";
     }
   }
-
 }

@@ -31,5 +31,4 @@ public final class OrderedParameterCommandImpl extends AbstractCommand
     sql.addParameter(parameters);
     return this;
   }
-
 }

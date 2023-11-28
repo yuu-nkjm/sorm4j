@@ -7,7 +7,6 @@ import org.nkjmlab.sorm4j.common.ColumnMetaData;
 
 public interface TableMetaDataParser {
   /**
-   *
    * Retrieves a list of auto-generated columns of the given table name from the database metadata.
    *
    * @param metaData
@@ -30,7 +29,6 @@ public interface TableMetaDataParser {
       throws SQLException;
 
   /**
-   *
    * Retrieves a list of primary keys columns of the given table name from the database metadata.
    *
    * @param metaData
@@ -38,7 +36,5 @@ public interface TableMetaDataParser {
    * @return
    * @throws SQLException
    */
-
   List<String> getPrimaryKeys(DatabaseMetaData metaData, String tableName) throws SQLException;
-
 }

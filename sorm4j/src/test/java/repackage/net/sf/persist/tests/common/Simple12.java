@@ -11,7 +11,4 @@ public class Simple12 {
 
   // no plain constructor -- fail
   public Simple12(long id) {}
-
-
 }
-

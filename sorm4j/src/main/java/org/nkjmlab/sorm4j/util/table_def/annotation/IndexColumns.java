@@ -6,17 +6,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Defines index pair.
- */
+/** Defines index pair. */
 @Repeatable(RepeatableIndexColumns.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface IndexColumns {
 
-  /**
-   * Name of the index
-   */
+  /** Name of the index */
   String[] value();
-
 }

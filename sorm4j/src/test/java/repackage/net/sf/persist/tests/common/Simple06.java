@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -10,6 +9,7 @@ public class Simple06 {
 
   private long id;
   private String stringCol;
+
   @SuppressWarnings("unused")
   private long longCol;
 
@@ -28,6 +28,4 @@ public class Simple06 {
   public void setStringCol(String stringCol) {
     this.stringCol = stringCol;
   }
-
 }
-

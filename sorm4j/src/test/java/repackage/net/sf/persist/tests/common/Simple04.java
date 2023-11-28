@@ -1,4 +1,3 @@
-
 // $Id$
 
 package repackage.net.sf.persist.tests.common;
@@ -6,12 +5,13 @@ package repackage.net.sf.persist.tests.common;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 
 @OrmTable("SIMPLE")
-
 public class Simple04 {
 
   private long id;
+
   @SuppressWarnings("unused")
   private String stringCol;
+
   private long longCol;
 
   public long getId() {
@@ -40,6 +40,4 @@ public class Simple04 {
   public void setLongCol(boolean intCol) {
     this.longCol = 9999;
   }
-
 }
-

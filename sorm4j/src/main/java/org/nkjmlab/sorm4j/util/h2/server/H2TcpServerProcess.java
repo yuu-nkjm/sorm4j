@@ -17,7 +17,6 @@ public class H2TcpServerProcess extends H2ServerProcess {
     super(properties);
   }
 
-
   /**
    * @see #awaitShutdown(long, TimeUnit)
    * @return
@@ -37,15 +36,19 @@ public class H2TcpServerProcess extends H2ServerProcess {
     return awaitShutdownTcpServer((H2TcpServerProperties) properties, timeout, unit);
   }
 
-  private static boolean awaitShutdownTcpServer(H2TcpServerProperties props, long timeout,
-      TimeUnit unit) {
+  private static boolean awaitShutdownTcpServer(
+      H2TcpServerProperties props, long timeout, TimeUnit unit) {
     if (!isActive(props.port)) {
       log.info("H2 TCP server is not active at {}.", props.port);
       return true;
     }
     try {
-      log.info("Wait up [{} {}] for H2 {} server shutdowns at port {}.", timeout, unit,
-          props.serverType, props.port);
+      log.info(
+          "Wait up [{} {}] for H2 {} server shutdowns at port {}.",
+          timeout,
+          unit,
+          props.serverType,
+          props.port);
       Server.shutdownTcpServer("tcp://localhost:" + props.port, props.password, false, false);
     } catch (SQLException e) {
       throw Try.rethrow(e);
@@ -67,5 +70,4 @@ public class H2TcpServerProcess extends H2ServerProcess {
     log.info("H2 TCP server is not active.");
     return true;
   }
-
 }

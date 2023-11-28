@@ -27,16 +27,11 @@ public class GeometryJts {
     return Objects.hash(geometry);
   }
 
-
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof GeometryJts))
-      return false;
+    if (this == obj) return true;
+    if (!(obj instanceof GeometryJts)) return false;
     GeometryJts other = (GeometryJts) obj;
     return Objects.equals(geometry, other.geometry);
   }
-
-
 }

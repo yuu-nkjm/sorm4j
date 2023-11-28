@@ -26,8 +26,10 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   private final Map<String, ConstructorParameter[]> columnAndConstructorParameterMapping =
       new ConcurrentHashMap<>();
 
-  public SqlResultToContainerMappingWithConstructor(ColumnToAccessorMapping columnToAccessorMap,
-      Constructor<S> constructor, String[] parameterNames) {
+  public SqlResultToContainerMappingWithConstructor(
+      ColumnToAccessorMapping columnToAccessorMap,
+      Constructor<S> constructor,
+      String[] parameterNames) {
     super(columnToAccessorMap, constructor);
     String columnAliasPrefix = columnToAccessorMap.getColumnAliasPrefix();
     Parameter[] parameters = constructor.getParameters();
@@ -44,8 +46,9 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
     }
   }
 
-
   /**
+   *
+   *
    * <pre>
    * <code>
    * Pojo(int a, String b, int c);
@@ -63,11 +66,14 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
    * @param resultSet
    * @param sqlTypes
    * @param constructorParameters ordered by column. if the column is not mapped to constructor
-   *        parameter, the value is null.
+   *     parameter, the value is null.
    * @return
    */
-  private S createContainerObject(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, int[] sqlTypes, ConstructorParameter[] constructorParameters) {
+  private S createContainerObject(
+      ColumnValueToJavaObjectConverters columnValueConverter,
+      ResultSet resultSet,
+      int[] sqlTypes,
+      ConstructorParameter[] constructorParameters) {
     try {
       final Object[] params = new Object[constructorParametersLength];
 
@@ -76,68 +82,90 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
         if (cp == null) {
           continue;
         }
-        params[cp.getOrder()] = columnValueConverter.convertTo(resultSet, i + 1, sqlTypes[i],
-            constructorParameters[i].getType());
+        params[cp.getOrder()] =
+            columnValueConverter.convertTo(
+                resultSet, i + 1, sqlTypes[i], constructorParameters[i].getType());
       }
       return constructor.newInstance(params);
-    } catch (IllegalArgumentException | SecurityException | InstantiationException
-        | IllegalAccessException | InvocationTargetException e) {
+    } catch (IllegalArgumentException
+        | SecurityException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException e) {
       Object[] params = {JdbcTypeUtils.convert(sqlTypes), constructorParameters};
-      throw new SormException(ParameterizedStringFormatter.LENGTH_256.format("Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}", params), e);
+      throw new SormException(
+          ParameterizedStringFormatter.LENGTH_256.format(
+              "Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}",
+              params),
+          e);
     }
   }
 
-
-  private ConstructorParameter[] getCorrespondingParameter(String[] columns,
-      String objectColumnsStr) {
-    return columnAndConstructorParameterMapping.computeIfAbsent(objectColumnsStr,
-        key -> Arrays.stream(columns).map(col -> constructorParametersMap.get(toCanonicalCase(col)))
-            .toArray(ConstructorParameter[]::new));
+  private ConstructorParameter[] getCorrespondingParameter(
+      String[] columns, String objectColumnsStr) {
+    return columnAndConstructorParameterMapping.computeIfAbsent(
+        objectColumnsStr,
+        key ->
+            Arrays.stream(columns)
+                .map(col -> constructorParametersMap.get(toCanonicalCase(col)))
+                .toArray(ConstructorParameter[]::new));
   }
 
   @Override
-  List<S> loadContainerObjectList(ColumnValueToJavaObjectConverters columnValueConverter,
-      ResultSet resultSet, String[] columns, int[] columnTypes, String columnsString)
+  List<S> loadContainerObjectList(
+      ColumnValueToJavaObjectConverters columnValueConverter,
+      ResultSet resultSet,
+      String[] columns,
+      int[] columnTypes,
+      String columnsString)
       throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(createContainerObject(columnValueConverter, resultSet, columnTypes,
-          constructorParameters));
+      ret.add(
+          createContainerObject(
+              columnValueConverter, resultSet, columnTypes, constructorParameters));
     }
     return ret;
   }
 
-
   @Override
-  S loadContainerObject(ColumnValueToJavaObjectConverters columnValueConverter, ResultSet resultSet,
-      String[] columns, int[] columnTypes, String columnsString) throws SQLException {
+  S loadContainerObject(
+      ColumnValueToJavaObjectConverters columnValueConverter,
+      ResultSet resultSet,
+      String[] columns,
+      int[] columnTypes,
+      String columnsString)
+      throws SQLException {
     final ConstructorParameter[] constructorParameters =
         getCorrespondingParameter(columns, columnsString);
-    return createContainerObject(columnValueConverter, resultSet, columnTypes,
-        constructorParameters);
+    return createContainerObject(
+        columnValueConverter, resultSet, columnTypes, constructorParameters);
   }
-
 
   @Override
   public String toString() {
     List<String> keySet =
         constructorParametersMap.keySet().stream().sorted().collect(Collectors.toList());
-    Object[] params = {constructor, keySet, String.join(System.lineSeparator(),
-        keySet.stream().map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
-            .collect(Collectors.toList()))};
-    return ParameterizedStringFormatter.LENGTH_256.format("constructor=[{}], arguments={}" + System.lineSeparator() + "{}", params);
-
+    Object[] params = {
+      constructor,
+      keySet,
+      String.join(
+          System.lineSeparator(),
+          keySet.stream()
+              .map(key -> "  " + key + "=>" + constructorParametersMap.get(key))
+              .collect(Collectors.toList()))
+    };
+    return ParameterizedStringFormatter.LENGTH_256.format(
+        "constructor=[{}], arguments={}" + System.lineSeparator() + "{}", params);
   }
 
-
-  final static class ConstructorParameter {
+  static final class ConstructorParameter {
     private final String name;
-    /**
-     * Order in the constructor parameter
-     */
+    /** Order in the constructor parameter */
     private final int order;
+
     private final Class<?> type;
 
     public ConstructorParameter(String name, int order, Class<?> type) {
@@ -158,7 +186,5 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
     public String toString() {
       return "[name=" + name + ", order=" + order + ", type=" + type + "]";
     }
-
   }
-
 }

@@ -1,5 +1,3 @@
-
-
 package repackage.net.sf.persist.tests.engine.mysql;
 
 import java.math.BigDecimal;
@@ -16,15 +14,15 @@ import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 import repackage.net.sf.persist.tests.engine.framework.FieldMap;
 
-
 public class TestMysql {
 
   private static DataSource dataSource;
 
   @BeforeAll
   static void beforAll() {
-    dataSource = DbEngineTestUtils.getDataSource(TestMysql.class,
-        "jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE");
+    dataSource =
+        DbEngineTestUtils.getDataSource(
+            TestMysql.class, "jdbc:h2:mem:mysql;MODE=MySQL;DATABASE_TO_LOWER=TRUE");
     DbEngineTestUtils.executeSql(dataSource, TestMysql.class, "schema.sql");
   }
 
@@ -32,37 +30,43 @@ public class TestMysql {
     beforAll();
   }
 
-
   @Test
   public void testBinaryTypes() throws SQLException {
     try (Connection conn = dataSource.getConnection();
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
-
       Class<?>[] binaryTypes = new Class<?>[] {byte[].class, Blob.class};
       Class<?>[] blobTypes = new Class<?>[] {Blob.class};
 
-      BeanMap beanMap = new BeanMap("BinaryTypes")
-          .addField(new FieldMap("binaryCol").setTypes(binaryTypes).setSize(255))
-          .addField(new FieldMap("varbinaryCol").setTypes(binaryTypes).setSize(255))
-          .addField(new FieldMap("tinyblobCol").setTypes(binaryTypes).setSize(255))
-          .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(255))
-          .addField(new FieldMap("mediumblobCol").setTypes(binaryTypes).setSize(255))
-          .addField(new FieldMap("longblobCol").setTypes(binaryTypes).setSize(16384));
+      BeanMap beanMap =
+          new BeanMap("BinaryTypes")
+              .addField(new FieldMap("binaryCol").setTypes(binaryTypes).setSize(255))
+              .addField(new FieldMap("varbinaryCol").setTypes(binaryTypes).setSize(255))
+              .addField(new FieldMap("tinyblobCol").setTypes(binaryTypes).setSize(255))
+              .addField(new FieldMap("blobCol").setTypes(blobTypes).setSize(255))
+              .addField(new FieldMap("mediumblobCol").setTypes(binaryTypes).setSize(255))
+              .addField(new FieldMap("longblobCol").setTypes(binaryTypes).setSize(16384));
 
-      BeanTest.test(getClass(), ormConn, beanMap, obj -> {
-        BeanTest.testInsert(ormConn, obj, beanMap);
-        BeanTest.testSelectByFields(ormConn, obj, beanMap);
-        BeanTest.testSelectFields(ormConn, obj, beanMap, false);
-        BeanTest.testSelectMap(ormConn, obj, beanMap);
-      });
-      BeanTest.testNull(getClass(), ormConn, beanMap, objNull -> {
-        BeanTest.testInsert(ormConn, objNull, beanMap);
-        BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
-        BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
-        BeanTest.testSelectMap(ormConn, objNull, beanMap);
-      });
-
+      BeanTest.test(
+          getClass(),
+          ormConn,
+          beanMap,
+          obj -> {
+            BeanTest.testInsert(ormConn, obj, beanMap);
+            BeanTest.testSelectByFields(ormConn, obj, beanMap);
+            BeanTest.testSelectFields(ormConn, obj, beanMap, false);
+            BeanTest.testSelectMap(ormConn, obj, beanMap);
+          });
+      BeanTest.testNull(
+          getClass(),
+          ormConn,
+          beanMap,
+          objNull -> {
+            BeanTest.testInsert(ormConn, objNull, beanMap);
+            BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
+            BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
+            BeanTest.testSelectMap(ormConn, objNull, beanMap);
+          });
     }
   }
 
@@ -71,27 +75,39 @@ public class TestMysql {
     try (Connection conn = dataSource.getConnection();
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
-      BeanMap beanMap = new BeanMap("DatetimeTypes")
-          .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
-          .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
-          .addField(
-              new FieldMap("datetimeCol").setTypes(java.sql.Timestamp.class, java.util.Date.class))
-          .addField(new FieldMap("year4Col").setTypes(Short.class, short.class)
-              .setBoundaries(1901, 1999).setSupportsCompareMapValue(false));
+      BeanMap beanMap =
+          new BeanMap("DatetimeTypes")
+              .addField(new FieldMap("dateCol").setTypes(java.sql.Date.class))
+              .addField(new FieldMap("timeCol").setTypes(java.sql.Time.class))
+              .addField(
+                  new FieldMap("datetimeCol")
+                      .setTypes(java.sql.Timestamp.class, java.util.Date.class))
+              .addField(
+                  new FieldMap("year4Col")
+                      .setTypes(Short.class, short.class)
+                      .setBoundaries(1901, 1999)
+                      .setSupportsCompareMapValue(false));
 
-      BeanTest.test(getClass(), ormConn, beanMap, obj -> {
-        BeanTest.testInsert(ormConn, obj, beanMap);
-        // BeanTest.testSelectByFields(ormConn, obj, beanMap);
-        BeanTest.testSelectFields(ormConn, obj, beanMap, false);
-        BeanTest.testSelectMap(ormConn, obj, beanMap);
-      });
-      BeanTest.testNull(getClass(), ormConn, beanMap, objNull -> {
-        BeanTest.testInsert(ormConn, objNull, beanMap);
-        BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
-        BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
-        BeanTest.testSelectMap(ormConn, objNull, beanMap);
-      });
-
+      BeanTest.test(
+          getClass(),
+          ormConn,
+          beanMap,
+          obj -> {
+            BeanTest.testInsert(ormConn, obj, beanMap);
+            // BeanTest.testSelectByFields(ormConn, obj, beanMap);
+            BeanTest.testSelectFields(ormConn, obj, beanMap, false);
+            BeanTest.testSelectMap(ormConn, obj, beanMap);
+          });
+      BeanTest.testNull(
+          getClass(),
+          ormConn,
+          beanMap,
+          objNull -> {
+            BeanTest.testInsert(ormConn, objNull, beanMap);
+            BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
+            BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
+            BeanTest.testSelectMap(ormConn, objNull, beanMap);
+          });
     }
   }
 
@@ -110,7 +126,8 @@ public class TestMysql {
           new Class<?>[] {Float.class, float.class, Double.class, double.class, BigDecimal.class};
 
       BeanMap beanMap =
-          new BeanMap("NumericTypes").addField(new FieldMap("bitCol").setTypes(booleanTypes))
+          new BeanMap("NumericTypes")
+              .addField(new FieldMap("bitCol").setTypes(booleanTypes))
               .addField(new FieldMap("booleanCol").setTypes(booleanTypes))
               .addField(new FieldMap("tinyintCol").setTypes(byteTypes))
               .addField(new FieldMap("smallintCol").setTypes(shortTypes))
@@ -121,19 +138,26 @@ public class TestMysql {
               .addField(new FieldMap("doubleCol").setTypes(doubleTypes).setBoundaries(0, 9999))
               .addField(new FieldMap("decimalCol").setTypes(integerTypes));
 
-      BeanTest.test(getClass(), ormConn, beanMap, obj -> {
-        BeanTest.testInsert(ormConn, obj, beanMap);
-        BeanTest.testSelectByFields(ormConn, obj, beanMap);
-        BeanTest.testSelectFields(ormConn, obj, beanMap, false);
-        BeanTest.testSelectMap(ormConn, obj, beanMap);
-      });
-      BeanTest.testNull(getClass(), ormConn, beanMap, objNull -> {
-        BeanTest.testInsert(ormConn, objNull, beanMap);
-        BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
-        BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
-        BeanTest.testSelectMap(ormConn, objNull, beanMap);
-      });
-
+      BeanTest.test(
+          getClass(),
+          ormConn,
+          beanMap,
+          obj -> {
+            BeanTest.testInsert(ormConn, obj, beanMap);
+            BeanTest.testSelectByFields(ormConn, obj, beanMap);
+            BeanTest.testSelectFields(ormConn, obj, beanMap, false);
+            BeanTest.testSelectMap(ormConn, obj, beanMap);
+          });
+      BeanTest.testNull(
+          getClass(),
+          ormConn,
+          beanMap,
+          objNull -> {
+            BeanTest.testInsert(ormConn, objNull, beanMap);
+            BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
+            BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
+            BeanTest.testSelectMap(ormConn, objNull, beanMap);
+          });
     }
   }
 
@@ -148,31 +172,37 @@ public class TestMysql {
       // new Class<?>[] {String.class, char[].class, Character[].class, Reader.class, Clob.class};
       Class<?>[] clobTypes = new Class<?>[] {String.class};
 
-      BeanMap beanMap = new BeanMap("StringTypes")
-          .addField(new FieldMap("charCol").setTypes(characterTypes).setSize(1))
-          .addField(new FieldMap("varcharCol").setTypes(stringTypes).setSize(255))
-          .addField(new FieldMap("tinytextCol").setTypes(clobTypes).setSize(255))
-          .addField(new FieldMap("mediumtextCol").setTypes(clobTypes).setSize(1024))
-          .addField(new FieldMap("longtextCol").setTypes(clobTypes).setSize(16384))
-          .addField(new FieldMap("textCol").setTypes(clobTypes).setSize(16384))
-          .addField(new FieldMap("enumCol").setTypes(characterTypes).setSize(1));
+      BeanMap beanMap =
+          new BeanMap("StringTypes")
+              .addField(new FieldMap("charCol").setTypes(characterTypes).setSize(1))
+              .addField(new FieldMap("varcharCol").setTypes(stringTypes).setSize(255))
+              .addField(new FieldMap("tinytextCol").setTypes(clobTypes).setSize(255))
+              .addField(new FieldMap("mediumtextCol").setTypes(clobTypes).setSize(1024))
+              .addField(new FieldMap("longtextCol").setTypes(clobTypes).setSize(16384))
+              .addField(new FieldMap("textCol").setTypes(clobTypes).setSize(16384))
+              .addField(new FieldMap("enumCol").setTypes(characterTypes).setSize(1));
       // .addField(new FieldMap("setCol").setTypes(characterTypes).setSize(1));
 
-      BeanTest.test(getClass(), ormConn, beanMap, obj -> {
-        BeanTest.testInsert(ormConn, obj, beanMap);
-        BeanTest.testSelectByFields(ormConn, obj, beanMap);
-        BeanTest.testSelectFields(ormConn, obj, beanMap, false);
-        BeanTest.testSelectMap(ormConn, obj, beanMap);
-      });
-      BeanTest.testNull(getClass(), ormConn, beanMap, objNull -> {
-        BeanTest.testInsert(ormConn, objNull, beanMap);
-        BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
-        BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
-        BeanTest.testSelectMap(ormConn, objNull, beanMap);
-      });
-
+      BeanTest.test(
+          getClass(),
+          ormConn,
+          beanMap,
+          obj -> {
+            BeanTest.testInsert(ormConn, obj, beanMap);
+            BeanTest.testSelectByFields(ormConn, obj, beanMap);
+            BeanTest.testSelectFields(ormConn, obj, beanMap, false);
+            BeanTest.testSelectMap(ormConn, obj, beanMap);
+          });
+      BeanTest.testNull(
+          getClass(),
+          ormConn,
+          beanMap,
+          objNull -> {
+            BeanTest.testInsert(ormConn, objNull, beanMap);
+            BeanTest.testSelectByFieldsNull(ormConn, objNull, beanMap);
+            BeanTest.testSelectFields(ormConn, objNull, beanMap, true);
+            BeanTest.testSelectMap(ormConn, objNull, beanMap);
+          });
     }
   }
-
-
 }

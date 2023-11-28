@@ -54,7 +54,5 @@ public class TestUtils {
   public static final OffsetTime[] OFFSET_TIME_ARRAY = {OffsetTime.now()};
   public static final OffsetDateTime[] OFFSET_DATE_TIME_ARRAY = {OffsetDateTime.now()};
 
-
   public static final Object[] OBJECT_ARRAY = new Object[] {new File("./")};
-
 }

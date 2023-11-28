@@ -17,34 +17,48 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
 
   private final int multiRowSize;
 
-  public MultiRowInOneStatementProcessor(LoggerContext loggerContext,
-      SqlParametersSetter sqlParametersSetter, PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping, int batchSize, int multiRowSize) {
+  public MultiRowInOneStatementProcessor(
+      LoggerContext loggerContext,
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier statementSupplier,
+      SqlParametersToTableMapping<T> tableMapping,
+      int batchSize,
+      int multiRowSize) {
     super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
     this.multiRowSize = multiRowSize;
-
   }
 
   @Override
   public final int[] multiRowInsert(Connection con, T[] objects) {
-    return execMultiRowProcIfValidObjects(con, objects,
-        nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
-            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+    return execMultiRowProcIfValidObjects(
+        con,
+        objects,
+        nonNullObjects ->
+            procMultiRowOneStatement(
+                con,
+                num -> prepareStatement(con, getSql().getMultirowInsertSql(num)),
+                (stmt, objs) -> setPrametersOfMultiRow(stmt, objs),
+                nonNullObjects));
   }
 
   @Override
   public final int[] multiRowMerge(Connection con, T[] objects) {
-    return execMultiRowProcIfValidObjects(con, objects,
-        nonNullObjects -> procMultiRowOneStatement(con,
-            num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
-            (stmt, objs) -> setPrametersOfMultiRow(stmt, objs), nonNullObjects));
+    return execMultiRowProcIfValidObjects(
+        con,
+        objects,
+        nonNullObjects ->
+            procMultiRowOneStatement(
+                con,
+                num -> prepareStatement(con, getSql().getMultirowMergeSql(num)),
+                (stmt, objs) -> setPrametersOfMultiRow(stmt, objs),
+                nonNullObjects));
   }
 
-
-  private final int[] procMultiRowOneStatement(Connection con,
+  private final int[] procMultiRowOneStatement(
+      Connection con,
       ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
-      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter, T[] objects) {
+      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter,
+      T[] objects) {
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);
     final int[] result = new int[objsPartitions.size()];
     final boolean origAutoCommit = OrmConnectionImpl.getAutoCommit(con);
@@ -73,7 +87,4 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
       OrmConnectionImpl.setAutoCommit(con, origAutoCommit);
     }
   }
-
-
-
 }

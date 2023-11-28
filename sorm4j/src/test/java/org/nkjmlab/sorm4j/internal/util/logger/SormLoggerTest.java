@@ -60,14 +60,14 @@ class SormLoggerTest {
     return appender;
   }
 
-
   @Test
   void testLogAfterQuery() {
     org.nkjmlab.sorm4j.util.logger.LoggerContext lc =
         org.nkjmlab.sorm4j.util.logger.LoggerContext.builder().enableAll().build();
 
-    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(
-        SormContext.builder().setLoggerContext(lc).build());
+    Sorm sorm =
+        SormTestUtils.createSormWithNewDatabaseAndCreateTables(
+            SormContext.builder().setLoggerContext(lc).build());
 
     Optional<LogPoint> lp = lc.createLogPoint(Category.EXECUTE_QUERY, getClass());
     {
@@ -86,22 +86,28 @@ class SormLoggerTest {
       assertThat(text).contains("Affect [1] rows");
     }
 
-    try (Connection conn = sorm.getJdbcConnection()) {
+    try (Connection conn = sorm.openJdbcConnection()) {
       {
-        String text = proc(stringWriter,
-            () -> lp.get().logBeforeMultiRow(conn, SormLoggerTest.class, 1, "players"));
+        String text =
+            proc(
+                stringWriter,
+                () -> lp.get().logBeforeMultiRow(conn, SormLoggerTest.class, 1, "players"));
         assertThat(text.length()).isLessThan(500);
         assertThat(text).contains("players");
       }
       {
-        String text = proc(stringWriter,
-            () -> lp.get().logBeforeSql(conn, ParameterizedSql.of("select * from players")));
+        String text =
+            proc(
+                stringWriter,
+                () -> lp.get().logBeforeSql(conn, ParameterizedSql.of("select * from players")));
         assertThat(text.length()).isLessThan(400);
         assertThat(text).contains("select * from players");
       }
       {
-        String text = proc(stringWriter,
-            () -> lp.get().logBeforeSql(conn, "select * from players where id=?", 1));
+        String text =
+            proc(
+                stringWriter,
+                () -> lp.get().logBeforeSql(conn, "select * from players where id=?", 1));
         assertThat(text.length()).isLessThan(450);
         assertThat(text).contains("select * from players where id=1");
       }
@@ -114,10 +120,7 @@ class SormLoggerTest {
       throw Try.rethrow(e);
     }
     appender.stop();
-
   }
-
-
 
   @Test
   void testLog4jSormLoggerOut() throws IOException {
@@ -142,7 +145,6 @@ class SormLoggerTest {
     outTestHelper(logger, content);
     System.setErr(syserr);
   }
-
 
   @Test
   void testLog4jSormLoggerError() {
@@ -198,7 +200,6 @@ class SormLoggerTest {
     }
   }
 
-
   private void outTestHelper(SormLogger logger, ByteArrayOutputStream target) throws IOException {
     {
       String text = proc(target, () -> logger.info("info test {}", 1));
@@ -253,7 +254,6 @@ class SormLoggerTest {
       assertThat(text.length()).isLessThan(256);
       assertThat(text).contains("warn test 1");
     }
-
   }
 
   private void errorTestHelper(SormLogger logger, ByteArrayOutputStream target) {
@@ -277,9 +277,7 @@ class SormLoggerTest {
       assertThat(text.length()).isLessThan(256);
       assertThat(text).contains("warn test 1");
     }
-
   }
-
 
   private String proc(ByteArrayOutputStream target, Runnable run) {
     target.reset();
@@ -291,7 +289,5 @@ class SormLoggerTest {
     sw.getBuffer().delete(0, sw.getBuffer().length());
     run.run();
     return sw.toString();
-
   }
-
 }

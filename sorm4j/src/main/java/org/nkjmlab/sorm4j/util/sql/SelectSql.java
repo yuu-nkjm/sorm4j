@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
-
 /**
  * API of creates a select SQL statement.
  *
  * @author nkjm
- *
  */
 @Experimental
 public final class SelectSql {
@@ -56,18 +54,15 @@ public final class SelectSql {
       return toString();
     }
 
-    /**
-     * Add distinct keyword to SQL.
-     */
-
+    /** Add distinct keyword to SQL. */
     public Builder distinct() {
       this.distinct = true;
       return this;
     }
 
-
     /**
      * Creates from clause.
+     *
      * <p>
      *
      * <pre>
@@ -93,7 +88,6 @@ public final class SelectSql {
       return this;
     }
 
-
     /**
      * Creates having clause with the given {@link Condition}.
      *
@@ -104,8 +98,6 @@ public final class SelectSql {
       having(condition.toString());
       return this;
     }
-
-
 
     /**
      * Creates having clause.
@@ -118,7 +110,6 @@ public final class SelectSql {
       return this;
     }
 
-
     /**
      * Creates limit clause.
      *
@@ -128,8 +119,6 @@ public final class SelectSql {
     public Builder limit(int limit) {
       return limit(limit, 0);
     }
-
-
 
     /**
      * Creates limit clause with offset.
@@ -141,8 +130,6 @@ public final class SelectSql {
       this.limit = limit + (offset > 0 ? " offset " + offset : "");
       return this;
     }
-
-
 
     /**
      * Creates order by clause.
@@ -156,11 +143,10 @@ public final class SelectSql {
       return this;
     }
 
-
     /**
      * Creates select clause. The default value is "*".
-     * <p>
-     * For example,
+     *
+     * <p>For example,
      *
      * <pre>
      * select("id","name","age") returns "select id, name, age"
@@ -173,7 +159,6 @@ public final class SelectSql {
       this.columns = String.join(", ", Arrays.stream(columns).collect(Collectors.toList()));
       return this;
     }
-
 
     /**
      * Creates prettified string.
@@ -222,13 +207,10 @@ public final class SelectSql {
       return sql.toString();
     }
 
-
     @Override
     public String toString() {
       return toPrettyString(false);
     }
-
-
 
     /**
      * Creates where clause.
@@ -241,7 +223,6 @@ public final class SelectSql {
       return this;
     }
 
-
     /**
      * Creates where clause.
      *
@@ -252,14 +233,12 @@ public final class SelectSql {
       where = expr;
       return this;
     }
-
   }
 
   /**
    * Value object represents conditions of where clause or having clause. This object could include
    * AND and OR operators.
    */
-
   public static class Condition {
     private final Object condition;
 
@@ -288,7 +267,6 @@ public final class SelectSql {
       this.condition = left + " " + op.trim() + " " + right;
     }
 
-
     @Override
     public String toString() {
       return condition.toString();
@@ -316,11 +294,9 @@ public final class SelectSql {
   }
 
   /**
-   * <p>
    * Creates AS alias.
    *
-   * <p>
-   * For example,
+   * <p>For example,
    *
    * <pre>
    * as("avg(score)", "avg_score")  returns "avg(score) as avg_score"
@@ -347,14 +323,15 @@ public final class SelectSql {
   }
 
   public static String columnWithTableName(String tableName, String... colNames) {
-    return wrapSpace(Arrays.stream(colNames).map(col -> column(tableName, col))
-        .collect(Collectors.joining(",")));
+    return wrapSpace(
+        Arrays.stream(colNames)
+            .map(col -> column(tableName, col))
+            .collect(Collectors.joining(",")));
   }
 
   public static String column(String tableName, String colName) {
     return wrapSpace(tableName + "." + colName);
   }
-
 
   public static String from(String tableName) {
     return wrapSpace("from " + tableName);
@@ -372,7 +349,7 @@ public final class SelectSql {
     return where(searchCondition.toString());
   }
 
-  /** operator **/
+  /** operator * */
 
   /**
    * Creates a string of binary operator and operands which wrapped parentheses.
@@ -397,11 +374,9 @@ public final class SelectSql {
   }
 
   /**
-   * <p>
    * Creates {@link Condition} instance.
    *
-   * <p>
-   * For example,
+   * <p>For example,
    *
    * <pre>
    * and(cond("id=?"), "name=?")  returns "id=? and name=?"
@@ -418,17 +393,15 @@ public final class SelectSql {
    * @param operator
    * @param right
    */
-
   public static Condition cond(Object left, String operator, Object right) {
     return new Condition(left, operator, right);
   }
 
-  /** Conditions **/
+  /** Conditions * */
   /**
-   * <p>
    * Creates AND condition with concatenating arguments.
-   * <p>
-   * For example,
+   *
+   * <p>For example,
    *
    * <pre>
    * and("id=?", "name=?") returns "id=? and name=?"
@@ -442,10 +415,9 @@ public final class SelectSql {
   }
 
   /**
-   * <p>
    * Creates OR condition with concatenating arguments.
-   * <p>
-   * For example,
+   *
+   * <p>For example,
    *
    * <pre>
    * or("id=?", "name=?") returns "id=? or name=?"
@@ -463,7 +435,6 @@ public final class SelectSql {
   public static Condition in(Object colName, List<?> values) {
     return new Condition(wrapSpace(colName + IN + wrapParentheses(literal(values))));
   }
-
 
   public static String groupBy(Object... groups) {
     return wrapSpace("group by " + joinCommaAndSpace(groups));
@@ -495,8 +466,7 @@ public final class SelectSql {
     return orderBy(column, "desc");
   }
 
-  /** functions **/
-
+  /** functions * */
   public static String func(String functionName, Object args) {
     return wrapSpace(functionName + wrapParentheses(args));
   }
@@ -517,14 +487,12 @@ public final class SelectSql {
     return func("avg", column);
   }
 
-
   /**
    * Converts the given arguments to SQL literal.
    *
    * @param element
    * @return
    */
-
   public static String literal(Object element) {
     if (element == null) {
       return "null";
@@ -536,8 +504,8 @@ public final class SelectSql {
       }
       return "array [" + String.join(", ", ret) + "]";
     } else if (element instanceof List) {
-      return String.join(", ",
-          ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
+      return String.join(
+          ", ", ((List<?>) element).stream().map(e -> literal(e)).toArray(String[]::new));
     }
 
     final String str = element.toString();
@@ -575,8 +543,8 @@ public final class SelectSql {
   }
 
   public static String joinObjects(String delimiter, Object... elements) {
-    return String.join(delimiter,
-        Arrays.stream(elements).map(o -> o.toString()).toArray(String[]::new));
+    return String.join(
+        delimiter, Arrays.stream(elements).map(o -> o.toString()).toArray(String[]::new));
   }
 
   public static String wrapParentheses(Object str) {
@@ -596,6 +564,4 @@ public final class SelectSql {
   public static String wrapSpace(Object str) {
     return " " + (str == null ? "null" : str.toString().trim()) + " ";
   }
-
-
 }

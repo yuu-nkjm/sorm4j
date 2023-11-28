@@ -1,8 +1,11 @@
 package org.nkjmlab.sorm4j.table;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AND;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.WHERE;
+
 import java.sql.PreparedStatement;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -22,7 +25,7 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql;
 public interface TableMappedOrm<T> {
 
   /**
-   * Gets Sorm objects
+   * Gets {@link Orm} object
    *
    * @return
    */
@@ -46,11 +49,9 @@ public interface TableMappedOrm<T> {
     return getOrm().readFirst(getValueType(), sql);
   }
 
-
   default T readFirst(String sql, Object... parameters) {
     return getOrm().readFirst(getValueType(), sql, parameters);
   }
-
 
   default List<T> readList(ParameterizedSql sql) {
     return getOrm().readList(getValueType(), sql);
@@ -64,7 +65,6 @@ public interface TableMappedOrm<T> {
     return getOrm().readOne(getValueType(), sql);
   }
 
-
   default T readOne(String sql, Object... parameters) {
     return getOrm().readOne(getValueType(), sql, parameters);
   }
@@ -73,11 +73,9 @@ public interface TableMappedOrm<T> {
     return getOrm().getRowMapper(getValueType());
   }
 
-
   default ResultSetTraverser<List<T>> getResultSetTraverser() {
     return getOrm().getResultSetTraverser(getValueType());
   }
-
 
   default TableMetaData getTableMetaData() {
     return getOrm().getTableMetaData(getValueType());
@@ -91,21 +89,17 @@ public interface TableMappedOrm<T> {
     return getOrm().exists(getValueType(), primaryKeyValues);
   }
 
-
   default int[] delete(List<T> objects) {
     return getOrm().deleteIn(getTableName(), objects);
   }
-
 
   default int delete(T object) {
     return getOrm().deleteIn(getTableName(), object);
   }
 
-
   default int[] delete(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().deleteIn(getTableName(), objects);
   }
-
 
   default int deleteAll() {
     return getOrm().deleteAllIn(getTableName());
@@ -125,11 +119,9 @@ public interface TableMappedOrm<T> {
     return getOrm().insertIn(getTableName(), objects);
   }
 
-
   default int insert(T object) {
     return getOrm().insertIn(getTableName(), object);
   }
-
 
   default int[] insert(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().insertIn(getTableName(), objects);
@@ -155,36 +147,29 @@ public interface TableMappedOrm<T> {
     return getOrm().insertAndGetIn(getTableName(), object);
   }
 
-
   default InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
-
 
   default int[] merge(List<T> objects) {
     return getOrm().mergeIn(getTableName(), objects);
   }
 
-
   default int merge(T object) {
     return getOrm().mergeIn(getTableName(), object);
   }
-
 
   default int[] merge(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().mergeIn(getTableName(), objects);
   }
 
-
   default int[] update(List<T> objects) {
     return getOrm().updateIn(getTableName(), objects);
   }
 
-
   default int update(T object) {
     return getOrm().updateIn(getTableName(), object);
   }
-
 
   default int[] update(@SuppressWarnings("unchecked") T... objects) {
     return getOrm().updateIn(getTableName(), objects);
@@ -216,7 +201,6 @@ public interface TableMappedOrm<T> {
 
   /**
    * @see {@link #getAllEqualSql(List)}
-   *
    * @param tupplesOfNameAndValue
    * @return
    */
@@ -224,11 +208,8 @@ public interface TableMappedOrm<T> {
     return getOrm().readList(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
-
-
   /**
    * @see {@link #getAllEqualSql(Object...)}
-   *
    * @param tupplesOfNameAndValue
    * @return
    */
@@ -236,10 +217,8 @@ public interface TableMappedOrm<T> {
     return getOrm().readFirst(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
-
   /**
    * @see {@link #getAllEqualSql(Object...))}
-   *
    * @param tupplesOfNameAndValue
    * @return
    */
@@ -247,15 +226,13 @@ public interface TableMappedOrm<T> {
     return getOrm().readOne(getValueType(), getAllEqualSql(tupplesOfNameAndValue));
   }
 
-
-
   /**
    * Creates a SQL statement selecting rows which are satisfied all equal condition corresponding to
    * the given arguments.
    *
-   * <strong>Note:</strong> All the rows will be selected, if length of arguments is zero
+   * <p><strong>Note:</strong> All the rows will be selected, if length of arguments is zero
    *
-   * Example
+   * <p>Example
    *
    * <pre>
    * getAllEqualSql("address", "Tokyo", "age", 20)
@@ -299,7 +276,6 @@ public interface TableMappedOrm<T> {
    *
    * @return
    */
-
   default ResultSetStream<T> streamAll() {
     return getOrm().streamAll(getValueType());
   }
@@ -316,9 +292,9 @@ public interface TableMappedOrm<T> {
 
   /**
    * Returns an {@link ResultSetStream}.
-   * <p>
-   * Parameters will be set according with the correspondence defined in
-   * {@link SqlParametersSetter#setParameters(PreparedStatement,Object[])}
+   *
+   * <p>Parameters will be set according with the correspondence defined in {@link
+   * SqlParametersSetter#setParameters(PreparedStatement,Object[])}
    *
    * @param sql
    * @param parameters
@@ -334,15 +310,14 @@ public interface TableMappedOrm<T> {
   }
 
   @Experimental
-  default <S, U> List<Tuple3<T, S, U>> join(TableMappedOrm<S> second, TableMappedOrm<U> third,
-      String sql, Object... parameters) {
-    return getOrm().join(getValueType(), second.getValueType(), third.getValueType(), sql,
-        parameters);
+  default <S, U> List<Tuple3<T, S, U>> join(
+      TableMappedOrm<S> second, TableMappedOrm<U> third, String sql, Object... parameters) {
+    return getOrm()
+        .join(getValueType(), second.getValueType(), third.getValueType(), sql, parameters);
   }
 
   @Experimental
   default JoinSql.Builder joinSqlBuilder() {
     return JoinSql.builder(this);
   }
-
 }
