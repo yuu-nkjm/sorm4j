@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.util.h2.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 
 /**
@@ -31,8 +32,8 @@ public class H2WebConsoleServerProperties extends H2ServerProperties {
           new ArrayList<>(List.of(javaCommand, "-cp", getH2ClassPath(), "org.h2.tools.Server"));
       args.addAll(List.of("-web", "-webPort", port + ""));
       args.addAll(Arrays.asList(options));
-      args.add("-webAdminPassword");
-      args.add(password);
+      //      args.add("-webAdminPassword");
+      //      args.add(password);
       return new H2WebConsoleServerProperties(
           serverType, port, password, args.toArray(String[]::new));
     }

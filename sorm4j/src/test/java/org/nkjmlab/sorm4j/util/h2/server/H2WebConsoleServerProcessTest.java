@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class H2WebConsoleServerProcessTest {
+  static final org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
 
   @Test
   void testAwaitStart() throws StreamReadException, DatabindException, IOException {
@@ -19,6 +21,7 @@ class H2WebConsoleServerProcessTest {
 
     H2WebConsoleServerProcess server = new H2WebConsoleServerProcess(prop);
     server.awaitStart();
+    log.debug("started");
     ProcessUtils.stopProcessBindingPortIfExists(prop.port);
   }
 }
