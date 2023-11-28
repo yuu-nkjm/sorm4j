@@ -25,17 +25,6 @@ import org.nkjmlab.sorm4j.util.sql.SelectSql;
 public interface TableMappedOrm<T> {
 
   /**
-   * Create a {@link TableMappedOrmConnection} wrapping a JDBC Connection.
-   *
-   * <p>You should always use try-with-resources block to ensure the database connection is
-   * released.
-   *
-   * @return
-   */
-  default TableMappedOrmConnection<T> getTableMappedOrmConnection() {
-    return TableMappedOrmConnection.of(getOrm().getOrmConnection(), getValueType());
-  }
-  /**
    * Gets {@link Orm} object
    *
    * @return

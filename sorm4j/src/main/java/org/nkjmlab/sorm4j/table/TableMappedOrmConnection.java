@@ -12,14 +12,12 @@ public interface TableMappedOrmConnection<T> extends TableMappedOrm<T> {
    *
    * @return
    */
+  @Override
   OrmConnection getOrm();
 
   /**
-   * Create a {@link TableMappedOrmConnection} wrapping the given JDBC Connection and the given
+   * Gets a {@link TableMappedOrmConnection} wrapping the given JDBC Connection and the given
    * context.
-   *
-   * <p>You should always use try-with-resources block to ensure the database connection is
-   * released.
    *
    * @param <T>
    * @param connection
@@ -28,5 +26,20 @@ public interface TableMappedOrmConnection<T> extends TableMappedOrm<T> {
    */
   static <T> TableMappedOrmConnection<T> of(OrmConnection connection, Class<T> valueType) {
     return new TableMappedOrmConnectionImpl<T>(connection, valueType);
+  }
+
+  /**
+   * Gets a {@link TableMappedOrmConnection} wrapping the given JDBC Connection and the given
+   * context.
+   *
+   * @param <T>
+   * @param connection
+   * @param valueType
+   * @param tableName
+   * @return
+   */
+  static <T> TableMappedOrmConnection<T> of(
+      OrmConnection connection, Class<T> valueType, String tableName) {
+    return new TableMappedOrmConnectionImpl<T>(connection, valueType, tableName);
   }
 }

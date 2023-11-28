@@ -56,7 +56,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public OrmTransaction open(int isolationLevel) {
-    return new OrmTransactionImpl(getJdbcConnection(), sormContext, isolationLevel);
+    return new OrmTransactionImpl(openJdbcConnection(), sormContext, isolationLevel);
   }
 
   @Override
@@ -97,7 +97,7 @@ public final class SormImpl implements Sorm {
 
   @Override
   public OrmConnectionImpl open() {
-    return new OrmConnectionImpl(getJdbcConnection(), sormContext);
+    return new OrmConnectionImpl(openJdbcConnection(), sormContext);
   }
 
   @Override
@@ -105,8 +105,9 @@ public final class SormImpl implements Sorm {
     return this.dataSource;
   }
 
+
   @Override
-  public Connection getJdbcConnection() {
+  public Connection openJdbcConnection() {
     try {
       return dataSource.getConnection();
     } catch (SQLException e) {

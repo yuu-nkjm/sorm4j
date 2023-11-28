@@ -20,7 +20,7 @@ class DefaultSqlParametersSetterTest {
   @Test
   void testArray() {
     Sorm sorm = createSormWithNewDatabaseAndCreateTables();
-    try (Connection conn = sorm.getJdbcConnection();
+    try (Connection conn = sorm.openJdbcConnection();
         PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
 
       assertThat(toSqlArray("boolean", conn, TestUtils.PRIMITIVE_BOOLEAN_ARRAY).getBaseType())
@@ -132,7 +132,7 @@ class DefaultSqlParametersSetterTest {
     sorm.readFirst(RowMap.class, "select * from TA where arry=?", (Object) new Double[] {0.1d});
 
     DefaultSqlParametersSetter setter = new DefaultSqlParametersSetter();
-    try (Connection conn = sorm.getJdbcConnection();
+    try (Connection conn = sorm.openJdbcConnection();
         PreparedStatement pstmt = conn.prepareStatement("select * from guests where id=?")) {
 
       setter.setParameters(pstmt, (Object[]) null);

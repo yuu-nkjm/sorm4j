@@ -38,6 +38,13 @@ public interface OrmConnection extends Orm, AutoCloseable {
   }
 
   /**
+   * Gets JDBC {@link Connection}.
+   *
+   * @return
+   */
+  Connection getJdbcConnection();
+
+  /**
    * Closes the {@link java.sql.Connection Connection} associated with this instance.
    *
    * @see java.sql.Connection#close()

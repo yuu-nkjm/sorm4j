@@ -1,7 +1,8 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
-import static java.lang.String.*;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static java.lang.String.join;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.toUpperSnakeCase;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -17,8 +18,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.Orm;
-import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
@@ -202,7 +203,7 @@ public final class TableDefinition {
     return this;
   }
 
-  public void dropTableIfExistsCascade(Sorm orm) {
+  public void dropTableIfExistsCascade(Orm orm) {
     orm.executeUpdate(getDropTableIfExistsStatement() + " cascade");
   }
 

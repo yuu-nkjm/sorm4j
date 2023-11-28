@@ -86,7 +86,7 @@ class SormLoggerTest {
       assertThat(text).contains("Affect [1] rows");
     }
 
-    try (Connection conn = sorm.getJdbcConnection()) {
+    try (Connection conn = sorm.openJdbcConnection()) {
       {
         String text =
             proc(

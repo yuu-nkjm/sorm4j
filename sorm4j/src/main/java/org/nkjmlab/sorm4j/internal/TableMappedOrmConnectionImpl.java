@@ -5,9 +5,9 @@ import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
 
 public class TableMappedOrmConnectionImpl<T> implements TableMappedOrmConnection<T> {
 
-  private final String tableName;
   private final OrmConnection ormConn;
   private final Class<T> valueType;
+  private final String tableName;
 
   public TableMappedOrmConnectionImpl(OrmConnection ormConn, Class<T> valueType, String tableName) {
     this.ormConn = ormConn;

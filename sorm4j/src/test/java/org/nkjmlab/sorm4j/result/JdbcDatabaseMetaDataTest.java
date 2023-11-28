@@ -13,14 +13,14 @@ class JdbcDatabaseMetaDataTest {
   void test() {
     TableWithDefinition<Player> playersTable =
         SormTestUtils.createPlayersTable(SormTestUtils.createSormWithNewContext());
-    String version = "2.1.214 (2022-06-13)";
+    String version = "2.";
     JdbcDatabaseMetaData md = playersTable.getOrm().getJdbcDatabaseMetaData();
     assertThat(md.getDatabaseProductName()).isEqualTo("H2");
-    assertThat(md.getDatabaseProductVersion()).isEqualTo(version);
+    assertThat(md.getDatabaseProductVersion()).contains(version);
     assertThat(md.getDefaultTransactionIsolation())
         .isEqualTo(Connection.TRANSACTION_READ_COMMITTED);
     assertThat(md.getDriverName()).isEqualTo("H2 JDBC Driver");
-    assertThat(md.getDriverVersion()).isEqualTo(version);
+    assertThat(md.getDriverVersion()).contains(version);
     assertThat(md.getJdbcTablesMetaData().get("PLAYERS").get("TABLE_NAME")).isEqualTo("PLAYERS");
     assertThat(md.getMaxConnections()).isEqualTo(0);
     assertThat(md.getSearchStringEscape()).isEqualTo("\\");

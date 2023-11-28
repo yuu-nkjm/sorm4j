@@ -39,25 +39,6 @@ public interface Orm {
   SormContext getContext();
 
   /**
-   * Gets JDBC {@link Connection}.
-   *
-   * @return
-   */
-  Connection getJdbcConnection();
-
-  /**
-   * Create a {@link OrmConnection} wrapping a JDBC Connection.
-   *
-   * <p>You should always use try-with-resources block to ensure the database connection is
-   * released.
-   *
-   * @return
-   */
-  default OrmConnection getOrmConnection() {
-    return OrmConnection.of(getJdbcConnection(), getContext());
-  }
-
-  /**
    * Deletes objects from the table corresponding to the class of the given objects.
    *
    * @param <T> the object's element type which is mapped to the unique table.

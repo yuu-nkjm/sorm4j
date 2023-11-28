@@ -330,11 +330,6 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public Connection getJdbcConnection() {
-    return connection;
-  }
-
-  @Override
   public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {
     try {
       java.sql.DatabaseMetaData metaData = connection.getMetaData();
@@ -1180,5 +1175,10 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName) {
     return new TableMappedOrmConnectionImpl<>(this, type, tableName);
+  }
+
+  @Override
+  public Connection getJdbcConnection() { // TODO Auto-generated method stub
+    return connection;
   }
 }

@@ -24,9 +24,8 @@ public interface Sorm extends Orm {
    *
    * <p>For example,
    *
-   * <pre>
-   *  *   <code>
-   *  *  *  *    * DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
+   * <pre><code>
+   *  DataSource dataSource = org.h2.jdbcx.JdbcConnectionPool.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;","sa","");
    * Sorm.create(dataSource);
    * </pre></code>
    *
@@ -149,6 +148,13 @@ public interface Sorm extends Orm {
    * @return
    */
   DataSource getDataSource();
+
+  /**
+   * Opens JDBC {@link Connection}.
+   *
+   * @return
+   */
+  Connection openJdbcConnection();
 
   /**
    * Open {@link OrmConnection}. You should always use <code>try-with-resources</code> block to

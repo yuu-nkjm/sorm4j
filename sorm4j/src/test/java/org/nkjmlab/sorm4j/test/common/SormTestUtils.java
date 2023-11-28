@@ -1,7 +1,13 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AUTO_INCREMENT;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.INT;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.PRIMARY_KEY;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
+
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
@@ -76,7 +82,7 @@ public class SormTestUtils {
           }
 
           @Override
-          public Sorm getOrm() {
+          public Orm getOrm() {
             return sorm;
           }
 
@@ -111,7 +117,7 @@ public class SormTestUtils {
           }
 
           @Override
-          public Sorm getOrm() {
+          public Orm getOrm() {
             return sorm;
           }
         };

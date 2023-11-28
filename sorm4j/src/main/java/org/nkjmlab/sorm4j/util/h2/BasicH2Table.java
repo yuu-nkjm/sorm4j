@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.util.h2;
 
-import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
@@ -15,8 +15,8 @@ public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Ta
    * @param valueType
    * @param tableDifinition
    */
-  public BasicH2Table(Sorm sorm, Class<T> valueType, TableDefinition tableDifinition) {
-    super(sorm, valueType, tableDifinition);
+  public BasicH2Table(Orm orm, Class<T> valueType, TableDefinition tableDifinition) {
+    super(orm, valueType, tableDifinition);
   }
 
   /**
@@ -25,8 +25,8 @@ public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Ta
    * @param sorm
    * @param valueType
    */
-  public BasicH2Table(Sorm sorm, Class<T> valueType) {
-    this(sorm, valueType, TableDefinition.builder(valueType).build());
+  public BasicH2Table(Orm orm, Class<T> valueType) {
+    this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 
   @Experimental

@@ -46,7 +46,7 @@ class SormContextImplTest {
 
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
 
-    try (Connection conn = sorm.getJdbcConnection()) {
+    try (Connection conn = sorm.openJdbcConnection()) {
       assertThatThrownBy(() -> SormImpl.DEFAULT_CONTEXT.getTableName(conn, Temporary.class))
           .isInstanceOfSatisfying(
               SormException.class, e -> assertThat(e.getMessage()).contains("TEMPORARIES"));

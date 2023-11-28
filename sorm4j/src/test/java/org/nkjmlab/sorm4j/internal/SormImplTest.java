@@ -68,7 +68,7 @@ class SormImplTest {
     sorm.insert(SormTestUtils.GUEST_ALICE);
 
     Table.create(sorm, Guest.class);
-    try (Connection conn = sorm.getJdbcConnection()) {
+    try (Connection conn = sorm.openJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("CsvColumn");
     } catch (SQLException e) {
@@ -100,7 +100,7 @@ class SormImplTest {
 
     Sorm sorm = Sorm.create(dsMock);
     try {
-      sorm.getJdbcConnection();
+      sorm.openJdbcConnection();
       failBecauseExceptionWasNotThrown(Exception.class);
     } catch (Exception e) {
     }

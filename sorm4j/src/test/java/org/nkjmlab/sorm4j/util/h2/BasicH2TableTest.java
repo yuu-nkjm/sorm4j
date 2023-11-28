@@ -29,7 +29,7 @@ class BasicH2TableTest {
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
-    try (Connection con = sorm.getJdbcConnection()) {
+    try (Connection con = sorm.openJdbcConnection()) {
       PreparedStatement ps =
           con.prepareStatement("insert into ORM_RECORD_EXAMPLES VALUES(?,?,? format json)");
       ps.setInt(1, 3);
