@@ -7,7 +7,6 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
@@ -82,7 +81,7 @@ public class SormTestUtils {
           }
 
           @Override
-          public Orm getOrm() {
+          public Sorm getOrm() {
             return sorm;
           }
 
@@ -117,7 +116,7 @@ public class SormTestUtils {
           }
 
           @Override
-          public Orm getOrm() {
+          public Sorm getOrm() {
             return sorm;
           }
         };

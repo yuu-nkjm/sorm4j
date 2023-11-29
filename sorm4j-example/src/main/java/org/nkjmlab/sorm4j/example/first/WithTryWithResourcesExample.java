@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 
 public class WithTryWithResourcesExample {
 

@@ -57,9 +57,8 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
-  public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
-
-    Builder builder = TableDefinition.builder(toTableName(ormRecordClass));
+  public static TableDefinition.Builder builder(Class<?> ormRecordClass, String tableName) {
+    Builder builder = TableDefinition.builder(tableName);
 
     Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class))
         .map(a -> a.value())
@@ -121,6 +120,10 @@ public final class TableDefinition {
       builder.addColumnDefinition(toUpperSnakeCase(field.getName()), opt.toArray(String[]::new));
     }
     return builder;
+  }
+
+  public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
+    return builder(ormRecordClass, toTableName(ormRecordClass));
   }
 
   public static String toTableName(Class<?> ormRecordClass) {

@@ -5,7 +5,7 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
+import org.nkjmlab.sorm4j.table.TableConnection;
 
 /** @author yuu_nkjm */
 public interface OrmConnection extends Orm, AutoCloseable {
@@ -75,22 +75,22 @@ public interface OrmConnection extends Orm, AutoCloseable {
   void setAutoCommit(boolean autoCommit);
 
   /**
-   * Gets a {@link TableMappedOrmConnection} instance indicated the given parameter. The table name
+   * Gets a {@link TableConnection} instance indicated the given parameter. The table name
    * is guessed from the given type.
    *
    * @param <T>
    * @param type
    * @return
    */
-  <T> TableMappedOrmConnection<T> mapToTable(Class<T> type);
+  <T> TableConnection<T> mapToTable(Class<T> type);
 
   /**
-   * Gets a {@link TableMappedOrmConnection} instance indicated the given parameters.
+   * Gets a {@link TableConnection} instance indicated the given parameters.
    *
    * @param <T>
    * @param type
    * @param tableName
    * @return
    */
-  <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName);
+  <T> TableConnection<T> mapToTable(Class<T> type, String tableName);
 }

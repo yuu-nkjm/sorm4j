@@ -4,13 +4,31 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvFunctions;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvReadSql;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 @Experimental
 public interface H2Table<T> extends TableWithDefinition<T> {
+
+  /**
+   * @param <T>
+   * @param orm
+   * @param valueType
+   * @return
+   */
+  static <T> H2Table<T> create(Sorm orm, Class<T> valueType) {
+    return new BasicH2Table<>(orm, valueType);
+  }
+
+  static <T> H2Table<T> create(Sorm orm, Class<T> valueType, String tableName) {
+    return new BasicH2Table<>(
+        orm, valueType, TableDefinition.builder(valueType, tableName).build());
+  }
 
   default H2CsvReadSql.Builder csvReadSqlBuilder(File csvFile) {
     return H2CsvReadSql.builder(csvFile, getValueType());

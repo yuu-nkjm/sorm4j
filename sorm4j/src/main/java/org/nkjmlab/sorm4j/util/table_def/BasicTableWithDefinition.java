@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
-import org.nkjmlab.sorm4j.Orm;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.BasicTable;
 
@@ -16,12 +16,12 @@ public class BasicTableWithDefinition<T> extends BasicTable<T> implements TableW
    * @param valueType
    * @param tableDefinition
    */
-  public BasicTableWithDefinition(Orm orm, Class<T> valueType, TableDefinition tableDefinition) {
+  public BasicTableWithDefinition(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
     super(orm, valueType, tableDefinition.getTableName());
     this.tableDefinition = tableDefinition;
   }
 
-  public BasicTableWithDefinition(Orm orm, Class<T> valueType) {
+  public BasicTableWithDefinition(Sorm orm, Class<T> valueType) {
     this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 

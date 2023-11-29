@@ -1,15 +1,15 @@
 package org.nkjmlab.sorm4j.table;
 
-import org.nkjmlab.sorm4j.Orm;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.util.sql.SqlKeyword;
 
 public class BasicTable<T> implements Table<T>, SqlKeyword {
 
-  private final Orm orm;
+  private final Sorm orm;
   private final Class<T> valueType;
   private final String tableName;
 
-  public BasicTable(Orm orm, Class<T> valueType, String tableName) {
+  public BasicTable(Sorm orm, Class<T> valueType, String tableName) {
     this.orm = orm;
     this.valueType = valueType;
     this.tableName = tableName;
@@ -21,7 +21,7 @@ public class BasicTable<T> implements Table<T>, SqlKeyword {
    * @param orm
    * @param valueType
    */
-  public BasicTable(Orm orm, Class<T> valueType) {
+  public BasicTable(Sorm orm, Class<T> valueType) {
     this(orm, valueType, orm.getTableName(valueType));
   }
 
@@ -36,7 +36,8 @@ public class BasicTable<T> implements Table<T>, SqlKeyword {
   }
 
   @Override
-  public Orm getOrm() {
+  public Sorm getOrm() {
     return orm;
   }
+
 }
