@@ -1,10 +1,17 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
+import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.table.Table;
 
 @Experimental
-public interface TableWithDefinition<T> extends Table<T> {
+public interface WithTableDefinition {
+
+  /**
+   * Gets {@link Orm} object
+   *
+   * @return
+   */
+  Orm getOrm();
 
   /**
    * Gets the table definition.
@@ -13,28 +20,23 @@ public interface TableWithDefinition<T> extends Table<T> {
    */
   TableDefinition getTableDefinition();
 
-  default TableWithDefinition<T> createTableIfNotExists() {
+  default WithTableDefinition createTableIfNotExists() {
     getTableDefinition().createTableIfNotExists(getOrm());
     return this;
   }
 
-  default TableWithDefinition<T> createIndexesIfNotExists() {
+  default WithTableDefinition createIndexesIfNotExists() {
     getTableDefinition().createIndexesIfNotExists(getOrm());
     return this;
   }
 
-  default TableWithDefinition<T> dropTableIfExists() {
+  default WithTableDefinition dropTableIfExists() {
     getTableDefinition().dropTableIfExists(getOrm());
     return this;
   }
 
-  default TableWithDefinition<T> dropTableIfExistsCascade() {
+  default WithTableDefinition dropTableIfExistsCascade() {
     getTableDefinition().dropTableIfExistsCascade(getOrm());
     return this;
-  }
-
-  @Override
-  default String getTableName() {
-    return getTableDefinition().getTableName();
   }
 }

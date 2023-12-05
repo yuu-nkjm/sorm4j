@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
-import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 public class SormTestUtils {
 
@@ -37,7 +36,7 @@ public class SormTestUtils {
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  public static TableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
+  public static BasicTableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("guests")
             .addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
@@ -52,11 +51,11 @@ public class SormTestUtils {
     return tbl;
   }
 
-  public static TableWithDefinition<Player> createPlayersTable(Sorm sorm) {
+  public static BasicTableWithDefinition<Player> createPlayersTable(Sorm sorm) {
     return createPlayersTable(sorm, "players");
   }
 
-  public static TableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
+  public static BasicTableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
 
     TableDefinition schema =
         TableDefinition.builder(tableName)
@@ -67,59 +66,22 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    TableWithDefinition<Player> tbl =
-        new TableWithDefinition<>() {
-
-          @Override
-          public TableDefinition getTableDefinition() {
-            return schema;
-          }
-
-          @Override
-          public Class<Player> getValueType() {
-            return Player.class;
-          }
-
-          @Override
-          public Sorm getOrm() {
-            return sorm;
-          }
-
-          @Override
-          public String getTableName() {
-            return schema.getTableName();
-          }
-        };
+    BasicTableWithDefinition<Player> tbl =
+        new BasicTableWithDefinition<>(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static TableWithDefinition<Sport> createSportsTable(Sorm sorm) {
+  public static BasicTableWithDefinition<Sport> createSportsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("sports")
             .addColumnDefinition("id", INT, PRIMARY_KEY)
             .addColumnDefinition("name", VARCHAR)
             .build();
 
-    TableWithDefinition<Sport> tbl =
-        new TableWithDefinition<>() {
+    BasicTableWithDefinition<Sport> tbl = new BasicTableWithDefinition<>(sorm, Sport.class, schema);
 
-          @Override
-          public TableDefinition getTableDefinition() {
-            return schema;
-          }
-
-          @Override
-          public Class<Sport> getValueType() {
-            return Sport.class;
-          }
-
-          @Override
-          public Sorm getOrm() {
-            return sorm;
-          }
-        };
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;

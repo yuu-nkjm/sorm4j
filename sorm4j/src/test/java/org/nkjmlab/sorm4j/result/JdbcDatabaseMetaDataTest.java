@@ -1,17 +1,19 @@
 package org.nkjmlab.sorm4j.result;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
 
 class JdbcDatabaseMetaDataTest {
 
   @Test
   void test() {
-    TableWithDefinition<Player> playersTable =
+    BasicTableWithDefinition<Player> playersTable =
         SormTestUtils.createPlayersTable(SormTestUtils.createSormWithNewContext());
     String version = "2.";
     JdbcDatabaseMetaData md = playersTable.getOrm().getJdbcDatabaseMetaData();

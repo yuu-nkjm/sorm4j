@@ -4,6 +4,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
+import org.nkjmlab.sorm4j.util.table_def.WithTableDefinition;
 
 @Experimental
 public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Table<T> {
@@ -32,28 +33,28 @@ public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Ta
   @Experimental
   @Override
   public BasicH2Table<T> createTableIfNotExists() {
-    H2Table.super.createTableIfNotExists();
+    super.createTableIfNotExists();
     return this;
   }
 
   @Experimental
   @Override
   public BasicH2Table<T> createIndexesIfNotExists() {
-    H2Table.super.createIndexesIfNotExists();
+    super.createIndexesIfNotExists();
     return this;
   }
 
   @Experimental
   @Override
   public BasicH2Table<T> dropTableIfExists() {
-    H2Table.super.dropTableIfExists();
+    super.dropTableIfExists();
     return this;
   }
 
   @Experimental
   @Override
   public BasicH2Table<T> dropTableIfExistsCascade() {
-    H2Table.super.dropTableIfExistsCascade();
+    super.dropTableIfExistsCascade();
     return this;
   }
 }

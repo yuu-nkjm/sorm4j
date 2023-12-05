@@ -3,7 +3,8 @@ package org.nkjmlab.sorm4j.example.first;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.table.TableConnection;
-import org.nkjmlab.sorm4j.util.h2.H2Table;
+import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 public class TableExample {
 
@@ -12,7 +13,9 @@ public class TableExample {
     Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
     // Create a table access object.
-    H2Table<Customer> customerTable = H2Table.create(sorm, Customer.class, "customer");
+    BasicH2Table<Customer> customerTable =
+        new BasicH2Table<>(
+            sorm, Customer.class, TableDefinition.builder(Customer.class, "customer").build());
 
     // Create the table based on Customer.class
     customerTable.createTableIfNotExists();
