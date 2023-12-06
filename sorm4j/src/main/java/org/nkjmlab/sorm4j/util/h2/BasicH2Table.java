@@ -2,12 +2,11 @@ package org.nkjmlab.sorm4j.util.h2;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
-import org.nkjmlab.sorm4j.util.table_def.WithTableDefinition;
 
 @Experimental
-public class BasicH2Table<T> extends BasicTableWithDefinition<T> implements H2Table<T> {
+public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
 
   /**
    * This table instance is bind to the table name defined in the given {@link TableDefinition}.

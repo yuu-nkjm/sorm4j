@@ -26,7 +26,11 @@ public interface Table<T> extends TableMappedOrm<T> {
    * @return
    */
   static <T> Table<T> create(Sorm orm, Class<T> valueType) {
-    return new BasicTable<>(orm, valueType);
+    return new SimpleTable<>(orm, valueType);
+  }
+
+  default TableConnection<T> toTableConnection(OrmConnection conn) {
+    return TableConnection.of(conn, getValueType(), getTableName());
   }
 
   /**

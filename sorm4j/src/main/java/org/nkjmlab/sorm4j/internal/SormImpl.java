@@ -27,7 +27,7 @@ import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.BasicTable;
+import org.nkjmlab.sorm4j.table.SimpleTable;
 import org.nkjmlab.sorm4j.table.Table;
 
 /**
@@ -542,7 +542,7 @@ public final class SormImpl implements Sorm {
   @Override
   @SuppressWarnings("unchecked")
   public <T> Table<T> getTable(Class<T> type) {
-    return (Table<T>) tables.computeIfAbsent(type.getName(), key -> new BasicTable<>(this, type));
+    return (Table<T>) tables.computeIfAbsent(type.getName(), key -> new SimpleTable<>(this, type));
   }
 
   @Override
@@ -550,7 +550,7 @@ public final class SormImpl implements Sorm {
   public <T> Table<T> getTable(Class<T> type, String tableName) {
     return (Table<T>)
         tables.computeIfAbsent(
-            type.getName() + "-" + tableName, key -> new BasicTable<>(this, type, tableName));
+            type.getName() + "-" + tableName, key -> new SimpleTable<>(this, type, tableName));
   }
 
   @Override

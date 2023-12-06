@@ -23,15 +23,15 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.sql.JoinSql;
-import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private BasicTableWithDefinition<Player> playersTable;
-  private BasicTableWithDefinition<Sport> sportsTable;
+  private BasicTable<Player> playersTable;
+  private BasicTable<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
@@ -46,7 +46,7 @@ class TableTest {
     Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     playersTable.getTableDefinition();
 
-    BasicTable<Guest> gt = new BasicTable<>(sorm, Guest.class);
+    SimpleTable<Guest> gt = new SimpleTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
     assertThat(gt.getValueType()).isEqualTo(Guest.class);
   }

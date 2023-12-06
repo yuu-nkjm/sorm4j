@@ -7,13 +7,13 @@ import java.sql.Connection;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_def.BasicTableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 
 class JdbcDatabaseMetaDataTest {
 
   @Test
   void test() {
-    BasicTableWithDefinition<Player> playersTable =
+    BasicTable<Player> playersTable =
         SormTestUtils.createPlayersTable(SormTestUtils.createSormWithNewContext());
     String version = "2.";
     JdbcDatabaseMetaData md = playersTable.getOrm().getJdbcDatabaseMetaData();
