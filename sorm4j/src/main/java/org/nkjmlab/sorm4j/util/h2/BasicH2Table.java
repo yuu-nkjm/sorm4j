@@ -1,5 +1,7 @@
 package org.nkjmlab.sorm4j.util.h2;
 
+import java.io.File;
+
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.table_def.BasicTable;
@@ -55,5 +57,14 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
   public BasicH2Table<T> dropTableIfExistsCascade() {
     super.dropTableIfExistsCascade();
     return this;
+  }
+
+  public void createTableAsSelectFromCsv(File csvFile) {
+    getOrm()
+        .execute(
+            getTableDefinition().getCreateTableIfNotExistsStatement()
+                + " as select * from csvread('"
+                + csvFile.getAbsoluteFile()
+                + "')");
   }
 }
