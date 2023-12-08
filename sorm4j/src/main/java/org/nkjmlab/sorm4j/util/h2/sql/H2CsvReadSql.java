@@ -25,7 +25,7 @@ public class H2CsvReadSql {
 
   private final String csvReadAndSelectSql;
 
-  public H2CsvReadSql(List<String> columns, String csvReadAndSelectSql) {
+  private H2CsvReadSql(List<String> columns, String csvReadAndSelectSql) {
     this.columns = columns;
     this.csvReadAndSelectSql = csvReadAndSelectSql;
   }

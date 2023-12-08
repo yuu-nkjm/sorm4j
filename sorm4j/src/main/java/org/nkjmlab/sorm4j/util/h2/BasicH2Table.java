@@ -1,9 +1,8 @@
 package org.nkjmlab.sorm4j.util.h2;
 
-import java.io.File;
-
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvRead;
 import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
@@ -59,12 +58,11 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
     return this;
   }
 
-  public void createTableAsSelectFromCsv(File csvFile) {
+  public void createTableIfNotExists(CsvRead csvRead) {
     getOrm()
         .execute(
             getTableDefinition().getCreateTableIfNotExistsStatement()
-                + " as select * from csvread('"
-                + csvFile.getAbsoluteFile()
-                + "')");
+                + " as select * from "
+                + csvRead);
   }
 }

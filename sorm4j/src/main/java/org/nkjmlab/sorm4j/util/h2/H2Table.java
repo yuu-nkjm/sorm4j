@@ -8,6 +8,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.Table;
 import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvRead;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvFunctions;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvReadSql;
 
@@ -95,13 +96,7 @@ public interface H2Table<T> extends Table<T>, H2Orm {
                 getTableName()));
   }
 
-  default int insertCsv(File csv) {
-    return getOrm()
-        .executeUpdate(
-            "insert into "
-                + getTableName()
-                + " select * from csvread("
-                + H2Keyword.wrapSingleQuote(csv.getAbsolutePath())
-                + ")");
+  default int insertCsv(CsvRead csvRead) {
+    return getOrm().executeUpdate("insert into " + getTableName() + " select * from " + csvRead);
   }
 }
