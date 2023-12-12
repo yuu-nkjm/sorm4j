@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.util.h2;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
@@ -25,7 +27,7 @@ class BasicH2TableTest {
   @Test
   void test2() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    H2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
@@ -55,7 +57,7 @@ class BasicH2TableTest {
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
-    H2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
     OrmRecordExample ret = table.readCsvWithHeader(tmpCsv).get(0);

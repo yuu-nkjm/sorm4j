@@ -44,7 +44,7 @@ import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.TableMappedOrmConnection;
+import org.nkjmlab.sorm4j.table.TableConnection;
 import org.nkjmlab.sorm4j.util.logger.LogPoint;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
@@ -1168,13 +1168,13 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type) {
-    return new TableMappedOrmConnectionImpl<>(this, type);
+  public <T> TableConnection<T> mapToTable(Class<T> type) {
+    return new TableConnectionImpl<>(this, type, this.getTableName(type));
   }
 
   @Override
-  public <T> TableMappedOrmConnection<T> mapToTable(Class<T> type, String tableName) {
-    return new TableMappedOrmConnectionImpl<>(this, type, tableName);
+  public <T> TableConnection<T> mapToTable(Class<T> type, String tableName) {
+    return new TableConnectionImpl<>(this, type, tableName);
   }
 
   @Override

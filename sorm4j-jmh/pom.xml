@@ -21,12 +21,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j-jmh</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.6</version>
   <packaging>jar</packaging>
   <name>Sorm4j benchmark</name>
 
   <properties>
-    <sorm4j-version>2.0.0</sorm4j-version>
+    <sorm4j-version>2.0.6</sorm4j-version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -118,7 +118,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.17.0</version>
+        <version>3.11.0</version>
         <configuration>
           <compilerVersion>${javac.target}</compilerVersion>
           <source>${javac.target}</source>

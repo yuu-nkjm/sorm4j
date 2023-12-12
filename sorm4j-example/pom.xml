@@ -1,49 +1,70 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.nkjmlab</groupId>
-  <artifactId>sorm4j-example</artifactId>
-  <version>2.0.0</version>
-  <description>Example of Sorm4j</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.nkjmlab</groupId>
+	<artifactId>sorm4j-example</artifactId>
+	<version>2.0.7</version>
+	<description>Example of Sorm4j</description>
 
-  <properties>
-    <sorm4j-version>2.0.0</sorm4j-version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <additionalparam>-Xdoclint:none</additionalparam>
-    <downloadSources>true</downloadSources>
-    <downloadJavadocs>true</downloadJavadocs>
-  </properties>
+	<properties>
+		<sorm4j-version>2.0.6</sorm4j-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<additionalparam>-Xdoclint:none</additionalparam>
+		<downloadSources>true</downloadSources>
+		<downloadJavadocs>true</downloadJavadocs>
+	</properties>
 
-  <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.nkjmlab/sorm4j -->
-    <dependency>
-      <groupId>org.nkjmlab</groupId>
-      <artifactId>sorm4j</artifactId>
-      <version>${sorm4j-version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>2.1.214</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>2.20.0</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
-        <configuration>
-          <release>17</release>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.nkjmlab/sorm4j -->
+		<dependency>
+			<groupId>org.nkjmlab</groupId>
+			<artifactId>sorm4j</artifactId>
+			<version>${sorm4j-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.224</version>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.22.0</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>17</release>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<!--
+				https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.15.0</version>
+				<configuration>
+					<ruleSet>
+						<ignoreVersions>
+							<ignoreVersion>
+								<type>regex</type>
+								<version>
+									(?i).*(alpha|beta|snapshot|pre|rc|M\d).*</version>
+							</ignoreVersion>
+						</ignoreVersions>
+					</ruleSet>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

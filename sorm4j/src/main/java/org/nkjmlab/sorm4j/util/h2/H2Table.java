@@ -4,13 +4,16 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvRead;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvFunctions;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvReadSql;
-import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
 
 @Experimental
-public interface H2Table<T> extends TableWithDefinition<T> {
+public interface H2Table<T> extends Table<T>, H2Orm {
 
   default H2CsvReadSql.Builder csvReadSqlBuilder(File csvFile) {
     return H2CsvReadSql.builder(csvFile, getValueType());
@@ -64,5 +67,36 @@ public interface H2Table<T> extends TableWithDefinition<T> {
             H2CsvFunctions.getCallCsvWriteSql(
                 toFile, selectSql, charset, fieldSeparator, fieldDelimiter));
     return toFile;
+  }
+
+  default void scriptTableTo(File destFile, boolean includeDrop) {
+    getOrm()
+        .execute(
+            String.join(
+                " ",
+                "script",
+                H2Keyword.drop(includeDrop),
+                "to",
+                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath()),
+                "table",
+                getTableName()));
+  }
+
+  default void scriptTableTo(File destFile, boolean includeDrop, String password) {
+    getOrm()
+        .execute(
+            String.join(
+                " ",
+                "script",
+                H2Keyword.drop(includeDrop),
+                "to",
+                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath()),
+                H2Keyword.scriptCompressionEncryption(password),
+                "table",
+                getTableName()));
+  }
+
+  default int insertCsv(CsvRead csvRead) {
+    return getOrm().executeUpdate("insert into " + getTableName() + " select * from " + csvRead);
   }
 }

@@ -11,7 +11,7 @@ Sorm4j sets Java objects into parameters of an SQL statement and executes the SQ
 
 Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has no runtime dependencies. It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
 
-Sorm4j requires Java 17 (or above) after version 2.0.0 (Sorm4j version 1.4.16).
+Sorm4j requires Java 17 (or above) after version 2.0.0.
 
 
 ## Quickstart
@@ -21,7 +21,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>2.0.0</version>
+   <version>2.0.7</version>
  </dependency>
 ```
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`

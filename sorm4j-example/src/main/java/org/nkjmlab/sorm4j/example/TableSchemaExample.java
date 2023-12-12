@@ -15,11 +15,10 @@ public class TableSchemaExample {
     DataSource dataSorce = Sorm.createDataSource(jdbcUrl, user, password);
 
     QuizTable quizTable = new QuizTable(dataSorce);
-
+    quizTable.createTableAndIndexesIfNotExists();
     quizTable.insert(new Quiz("book1", "What is this?", "apple"));
-
+    System.out.println(quizTable.readAllBookNames());
   }
-
 
   public static class QuizTable {
     private final TableDefinition schema;
@@ -32,14 +31,16 @@ public class TableSchemaExample {
     private static final String QUESTION = "question";
     private static final String ANSWER = "answer";
 
-
-
     public QuizTable(DataSource dataSorce) {
       this.sorm = Sorm.create(dataSorce);
-      this.schema = TableDefinition.builder(TABLE_NAME)
-          .addColumnDefinition(ID, INT, AUTO_INCREMENT, PRIMARY_KEY)
-          .addColumnDefinition(BOOK_NAME, VARCHAR).addColumnDefinition(BOOK_NAME, VARCHAR)
-          .addColumnDefinition(QUESTION, VARCHAR).addColumnDefinition(ANSWER, VARCHAR).build();
+      this.schema =
+          TableDefinition.builder(TABLE_NAME)
+              .addColumnDefinition(ID, INT, AUTO_INCREMENT, PRIMARY_KEY)
+              .addColumnDefinition(BOOK_NAME, VARCHAR)
+              .addColumnDefinition(BOOK_NAME, VARCHAR)
+              .addColumnDefinition(QUESTION, VARCHAR)
+              .addColumnDefinition(ANSWER, VARCHAR)
+              .build();
     }
 
     public void insert(Quiz quiz) {
@@ -51,11 +52,13 @@ public class TableSchemaExample {
     }
 
     public void createTableAndIndexesIfNotExists() {
-      sorm.acceptHandler(conn -> {
-        conn.executeUpdate(schema.getCreateTableIfNotExistsStatement());
-        schema.getCreateIndexIfNotExistsStatements()
-            .forEach(createIndexStatement -> conn.executeUpdate(createIndexStatement));
-      });
+      sorm.acceptHandler(
+          conn -> {
+            conn.executeUpdate(schema.getCreateTableIfNotExistsStatement());
+            schema
+                .getCreateIndexIfNotExistsStatements()
+                .forEach(createIndexStatement -> conn.executeUpdate(createIndexStatement));
+          });
     }
 
     public List<Quiz> readAllQuizzes() {
@@ -81,10 +84,5 @@ public class TableSchemaExample {
       this.question = question;
       this.answer = answer;
     }
-
-
-
   }
-
-
 }

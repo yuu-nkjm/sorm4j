@@ -1,10 +1,19 @@
 package org.nkjmlab.sorm4j.table;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
-import static org.nkjmlab.sorm4j.util.sql.SelectSql.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createGuestsTable;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createPlayersTable;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewContext;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSportsTable;
+import static org.nkjmlab.sorm4j.util.sql.SelectSql.selectCountFrom;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -14,15 +23,15 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.sql.JoinSql;
-import org.nkjmlab.sorm4j.util.table_def.TableWithDefinition;
+import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private TableWithDefinition<Player> playersTable;
-  private TableWithDefinition<Sport> sportsTable;
+  private BasicTable<Player> playersTable;
+  private BasicTable<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
@@ -37,7 +46,7 @@ class TableTest {
     Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     playersTable.getTableDefinition();
 
-    BasicTable<Guest> gt = new BasicTable<>(sorm, Guest.class);
+    SimpleTable<Guest> gt = new SimpleTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
     assertThat(gt.getValueType()).isEqualTo(Guest.class);
   }

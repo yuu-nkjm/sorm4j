@@ -6,7 +6,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** Defines index pair. */
+/**
+ * Defines multi-column index.
+ *
+ * <p>For example,
+ *
+ * <pre><code>
+ * @IndexColumns({"user_id", "item_id"})
+ *
+ * </pre></code>
+ */
 @Repeatable(RepeatableIndexColumns.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
