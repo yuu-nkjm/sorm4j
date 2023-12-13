@@ -4,6 +4,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
 
 /**
@@ -30,6 +32,7 @@ import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
  * <code>select parsedatetime(delivery_date, 'y/MM/d') as DELIVERY_DATE,`price/prices` as PRICE from csvread('file.csv',null,'charset=UTF-8 fieldSeparator='||char(9))</code>
  * </pre>
  */
+@Experimental
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface CsvColumn {
