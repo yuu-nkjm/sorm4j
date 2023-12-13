@@ -66,8 +66,7 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    BasicTable<Player> tbl =
-        new BasicTable<>(sorm, Player.class, schema);
+    BasicTable<Player> tbl = new BasicTable<>(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
@@ -107,9 +106,7 @@ public class SormTestUtils {
 
   public static DriverManagerDataSource createNewDatabaseDataSource() {
     final String JDBC_URL =
-        "jdbc:h2:mem:test"
-            + urlSuffuix.incrementAndGet()
-            + ";DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
+        "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1";
     final String USER = "sa";
     final String PASSWORD = "";
     return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);

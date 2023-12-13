@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.util.h2.internal;
 
 public class H2Keyword {
 
-  public static String wrapSingleQuote(Object str) {
-    return "'" + (str == null ? "" : str) + "'";
+  private static String wrapSingleQuote(Object str) {
+    return str == null ? null : "'" + str + "'";
   }
 
   public static String scriptCompressionEncryption(String password) {

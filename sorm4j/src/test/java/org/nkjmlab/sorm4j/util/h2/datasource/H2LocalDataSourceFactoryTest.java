@@ -1,10 +1,13 @@
 package org.nkjmlab.sorm4j.util.h2.datasource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
+
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,8 +29,7 @@ class H2LocalDataSourceFactoryTest {
     assertThat(factory.getEmbeddedModeJdbcUrl())
         .isEqualTo("jdbc:h2:file:" + userHomeDir() + "/h2db/testdir/testdb");
 
-    assertThat(factory.getInMemoryModeJdbcUrl())
-        .isEqualTo("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+    assertThat(factory.getInMemoryModeJdbcUrl()).isEqualTo("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
 
     assertThat(factory.getServerModeJdbcUrl())
         .isEqualTo("jdbc:h2:tcp://localhost/" + userHomeDir() + "/h2db/testdir/testdb");
@@ -35,8 +37,7 @@ class H2LocalDataSourceFactoryTest {
     assertThat(factory.getMixedModeJdbcUrl())
         .isEqualTo("jdbc:h2:" + userHomeDir() + "/h2db/testdir/testdb;AUTO_SERVER=TRUE");
 
-    assertThat(factory.toString())
-        .contains("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+    assertThat(factory.toString()).contains("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
 
     H2LocalDataSourceFactory.builder();
     H2LocalDataSourceFactory.builder(
@@ -59,6 +60,6 @@ class H2LocalDataSourceFactoryTest {
   }
 
   private String userHomeDir() {
-    return SystemPropertyUtils.getUserHomeDirectory().getPath().replace("\\", "/");
+    return new File(System.getProperty("user.home")).getPath().replace("\\", "/");
   }
 }

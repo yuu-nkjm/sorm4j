@@ -4,8 +4,10 @@ import java.io.File;
 
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
 
+@Experimental
 public interface H2Orm {
 
   /**
@@ -17,9 +19,7 @@ public interface H2Orm {
 
   default void runscript(File srcFile) {
     getOrm()
-        .execute(
-            String.join(
-                " ", "runscript", "from", H2Keyword.wrapSingleQuote(srcFile.getAbsolutePath())));
+        .execute(String.join(" ", "runscript", "from", wrapSingleQuote(srcFile.getAbsolutePath())));
   }
 
   default void runscript(File srcFile, String password) {
@@ -29,7 +29,7 @@ public interface H2Orm {
                 " ",
                 "runscript",
                 "from",
-                H2Keyword.wrapSingleQuote(srcFile.getAbsolutePath()),
+                wrapSingleQuote(srcFile.getAbsolutePath()),
                 H2Keyword.scriptCompressionEncryption(password)));
   }
 
@@ -41,7 +41,7 @@ public interface H2Orm {
                 "script",
                 H2Keyword.drop(includeDrop),
                 "to",
-                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath())));
+                wrapSingleQuote(destFile.getAbsolutePath())));
   }
 
   default void scriptTo(File destFile, boolean includeDrop, String password) {
@@ -52,7 +52,11 @@ public interface H2Orm {
                 "script",
                 H2Keyword.drop(includeDrop),
                 "to",
-                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath()),
+                wrapSingleQuote(destFile.getAbsolutePath()),
                 H2Keyword.scriptCompressionEncryption(password)));
+  }
+
+  private static String wrapSingleQuote(Object str) {
+    return str == null ? null : "'" + str + "'";
   }
 }

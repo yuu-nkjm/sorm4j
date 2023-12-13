@@ -69,7 +69,7 @@ public class SystemPropertyUtils {
    *
    * @return
    */
-  public static File getUserHomeDirectory() {
+  private static File getUserHomeDirectory() {
     return new File(System.getProperty("user.home"));
   }
 
