@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.h2;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.h2.sql.CsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
 import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 

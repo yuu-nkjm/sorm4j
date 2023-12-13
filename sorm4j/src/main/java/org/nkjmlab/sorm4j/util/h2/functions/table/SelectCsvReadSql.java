@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.h2.sql;
+package org.nkjmlab.sorm4j.util.h2.functions.table;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -13,19 +13,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 @Experimental
-public class H2CsvReadSql {
+public class SelectCsvReadSql {
 
   private final List<String> columns;
 
   private final String csvReadAndSelectSql;
 
-  private H2CsvReadSql(List<String> columns, String csvReadAndSelectSql) {
+  private SelectCsvReadSql(List<String> columns, String csvReadAndSelectSql) {
     this.columns = columns;
     this.csvReadAndSelectSql = csvReadAndSelectSql;
   }
@@ -47,8 +48,8 @@ public class H2CsvReadSql {
     return new Builder();
   }
 
-  public static Builder builder(File csvFile, Class<?> ormRecordClass) {
-    return new Builder(csvFile, ormRecordClass);
+  public static Builder builder(File csvFile, Class<?> valueType) {
+    return new Builder(csvFile, valueType);
   }
 
   public static Builder builder(File csvFile) {
@@ -66,21 +67,21 @@ public class H2CsvReadSql {
 
     private File csvFile;
     private Charset charset = StandardCharsets.UTF_8;
-    private char fieldSeparator = ',';
+    private Character fieldSeparator = ',';
     private Character fieldDelimiter = null;
 
     public Builder(File csvFile) {
-      setCsvFile(csvFile);
+      csvFile(csvFile);
     }
 
-    public Builder(File csvFile, Class<?> ormRecordClass) {
+    public Builder(File csvFile, Class<?> valueType) {
       this(csvFile);
-      setOrmRecordClass(ormRecordClass);
+      valueType(valueType);
     }
 
     private Builder() {}
 
-    public H2CsvReadSql build() {
+    public SelectCsvReadSql build() {
       List<String> selectedColumns = new ArrayList<>(columns);
 
       aliases
@@ -97,52 +98,52 @@ public class H2CsvReadSql {
                 selectedColumns.set(index, en.getValue());
               });
 
-      return new H2CsvReadSql(
+      return new SelectCsvReadSql(
           columns,
-          H2CsvFunctions.getCsvReadAndSelectSql(
+          getCsvReadAndSelectSql(
               selectedColumns, csvFile, csvColumns, charset, fieldSeparator, fieldDelimiter));
     }
 
-    public Builder setCsvFile(File csvFile) {
+    public Builder csvFile(File csvFile) {
       this.csvFile = csvFile;
       return this;
     }
 
-    public Builder setCharset(Charset charset) {
+    public Builder charset(Charset charset) {
       this.charset = charset;
       return this;
     }
 
-    public Builder setFieldSeparator(char fieldSeparator) {
+    public Builder fieldSeparator(Character fieldSeparator) {
       this.fieldSeparator = fieldSeparator;
       return this;
     }
 
-    public Builder setFieldDelimiter(Character fieldDelimiter) {
+    public Builder fieldDelimiter(Character fieldDelimiter) {
       this.fieldDelimiter = fieldDelimiter;
       return this;
     }
 
-    public Builder setCharset(String charset) {
-      return setCharset(Charset.forName(charset));
+    public Builder charset(String charset) {
+      return charset(Charset.forName(charset));
     }
 
-    public Builder setTableColumns(List<String> tableColumns) {
+    public Builder tableColumns(List<String> tableColumns) {
       this.columns = new ArrayList<>(tableColumns);
       return this;
     }
 
-    public Builder setTableColumns(String... tableColumns) {
-      return setTableColumns(Arrays.asList(tableColumns));
+    public Builder tableColumns(String... tableColumns) {
+      return tableColumns(Arrays.asList(tableColumns));
     }
 
-    public Builder setCsvColumns(List<String> csvColumns) {
+    public Builder csvColumns(List<String> csvColumns) {
       this.csvColumns = new ArrayList<>(csvColumns);
       return this;
     }
 
-    public Builder setCsvColumns(String... csvColumns) {
-      return setCsvColumns(Arrays.asList(csvColumns));
+    public Builder csvColumns(String... csvColumns) {
+      return csvColumns(Arrays.asList(csvColumns));
     }
 
     public Builder mapCsvColumnToTableColumn(String expression, String column) {
@@ -169,15 +170,15 @@ public class H2CsvReadSql {
           + "]";
     }
 
-    public Builder setOrmRecordClass(Class<?> ormRecordClass) {
+    public Builder valueType(Class<?> valueType) {
 
       Annotation[][] parameterAnnotationsOfConstructor =
-          TableDefinition.getCanonicalConstructor(ormRecordClass)
+          TableDefinition.getCanonicalConstructor(valueType)
               .map(constructor -> constructor.getParameterAnnotations())
               .orElse(null);
 
       Field[] fields =
-          Stream.of(ormRecordClass.getDeclaredFields())
+          Stream.of(valueType.getDeclaredFields())
               .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
               .toArray(Field[]::new);
 
@@ -202,7 +203,7 @@ public class H2CsvReadSql {
           }
         }
       }
-      setTableColumns(
+      tableColumns(
           Stream.of(fields)
               .map(
                   f -> {
@@ -214,5 +215,34 @@ public class H2CsvReadSql {
 
       return this;
     }
+  }
+
+  /**
+   * @param selectedColumns columns in select clause. null or empty means the all columns.
+   * @param csvFile
+   * @param csvColumns
+   * @param charset
+   * @param fieldSeparator
+   * @return
+   */
+  private static String getCsvReadAndSelectSql(
+      List<String> selectedColumns,
+      File csvFile,
+      List<String> csvColumns,
+      Charset charset,
+      char fieldSeparator,
+      Character fieldDelimiter) {
+    return "select "
+        + (selectedColumns == null || selectedColumns.size() == 0
+            ? "*"
+            : String.join(",", selectedColumns))
+        + " from "
+        + (csvColumns == null || csvColumns.size() == 0
+                ? CsvReadSql.builderForCsvWithHeader(csvFile)
+                : CsvReadSql.builderForCsvWithoutHeader(csvFile, csvColumns))
+            .charset(charset.toString())
+            .fieldSeparator(fieldSeparator + "")
+            .fieldDelimiter(fieldDelimiter + "")
+            .build();
   }
 }

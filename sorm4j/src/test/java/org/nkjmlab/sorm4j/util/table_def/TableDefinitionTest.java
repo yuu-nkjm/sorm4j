@@ -1,11 +1,12 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.time.LocalDate;
@@ -14,11 +15,14 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.h2.sql.H2CsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -56,14 +60,17 @@ class TableDefinitionTest {
             "TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0))");
     sorm.executeUpdate(def.getCreateTableIfNotExistsStatement());
 
-    String selectSql =
-        H2CsvReadSql.builder(
-                Paths.get(TableDefinitionTest.class.getResource("test.csv").toURI()).toFile())
-            .build()
-            .getCsvReadAndSelectSql();
+    List<RowMap> csvRows =
+        sorm.readList(
+            RowMap.class,
+            "select * from "
+                + CsvReadSql.builderForCsvWithHeader(
+                        new File(TableDefinitionTest.class.getResource("test.csv").toURI()))
+                    .build()
+                    .getSql());
 
-    List<TableDefExample> ret = sorm.readList(TableDefExample.class, selectSql);
-    sorm.insert(ret);
+    BasicH2Table<TableDefExample> table = new BasicH2Table<>(sorm, TableDefExample.class, def);
+    table.insertMapIn(csvRows);
 
     assertThat(sorm.selectAll(TableDefExample.class).get(0).phoneNumber).isEqualTo("000-000-0000");
     System.out.println(sorm.selectAll(TableDefExample.class));

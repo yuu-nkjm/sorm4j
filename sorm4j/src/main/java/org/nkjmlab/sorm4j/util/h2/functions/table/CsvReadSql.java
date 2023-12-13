@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.h2.sql;
+package org.nkjmlab.sorm4j.util.h2.functions.table;
 
 import java.io.File;
 import java.util.List;
@@ -13,9 +13,15 @@ import org.nkjmlab.sorm4j.annotation.Experimental;
 public class CsvReadSql {
 
   private final String sql;
+  private final List<String> csvColumns;
 
-  public CsvReadSql(String sql) {
+  public CsvReadSql(String sql, List<String> csvColumns) {
     this.sql = sql;
+    this.csvColumns = csvColumns;
+  }
+
+  public String getSql() {
+    return sql;
   }
 
   @Override
@@ -42,19 +48,26 @@ public class CsvReadSql {
     return new CsvReadSql.Builder().csvFile(csvFile);
   }
 
+  public static Builder builderForCsvWithoutHeader(File csvFile, List<String> csvColumns) {
+    return new CsvReadSql.Builder().csvFile(csvFile).columns(csvColumns);
+  }
+
   /**
    * @param csvFile
    * @param csvColumnsCount count of columns in csv file.
    * @return
    */
   public static CsvReadSql.Builder builderForCsvWithoutHeader(File csvFile, int csvColumnsCount) {
-    return new CsvReadSql.Builder()
-        .csvFile(csvFile)
-        .columns(IntStream.range(0, csvColumnsCount).mapToObj(i -> "COL_" + i).toList());
+    return builderForCsvWithoutHeader(
+        csvFile, IntStream.range(0, csvColumnsCount).mapToObj(i -> "COL_" + i).toList());
   }
 
   static CsvReadSql.Builder builder() {
     return new Builder();
+  }
+
+  public List<String> getCsvColumns() {
+    return csvColumns;
   }
 
   public static class Builder {
@@ -110,7 +123,7 @@ public class CsvReadSql {
                       : "stringdecode(" + wrapSingleQuote(optionsString) + ")")
               .toList();
 
-      return new CsvReadSql("csvread (" + String.join(", ", l) + ")");
+      return new CsvReadSql("csvread (" + String.join(", ", l) + ")", columns);
     }
   }
 }

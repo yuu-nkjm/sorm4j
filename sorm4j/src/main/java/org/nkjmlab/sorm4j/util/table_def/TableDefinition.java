@@ -57,30 +57,30 @@ public final class TableDefinition {
     return new TableDefinition.Builder(tableName);
   }
 
-  public static TableDefinition.Builder builder(Class<?> ormRecordClass, String tableName) {
+  public static TableDefinition.Builder builder(Class<?> valueType, String tableName) {
     Builder builder = TableDefinition.builder(tableName);
 
-    Optional.ofNullable(ormRecordClass.getAnnotation(PrimaryKeyColumns.class))
+    Optional.ofNullable(valueType.getAnnotation(PrimaryKeyColumns.class))
         .map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(IndexColumns.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumns.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(UniqueColumns.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(UniqueColumns.class))
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
-    Optional.ofNullable(ormRecordClass.getAnnotationsByType(CheckConstraint.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(CheckConstraint.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
     Annotation[][] parameterAnnotationsOfConstructor =
-        getCanonicalConstructor(ormRecordClass)
+        getCanonicalConstructor(valueType)
             .map(constructor -> constructor.getParameterAnnotations())
             .orElse(null);
 
     Field[] fields =
-        Stream.of(ormRecordClass.getDeclaredFields())
+        Stream.of(valueType.getDeclaredFields())
             .filter(f -> !Modifier.isStatic(f.getModifiers()))
             .toArray(Field[]::new);
 
@@ -122,14 +122,14 @@ public final class TableDefinition {
     return builder;
   }
 
-  public static TableDefinition.Builder builder(Class<?> ormRecordClass) {
-    return builder(ormRecordClass, toTableName(ormRecordClass));
+  public static TableDefinition.Builder builder(Class<?> valueType) {
+    return builder(valueType, toTableName(valueType));
   }
 
-  public static String toTableName(Class<?> ormRecordClass) {
-    OrmTable ann = ormRecordClass.getAnnotation(OrmTable.class);
+  public static String toTableName(Class<?> valueType) {
+    OrmTable ann = valueType.getAnnotation(OrmTable.class);
     if (ann == null || ann.value().length() == 0) {
-      return toUpperSnakeCase(ormRecordClass.getSimpleName() + "s");
+      return toUpperSnakeCase(valueType.getSimpleName() + "s");
     } else {
       return ann.value();
     }
