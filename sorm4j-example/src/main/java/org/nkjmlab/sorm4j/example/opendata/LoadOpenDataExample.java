@@ -13,32 +13,35 @@ import java.util.function.Consumer;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ElectronicsTable.Electronic;
+import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ModClothsTable.ModCloth;
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.TwitchsTable.Twitch;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
 import org.nkjmlab.sorm4j.util.h2.datasource.H2LocalDataSourceFactory;
-import org.nkjmlab.sorm4j.util.h2.sql.CsvRead;
+import org.nkjmlab.sorm4j.util.h2.server.H2Startup;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvReadSql;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
 
 public class LoadOpenDataExample {
   private static final org.apache.logging.log4j.Logger log =
       org.apache.logging.log4j.LogManager.getLogger();
 
-  private static File srcDir = new File(new File(System.getProperty("java.io.tmpdir")), "sorm4j");
-  private static final H2LocalDataSourceFactory factory =
-      H2LocalDataSourceFactory.builder(srcDir, "sorm4j_example", "sa", "").build();
+  private static final H2LocalDataSourceFactory dataSourceFactory =
+      H2LocalDataSourceFactory.builder(new File("$TMPDIR/sorm4j"), "sorm4j_example", "sa", "")
+          .build();
 
   static {
-    factory.makeFileDatabaseIfNotExists();
-    log.debug(factory.getServerModeJdbcUrl());
-    srcDir.mkdirs();
-    log.info("{}", srcDir);
+    dataSourceFactory.makeFileDatabaseIfNotExists();
+    dataSourceFactory.getDatabaseDirectory().mkdirs();
+    log.debug(dataSourceFactory.getMixedModeJdbcUrl());
+    log.info("{}", dataSourceFactory.getDatabaseDirectory());
   }
 
-  private Sorm fileDb = Sorm.create(factory.createServerModeDataSource());
+  private Sorm fileDb = Sorm.create(dataSourceFactory.createMixedModeDataSource());
 
   public static void main(String[] args) {
-
+    H2Startup.startDefaultLocalTcpServer();
+    H2Startup.startDefaultWebConsole();
     LoadOpenDataExample example = new LoadOpenDataExample();
     example.loadElectronic();
     example.loadModCloth();
@@ -53,7 +56,7 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvRead.builderForCsvWithHeader(csvFile).build());
+          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithHeader(csvFile).build());
         });
   }
 
@@ -65,7 +68,7 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvRead.builderForCsvWithHeader(csvFile).build());
+          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithHeader(csvFile).build());
         });
   }
 
@@ -78,12 +81,12 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvRead.builderForCsvWithoutHeader(csvFile, 5).build());
+          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithoutHeader(csvFile, 5).build());
         });
   }
 
   private static File downloadFile(String fileURL, String fileName) {
-    File outFile = new File(srcDir, fileName);
+    File outFile = new File(dataSourceFactory.getDatabaseDirectory(), fileName);
     if (outFile.exists()) {
       return outFile;
     }
@@ -105,7 +108,7 @@ public class LoadOpenDataExample {
    * @see <a href="https://github.com/MengtingWan/marketBias/tree/master/data">marketBias/data at
    *     master · MengtingWan/marketBias</a>
    */
-  public static class ModClothsTable extends BasicH2Table<Electronic> {
+  public static class ModClothsTable extends BasicH2Table<ModCloth> {
 
     @OrmRecord
     @PrimaryKeyColumns({"item_id", "user_id"})
@@ -124,7 +127,7 @@ public class LoadOpenDataExample {
         int split) {}
 
     public ModClothsTable(Sorm orm) {
-      super(orm, Electronic.class);
+      super(orm, ModCloth.class);
     }
 
     public File getCsv() {
@@ -186,7 +189,7 @@ public class LoadOpenDataExample {
     }
 
     public File getCsv() {
-      return new File(srcDir, "100k_a.csv");
+      return new File(dataSourceFactory.getDatabaseDirectory(), "100k_a.csv");
     }
   }
 
