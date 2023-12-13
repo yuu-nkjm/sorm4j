@@ -8,7 +8,7 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.Table;
 import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
-import org.nkjmlab.sorm4j.util.h2.sql.CsvRead;
+import org.nkjmlab.sorm4j.util.h2.sql.CsvReadSql;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvFunctions;
 import org.nkjmlab.sorm4j.util.h2.sql.H2CsvReadSql;
 
@@ -77,7 +77,7 @@ public interface H2Table<T> extends Table<T>, H2Orm {
                 "script",
                 H2Keyword.drop(includeDrop),
                 "to",
-                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath()),
+                wrapSingleQuote(destFile.getAbsolutePath()),
                 "table",
                 getTableName()));
   }
@@ -90,13 +90,17 @@ public interface H2Table<T> extends Table<T>, H2Orm {
                 "script",
                 H2Keyword.drop(includeDrop),
                 "to",
-                H2Keyword.wrapSingleQuote(destFile.getAbsolutePath()),
+                wrapSingleQuote(destFile.getAbsolutePath()),
                 H2Keyword.scriptCompressionEncryption(password),
                 "table",
                 getTableName()));
   }
 
-  default int insertCsv(CsvRead csvRead) {
+  default int insertCsv(CsvReadSql csvRead) {
     return getOrm().executeUpdate("insert into " + getTableName() + " select * from " + csvRead);
+  }
+
+  private static String wrapSingleQuote(Object str) {
+    return str == null ? null : "'" + str + "'";
   }
 }

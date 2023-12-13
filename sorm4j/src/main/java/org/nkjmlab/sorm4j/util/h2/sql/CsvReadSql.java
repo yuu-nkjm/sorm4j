@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j.util.h2.sql;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.H2Keyword.wrapSingleQuote;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -9,17 +7,24 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class CsvRead {
+import org.nkjmlab.sorm4j.annotation.Experimental;
+
+@Experimental
+public class CsvReadSql {
 
   private final String sql;
 
-  public CsvRead(String sql) {
+  public CsvReadSql(String sql) {
     this.sql = sql;
   }
 
   @Override
   public String toString() {
     return sql;
+  }
+
+  private static String wrapSingleQuote(Object str) {
+    return str == null ? null : "'" + str + "'";
   }
 
   private static String escape(String s) {
@@ -33,8 +38,8 @@ public class CsvRead {
         .replace("\"", "\\\"");
   }
 
-  public static CsvRead.Builder builderForCsvWithHeader(File csvFile) {
-    return new CsvRead.Builder().csvFile(csvFile);
+  public static CsvReadSql.Builder builderForCsvWithHeader(File csvFile) {
+    return new CsvReadSql.Builder().csvFile(csvFile);
   }
 
   /**
@@ -42,13 +47,13 @@ public class CsvRead {
    * @param csvColumnsCount count of columns in csv file.
    * @return
    */
-  public static CsvRead.Builder builderForCsvWithoutHeader(File csvFile, int csvColumnsCount) {
-    return new CsvRead.Builder()
+  public static CsvReadSql.Builder builderForCsvWithoutHeader(File csvFile, int csvColumnsCount) {
+    return new CsvReadSql.Builder()
         .csvFile(csvFile)
         .columns(IntStream.range(0, csvColumnsCount).mapToObj(i -> "COL_" + i).toList());
   }
 
-  static CsvRead.Builder builder() {
+  static CsvReadSql.Builder builder() {
     return new Builder();
   }
 
@@ -57,32 +62,32 @@ public class CsvRead {
     private File csvFile;
     private List<String> columns;
 
-    public CsvRead.Builder columns(List<String> columns) {
+    public CsvReadSql.Builder columns(List<String> columns) {
       this.columns = columns;
       return this;
     }
 
-    public CsvRead.Builder csvFile(File csvFile) {
+    public CsvReadSql.Builder csvFile(File csvFile) {
       this.csvFile = csvFile;
       return this;
     }
 
-    public CsvRead.Builder fieldSeparator(String val) {
+    public CsvReadSql.Builder fieldSeparator(String val) {
       options.put("fieldSeparator", val);
       return this;
     }
 
-    public CsvRead.Builder fieldDelimiter(String val) {
+    public CsvReadSql.Builder fieldDelimiter(String val) {
       options.put("fieldDelimiter", val);
       return this;
     }
 
-    public CsvRead.Builder charset(String val) {
+    public CsvReadSql.Builder charset(String val) {
       options.put("charset", val);
       return this;
     }
 
-    public CsvRead build() {
+    public CsvReadSql build() {
       String columnsString =
           columns == null
               ? null
@@ -105,7 +110,7 @@ public class CsvRead {
                       : "stringdecode(" + wrapSingleQuote(optionsString) + ")")
               .toList();
 
-      return new CsvRead("csvread (" + String.join(", ", l) + ")");
+      return new CsvReadSql("csvread (" + String.join(", ", l) + ")");
     }
   }
 }
