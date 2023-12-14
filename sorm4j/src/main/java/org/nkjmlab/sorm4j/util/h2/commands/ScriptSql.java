@@ -98,13 +98,13 @@ public class ScriptSql {
     public ScriptSql build() {
       List<String> ret = new ArrayList<>();
       ret.add("script");
-      Optional.of(noData).filter(b -> b).ifPresent(c -> ret.add("nodata"));
-      Optional.of(simple).filter(b -> b).ifPresent(c -> ret.add("simple"));
-      Optional.of(columns).filter(b -> b).ifPresent(c -> ret.add("columns"));
-      Optional.of(noPasswords).filter(b -> b).ifPresent(c -> ret.add("noPasswords"));
-      Optional.of(noSettings).filter(b -> b).ifPresent(c -> ret.add("noSettings"));
-      Optional.of(drop).filter(b -> b).ifPresent(c -> ret.add("drop"));
-      Optional.of(blockSize)
+      Optional.ofNullable(noData).filter(b -> b).ifPresent(c -> ret.add("nodata"));
+      Optional.ofNullable(simple).ifPresent(c -> ret.add("simple"));
+      Optional.ofNullable(columns).filter(b -> b).ifPresent(c -> ret.add("columns"));
+      Optional.ofNullable(noPasswords).filter(b -> b).ifPresent(c -> ret.add("noPasswords"));
+      Optional.ofNullable(noSettings).filter(b -> b).ifPresent(c -> ret.add("noSettings"));
+      Optional.ofNullable(drop).filter(b -> b).ifPresent(c -> ret.add("drop"));
+      Optional.ofNullable(blockSize)
           .filter(b -> b != null)
           .ifPresent(c -> ret.add("blocksize " + blockSize));
       if (fileName != null) {
