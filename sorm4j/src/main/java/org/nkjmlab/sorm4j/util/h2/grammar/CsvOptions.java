@@ -113,7 +113,7 @@ public class CsvOptions {
      * @return
      */
     public CsvOptions.Builder quotedNulls(String val) {
-      return putCsvOption("null", val);
+      return putCsvOption("quotedNulls", val);
     }
     /**
      * preserveWhitespace (true or false; disabled by default),
