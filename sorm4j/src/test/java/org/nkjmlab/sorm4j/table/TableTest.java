@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -49,6 +50,14 @@ class TableTest {
     SimpleTable<Guest> gt = new SimpleTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
     assertThat(gt.getValueType()).isEqualTo(Guest.class);
+  }
+
+  @Test
+  void testTableCon() {
+    try (OrmConnection con = playersTable.getOrm().open()) {
+      TableConnection<Player> c = TableConnection.of(con, Player.class);
+      c.count();
+    }
   }
 
   @Test
