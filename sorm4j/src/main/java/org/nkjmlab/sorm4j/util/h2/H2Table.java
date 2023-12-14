@@ -1,14 +1,13 @@
 package org.nkjmlab.sorm4j.util.h2;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
-
 import java.io.File;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.util.h2.commands.ScriptSql;
 import org.nkjmlab.sorm4j.util.h2.functions.system.CsvWrite;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.h2.grammar.OtherGrammars;
+import org.nkjmlab.sorm4j.util.h2.grammar.ScriptCompressionEncryption;
 
 @Experimental
 public interface H2Table<T> extends Table<T>, H2Orm {
@@ -36,30 +35,27 @@ public interface H2Table<T> extends Table<T>, H2Orm {
   }
 
   default void scriptTableTo(File destFile, boolean includeDrop) {
-    getOrm()
-        .execute(
-            String.join(
-                " ",
-                "script",
-                OtherGrammars.drop(includeDrop),
-                "to",
-                wrapSingleQuote(destFile.getAbsolutePath()),
-                "table",
-                getTableName()));
+    String sql =
+        ScriptSql.builder()
+            .drop(includeDrop)
+            .to(destFile)
+            .addTable(getTableName())
+            .build()
+            .getSql();
+    getOrm().execute(sql);
   }
 
   default void scriptTableTo(File destFile, boolean includeDrop, String password) {
-    getOrm()
-        .execute(
-            String.join(
-                " ",
-                "script",
-                OtherGrammars.drop(includeDrop),
-                "to",
-                wrapSingleQuote(destFile.getAbsolutePath()),
-                OtherGrammars.scriptCompressionEncryption(password),
-                "table",
-                getTableName()));
+    String sql =
+        ScriptSql.builder()
+            .drop(includeDrop)
+            .to(destFile)
+            .addTable(getTableName())
+            .scriptCompressionEncryption(
+                ScriptCompressionEncryption.defaultBuilder(password).build())
+            .build()
+            .getSql();
+    getOrm().execute(sql);
   }
 
   default int insertCsv(CsvRead csvRead) {

@@ -1,12 +1,9 @@
 package org.nkjmlab.sorm4j.util.h2.functions.table;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.escapeJavaString;
 import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -141,7 +138,7 @@ public class CsvRead {
           Stream.of(
                   wrapSingleQuote(file.getAbsolutePath().toString()),
                   columnsString == null ? null : wrapSingleQuote(columnsString),
-                  csvOptions == null
+                  csvOptions == null || csvOptions.getSql() == null
                       ? null
                       : "stringdecode(" + wrapSingleQuote(csvOptions.getSql()) + ")")
               .toList();

@@ -114,13 +114,13 @@ public class CsvWrite {
       List<String> l =
           Stream.of(
                   wrapSingleQuote(file.getAbsolutePath().toString()),
-                  query,
-                  csvOptions == null
+                  wrapSingleQuote(query),
+                  csvOptions == null || csvOptions.getSql() == null
                       ? null
                       : "stringdecode(" + wrapSingleQuote(csvOptions.getSql()) + ")")
               .toList();
 
-      return new CsvWrite("csvWrite(" + String.join(", ", l) + ")");
+      return new CsvWrite("csvwrite(" + String.join(", ", l) + ")");
     }
   }
 }

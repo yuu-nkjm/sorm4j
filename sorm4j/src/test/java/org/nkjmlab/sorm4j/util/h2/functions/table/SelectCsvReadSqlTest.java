@@ -7,11 +7,15 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.commands.InsertSelectCsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.commands.SelectCsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.commands.annotation.CsvColumn;
 import org.nkjmlab.sorm4j.util.h2.datasource.H2LocalDataSourceFactory;
 
 class SelectCsvReadSqlTest {
@@ -22,10 +26,7 @@ class SelectCsvReadSqlTest {
     Sorm sorm = Sorm.create(H2LocalDataSourceFactory.createTemporalInMemoryDataSource());
     BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     table.createTableIfNotExists(
-        CsvRead.builderForCsvWithoutHeader(file, 2)
-            .charset("UTF-16")
-            .fieldSeparator("\t")
-            .build());
+        CsvRead.builderForCsvWithoutHeader(file, 2).charset("UTF-16").fieldSeparator("\t").build());
     assertThat(table.selectAll().get(0).id).isEqualTo(1);
   }
 
@@ -34,48 +35,57 @@ class SelectCsvReadSqlTest {
     File file = Paths.get(SelectCsvReadSqlTest.class.getResource("test.tsv").toURI()).toFile();
 
     assertThat(
-            SelectCsvReadSql.builder(file)
-                .csvColumns("col-1", "col-2")
+            SelectCsvReadSql.builder(
+                    CsvRead.builderForCsvWithoutHeader(file, List.of("col-1", "col-2"))
+                        .charset("UTF-16")
+                        .fieldSeparator("\t")
+                        .build())
                 .tableColumns("col_1", "col_2")
-                .charset("UTF_16")
-                .fieldSeparator('\t')
                 .mapCsvColumnToTableColumn("`col-1`", "col_1")
                 .mapCsvColumnToTableColumn("`col-2`", "col_2")
                 .build()
-                .getCsvReadAndSelectSql())
+                .getSql())
         .isEqualTo(
             "select `col-1` as col_1,`col-2` as col_2 from csvread('"
                 + file.getAbsolutePath()
-                + "', 'col-1	col-2', stringdecode('charset=UTF-16 fieldDelimiter=null fieldSeparator=\\t'))");
+                + "', 'col-1	col-2', stringdecode('charset=UTF-16 fieldSeparator=\\t'))");
   }
 
   @Test
   void test2() throws URISyntaxException {
     File file = Paths.get(SelectCsvReadSqlTest.class.getResource("test.tsv").toURI()).toFile();
     assertThat(
-            SelectCsvReadSql.builder(file, OrmRecordExample.class)
+            InsertSelectCsvReadSql.builder(
+                    "test_table",
+                    SelectCsvReadSql.builder(
+                            CsvRead.builderForCsvWithoutHeader(file, List.of("ID", "NAME")).build(),
+                            OrmRecordExample.class)
+                        .build())
                 .build()
-                .getCsvReadAndInsertSql("test_table"))
+                .getSql())
         .isEqualTo(
             "insert into test_table(ID,NAME) select ID,NAME from csvread('"
                 + file.getAbsolutePath()
-                + "', null, stringdecode('charset=UTF-8 fieldDelimiter=null fieldSeparator=,'))");
+                + "', 'ID,NAME', null)");
   }
 
   @Test
   void test3() {
     File file = new File("file.csv");
     String ret =
-        SelectCsvReadSql.builder(file, Item.class)
-            .charset(StandardCharsets.UTF_8)
-            .fieldSeparator('\t')
+        SelectCsvReadSql.builder(
+                CsvRead.builderForCsvWithHeader(file)
+                    .charset(StandardCharsets.UTF_8.toString())
+                    .fieldSeparator("\t")
+                    .build(),
+                Item.class)
             .build()
-            .getCsvReadAndSelectSql();
+            .getSql();
     assertThat(ret)
         .isEqualTo(
             "select parsedatetime(delivery_date, 'y/MM/d') as DELIVERY_DATE,`price/prices` as PRICE from csvread('"
                 + file.getAbsolutePath()
-                + "', null, stringdecode('charset=UTF-8 fieldDelimiter=null fieldSeparator=\\t'))");
+                + "', null, stringdecode('charset=UTF-8 fieldSeparator=\\t'))");
   }
 
   @OrmRecord
