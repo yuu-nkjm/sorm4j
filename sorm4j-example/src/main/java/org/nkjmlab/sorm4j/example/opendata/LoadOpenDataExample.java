@@ -18,7 +18,7 @@ import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.TwitchsTable.Twit
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
 import org.nkjmlab.sorm4j.util.h2.datasource.H2LocalDataSourceFactory;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.util.h2.server.H2Startup;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
 
@@ -56,7 +56,7 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithHeader(csvFile).build());
+          tbl.createTableIfNotExists(CsvRead.builderForCsvWithHeader(csvFile).build());
         });
   }
 
@@ -68,7 +68,7 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithHeader(csvFile).build());
+          tbl.createTableIfNotExists(CsvRead.builderForCsvWithHeader(csvFile).build());
         });
   }
 
@@ -81,7 +81,7 @@ public class LoadOpenDataExample {
         "create table as select to mem",
         tbl.getTableName(),
         memDb -> {
-          tbl.createTableIfNotExists(CsvReadSql.builderForCsvWithoutHeader(csvFile, 5).build());
+          tbl.createTableIfNotExists(CsvRead.builderForCsvWithoutHeader(csvFile, 5).build());
         });
   }
 

@@ -1,37 +1,37 @@
 package org.nkjmlab.sorm4j.util.h2;
 
+import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
+
 import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.table.Table;
-import org.nkjmlab.sorm4j.util.h2.functions.system.SystemFunctions;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
-import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
+import org.nkjmlab.sorm4j.util.h2.functions.system.CsvWrite;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
+import org.nkjmlab.sorm4j.util.h2.grammar.OtherGrammars;
 
 @Experimental
 public interface H2Table<T> extends Table<T>, H2Orm {
 
-
+  /**
+   * Write all rows to csv file.
+   *
+   * @param toFile
+   * @return
+   */
   default File writeCsv(File toFile) {
     return writeCsv(toFile, "select * from " + getTableName());
   }
 
+  /**
+   * Write selected rows to csv file.
+   *
+   * @param toFile
+   * @param selectSql
+   * @return
+   */
   default File writeCsv(File toFile, String selectSql) {
-    return writeCsv(toFile, selectSql, StandardCharsets.UTF_8, ',', null);
-  }
-
-  default File writeCsv(
-      File toFile,
-      String selectSql,
-      Charset charset,
-      char fieldSeparator,
-      Character fieldDelimiter) {
-    getOrm()
-        .executeUpdate(
-            SystemFunctions.getCallCsvWriteSql(
-                toFile, selectSql, charset, fieldSeparator, fieldDelimiter));
+    getOrm().executeUpdate("call " + CsvWrite.builder(toFile).query(selectSql).build().getSql());
     return toFile;
   }
 
@@ -41,7 +41,7 @@ public interface H2Table<T> extends Table<T>, H2Orm {
             String.join(
                 " ",
                 "script",
-                H2Keyword.drop(includeDrop),
+                OtherGrammars.drop(includeDrop),
                 "to",
                 wrapSingleQuote(destFile.getAbsolutePath()),
                 "table",
@@ -54,19 +54,15 @@ public interface H2Table<T> extends Table<T>, H2Orm {
             String.join(
                 " ",
                 "script",
-                H2Keyword.drop(includeDrop),
+                OtherGrammars.drop(includeDrop),
                 "to",
                 wrapSingleQuote(destFile.getAbsolutePath()),
-                H2Keyword.scriptCompressionEncryption(password),
+                OtherGrammars.scriptCompressionEncryption(password),
                 "table",
                 getTableName()));
   }
 
-  default int insertCsv(CsvReadSql csvRead) {
+  default int insertCsv(CsvRead csvRead) {
     return getOrm().executeUpdate("insert into " + getTableName() + " select * from " + csvRead);
-  }
-
-  private static String wrapSingleQuote(Object str) {
-    return str == null ? null : "'" + str + "'";
   }
 }

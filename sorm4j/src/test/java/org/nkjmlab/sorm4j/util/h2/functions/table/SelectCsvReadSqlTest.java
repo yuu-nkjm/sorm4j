@@ -22,7 +22,7 @@ class SelectCsvReadSqlTest {
     Sorm sorm = Sorm.create(H2LocalDataSourceFactory.createTemporalInMemoryDataSource());
     BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     table.createTableIfNotExists(
-        CsvReadSql.builderForCsvWithoutHeader(file, 2)
+        CsvRead.builderForCsvWithoutHeader(file, 2)
             .charset("UTF-16")
             .fieldSeparator("\t")
             .build());
@@ -44,7 +44,7 @@ class SelectCsvReadSqlTest {
                 .build()
                 .getCsvReadAndSelectSql())
         .isEqualTo(
-            "select `col-1` as col_1,`col-2` as col_2 from csvread ('"
+            "select `col-1` as col_1,`col-2` as col_2 from csvread('"
                 + file.getAbsolutePath()
                 + "', 'col-1	col-2', stringdecode('charset=UTF-16 fieldDelimiter=null fieldSeparator=\\t'))");
   }
@@ -57,7 +57,7 @@ class SelectCsvReadSqlTest {
                 .build()
                 .getCsvReadAndInsertSql("test_table"))
         .isEqualTo(
-            "insert into test_table(ID,NAME) select ID,NAME from csvread ('"
+            "insert into test_table(ID,NAME) select ID,NAME from csvread('"
                 + file.getAbsolutePath()
                 + "', null, stringdecode('charset=UTF-8 fieldDelimiter=null fieldSeparator=,'))");
   }
@@ -73,7 +73,7 @@ class SelectCsvReadSqlTest {
             .getCsvReadAndSelectSql();
     assertThat(ret)
         .isEqualTo(
-            "select parsedatetime(delivery_date, 'y/MM/d') as DELIVERY_DATE,`price/prices` as PRICE from csvread ('"
+            "select parsedatetime(delivery_date, 'y/MM/d') as DELIVERY_DATE,`price/prices` as PRICE from csvread('"
                 + file.getAbsolutePath()
                 + "', null, stringdecode('charset=UTF-8 fieldDelimiter=null fieldSeparator=\\t'))");
   }

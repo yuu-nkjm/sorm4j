@@ -238,8 +238,8 @@ public class SelectCsvReadSql {
             : String.join(",", selectedColumns))
         + " from "
         + (csvColumns == null || csvColumns.size() == 0
-                ? CsvReadSql.builderForCsvWithHeader(csvFile)
-                : CsvReadSql.builderForCsvWithoutHeader(csvFile, csvColumns))
+                ? CsvRead.builderForCsvWithHeader(csvFile)
+                : CsvRead.builderForCsvWithoutHeader(csvFile, csvColumns))
             .charset(charset.toString())
             .fieldSeparator(fieldSeparator + "")
             .fieldDelimiter(fieldDelimiter + "")

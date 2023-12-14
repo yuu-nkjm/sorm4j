@@ -18,7 +18,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 
 class BasicH2TableTest {
 
@@ -57,7 +57,7 @@ class BasicH2TableTest {
     }
     BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
-    table.createTableIfNotExists(CsvReadSql.builderForCsvWithHeader(tmpCsv).build());
+    table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());
     OrmRecordExample ret = table.selectAll().get(0);
     assertThat(ret.id).isEqualTo(1);
     assertThat(ret.name).isEqualTo("Alice");

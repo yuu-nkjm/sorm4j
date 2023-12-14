@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvReadSql;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.util.table_def.annotation.Check;
 import org.nkjmlab.sorm4j.util.table_def.annotation.CheckConstraint;
@@ -64,7 +64,7 @@ class TableDefinitionTest {
         sorm.readList(
             RowMap.class,
             "select * from "
-                + CsvReadSql.builderForCsvWithHeader(
+                + CsvRead.builderForCsvWithHeader(
                         new File(TableDefinitionTest.class.getResource("test.csv").toURI()))
                     .build()
                     .getSql());

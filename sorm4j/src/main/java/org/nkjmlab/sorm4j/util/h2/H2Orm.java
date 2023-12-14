@@ -1,11 +1,13 @@
 package org.nkjmlab.sorm4j.util.h2;
 
+import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
+
 import java.io.File;
 
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.h2.internal.H2Keyword;
+import org.nkjmlab.sorm4j.util.h2.grammar.OtherGrammars;
 
 @Experimental
 public interface H2Orm {
@@ -30,7 +32,7 @@ public interface H2Orm {
                 "runscript",
                 "from",
                 wrapSingleQuote(srcFile.getAbsolutePath()),
-                H2Keyword.scriptCompressionEncryption(password)));
+                OtherGrammars.scriptCompressionEncryption(password)));
   }
 
   default void scriptTo(File destFile, boolean includeDrop) {
@@ -39,7 +41,7 @@ public interface H2Orm {
             String.join(
                 " ",
                 "script",
-                H2Keyword.drop(includeDrop),
+                OtherGrammars.drop(includeDrop),
                 "to",
                 wrapSingleQuote(destFile.getAbsolutePath())));
   }
@@ -50,13 +52,10 @@ public interface H2Orm {
             String.join(
                 " ",
                 "script",
-                H2Keyword.drop(includeDrop),
+                OtherGrammars.drop(includeDrop),
                 "to",
                 wrapSingleQuote(destFile.getAbsolutePath()),
-                H2Keyword.scriptCompressionEncryption(password)));
+                OtherGrammars.scriptCompressionEncryption(password)));
   }
 
-  private static String wrapSingleQuote(Object str) {
-    return str == null ? null : "'" + str + "'";
-  }
 }
