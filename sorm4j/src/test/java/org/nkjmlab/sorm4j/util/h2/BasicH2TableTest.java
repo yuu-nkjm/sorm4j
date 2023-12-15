@@ -5,12 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,8 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
-import org.nkjmlab.sorm4j.util.h2.sql.CsvColumn;
+import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
+import org.nkjmlab.sorm4j.util.table_def.BasicTable;
 
 class BasicH2TableTest {
 
@@ -58,9 +57,12 @@ class BasicH2TableTest {
       throw Try.rethrow(e);
     }
     BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    {
+      BasicTable<OrmRecordExample> t = new BasicTable<>(sorm, OrmRecordExample.class);
+    }
     table.dropTableIfExists();
-    table.createTableIfNotExists();
-    OrmRecordExample ret = table.readCsvWithHeader(tmpCsv).get(0);
+    table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());
+    OrmRecordExample ret = table.selectAll().get(0);
     assertThat(ret.id).isEqualTo(1);
     assertThat(ret.name).isEqualTo("Alice");
     table.insert(ret);
@@ -68,28 +70,9 @@ class BasicH2TableTest {
 
     table.writeCsv(tmpCsv);
 
-    int s = table.readCsvWithHeader(tmpCsv).size();
-    assertThat(s).isEqualTo(2);
     List<OrmRecordExample> rows = table.selectAll();
     table.deleteAll();
     table.insert(rows);
-  }
-
-  @Test
-  void test3() {
-    H2Table<Item> table = new BasicH2Table<>(SormTestUtils.createSormWithNewContext(), Item.class);
-    String ret =
-        table.getReadCsvWithHeaderSql(new File("file.csv"), StandardCharsets.UTF_8, '\t', '"');
-    System.out.println(ret);
-  }
-
-  @OrmRecord
-  public static class Item {
-    @CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
-    public LocalDate deliveryDate;
-
-    @CsvColumn("`price/prices`")
-    public int price;
   }
 
   @OrmRecord

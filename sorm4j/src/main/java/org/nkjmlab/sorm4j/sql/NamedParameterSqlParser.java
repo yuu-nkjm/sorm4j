@@ -8,13 +8,19 @@ import org.nkjmlab.sorm4j.internal.sql.NamedParameterSqlParserImpl;
 /**
  * SQL parser for named parameters.
  *
- * <p>Following characters could be used for named parameters.
+ * <p>Example.
  *
- * <pre>
- * <code>
- * ('a' &lt;= c &amp;&amp; c &lt;= 'z') || ('A' &lt;= c &amp;&amp; c &lt;= 'Z') || ('0' &lt;= c &amp;&amp; c &lt;= '9') || c == '_';
- * </code>
- * </pre>
+ * <pre><code>
+ * String sql = "select * from customer where id=:id and address=:address";
+ *
+ * ParameterizedSql statement =
+ *     NamedParameterSql.parse(sql, Map.of("id",1, "address","Kyoto"));
+ * // or
+ * ParameterizedSql statement1 =
+ *     NamedParameterSql.of(sql).bind("id", 1).bind("address", "Kyoto").parse();
+ *
+ * List<Customer> customers =  sorm.readList(Customer.class, statement);
+ * </code></pre>
  *
  * @author yuu_nkjm
  */

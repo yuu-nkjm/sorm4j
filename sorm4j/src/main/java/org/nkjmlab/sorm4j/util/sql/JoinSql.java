@@ -39,6 +39,11 @@ public class JoinSql {
       this(first.getTableMetaData());
     }
 
+    public Builder distinct() {
+      distinct = true;
+      return this;
+    }
+
     public JoinSql.Builder joinUsing(TableMetaData other, String... columnsForJoin) {
       return joinUsing("join", other, columnsForJoin);
     }
@@ -149,20 +154,20 @@ public class JoinSql {
 
     public String build() {
 
-      StringBuilder sql = new StringBuilder("select ");
+      StringBuilder sql = new StringBuilder("select");
       if (distinct) {
-        sql.append("distinct ");
+        sql.append(" distinct");
       }
-      sql.append(String.join(",", columns.stream().toArray(String[]::new)) + " ");
-      sql.append("from " + String.join(" ", froms) + " ");
+      sql.append(" " + String.join(",", columns.stream().toArray(String[]::new)));
+      sql.append(" from " + String.join(" ", froms));
       if (where != null) {
-        sql.append("where " + where + " ");
+        sql.append(" where " + where);
       }
       if (orderBy != null) {
-        sql.append("order by " + orderBy + " ");
+        sql.append(" order by " + orderBy);
       }
       if (limit != null) {
-        sql.append("limit " + limit);
+        sql.append(" limit " + limit);
       }
       return sql.toString();
     }

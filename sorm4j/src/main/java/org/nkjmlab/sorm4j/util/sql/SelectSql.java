@@ -547,21 +547,33 @@ public final class SelectSql {
         delimiter, Arrays.stream(elements).map(o -> o.toString()).toArray(String[]::new));
   }
 
-  public static String wrapParentheses(Object str) {
-    return "(" + str + ")";
-  }
-
-  public static String wrapSingleQuote(Object str) {
-    return "'" + str + "'";
-  }
-
   /**
-   * Wrap single space
+   * Wraps the given string in parentheses. If the argument is null, the method returns null.
    *
    * @param str
    * @return
    */
-  public static String wrapSpace(Object str) {
-    return " " + (str == null ? "null" : str.toString().trim()) + " ";
+  private static String wrapParentheses(Object str) {
+    return str == null ? null : "(" + str + ")";
+  }
+
+  /**
+   * Wraps the given string in single quotes. If the argument is null, the method returns null.
+   *
+   * @param str
+   * @return
+   */
+  private static String wrapSingleQuote(Object str) {
+    return str == null ? null : "'" + str + "'";
+  }
+
+  /**
+   * Wraps the given string in spaces. If the argument is null, the method returns null.
+   *
+   * @param str
+   * @return
+   */
+  private static String wrapSpace(Object str) {
+    return str == null ? null : " " + str.toString().trim() + " ";
   }
 }

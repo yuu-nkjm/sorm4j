@@ -127,6 +127,6 @@ public interface SqlKeyword {
   }
 
   private static String wrapSpace(String str) {
-    return " " + (str == null ? "null" : str.toString()) + " ";
+    return str == null ? null : " " + str + " ";
   }
 }

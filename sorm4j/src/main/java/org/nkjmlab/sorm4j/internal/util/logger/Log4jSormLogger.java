@@ -20,18 +20,26 @@ public final class Log4jSormLogger extends AbstractSormLogger implements SormLog
   }
 
   private final org.apache.logging.log4j.Logger logger;
+  private final ParameterizedStringFormatter logMessageFormatter;
 
   public static SormLogger getLogger() {
+    return getLogger(ParameterizedStringFormatter.LENGTH_512);
+  }
+
+  public static SormLogger getLogger(ParameterizedStringFormatter logMessageFormatter) {
     if (!enableLogger) {
       System.err.println(
           "sorm4j: [org.apache.logging.log4j.Logger] is not found at the classpath."
               + "If you want to use Log4j2, you should add Log4j2 logger at the classpath.");
     }
-    return new Log4jSormLogger(org.apache.logging.log4j.LogManager.getLogger());
+    return new Log4jSormLogger(
+        org.apache.logging.log4j.LogManager.getLogger(), logMessageFormatter);
   }
 
-  Log4jSormLogger(org.apache.logging.log4j.Logger logger) {
+  private Log4jSormLogger(
+      org.apache.logging.log4j.Logger logger, ParameterizedStringFormatter logMessageFormatter) {
     this.logger = logger;
+    this.logMessageFormatter = logMessageFormatter;
   }
 
   @Override
@@ -47,9 +55,10 @@ public final class Log4jSormLogger extends AbstractSormLogger implements SormLog
   private void printf(int depth, Level level, String format, Object... params) {
     this.logger.printf(
         level,
-        "%n  "
+        System.lineSeparator()
+            + "  "
             + MethodInvokerInfoUtils.getInvokerInfo(depth, new Throwable().getStackTrace())
-            + ParameterizedStringFormatter.LENGTH_256.format(format, params));
+            + logMessageFormatter.format(format, params));
   }
 
   @Override

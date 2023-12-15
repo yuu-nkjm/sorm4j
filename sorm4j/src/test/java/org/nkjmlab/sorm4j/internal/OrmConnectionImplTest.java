@@ -1,16 +1,28 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static java.sql.Connection.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
@@ -18,6 +30,7 @@ import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -28,16 +41,50 @@ import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.command.Command;
 
 class OrmConnectionImplTest {
-  private Sorm sorm;
+  private Sorm orm;
+  static final org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
 
   @BeforeEach
-  void setUp() {
-    sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+  void setUp() throws SQLException {
+    orm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+  }
+
+  @Test
+  public void testCloseWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    doThrow(SQLException.class).when(mockConnection).close();
+    OrmConnection.of(mockConnection).close();
+  }
+
+  @Test
+  public void testCommitWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    doThrow(SQLException.class).when(mockConnection).commit();
+    assertThrows(SQLException.class, () -> OrmConnection.of(mockConnection).commit());
+  }
+
+  @Test
+  public void testExecuteWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    String sql = "SELECT * FROM table";
+    when(mockConnection.prepareStatement(sql)).thenThrow(SQLException.class);
+    assertThrows(SQLException.class, () -> OrmConnection.of(mockConnection).execute(sql));
+  }
+
+  @Test
+  public void testExecuteUpdateWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    String sql = "UPDATE table SET column = ?";
+    when(mockConnection.prepareStatement(sql)).thenThrow(SQLException.class);
+
+    assertThrows(
+        SQLException.class, () -> OrmConnection.of(mockConnection).executeUpdate(sql, "value"));
   }
 
   @Test
   void testDelete() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         conn -> {
           conn.insert(PLAYER_ALICE);
           assertThat(conn.exists(PLAYER_ALICE)).isTrue();
@@ -50,20 +97,20 @@ class OrmConnectionImplTest {
 
   @Test
   void testJoin() {
-    sorm.insert(GUEST_ALICE, GUEST_BOB);
-    sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.insert(SormTestUtils.SOCCER);
-    sorm.insert(SormTestUtils.TENNIS);
+    orm.insert(GUEST_ALICE, GUEST_BOB);
+    orm.insert(PLAYER_ALICE, PLAYER_BOB);
+    orm.insert(SormTestUtils.SOCCER);
+    orm.insert(SormTestUtils.TENNIS);
 
     List<Tuple2<Guest, Player>> result =
-        sorm.joinOn(Guest.class, Player.class, "guests.id=players.id");
+        orm.joinOn(Guest.class, Player.class, "guests.id=players.id");
 
     assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
     assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result.get(0).toString()).contains("Alice");
 
     List<Tuple3<Guest, Player, Sport>> result1 =
-        sorm.joinOn(
+        orm.joinOn(
             Guest.class, Player.class, Sport.class, "guests.id=players.id", "players.id=sports.id");
 
     assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
@@ -77,7 +124,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testTupleList() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.insert(GUEST_ALICE, GUEST_BOB);
           m.insert(PLAYER_ALICE, PLAYER_BOB);
@@ -119,7 +166,7 @@ class OrmConnectionImplTest {
   @Test
   void testNamedRequest1() {
     int row =
-        sorm.applyHandler(
+        orm.applyHandler(
             conn ->
                 Command.create(conn, "insert into players values(:id, :name, :address)")
                     .bindBean(new Player(1, "Frank", "Tokyo"))
@@ -132,7 +179,7 @@ class OrmConnectionImplTest {
     AtomicInteger id = new AtomicInteger(10);
 
     int row =
-        sorm.applyHandler(
+        orm.applyHandler(
             conn ->
                 Command.create(conn, "insert into players values(:id, :name, :address)")
                     .bindAll(
@@ -141,7 +188,7 @@ class OrmConnectionImplTest {
     assertThat(row).isEqualTo(1);
 
     row =
-        sorm.applyHandler(
+        orm.applyHandler(
             conn ->
                 Command.create(conn, "insert into players values(:id, :name, :address)")
                     .bind("id", id.incrementAndGet())
@@ -151,7 +198,7 @@ class OrmConnectionImplTest {
     assertThat(row).isEqualTo(1);
 
     row =
-        sorm.applyHandler(
+        orm.applyHandler(
             conn -> {
               NamedParameterSqlParser sql =
                   NamedParameterSqlParser.of(
@@ -165,7 +212,7 @@ class OrmConnectionImplTest {
     assertThat(row).isEqualTo(1);
 
     var ret =
-        sorm.applyHandler(
+        orm.applyHandler(
             conn ->
                 Command.create(conn, "select * from players where id=:id")
                     .bind("id", id.get())
@@ -176,7 +223,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testClose() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.close();
           try {
@@ -189,7 +236,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testCommint() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         TRANSACTION_READ_COMMITTED,
         m -> {
           m.insert(PLAYER_ALICE);
@@ -197,14 +244,14 @@ class OrmConnectionImplTest {
           assertThat(p.getName()).isEqualTo(PLAYER_ALICE.getName());
           // auto roll-back;
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         TRANSACTION_READ_COMMITTED,
         m -> {
           m.insert(PLAYER_ALICE);
           m.commit();
           m.close();
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player p = m.readOne(Player.class, "SELECT * FROM PLAYERS");
           assertThat(p.getName()).isEqualTo(PLAYER_ALICE.getName());
@@ -213,7 +260,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testDeleteOnStringT() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
@@ -228,7 +275,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testDeleteT() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
@@ -250,18 +297,18 @@ class OrmConnectionImplTest {
   @Test
   void testInsertAndGetOnStringT() {
     Guest a = GUEST_ALICE;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGet(new Guest[] {});
           assertThat(g.countRowsModified()).isEqualTo(0);
         });
 
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGet(a);
           assertThat(g.getGeneratedKeys().get("id")).isEqualTo(1);
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGetIn("players1", a);
           assertThat(g.getGeneratedKeys().get("id")).isNull();
@@ -271,18 +318,18 @@ class OrmConnectionImplTest {
   @Test
   void testInsertAndGetOnList() {
     Guest a = GUEST_ALICE;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGetIn("players1", List.of());
           assertThat(g.toString()).contains("InsertResult");
           assertThat(g.countRowsModified()).isEqualTo(0);
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGet(List.of(a));
           assertThat(g.getGeneratedKeys().get("id")).isEqualTo(1);
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGetIn("guests", List.of(GUEST_BOB));
           assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
@@ -293,7 +340,7 @@ class OrmConnectionImplTest {
   void testInsertAndGetOnStringT0() {
     Guest a = GUEST_ALICE;
     Guest b = GUEST_BOB;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGet(a, b);
           assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
@@ -304,7 +351,7 @@ class OrmConnectionImplTest {
   void testInsertAndGetOnStringT1() {
     Guest a = GUEST_ALICE;
     Guest b = GUEST_BOB;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           InsertResult g = m.insertAndGetIn("guests", a, b);
           assertThat(g.getGeneratedKeys().get("id")).isEqualTo(2);
@@ -313,7 +360,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testInsertAndRead() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Guest a = GUEST_ALICE;
           m.insert(a);
@@ -327,7 +374,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testInsertOnStringT() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
@@ -336,7 +383,7 @@ class OrmConnectionImplTest {
           m.deleteAllIn("players1");
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
         });
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
@@ -349,7 +396,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testExec() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.insert(PLAYER_ALICE);
           assertThat(m.executeUpdate("delete from players")).isEqualTo(1);
@@ -363,7 +410,7 @@ class OrmConnectionImplTest {
   @Test
   void testMergeError() {
     try {
-      sorm.acceptHandler(
+      orm.acceptHandler(
           m -> {
             Guest a = GUEST_ALICE;
             m.merge(a);
@@ -375,23 +422,23 @@ class OrmConnectionImplTest {
 
   @Test
   void testmergeInT() {
-    sorm.mergeIn("players1", new Player[] {});
-    sorm.merge(new Player[] {});
+    orm.mergeIn("players1", new Player[] {});
+    orm.merge(new Player[] {});
 
     Player a = PLAYER_ALICE;
     Player b = PLAYER_BOB;
-    sorm.mergeIn("players1", a);
-    sorm.mergeIn("players1", a, b);
-    assertThat(sorm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
+    orm.mergeIn("players1", a);
+    orm.mergeIn("players1", a, b);
+    assertThat(orm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
 
-    sorm.mergeIn("players1", List.of(a, b));
-    assertThat(sorm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
+    orm.mergeIn("players1", List.of(a, b));
+    assertThat(orm.readList(Player.class, "select * from players1").size()).isEqualTo(2);
   }
 
   @Test
   void testMergesError() {
     try {
-      sorm.acceptHandler(
+      orm.acceptHandler(
           m -> {
             Guest a = GUEST_ALICE;
             Guest b = GUEST_BOB;
@@ -406,13 +453,13 @@ class OrmConnectionImplTest {
   void testMergeT() {
     Player a = PLAYER_ALICE;
     Player b = PLAYER_BOB;
-    sorm.merge(a);
-    sorm.merge(a, b);
-    sorm.merge(List.of(a, b));
+    orm.merge(a);
+    orm.merge(a, b);
+    orm.merge(List.of(a, b));
     Player c = new Player(a.getId(), "UPDATED", "UPDATED");
-    sorm.merge(c, b);
-    assertThat(sorm.selectAll(Player.class).size()).isEqualTo(2);
-    assertThat(sorm.selectByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
+    orm.merge(c, b);
+    assertThat(orm.selectAll(Player.class).size()).isEqualTo(2);
+    assertThat(orm.selectByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("UPDATED");
   }
 
   @Test
@@ -420,7 +467,7 @@ class OrmConnectionImplTest {
     Player a = PLAYER_ALICE;
     Player b = PLAYER_BOB;
 
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.insert(a, b);
 
@@ -449,7 +496,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testReadByPrimaryKey() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Guest a = GUEST_ALICE;
           m.insert(a);
@@ -461,7 +508,7 @@ class OrmConnectionImplTest {
 
   @Test
   void testReadList() {
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
@@ -481,7 +528,7 @@ class OrmConnectionImplTest {
   @Test
   void testReadOne() {
     try {
-      sorm.acceptHandler(
+      orm.acceptHandler(
           m -> {
             Guest a = GUEST_ALICE;
             Guest b = GUEST_BOB;
@@ -504,14 +551,14 @@ class OrmConnectionImplTest {
   @Test
   void testTransaction() {
     Guest a = GUEST_ALICE;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         TRANSACTION_READ_COMMITTED,
         m -> {
           m.insert(a);
           m.rollback();
         });
 
-    sorm.acceptHandler(
+    orm.acceptHandler(
         TRANSACTION_READ_COMMITTED,
         m -> {
           m.insert(a);
@@ -524,21 +571,20 @@ class OrmConnectionImplTest {
 
   @Test
   void testTransactionLevel() {
-    Sorm orm = Sorm.create(sorm.getDataSource(), SormContext.builder().build());
-
-    orm.acceptHandler(
-        Connection.TRANSACTION_SERIALIZABLE,
-        m -> {
-          assertThat(m.getJdbcConnection().getTransactionIsolation())
-              .isEqualTo(Connection.TRANSACTION_SERIALIZABLE);
-        });
+    Sorm.create(orm.getDataSource(), SormContext.builder().build())
+        .acceptHandler(
+            Connection.TRANSACTION_SERIALIZABLE,
+            m -> {
+              assertThat(m.getJdbcConnection().getTransactionIsolation())
+                  .isEqualTo(Connection.TRANSACTION_SERIALIZABLE);
+            });
   }
 
   @Test
   void testUpdateOnT() {
     Player a = PLAYER_ALICE;
     Player b = PLAYER_ALICE;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.insert(a);
           m.updateIn("players", new Player(a.getId(), "UPDATED", "UPDATED"));
@@ -555,6 +601,9 @@ class OrmConnectionImplTest {
           assertThat(p.readAddress()).isEqualTo("UPDATED");
           p = m.selectByPrimaryKey(Player.class, b.getId());
           assertThat(p.readAddress()).isEqualTo("UPDATED");
+          m.updateByPrimaryKey(Player.class, RowMap.of("address", "upup"), a.getId());
+          assertThat(m.selectByPrimaryKey(Player.class, a.getId()).readAddress()).isEqualTo("upup");
+          assertThat(m.exists(p)).isTrue();
         });
   }
 
@@ -562,7 +611,7 @@ class OrmConnectionImplTest {
   void testUpdateT() {
     Player a = PLAYER_ALICE;
     Player b = PLAYER_ALICE;
-    sorm.acceptHandler(
+    orm.acceptHandler(
         m -> {
           m.insert(a);
           m.update(new Player(a.getId(), "UPDATED", "UPDATED"));

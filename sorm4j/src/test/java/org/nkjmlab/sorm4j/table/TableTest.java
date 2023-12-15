@@ -1,6 +1,12 @@
 package org.nkjmlab.sorm4j.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
@@ -16,7 +22,10 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -49,6 +58,14 @@ class TableTest {
     SimpleTable<Guest> gt = new SimpleTable<>(sorm, Guest.class);
     assertThat(gt.getTableName()).isEqualTo("GUESTS");
     assertThat(gt.getValueType()).isEqualTo(Guest.class);
+  }
+
+  @Test
+  void testTableCon() {
+    try (OrmConnection con = playersTable.getOrm().open()) {
+      TableConnection<Player> c = TableConnection.of(con, Player.class);
+      c.count();
+    }
   }
 
   @Test
@@ -336,5 +353,42 @@ class TableTest {
         playersTable.stream(ParameterizedSql.of("select * from players"))
             .apply(stream -> stream.collect(Collectors.toList()));
     assertThat(ret1.size()).isEqualTo(1);
+  }
+
+  @Test
+  void testCreate() {
+    Sorm mockSorm = mock(Sorm.class);
+    Class<?> valueType = Player.class;
+
+    Table<?> table = Table.create(mockSorm, valueType);
+
+    assertNotNull(table);
+    assertTrue(table instanceof Table);
+  }
+
+  @Test
+  void testOpen() {
+    Sorm mockSorm = mock(Sorm.class);
+    OrmConnection mockOrmConnection = mock(OrmConnection.class);
+    when(mockSorm.open()).thenReturn(mockOrmConnection);
+
+    Table<?> table = Table.create(mockSorm, Player.class);
+    TableConnection<?> tableConnection = table.open();
+
+    assertNotNull(tableConnection);
+    assertTrue(tableConnection instanceof TableConnection);
+  }
+
+  @Test
+  void testAcceptHandler() {
+    @SuppressWarnings("unchecked")
+    ConsumerHandler<TableConnection<Player>> handler = mock(ConsumerHandler.class);
+    assertDoesNotThrow(() -> playersTable.acceptHandler(handler));
+  }
+
+  @Test
+  void testApplyHandler() {
+    FunctionHandler<TableConnection<Player>, String> handler = conn -> "result";
+    assertEquals("result", playersTable.applyHandler(handler));
   }
 }
