@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.h2.server;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+
 import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
 import org.nkjmlab.sorm4j.annotation.Experimental;
