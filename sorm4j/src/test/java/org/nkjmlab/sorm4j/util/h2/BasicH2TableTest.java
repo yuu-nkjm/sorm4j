@@ -58,7 +58,7 @@ class BasicH2TableTest {
     }
     BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
     {
-      BasicTable<OrmRecordExample> t = new BasicTable<>(sorm, OrmRecordExample.class);
+      new BasicTable<>(sorm, OrmRecordExample.class);
     }
     table.dropTableIfExists();
     table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());
