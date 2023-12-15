@@ -31,7 +31,7 @@ public class SelectCsvReadSql {
     this.sql = sql;
   }
 
-  public List<String> getTableColumns() {
+  public List<String> getSelectColumns() {
     return tableColumns;
   }
 
@@ -94,7 +94,7 @@ public class SelectCsvReadSql {
                   : String.join(",", selectedColumns))
               + " from "
               + csvRead.getSql(),
-          tableColumns);
+          selectedColumns);
     }
 
     public Builder mapCsvColumnToTableColumn(String expression, String column) {
@@ -131,7 +131,10 @@ public class SelectCsvReadSql {
 
       Field[] fields =
           Stream.of(valueType.getDeclaredFields())
-              .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+              .filter(
+                  f ->
+                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
+                          && !f.getName().startsWith(("this$")))
               .toArray(Field[]::new);
 
       List<Field> csvSkipColumns = new ArrayList<>();

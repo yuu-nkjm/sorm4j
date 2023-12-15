@@ -40,7 +40,7 @@ public class InsertSelectCsvReadSql {
           "insert into "
               + tableName
               + "("
-              + String.join(",", selectCsvRead.getTableColumns())
+              + String.join(",", selectCsvRead.getSelectColumns())
               + ") "
               + selectCsvRead.getSql());
     }
