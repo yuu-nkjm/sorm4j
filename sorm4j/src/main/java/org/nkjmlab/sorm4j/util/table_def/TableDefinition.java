@@ -139,7 +139,10 @@ public final class TableDefinition {
     try {
       Class<?>[] componentTypes =
           Arrays.stream(recordClass.getDeclaredFields())
-              .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+              .filter(
+                  f ->
+                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
+                          && !f.getName().startsWith(("this$")))
               .map(f -> f.getType())
               .toArray(Class[]::new);
       return Optional.of(recordClass.getDeclaredConstructor(componentTypes));

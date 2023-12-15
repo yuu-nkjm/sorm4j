@@ -71,7 +71,10 @@ public final class SqlResultToColumnsMapping<T> {
         () ->
             objectClass.getConstructor(
                 Arrays.stream(objectClass.getDeclaredFields())
-                    .filter(f -> !java.lang.reflect.Modifier.isStatic(f.getModifiers()))
+                    .filter(
+                        f ->
+                            !java.lang.reflect.Modifier.isStatic(f.getModifiers())
+                                && !f.getName().startsWith(("this$")))
                     .map(f -> f.getType())
                     .toArray(Class[]::new)),
         e ->
