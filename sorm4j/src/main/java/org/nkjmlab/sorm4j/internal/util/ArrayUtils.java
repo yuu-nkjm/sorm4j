@@ -199,6 +199,9 @@ public final class ArrayUtils {
 
   public static Object[] convertToObjectArray(Object srcArray) {
     Class<?> componentType = srcArray.getClass().getComponentType();
+    if (componentType == null) {
+      throw new IllegalArgumentException("the argument could not be convert to an object array.");
+    }
     if (!componentType.isArray()) {
       switch (srcArray.getClass().getComponentType().toString()) {
         case "boolean":

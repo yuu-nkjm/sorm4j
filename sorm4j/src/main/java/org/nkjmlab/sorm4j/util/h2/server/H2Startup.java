@@ -28,6 +28,6 @@ public class H2Startup {
   }
 
   public static boolean startDefaultWebConsole() {
-    return startConsole("-web", "-browser", "-tool");
+    return startConsole("-web", "-tool");
   }
 }
