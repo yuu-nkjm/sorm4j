@@ -1,16 +1,28 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static java.sql.Connection.*;
-import static org.assertj.core.api.Assertions.*;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
@@ -29,10 +41,44 @@ import org.nkjmlab.sorm4j.util.command.Command;
 
 class OrmConnectionImplTest {
   private Sorm sorm;
+  static final org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws SQLException {
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+  }
+
+  @Test
+  public void testCloseWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    doThrow(SQLException.class).when(mockConnection).close();
+    OrmConnection.of(mockConnection).close();
+  }
+
+  @Test
+  public void testCommitWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    doThrow(SQLException.class).when(mockConnection).commit();
+    assertThrows(SQLException.class, () -> OrmConnection.of(mockConnection).commit());
+  }
+
+  @Test
+  public void testExecuteWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    String sql = "SELECT * FROM table";
+    when(mockConnection.prepareStatement(sql)).thenThrow(SQLException.class);
+    assertThrows(SQLException.class, () -> OrmConnection.of(mockConnection).execute(sql));
+  }
+
+  @Test
+  public void testExecuteUpdateWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    String sql = "UPDATE table SET column = ?";
+    when(mockConnection.prepareStatement(sql)).thenThrow(SQLException.class);
+
+    assertThrows(
+        SQLException.class, () -> OrmConnection.of(mockConnection).executeUpdate(sql, "value"));
   }
 
   @Test
