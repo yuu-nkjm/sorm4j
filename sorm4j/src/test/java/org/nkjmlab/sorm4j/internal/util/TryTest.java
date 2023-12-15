@@ -390,4 +390,264 @@ class TryTest {
         NullPointerException.class, () -> Try.runOrElseThrow(null, e -> Try.rethrow(e)));
     Try.runOrElseThrow(() -> {}, e -> Try.rethrow(e));
   }
+
+  @Test
+  void test1CreateBiConsumer() {
+
+    Try.createBiConsumer((t, s) -> {}, e -> {}).accept("test", "test");
+
+    assertDoesNotThrow(
+        () ->
+            Try.createBiConsumer(
+                    (t, s) -> {
+                      throw new RuntimeException();
+                    },
+                    e -> {})
+                .accept("test", "test"));
+  }
+
+  @Test
+  void test1CreateBiConsumerWithThrow() {
+
+    Try.createBiConsumerWithThrow((t, s) -> {}, e -> new RuntimeException()).accept("test", "test");
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.createBiConsumerWithThrow(
+                    (t, s) -> {
+                      throw new RuntimeException();
+                    },
+                    e -> new RuntimeException())
+                .accept("test", "test"));
+  }
+
+  @Test
+  void test1CreateConsumer() {
+
+    Try.createConsumer(t -> {}, e -> {}).accept("test");
+
+    assertDoesNotThrow(
+        () ->
+            Try.createConsumer(
+                    t -> {
+                      throw new RuntimeException();
+                    },
+                    e -> {})
+                .accept("test"));
+  }
+
+  @Test
+  void test1CreateConsumerWithThrow() {
+
+    Try.createConsumerWithThrow(t -> {}, e -> new RuntimeException()).accept("test");
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.createConsumerWithThrow(
+                    t -> {
+                      throw new RuntimeException();
+                    },
+                    e -> new RuntimeException())
+                .accept("test"));
+  }
+
+  @Test
+  void test1CreateFunction() {
+
+    assertEquals("test", Try.createFunction(t -> "test", e -> "error").apply("test"));
+
+    assertEquals(
+        "error",
+        Try.createFunction(
+                t -> {
+                  throw new RuntimeException();
+                },
+                e -> "error")
+            .apply("test"));
+  }
+
+  @Test
+  void test1CreateFunctionWithThrow() {
+
+    assertEquals(
+        "test",
+        Try.createFunctionWithThrow(t -> "test", e -> new RuntimeException()).apply("test"));
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.createFunctionWithThrow(
+                    t -> {
+                      throw new RuntimeException();
+                    },
+                    e -> new RuntimeException())
+                .apply("test"));
+  }
+
+  @Test
+  void test1CreateRunnable() {
+
+    Try.createRunnable(() -> {}, e -> {}).run();
+
+    assertDoesNotThrow(
+        () ->
+            Try.createRunnable(
+                    () -> {
+                      throw new RuntimeException();
+                    },
+                    e -> {})
+                .run());
+  }
+
+  @Test
+  void test1CreateRunnableWithThrow() {
+
+    Try.createRunnableWithThrow(() -> {}, e -> new RuntimeException()).run();
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.createRunnableWithThrow(
+                    () -> {
+                      throw new RuntimeException();
+                    },
+                    e -> new RuntimeException())
+                .run());
+  }
+
+  @Test
+  void test1CreateSupplier() {
+
+    assertEquals("test", Try.createSupplier(() -> "test", e -> "error").get());
+
+    assertEquals(
+        "error",
+        Try.createSupplier(
+                () -> {
+                  throw new RuntimeException();
+                },
+                e -> "error")
+            .get());
+  }
+
+  @Test
+  void test1CreateSupplierWithThrow() {
+
+    assertEquals(
+        "test", Try.createSupplierWithThrow(() -> "test", e -> new RuntimeException()).get());
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.createSupplierWithThrow(
+                    () -> {
+                      throw new RuntimeException();
+                    },
+                    e -> new RuntimeException())
+                .get());
+  }
+
+  @Test
+  void test1OrElse() {
+
+    assertEquals("test", Try.getOrElse(() -> "test", "other"));
+
+    assertEquals(
+        "other",
+        Try.getOrElse(
+            () -> {
+              throw new RuntimeException();
+            },
+            "other"));
+  }
+
+  @Test
+  void test1OrElseGet() {
+
+    assertEquals("test", Try.getOrElseGet(() -> "test", e -> "error"));
+
+    assertEquals(
+        "error",
+        Try.getOrElseGet(
+            () -> {
+              throw new RuntimeException();
+            },
+            e -> "error"));
+  }
+
+  @Test
+  void test1OrElseThrow() {
+
+    assertEquals("test", Try.getOrElseThrow(() -> "test", e -> new RuntimeException()));
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.getOrElseThrow(
+                () -> {
+                  throw new RuntimeException();
+                },
+                e -> new RuntimeException()));
+  }
+
+  @Test
+  void test1OrElseNull() {
+
+    assertEquals("test", Try.getOrElseNull(() -> "test"));
+
+    assertNull(
+        Try.getOrElseNull(
+            () -> {
+              throw new RuntimeException();
+            }));
+  }
+
+  @Test
+  void test1Rethrow() {
+
+    RuntimeException exception = new RuntimeException("test");
+    assertThrows(RuntimeException.class, () -> Try.rethrow(exception));
+  }
+
+  @Test
+  void test1RunOrElseDo() {
+    Try.runOrElseDo(() -> {}, e -> {});
+
+    assertDoesNotThrow(
+        () ->
+            Try.runOrElseDo(
+                () -> {
+                  throw new RuntimeException();
+                },
+                e -> {}));
+  }
+
+  @Test
+  void test1RunOrElseThrow() {
+
+    assertDoesNotThrow(() -> Try.runOrElseThrow(() -> {}, e -> new RuntimeException()));
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.runOrElseThrow(
+                () -> {
+                  throw new RuntimeException();
+                },
+                e -> new RuntimeException()));
+  }
+
+  @Test
+  void test1RunOrElseRethrow() {
+
+    assertThrows(
+        RuntimeException.class,
+        () ->
+            Try.runOrElseRethrow(
+                () -> {
+                  throw new RuntimeException();
+                }));
+  }
 }

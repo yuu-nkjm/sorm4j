@@ -1,11 +1,19 @@
 package org.nkjmlab.sorm4j.result;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 class RowMapTest {
@@ -69,4 +77,65 @@ class RowMapTest {
     rm.put("by", by);
     assertThat(rm.getString("by").equals("aaa")).isTrue();
   }
+
+  @Test
+  void testFromRecord() {
+    TestRecord record = new TestRecord(LocalDate.now(), LocalDateTime.now(), LocalTime.now());
+    RowMap rowMap = RowMap.fromRecord(record);
+    assertEquals(record.date(), rowMap.getLocalDate("date"));
+    assertEquals(record.dateTime(), rowMap.getLocalDateTime("dateTime"));
+    assertEquals(record.time(), rowMap.getLocalTime("time"));
+  }
+
+  @Test
+  void testToRecord() {
+    RowMap rowMap =
+        RowMap.of(
+            "date", LocalDate.now(),
+            "dateTime", LocalDateTime.now(),
+            "time", LocalTime.now());
+
+    TestRecord record = rowMap.toRecord(TestRecord.class);
+
+    assertEquals(rowMap.getLocalDate("date"), record.date());
+    assertEquals(rowMap.getLocalDateTime("dateTime"), record.dateTime());
+    assertEquals(rowMap.getLocalTime("time"), record.time());
+  }
+
+  @Test
+  void testFromRecordWithException() {
+    TestRecord mockRecord = mock(TestRecord.class);
+    when(mockRecord.date()).thenThrow(new RuntimeException("Test exception"));
+    assertThrows(InvocationTargetException.class, () -> RowMap.fromRecord(mockRecord));
+  }
+
+  @Test
+  void testOfMethod() {
+    RowMap rowMap =
+        RowMap.of("key1", "value1", "key2", 2, "key3", 3.0, "key4", true, "key5", "value5");
+
+    assertEquals("value1", rowMap.getString("key1"));
+    assertEquals(2, rowMap.getInteger("key2"));
+    assertEquals(3.0, rowMap.getDouble("key3"));
+    assertEquals(true, rowMap.get("key4"));
+    assertEquals("value5", rowMap.getString("key5"));
+
+    assertEquals(5, rowMap.size());
+  }
+
+  @Test
+  void testToRecord1() {
+    LocalDate date = LocalDate.now();
+    RowMap rowMap =
+        RowMap.of("date", date, "dateTime", LocalDateTime.now(), "time", LocalTime.now());
+    assertThat(rowMap.toRecord(TestRecord.class).date()).isEqualTo(date);
+  }
+
+  @Test
+  void testToRecordWithException() {
+    RowMap rowMap = RowMap.of("date", "b");
+    assertThrows(RuntimeException.class, () -> rowMap.toRecord(TestRecord.class));
+  }
+
+  record TestRecord(LocalDate date, LocalDateTime dateTime, LocalTime time) {}
 }

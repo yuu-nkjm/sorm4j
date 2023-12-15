@@ -107,7 +107,7 @@ public interface RowMap extends Map<String, Object> {
    * @return
    */
   @Experimental
-  public static <T extends Record> RowMap fromRecord(T src) {
+  static <T extends Record> RowMap fromRecord(T src) {
     try {
       RecordComponent[] recordComponents = src.getClass().getRecordComponents();
       BasicRowMap destMap = new BasicRowMap();
@@ -133,19 +133,19 @@ public interface RowMap extends Map<String, Object> {
    * </pre>
    *
    * @param <T>
-   * @param <S>
+   * @param src
    * @param toType
    * @return
    */
   @Experimental
-  default <T extends Record> T toRecord(Class<T> toType) {
+  static <T extends Record> T toRecord(RowMap src, Class<T> toType) {
     try {
       RecordComponent[] recordComponents = toType.getRecordComponents();
       Class<?>[] types = new Class<?>[recordComponents.length];
       Object[] args = new Object[recordComponents.length];
       for (int i = 0; i < recordComponents.length; i++) {
         types[i] = recordComponents[i].getType();
-        args[i] = get(StringCache.toCanonicalCase(recordComponents[i].getName()));
+        args[i] = src.get(StringCache.toCanonicalCase(recordComponents[i].getName()));
       }
       return toType.getDeclaredConstructor(types).newInstance(args);
     } catch (InstantiationException
@@ -156,5 +156,22 @@ public interface RowMap extends Map<String, Object> {
         | SecurityException e) {
       throw Try.rethrow(e);
     }
+  }
+  /**
+   * The object is converted to a record object.
+   *
+   * <pre>
+   * A key of the map is included in the record components. =>  the record component set the value.
+   * A key of the map is not included in the record components. => the entry of the map is ignore.
+   * A record component does not exists in the key set of the map => the record component set as null. if the component is primitive type, an exception is thrown.
+   * </pre>
+   *
+   * @param <T>
+   * @param toType
+   * @return
+   */
+  @Experimental
+  default <T extends Record> T toRecord(Class<T> toType) {
+    return toRecord(this, toType);
   }
 }
