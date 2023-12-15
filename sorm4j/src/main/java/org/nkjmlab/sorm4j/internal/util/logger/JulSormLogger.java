@@ -11,7 +11,7 @@ public final class JulSormLogger extends AbstractSormLogger implements SormLogge
   private final java.util.logging.Logger logger;
   private static java.util.logging.Logger defaultLogger = getDefaultLogger();
 
-  public JulSormLogger(java.util.logging.Logger logger) {
+  private JulSormLogger(java.util.logging.Logger logger) {
     this.logger = logger;
   }
 

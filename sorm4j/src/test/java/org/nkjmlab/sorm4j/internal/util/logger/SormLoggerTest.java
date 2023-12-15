@@ -124,15 +124,13 @@ class SormLoggerTest {
 
   @Test
   void testLog4jSormLoggerOut() throws IOException {
-    SormLogger logger = new Log4jSormLogger(org.apache.logging.log4j.LogManager.getLogger());
+    SormLogger logger = Log4jSormLogger.getLogger();
     outTestHelper(logger);
   }
 
   @Test
   void testSlf4jSormLoggerOut() throws IOException {
-
-    SormLogger logger =
-        new Slf4jSormLogger(org.slf4j.LoggerFactory.getLogger(SormLoggerTest.class));
+    SormLogger logger = Slf4jSormLogger.getLogger();
     outTestHelper(logger);
   }
 

@@ -20,7 +20,7 @@ public final class Slf4jSormLogger extends AbstractSormLogger implements SormLog
 
   private final org.slf4j.Logger logger;
 
-  Slf4jSormLogger(org.slf4j.Logger logger) {
+  private Slf4jSormLogger(org.slf4j.Logger logger) {
     this.logger = logger;
   }
 
