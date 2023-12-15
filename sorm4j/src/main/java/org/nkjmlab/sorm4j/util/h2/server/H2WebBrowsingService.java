@@ -60,15 +60,4 @@ public class H2WebBrowsingService {
       log.error("{}", e.getMessage());
     }
   }
-
-  /**
-   * Open a new browser tab or window.
-   *
-   * @param dataSource
-   * @return
-   * @see #startTemporalWebConsoleServer(boolean)
-   */
-  public void open(DataSource dataSource) {
-    Try.runOrElseThrow(() -> open(dataSource.getConnection()), Try::rethrow);
-  }
 }

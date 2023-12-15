@@ -40,7 +40,7 @@ public final class SormContextImpl implements SormContext {
   private final ConcurrentMap<Class<?>, SqlResultToColumnsMapping<?>> sqlResultToColumnsMappings;
   private final SormConfig config;
 
-  private SormContextImpl(SormConfig sormConfig) {
+  SormContextImpl(SormConfig sormConfig) {
     this.config = sormConfig;
     this.tableMetaDataMap = new ConcurrentHashMap<>();
     this.tableSqlMap = new ConcurrentHashMap<>();
