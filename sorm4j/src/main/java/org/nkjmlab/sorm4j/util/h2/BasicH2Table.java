@@ -37,6 +37,15 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
     return this;
   }
 
+  public BasicH2Table<T> createTableIfNotExists(CsvRead csvRead) {
+    getOrm()
+        .execute(
+            getTableDefinition().getCreateTableIfNotExistsStatement()
+                + " as select * from "
+                + csvRead);
+    return this;
+  }
+
   @Experimental
   @Override
   public BasicH2Table<T> createIndexesIfNotExists() {
@@ -56,13 +65,5 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
   public BasicH2Table<T> dropTableIfExistsCascade() {
     super.dropTableIfExistsCascade();
     return this;
-  }
-
-  public void createTableIfNotExists(CsvRead csvRead) {
-    getOrm()
-        .execute(
-            getTableDefinition().getCreateTableIfNotExistsStatement()
-                + " as select * from "
-                + csvRead);
   }
 }
