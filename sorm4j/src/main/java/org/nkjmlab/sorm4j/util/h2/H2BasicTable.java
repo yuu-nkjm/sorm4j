@@ -3,11 +3,11 @@ package org.nkjmlab.sorm4j.util.h2;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.table_def.BasicTable;
+import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 @Experimental
-public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
+public class H2BasicTable<T> extends SimpleTableWithDefinition<T> implements H2Table<T> {
 
   /**
    * This table instance is bind to the table name defined in the given {@link TableDefinition}.
@@ -16,7 +16,7 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
    * @param valueType
    * @param tableDefinition
    */
-  public BasicH2Table(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
+  public H2BasicTable(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
     super(orm, valueType, tableDefinition);
   }
 
@@ -26,18 +26,18 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
    * @param sorm
    * @param valueType
    */
-  public BasicH2Table(Sorm orm, Class<T> valueType) {
+  public H2BasicTable(Sorm orm, Class<T> valueType) {
     this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 
   @Experimental
   @Override
-  public BasicH2Table<T> createTableIfNotExists() {
+  public H2BasicTable<T> createTableIfNotExists() {
     super.createTableIfNotExists();
     return this;
   }
 
-  public BasicH2Table<T> createTableIfNotExists(CsvRead csvRead) {
+  public H2BasicTable<T> createTableIfNotExists(CsvRead csvRead) {
     getOrm()
         .execute(
             getTableDefinition().getCreateTableIfNotExistsStatement()
@@ -48,21 +48,21 @@ public class BasicH2Table<T> extends BasicTable<T> implements H2Table<T> {
 
   @Experimental
   @Override
-  public BasicH2Table<T> createIndexesIfNotExists() {
+  public H2BasicTable<T> createIndexesIfNotExists() {
     super.createIndexesIfNotExists();
     return this;
   }
 
   @Experimental
   @Override
-  public BasicH2Table<T> dropTableIfExists() {
+  public H2BasicTable<T> dropTableIfExists() {
     super.dropTableIfExists();
     return this;
   }
 
   @Experimental
   @Override
-  public BasicH2Table<T> dropTableIfExistsCascade() {
+  public H2BasicTable<T> dropTableIfExistsCascade() {
     super.dropTableIfExistsCascade();
     return this;
   }

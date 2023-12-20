@@ -18,15 +18,15 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-class H2LocalDataSourceFactoryTest {
+class H2DataSourceFactoryTest {
 
   @Test
   void test() throws StreamReadException, DatabindException, IOException, SQLException {
-    H2LocalDataSourceFactory factory =
+    H2DataSourceFactory factory =
         new ObjectMapper()
             .readValue(
-                H2LocalDataSourceFactoryTest.class.getResourceAsStream("h2.json.sample"),
-                H2LocalDataSourceFactory.Builder.class)
+                H2DataSourceFactoryTest.class.getResourceAsStream("h2.json.sample"),
+                H2DataSourceFactory.Builder.class)
             .build();
     factory.getDatabaseFile().delete();
     factory.makeFileDatabaseIfNotExists();
@@ -45,14 +45,14 @@ class H2LocalDataSourceFactoryTest {
 
     assertThat(factory.toString()).contains("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
 
-    H2LocalDataSourceFactory.builder();
-    H2LocalDataSourceFactory.builder(
+    H2DataSourceFactory.builder();
+    H2DataSourceFactory.builder(
         factory.getDatabaseDirectory(),
         factory.getDatabaseName(),
         factory.getUsername(),
         factory.getPassword());
 
-    H2LocalDataSourceFactory.createTemporalInMemoryDataSource();
+    H2DataSourceFactory.createTemporalInMemoryDataSource();
 
     factory.createEmbeddedModeDataSource().getConnection();
     factory.createInMemoryModeDataSource().getConnection();
@@ -76,8 +76,8 @@ class H2LocalDataSourceFactoryTest {
     String username = "user";
     String password = "pass";
 
-    H2LocalDataSourceFactory factory =
-        H2LocalDataSourceFactory.builder(tempDir, dbName, username, password).build();
+    H2DataSourceFactory factory =
+        H2DataSourceFactory.builder(tempDir, dbName, username, password).build();
 
     assertEquals(tempDir.getAbsolutePath(), factory.getDatabaseDirectory().getAbsolutePath());
     assertEquals(dbName, factory.getDatabaseName());
@@ -124,7 +124,7 @@ class H2LocalDataSourceFactoryTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
-          H2LocalDataSourceFactory.builder(invalidDir, dbName, username, password);
+          H2DataSourceFactory.builder(invalidDir, dbName, username, password);
         });
   }
 
@@ -135,8 +135,8 @@ class H2LocalDataSourceFactoryTest {
     String username = "user";
     String password = "pass";
 
-    H2LocalDataSourceFactory factory =
-        H2LocalDataSourceFactory.builder(tempDir, dbName, username, password).build();
+    H2DataSourceFactory factory =
+        H2DataSourceFactory.builder(tempDir, dbName, username, password).build();
     boolean result = factory.makeFileDatabaseIfNotExists();
     assertTrue(result || !result);
   }

@@ -16,12 +16,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
-import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
 import org.nkjmlab.sorm4j.util.h2.commands.InsertSelectCsvReadSql;
 import org.nkjmlab.sorm4j.util.h2.commands.SelectCsvReadSql;
 import org.nkjmlab.sorm4j.util.h2.commands.annotation.CsvColumn;
 import org.nkjmlab.sorm4j.util.h2.commands.annotation.SkipCsvRead;
-import org.nkjmlab.sorm4j.util.h2.datasource.H2LocalDataSourceFactory;
+import org.nkjmlab.sorm4j.util.h2.datasource.H2DataSourceFactory;
 
 class SelectCsvReadSqlTest {
   @Test
@@ -76,8 +76,8 @@ class SelectCsvReadSqlTest {
   @Test
   void test0() throws URISyntaxException {
     File file = Paths.get(SelectCsvReadSqlTest.class.getResource("test.tsv").toURI()).toFile();
-    Sorm sorm = Sorm.create(H2LocalDataSourceFactory.createTemporalInMemoryDataSource());
-    BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    Sorm sorm = Sorm.create(H2DataSourceFactory.createTemporalInMemoryDataSource());
+    H2BasicTable<OrmRecordExample> table = new H2BasicTable<>(sorm, OrmRecordExample.class);
     table.createTableIfNotExists(
         CsvRead.builderForCsvWithoutHeader(file, 2).charset("UTF-16").fieldSeparator("\t").build());
     assertThat(table.selectAll().get(0).id).isEqualTo(1);

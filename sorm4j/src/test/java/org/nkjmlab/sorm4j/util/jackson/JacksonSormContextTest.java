@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 import org.nkjmlab.sorm4j.util.datatype.OrmJsonColumnContainer;
-import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +21,7 @@ class JacksonSormContextTest {
             SormTestUtils.createNewDatabaseDataSource(),
             JacksonSormContext.builder(new ObjectMapper()).build());
 
-    BasicH2Table<JacksonRecord> table = new BasicH2Table<>(sorm, JacksonRecord.class);
+    H2BasicTable<JacksonRecord> table = new H2BasicTable<>(sorm, JacksonRecord.class);
     table.createTableIfNotExists();
     table.insert(new JacksonRecord(new JsonByte("{\"name\":\"Alice\",\"age\":20}")));
     assertThat(table.selectAll().get(0).jsonCol.toString()).contains("Alice");
@@ -42,7 +42,7 @@ class JacksonSormContextTest {
             SormTestUtils.createNewDatabaseDataSource(),
             JacksonSormContext.builder(new ObjectMapper()).build());
 
-    BasicH2Table<HasJsonColumn> table = new BasicH2Table<>(sorm, HasJsonColumn.class);
+    H2BasicTable<HasJsonColumn> table = new H2BasicTable<>(sorm, HasJsonColumn.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .isEqualTo("create table if not exists HAS_JSON_COLUMNS(ID integer, JSON_COL json)");
 

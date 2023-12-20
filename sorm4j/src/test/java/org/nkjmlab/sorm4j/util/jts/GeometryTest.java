@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.GeometryString;
-import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
 
 class GeometryTest {
 
@@ -18,7 +18,7 @@ class GeometryTest {
 
     Sorm sorm = Sorm.create(SormTestUtils.createNewDatabaseDataSource());
 
-    BasicH2Table<GeometryStringRecord> table = new BasicH2Table<>(sorm, GeometryStringRecord.class);
+    H2BasicTable<GeometryStringRecord> table = new H2BasicTable<>(sorm, GeometryStringRecord.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_STR geometry");
     table.createTableIfNotExists();
@@ -45,7 +45,7 @@ class GeometryTest {
     Sorm sorm =
         Sorm.create(SormTestUtils.createNewDatabaseDataSource(), JtsSormContext.builder().build());
 
-    BasicH2Table<GeometryJtsRecord> table = new BasicH2Table<>(sorm, GeometryJtsRecord.class);
+    H2BasicTable<GeometryJtsRecord> table = new H2BasicTable<>(sorm, GeometryJtsRecord.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_JTS geometry");
     table.createTableIfNotExists();

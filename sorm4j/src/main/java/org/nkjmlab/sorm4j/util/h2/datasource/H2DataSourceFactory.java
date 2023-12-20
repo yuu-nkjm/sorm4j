@@ -25,7 +25,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  * @author nkjm
  */
 @Experimental
-public class H2LocalDataSourceFactory {
+public class H2DataSourceFactory {
 
   private final File databaseDirectory;
   private final String databaseName;
@@ -37,7 +37,7 @@ public class H2LocalDataSourceFactory {
   private final String embeddedModeJdbcUrl;
   private final String mixedModeJdbcUrl;
 
-  private H2LocalDataSourceFactory(
+  private H2DataSourceFactory(
       File databaseDirectory, String databaseName, String username, String password) {
     this.username = username;
     this.password = password;
@@ -217,8 +217,8 @@ public class H2LocalDataSourceFactory {
   }
 
   /**
-   * Initializes a newly created {@link H2LocalDataSourceFactory.Builder} object; you can get
-   * {{@code LocalDataSourceFactory} object via build method.
+   * Initializes a newly created {@link H2DataSourceFactory.Builder} object; you can get {{@code
+   * LocalDataSourceFactory} object via build method.
    *
    * <p>following variables in the path of database directory will be expanded.
    *
@@ -227,7 +227,7 @@ public class H2LocalDataSourceFactory {
    *   <li>"%TEMP%" or "$TMPDIR" to "java.io.tmpdir"
    * </ul>
    *
-   * @see {@link H2LocalDataSourceFactory.Builder#setDatabaseDirectory(File)}
+   * @see {@link H2DataSourceFactory.Builder#setDatabaseDirectory(File)}
    * @param databaseDirectory the directory including the database file.
    * @param databaseName the name of database.
    * @param username
@@ -262,8 +262,8 @@ public class H2LocalDataSourceFactory {
   }
 
   public static class Builder {
-    private File databaseDirectory = getTempDir();
-    private String databaseName = "tmph2db";
+    private File databaseDirectory = new File(getTempDir(), "h2db_tmp");
+    private String databaseName = "h2db_tmp";
     private String username = "";
     private String password = "";
 
@@ -276,12 +276,12 @@ public class H2LocalDataSourceFactory {
       setDatabaseDirectory(databaseDirectory);
     }
 
-    public H2LocalDataSourceFactory.Builder setUsername(String username) {
+    public H2DataSourceFactory.Builder setUsername(String username) {
       this.username = username;
       return this;
     }
 
-    public H2LocalDataSourceFactory.Builder setPassword(String password) {
+    public H2DataSourceFactory.Builder setPassword(String password) {
       this.password = password;
       return this;
     }
@@ -302,7 +302,7 @@ public class H2LocalDataSourceFactory {
      * @param databaseDirectoryPath
      * @return
      */
-    public H2LocalDataSourceFactory.Builder setDatabaseDirectory(File databaseDirectoryPath) {
+    public H2DataSourceFactory.Builder setDatabaseDirectory(File databaseDirectoryPath) {
       String databaseDirectoryPathStr = databaseDirectoryPath.toString();
       if (!databaseDirectoryPath.isAbsolute()
           && allowPrefixes.stream()
@@ -333,7 +333,7 @@ public class H2LocalDataSourceFactory {
       }
     }
 
-    public H2LocalDataSourceFactory.Builder setDatabaseName(String dbName) {
+    public H2DataSourceFactory.Builder setDatabaseName(String dbName) {
       this.databaseName = dbName;
       return this;
     }
@@ -347,12 +347,12 @@ public class H2LocalDataSourceFactory {
     }
 
     /**
-     * Builds a {@link H2LocalDataSourceFactory} instance.
+     * Builds a {@link H2DataSourceFactory} instance.
      *
      * @return
      */
-    public H2LocalDataSourceFactory build() {
-      return new H2LocalDataSourceFactory(databaseDirectory, databaseName, username, password);
+    public H2DataSourceFactory build() {
+      return new H2DataSourceFactory(databaseDirectory, databaseName, username, password);
     }
   }
 
