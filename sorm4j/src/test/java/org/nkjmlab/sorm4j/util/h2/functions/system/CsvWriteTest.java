@@ -24,9 +24,12 @@ class CsvWriteTest {
   @Test
   public void testBuilderWithFileOnly() {
     File csvFile = new File("output.csv");
-    CsvWrite csvWrite = CsvWrite.builder(csvFile).query("SELECT * FROM table").build();
+    CsvWrite csvWrite =
+        CsvWrite.builder(csvFile).query("SELECT * FROM table where id='sorm'").build();
     assertEquals(
-        "csvwrite('" + csvFile.getAbsolutePath() + "', 'SELECT * FROM table', null)",
+        "csvwrite('"
+            + csvFile.getAbsolutePath()
+            + "', 'SELECT * FROM table where id=''sorm''', null)",
         csvWrite.getSql());
   }
 

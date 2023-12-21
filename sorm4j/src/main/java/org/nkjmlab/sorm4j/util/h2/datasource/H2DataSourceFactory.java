@@ -262,8 +262,8 @@ public class H2DataSourceFactory {
   }
 
   public static class Builder {
-    private File databaseDirectory = new File(getTempDir(), "h2db_tmp");
-    private String databaseName = "h2db_tmp";
+    private File databaseDirectory = new File(getTempDir(), "h2db-tmp");
+    private String databaseName = "h2db-tmp";
     private String username = "";
     private String password = "";
 
