@@ -16,19 +16,17 @@ public interface H2Table<T> extends Table<T>, WithTableDefinition, H2Orm {
    * @param toFile
    * @return
    */
-  default File writeCsv(File toFile) {
-    return writeCsv(toFile, "select * from " + getTableName());
+  default void writeCsv(File toFile) {
+    writeCsv(CsvWrite.builder(toFile).query("select * from " + getTableName()).build());
   }
 
   /**
    * Write selected rows to csv file.
    *
-   * @param toFile
-   * @param query
+   * @param csvWrite
    * @return
    */
-  default File writeCsv(File toFile, String query) {
-    getOrm().executeUpdate("call " + CsvWrite.builder(toFile).query(query).build().getSql());
-    return toFile;
+  default void writeCsv(CsvWrite csvWrite) {
+    getOrm().executeUpdate("call " + csvWrite.getSql());
   }
 }
