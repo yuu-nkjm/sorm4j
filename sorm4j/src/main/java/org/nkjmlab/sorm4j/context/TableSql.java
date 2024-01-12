@@ -1,9 +1,10 @@
 package org.nkjmlab.sorm4j.context;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.context.DefaultTableSqlFactory.UpdateSqlFactory;
 import org.nkjmlab.sorm4j.internal.util.ConcurrentCache;
 import org.nkjmlab.sorm4j.result.RowMap;
@@ -59,6 +60,7 @@ public final class TableSql {
    * @param insertSqlPrefix
    * @param mergeSqlPrefix
    * @param updateSqlFactory
+   * @param primaryKeys
    */
   public TableSql(
       String inserPlaceholders,
@@ -72,7 +74,8 @@ public final class TableSql {
       String existsSql,
       String insertSqlPrefix,
       String mergeSqlPrefix,
-      UpdateSqlFactory updateSqlFactory) {
+      UpdateSqlFactory updateSqlFactory,
+      List<String> primaryKeys) {
     this.insertPlaceholders = inserPlaceholders;
     this.mergePlaceholders = mergePlaceholders;
     this.selectByPrimaryKeySql = selectByPrimaryKeySql;
@@ -169,6 +172,6 @@ public final class TableSql {
   }
 
   public String getUpdateSql(RowMap object) {
-    return updateSqlFactory.create(new ArrayList<>(object.keySet()));
+    return updateSqlFactory.createUpdateSql(object.keySet());
   }
 }

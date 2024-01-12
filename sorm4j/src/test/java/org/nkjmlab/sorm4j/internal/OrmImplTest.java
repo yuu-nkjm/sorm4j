@@ -138,7 +138,7 @@ class OrmImplTest {
 
   @Test
   void testDeleteOnStringT() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(1);
     sorm.deleteIn(PLAYERS1, PLAYER_ALICE);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(0);
@@ -146,7 +146,7 @@ class OrmImplTest {
 
   @Test
   void testDeleteOnStringTArray() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
     sorm.deleteIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(0);
@@ -162,7 +162,7 @@ class OrmImplTest {
 
   @Test
   void testDeleteAllIn() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
     sorm.deleteAllIn(PLAYERS1);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(0);
@@ -212,19 +212,19 @@ class OrmImplTest {
 
   @Test
   void testInsertOnStringListOfT() {
-    sorm.insertIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.insertInto(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
   }
 
   @Test
   void testInsertOnStringT() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(1);
   }
 
   @Test
   void testInsertOnStringTArray() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
   }
 
@@ -254,7 +254,7 @@ class OrmImplTest {
 
   @Test
   void testmergeInStringListOfT() {
-    sorm.insertIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    sorm.insertInto(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(2);
     sorm.mergeIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_CAROL));
     assertThat(sorm.getTable(Player.class, PLAYERS1).count()).isEqualTo(3);
@@ -295,19 +295,19 @@ class OrmImplTest {
   @Test
   void testUpdateOnStringListOfT() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateIn(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
+    sorm.updateWith(PLAYERS1, List.of(PLAYER_ALICE, PLAYER_BOB));
   }
 
   @Test
   void testUpdateOnStringT() {
     sorm.insert(PLAYER_ALICE);
-    sorm.updateIn(PLAYERS1, PLAYER_ALICE);
+    sorm.updateWith(PLAYERS1, PLAYER_ALICE);
   }
 
   @Test
   void testUpdateOnStringTArray() {
     sorm.insert(PLAYER_ALICE, PLAYER_BOB);
-    sorm.updateIn(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
+    sorm.updateWith(PLAYERS1, PLAYER_ALICE, PLAYER_BOB);
   }
 
   @Test
@@ -352,11 +352,11 @@ class OrmImplTest {
   void testInsertMapIn() {
 
     RowMap map = RowMap.of("id", 99, "name", "Test", "address", "Chiba");
-    sorm.insertMapIn(PLAYERS1, map);
+    sorm.insertMapInto(PLAYERS1, map);
     sorm.deleteAllIn(PLAYERS1);
-    sorm.insertMapIn(PLAYERS1, List.of(map));
+    sorm.insertMapInto(PLAYERS1, List.of(map));
     sorm.deleteAllIn(PLAYERS1);
-    sorm.insertMapIn(PLAYERS1, new RowMap[] {map});
+    sorm.insertMapInto(PLAYERS1, new RowMap[] {map});
   }
 
   @Test

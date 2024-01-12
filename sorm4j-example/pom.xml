@@ -4,11 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nkjmlab</groupId>
 	<artifactId>sorm4j-example</artifactId>
-	<version>2.1.2</version>
+	<version>2.1.4</version>
 	<description>Example of Sorm4j</description>
 
 	<properties>
-		<sorm4j-version>${project.version}</sorm4j-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<additionalparam>-Xdoclint:none</additionalparam>
 		<downloadSources>true</downloadSources>
@@ -20,7 +19,7 @@
 		<dependency>
 			<groupId>org.nkjmlab</groupId>
 			<artifactId>sorm4j</artifactId>
-			<version>${sorm4j-version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
 		<dependency>

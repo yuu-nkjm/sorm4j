@@ -409,7 +409,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int[] insertMapIn(String tableName, List<RowMap> result);
+  int[] insertMapInto(String tableName, List<RowMap> result);
 
   /**
    * @param tableName
@@ -417,7 +417,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int insertMapIn(String tableName, RowMap object);
+  int insertMapInto(String tableName, RowMap object);
 
   /**
    * This method is experimental.
@@ -427,7 +427,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int[] insertMapIn(String tableName, RowMap... objects);
+  int[] insertMapInto(String tableName, RowMap... objects);
 
   /**
    * Inserts objects and get the last insert result.
@@ -437,7 +437,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insertIn(String tableName, List<T> objects);
+  <T> int[] insertInto(String tableName, List<T> objects);
 
   /**
    * Inserts an object and get the insert result.
@@ -447,7 +447,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> int insertIn(String tableName, T object);
+  <T> int insertInto(String tableName, T object);
 
   /**
    * Inserts objects and get the last insert result.
@@ -457,7 +457,7 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   @Experimental
   <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
@@ -704,7 +704,7 @@ public interface Orm {
   <T> T selectByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
-   * Updates by objects in the table corresponding to the class of the given objects.
+   * Updates with objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -713,7 +713,7 @@ public interface Orm {
   <T> int[] update(List<T> objects);
 
   /**
-   * Updates by an object in the table corresponding to the class of the given object.
+   * Updates with an object in the table corresponding to the class of the given object.
    *
    * @param <T>
    * @param object
@@ -722,7 +722,7 @@ public interface Orm {
   <T> int update(T object);
 
   /**
-   * Updates by objects in the table corresponding to the class of the given objects.
+   * Updates with objects in the table corresponding to the class of the given objects.
    *
    * @param <T>
    * @param objects
@@ -731,9 +731,12 @@ public interface Orm {
   <T> int[] update(@SuppressWarnings("unchecked") T... objects);
 
   /**
+   * Updates with map in the table corresponding to the class. the map should not be included
+   * primary keys.
+   *
    * @param <T>
    * @param clazz
-   * @param object
+   * @param object should not include primary keys.
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
@@ -741,43 +744,46 @@ public interface Orm {
   <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues);
 
   /**
+   * Updates with map in the table corresponding to the given table name. the map should not be
+   * included primary keys.
+   *
    * @param tableName
-   * @param object
+   * @param object should not include primary keys.
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
   @Experimental
-  int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues);
+  int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues);
 
   /**
-   * Updates by objects in the table corresponding to the given table name.
+   * Updates with objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] updateIn(String tableName, List<T> objects);
+  <T> int[] updateWith(String tableName, List<T> objects);
 
   /**
-   * Updates by an object in the table corresponding to the given table name.
+   * Updates with an object in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param object
    * @return
    */
-  <T> int updateIn(String tableName, T object);
+  <T> int updateWith(String tableName, T object);
 
   /**
-   * Updates by objects in the table corresponding to the given table name.
+   * Updates with objects in the table corresponding to the given table name.
    *
    * @param <T>
    * @param tableName
    * @param objects
    * @return
    */
-  <T> int[] updateIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  <T> int[] updateWith(String tableName, @SuppressWarnings("unchecked") T... objects);
 
   /**
    * Returns {@link ResultSetStream} represents all rows from the table indicated by object class.

@@ -1,9 +1,11 @@
 package org.nkjmlab.sorm4j.context;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
@@ -48,7 +50,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
             tableName,
             tableMetaData.getNotPrimaryKeys(),
             whereClauseIdentifyByPrimaryKeys);
-    String updateSql = updateSqlFactory.create(tableMetaData.getNotPrimaryKeys());
+    String updateSql = updateSqlFactory.createUpdateSql(tableMetaData.getNotPrimaryKeys());
     String deleteSql =
         !tableMetaData.hasPrimaryKey()
             ? errorMsg
@@ -85,7 +87,8 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
         existsSql,
         insertSqlPrefix,
         mergeSqlPrefix,
-        updateSqlFactory);
+        updateSqlFactory,
+        primaryKeys);
   }
 
   public static class UpdateSqlFactory {
@@ -110,7 +113,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
           columns.stream().collect(Collectors.toMap(c -> StringCache.toCanonicalCase(c), c -> c));
     }
 
-    public String create(List<String> columns) {
+    public String createUpdateSql(Collection<String> columns) {
       return !hasPrimaryKey
           ? errorMsg
           : "update "
@@ -119,7 +122,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
               + whereClauseIdentifyByPrimaryKeys;
     }
 
-    private String createUpdateSetClause(List<String> columns) {
+    private String createUpdateSetClause(Collection<String> columns) {
       return " set "
           + String.join(
               ", ",

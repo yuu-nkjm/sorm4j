@@ -264,10 +264,10 @@ class OrmConnectionImplTest {
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
-          m.insertIn("players1", a);
+          m.insertInto("players1", a);
           m.deleteIn("players1", a);
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
-          m.insertIn("players1", a, b);
+          m.insertInto("players1", a, b);
           m.deleteIn("players1", a, b);
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
         });
@@ -378,7 +378,7 @@ class OrmConnectionImplTest {
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
-          m.insertIn("players1", a, b);
+          m.insertInto("players1", a, b);
           assertThat(m.readList(Player.class, "select * from players1")).contains(a, b);
           m.deleteAllIn("players1");
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
@@ -387,7 +387,7 @@ class OrmConnectionImplTest {
         m -> {
           Player a = PLAYER_ALICE;
           Player b = PLAYER_BOB;
-          m.insertIn("players1", List.of(a, b));
+          m.insertInto("players1", List.of(a, b));
           assertThat(m.readList(Player.class, "select * from players1")).contains(a, b);
           m.deleteIn("players1", List.of(a, b));
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
@@ -587,12 +587,12 @@ class OrmConnectionImplTest {
     orm.acceptHandler(
         m -> {
           m.insert(a);
-          m.updateIn("players", new Player(a.getId(), "UPDATED", "UPDATED"));
-          m.updateIn(
+          m.updateWith("players", new Player(a.getId(), "UPDATED", "UPDATED"));
+          m.updateWith(
               "players",
               new Player(a.getId(), "UPDATED", "UPDATED"),
               new Player(b.getId(), "UPDATED", "UPDATED"));
-          m.updateIn(
+          m.updateWith(
               "players",
               List.of(
                   new Player(a.getId(), "UPDATED", "UPDATED"),

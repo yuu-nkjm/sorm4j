@@ -5,6 +5,7 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.JOIN;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.LEFT;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.ON;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.SELECT;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
@@ -455,18 +457,18 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] insertIn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> insertIn(tableName, array));
+  public <T> int[] insertInto(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> insertInto(tableName, array));
   }
 
   @Override
-  public <T> int insertIn(String tableName, T object) {
+  public <T> int insertInto(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
     return executeUpdate(mapping.getSql().getInsertSql(), mapping.getInsertParameters(object));
   }
 
   @Override
-  public <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
@@ -475,11 +477,11 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int[] insertMapIn(String tableName, List<RowMap> objects) {
+  public int[] insertMapInto(String tableName, List<RowMap> objects) {
     boolean origAutoCommit = getAutoCommit(connection);
     try {
       setAutoCommit(connection, false);
-      int[] ret = objects.stream().mapToInt(o -> insertMapIn(tableName, o)).toArray();
+      int[] ret = objects.stream().mapToInt(o -> insertMapInto(tableName, o)).toArray();
       setAutoCommit(connection, true);
       commit();
       return ret;
@@ -490,7 +492,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int insertMapIn(String tableName, RowMap object) {
+  public int insertMapInto(String tableName, RowMap object) {
     String sql = getTableSql(tableName).getInsertSql();
     return executeUpdate(sql, toInsertParameters(tableName, object));
   }
@@ -501,8 +503,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int[] insertMapIn(String tableName, RowMap... objects) {
-    return insertMapIn(tableName, Arrays.asList(objects));
+  public int[] insertMapInto(String tableName, RowMap... objects) {
+    return insertMapInto(tableName, Arrays.asList(objects));
   }
 
   @Override
@@ -952,7 +954,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+  public int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues) {
     final String sql = getTableSql(tableName).getUpdateSql(object);
     List<Object> params = new ArrayList<>(object.values());
     params.addAll(Arrays.asList(primaryKeyValues));
@@ -973,18 +975,18 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] updateIn(String tableName, List<T> objects) {
-    return applytoArray(objects, array -> updateIn(tableName, array));
+  public <T> int[] updateWith(String tableName, List<T> objects) {
+    return applytoArray(objects, array -> updateWith(tableName, array));
   }
 
   @Override
-  public <T> int updateIn(String tableName, T object) {
+  public <T> int updateWith(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
     return executeUpdate(mapping.getSql().getUpdateSql(), mapping.getUpdateParameters(object));
   }
 
   @Override
-  public <T> int[] updateIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  public <T> int[] updateWith(String tableName, @SuppressWarnings("unchecked") T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
