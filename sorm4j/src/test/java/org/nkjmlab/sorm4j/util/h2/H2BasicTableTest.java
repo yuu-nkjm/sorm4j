@@ -37,10 +37,8 @@ class H2BasicTableTest {
       ps.setString(2, "C");
       ps.setObject(3, "{\"3\":\"val1\"}".getBytes());
       ps.execute();
-      // H2ServerUtils.openBrowser(con, true);
-      // Thread.sleep(1000000);
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw Try.rethrow(e);
     }
   }
 
