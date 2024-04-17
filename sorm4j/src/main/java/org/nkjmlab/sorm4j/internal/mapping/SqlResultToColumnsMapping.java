@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
@@ -42,15 +43,19 @@ public final class SqlResultToColumnsMapping<T> {
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;
 
-    Constructor<T> ormConstructor = getOrmConstructor(objectClass);
     Constructor<T> ormRecordConstructor = getOrmRecordConstructor(objectClass);
-    this.containerObjectCreator =
-        ormRecordConstructor != null
-            ? createContainerRecordCreator(objectClass, ormRecordConstructor)
-            : (ormConstructor != null
-                ? createOrmConstructorPojoCreator(objectClass, ormConstructor)
-                : new SqlResultToContainerMappingWithSetter<>(
-                    columnToAccessorMap, getDefaultConstructor(objectClass)));
+    if (ormRecordConstructor != null) {
+      this.containerObjectCreator = createContainerRecordCreator(objectClass, ormRecordConstructor);
+    } else {
+      Constructor<T> ormConstructor = getOrmConstructor(objectClass);
+      if (ormConstructor != null) {
+        this.containerObjectCreator = createOrmConstructorPojoCreator(objectClass, ormConstructor);
+      } else {
+        this.containerObjectCreator =
+            new SqlResultToContainerMappingWithSetter<>(
+                columnToAccessorMap, getDefaultConstructor(objectClass));
+      }
+    }
   }
 
   private SqlResultToContainerMapping<T> createContainerRecordCreator(
@@ -62,8 +67,7 @@ public final class SqlResultToColumnsMapping<T> {
   }
 
   private Constructor<T> getOrmRecordConstructor(Class<T> objectClass) {
-    OrmRecord a = objectClass.getAnnotation(OrmRecord.class);
-    if (a == null) {
+    if (!objectClass.isRecord() && objectClass.getAnnotation(OrmRecord.class) == null) {
       return null;
     }
     Object[] params = {objectClass, OrmRecord.class.getSimpleName()};
