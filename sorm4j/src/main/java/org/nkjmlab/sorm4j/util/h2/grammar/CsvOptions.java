@@ -23,6 +23,10 @@ public class CsvOptions {
     return fieldSeparator;
   }
 
+  public Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
     private final Map<String, String> csvOptions = new TreeMap<>();
 

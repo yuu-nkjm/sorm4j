@@ -42,9 +42,15 @@ public class CsvWrite {
     private String query;
     private final org.nkjmlab.sorm4j.util.h2.grammar.CsvOptions.Builder csvOptionsBuilder =
         new CsvOptions.Builder();
+    private boolean queryEscape = true;
 
     public CsvWrite.Builder query(String query) {
       this.query = query;
+      return this;
+    }
+
+    public CsvWrite.Builder queryEscape(boolean queryEscape) {
+      this.queryEscape = queryEscape;
       return this;
     }
 
@@ -114,7 +120,7 @@ public class CsvWrite {
       List<String> l =
           Stream.of(
                   wrapSingleQuote(file.getAbsolutePath().toString()),
-                  wrapSingleQuote(query),
+                  wrapSingleQuote(queryEscape ? escapeQuery(query) : query),
                   csvOptions == null || csvOptions.getSql() == null
                       ? null
                       : "stringdecode(" + wrapSingleQuote(csvOptions.getSql()) + ")")
@@ -122,5 +128,9 @@ public class CsvWrite {
 
       return new CsvWrite("csvwrite(" + String.join(", ", l) + ")");
     }
+  }
+
+  private static String escapeQuery(String query) {
+    return query.replace("'", "''");
   }
 }

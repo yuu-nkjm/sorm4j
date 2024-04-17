@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.h2.server;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+
 import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
 import org.nkjmlab.sorm4j.annotation.Experimental;
@@ -59,16 +59,5 @@ public class H2WebBrowsingService {
     } catch (Exception e) {
       log.error("{}", e.getMessage());
     }
-  }
-
-  /**
-   * Open a new browser tab or window.
-   *
-   * @param dataSource
-   * @return
-   * @see #startTemporalWebConsoleServer(boolean)
-   */
-  public void open(DataSource dataSource) {
-    Try.runOrElseThrow(() -> open(dataSource.getConnection()), Try::rethrow);
   }
 }

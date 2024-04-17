@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
+import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
 
 /**
  * Mapping a csv column to a table column.
@@ -25,7 +25,7 @@ import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
  * </code>
  * </pre>
  *
- * {@link BasicH2Table#getReadCsvWithHeaderSql(java.io.File, java.nio.charset.Charset, char)}
+ * {@link H2BasicTable#getReadCsvWithHeaderSql(java.io.File, java.nio.charset.Charset, char)}
  * generates the following SQL statement.
  *
  * <pre>

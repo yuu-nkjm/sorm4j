@@ -20,6 +20,10 @@ public class ScriptCompressionEncryption {
     return sql;
   }
 
+  public Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
     private final Map<String, String> props = new LinkedHashMap<>();
 
@@ -33,6 +37,12 @@ public class ScriptCompressionEncryption {
 
     public Builder compression(String compression) {
       this.props.put("compression", compression);
+      return this;
+    }
+
+    public Builder cipherAndPassword(String cipher, String password) {
+      cipher(cipher);
+      password(password);
       return this;
     }
 

@@ -16,8 +16,8 @@ import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ElectronicsTable.
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ModClothsTable.ModCloth;
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.TwitchsTable.Twitch;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.h2.BasicH2Table;
-import org.nkjmlab.sorm4j.util.h2.datasource.H2LocalDataSourceFactory;
+import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
+import org.nkjmlab.sorm4j.util.h2.datasource.H2DataSourceFactory;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.util.h2.server.H2Startup;
 import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
@@ -26,8 +26,8 @@ public class LoadOpenDataExample {
   private static final org.apache.logging.log4j.Logger log =
       org.apache.logging.log4j.LogManager.getLogger();
 
-  private static final H2LocalDataSourceFactory dataSourceFactory =
-      H2LocalDataSourceFactory.builder(new File("$TMPDIR/sorm4j"), "sorm4j_example", "sa", "")
+  private static final H2DataSourceFactory dataSourceFactory =
+      H2DataSourceFactory.builder(new File("$TMPDIR/sorm4j"), "sorm4j_example", "sa", "")
           .build();
 
   static {
@@ -108,7 +108,7 @@ public class LoadOpenDataExample {
    * @see <a href="https://github.com/MengtingWan/marketBias/tree/master/data">marketBias/data at
    *     master · MengtingWan/marketBias</a>
    */
-  public static class ModClothsTable extends BasicH2Table<ModCloth> {
+  public static class ModClothsTable extends H2BasicTable<ModCloth> {
 
     @OrmRecord
     @PrimaryKeyColumns({"item_id", "user_id"})
@@ -137,7 +137,7 @@ public class LoadOpenDataExample {
     }
   }
 
-  public static class ElectronicsTable extends BasicH2Table<Electronic> {
+  public static class ElectronicsTable extends H2BasicTable<Electronic> {
 
     @OrmRecord
     @PrimaryKeyColumns({"item_id", "user_id"})
@@ -164,7 +164,7 @@ public class LoadOpenDataExample {
     }
   }
 
-  public static class TwitchsTable extends BasicH2Table<Twitch> {
+  public static class TwitchsTable extends H2BasicTable<Twitch> {
 
     /**
      * This is a dataset of users consuming streaming content on Twitch. We retrieved all streamers,
@@ -194,7 +194,7 @@ public class LoadOpenDataExample {
   }
 
   private void load(String logLabel, String tableName, Consumer<Sorm> func) {
-    Sorm mem = Sorm.create(H2LocalDataSourceFactory.createTemporalInMemoryDataSource());
+    Sorm mem = Sorm.create(H2DataSourceFactory.createTemporalInMemoryDataSource());
     long start = System.currentTimeMillis();
     log.info("[START] {} - {}", logLabel, tableName);
     func.accept(mem);

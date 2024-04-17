@@ -19,14 +19,14 @@ import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.table_def.BasicTable;
+import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 
-class BasicH2TableTest {
+class H2BasicTableTest {
 
   @Test
   void test2() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    H2BasicTable<OrmRecordExample> table = new H2BasicTable<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
@@ -37,10 +37,8 @@ class BasicH2TableTest {
       ps.setString(2, "C");
       ps.setObject(3, "{\"3\":\"val1\"}".getBytes());
       ps.execute();
-      // H2ServerUtils.openBrowser(con, true);
-      // Thread.sleep(1000000);
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw Try.rethrow(e);
     }
   }
 
@@ -56,9 +54,9 @@ class BasicH2TableTest {
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
-    BasicH2Table<OrmRecordExample> table = new BasicH2Table<>(sorm, OrmRecordExample.class);
+    H2BasicTable<OrmRecordExample> table = new H2BasicTable<>(sorm, OrmRecordExample.class);
     {
-      BasicTable<OrmRecordExample> t = new BasicTable<>(sorm, OrmRecordExample.class);
+      new SimpleTableWithDefinition<>(sorm, OrmRecordExample.class);
     }
     table.dropTableIfExists();
     table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());

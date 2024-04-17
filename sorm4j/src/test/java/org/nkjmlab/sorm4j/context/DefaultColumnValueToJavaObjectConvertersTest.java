@@ -1,13 +1,22 @@
 package org.nkjmlab.sorm4j.context;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.Inet4Address;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -79,5 +88,53 @@ class DefaultColumnValueToJavaObjectConvertersTest {
     } catch (Exception e) {
       fail();
     }
+  }
+
+  @Test
+  void testConvertToWithSQLException() throws SQLException {
+    ResultSet mockResultSet = mock(ResultSet.class);
+    when(mockResultSet.getString(anyInt())).thenThrow(new SQLException("Test exception"));
+
+    DefaultColumnValueToJavaObjectConverters converters =
+        new DefaultColumnValueToJavaObjectConverters();
+
+    assertThrows(
+        SormException.class,
+        () ->
+            converters.convertTo(
+                mockResultSet, 1, JDBCType.VARCHAR.getVendorTypeNumber(), String.class));
+  }
+
+  public enum TestEnum {
+    VALUE1,
+    VALUE2
+  }
+
+  @Test
+  void testUnsupportedTypeConversion() throws SQLException {
+    ResultSet mockResultSet = mock(ResultSet.class);
+    when(mockResultSet.getObject(anyInt(), eq(TestEnum.class))).thenReturn(null);
+
+    DefaultColumnValueToJavaObjectConverters converters =
+        new DefaultColumnValueToJavaObjectConverters();
+
+    assertThrows(
+        SormException.class,
+        () ->
+            converters.convertTo(
+                mockResultSet, 1, JDBCType.OTHER.getVendorTypeNumber(), TestEnum.class));
+  }
+
+  @Test
+  void testArrayConversionException() throws SQLException {
+    ResultSet mockResultSet = mock(ResultSet.class);
+    when(mockResultSet.getArray(anyInt())).thenThrow(new SQLException("Test exception"));
+
+    DefaultColumnValueToJavaObjectConverters converters =
+        new DefaultColumnValueToJavaObjectConverters();
+
+    assertThrows(
+        SormException.class,
+        () -> converters.convertTo(mockResultSet, 1, JDBCType.ARRAY.getVendorTypeNumber(), int[].class));
   }
 }

@@ -331,18 +331,18 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public int insertMapIn(String tableName, RowMap object) {
-    return applyAndClose(conn -> conn.insertMapIn(tableName, object));
+  public int insertMapInto(String tableName, RowMap object) {
+    return applyAndClose(conn -> conn.insertMapInto(tableName, object));
   }
 
   @Override
-  public int[] insertMapIn(String tableName, RowMap... objects) {
-    return applyAndClose(conn -> conn.insertMapIn(tableName, objects));
+  public int[] insertMapInto(String tableName, RowMap... objects) {
+    return applyAndClose(conn -> conn.insertMapInto(tableName, objects));
   }
 
   @Override
-  public int[] insertMapIn(String tableName, List<RowMap> objects) {
-    return applyAndClose(conn -> conn.insertMapIn(tableName, objects));
+  public int[] insertMapInto(String tableName, List<RowMap> objects) {
+    return applyAndClose(conn -> conn.insertMapInto(tableName, objects));
   }
 
   @Override
@@ -382,18 +382,18 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> int[] insertIn(String tableName, List<T> objects) {
-    return applyAndClose(conn -> conn.insertIn(tableName, objects));
+  public <T> int[] insertInto(String tableName, List<T> objects) {
+    return applyAndClose(conn -> conn.insertInto(tableName, objects));
   }
 
   @Override
-  public <T> int insertIn(String tableName, T object) {
-    return applyAndClose(conn -> conn.insertIn(tableName, object));
+  public <T> int insertInto(String tableName, T object) {
+    return applyAndClose(conn -> conn.insertInto(tableName, object));
   }
 
   @Override
-  public <T> int[] insertIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return applyAndClose(conn -> conn.insertIn(tableName, objects));
+  public <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects) {
+    return applyAndClose(conn -> conn.insertInto(tableName, objects));
   }
 
   @Override
@@ -447,23 +447,23 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
-    return applyAndClose(conn -> conn.updateByPrimaryKeyIn(tableName, object, primaryKeyValues));
+  public int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKey(tableName, object, primaryKeyValues));
   }
 
   @Override
-  public <T> int[] updateIn(String tableName, List<T> objects) {
-    return applyAndClose(conn -> conn.updateIn(tableName, objects));
+  public <T> int[] updateWith(String tableName, List<T> objects) {
+    return applyAndClose(conn -> conn.updateWith(tableName, objects));
   }
 
   @Override
-  public <T> int updateIn(String tableName, T object) {
-    return applyAndClose(conn -> conn.updateIn(tableName, object));
+  public <T> int updateWith(String tableName, T object) {
+    return applyAndClose(conn -> conn.updateWith(tableName, object));
   }
 
   @Override
-  public <T> int[] updateIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
-    return applyAndClose(conn -> conn.updateIn(tableName, objects));
+  public <T> int[] updateWith(String tableName, @SuppressWarnings("unchecked") T... objects) {
+    return applyAndClose(conn -> conn.updateWith(tableName, objects));
   }
 
   @Override

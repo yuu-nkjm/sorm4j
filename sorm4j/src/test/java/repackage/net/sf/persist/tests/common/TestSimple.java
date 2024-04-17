@@ -118,8 +118,8 @@ public class TestSimple {
         OrmConnection orm = OrmConnection.of(conn, SormContext.builder().build())) {
       orm.insert(List.of(buildSimple()));
       orm.insert(buildSimple(), buildSimple());
-      orm.insertIn("simple", List.of(buildSimple()));
-      orm.insertIn("simple", buildSimple(), buildSimple());
+      orm.insertInto("simple", List.of(buildSimple()));
+      orm.insertInto("simple", buildSimple(), buildSimple());
     }
   }
 

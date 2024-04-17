@@ -32,15 +32,15 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
 import org.nkjmlab.sorm4j.util.sql.JoinSql;
-import org.nkjmlab.sorm4j.util.table_def.BasicTable;
+import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private BasicTable<Player> playersTable;
-  private BasicTable<Sport> sportsTable;
+  private SimpleTableWithDefinition<Player> playersTable;
+  private SimpleTableWithDefinition<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {

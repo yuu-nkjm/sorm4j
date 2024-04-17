@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.util.table_def.BasicTable;
+import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 public class SormTestUtils {
@@ -36,7 +36,7 @@ public class SormTestUtils {
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  public static BasicTable<Guest> createGuestsTable(Sorm sorm) {
+  public static SimpleTableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("guests")
             .addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
@@ -46,16 +46,16 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    BasicTable<Guest> tbl = new BasicTable<>(sorm, Guest.class, schema);
+    SimpleTableWithDefinition<Guest> tbl = new SimpleTableWithDefinition<>(sorm, Guest.class, schema);
     tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static BasicTable<Player> createPlayersTable(Sorm sorm) {
+  public static SimpleTableWithDefinition<Player> createPlayersTable(Sorm sorm) {
     return createPlayersTable(sorm, "players");
   }
 
-  public static BasicTable<Player> createPlayersTable(Sorm sorm, String tableName) {
+  public static SimpleTableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
 
     TableDefinition schema =
         TableDefinition.builder(tableName)
@@ -66,20 +66,20 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    BasicTable<Player> tbl = new BasicTable<>(sorm, Player.class, schema);
+    SimpleTableWithDefinition<Player> tbl = new SimpleTableWithDefinition<>(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static BasicTable<Sport> createSportsTable(Sorm sorm) {
+  public static SimpleTableWithDefinition<Sport> createSportsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("sports")
             .addColumnDefinition("id", INT, PRIMARY_KEY)
             .addColumnDefinition("name", VARCHAR)
             .build();
 
-    BasicTable<Sport> tbl = new BasicTable<>(sorm, Sport.class, schema);
+    SimpleTableWithDefinition<Sport> tbl = new SimpleTableWithDefinition<>(sorm, Sport.class, schema);
 
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();

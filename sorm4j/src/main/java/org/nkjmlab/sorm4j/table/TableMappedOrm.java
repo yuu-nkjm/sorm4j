@@ -116,27 +116,27 @@ public interface TableMappedOrm<T> {
   }
 
   default int[] insert(List<T> objects) {
-    return getOrm().insertIn(getTableName(), objects);
+    return getOrm().insertInto(getTableName(), objects);
   }
 
   default int insert(T object) {
-    return getOrm().insertIn(getTableName(), object);
+    return getOrm().insertInto(getTableName(), object);
   }
 
   default int[] insert(@SuppressWarnings("unchecked") T... objects) {
-    return getOrm().insertIn(getTableName(), objects);
+    return getOrm().insertInto(getTableName(), objects);
   }
 
   default int insertMapIn(RowMap object) {
-    return getOrm().insertMapIn(getTableName(), object);
+    return getOrm().insertMapInto(getTableName(), object);
   }
 
   default int[] insertMapIn(RowMap... objects) {
-    return getOrm().insertMapIn(getTableName(), objects);
+    return getOrm().insertMapInto(getTableName(), objects);
   }
 
   default int[] insertMapIn(List<RowMap> objects) {
-    return getOrm().insertMapIn(getTableName(), objects);
+    return getOrm().insertMapInto(getTableName(), objects);
   }
 
   default InsertResult insertAndGet(List<T> objects) {
@@ -164,19 +164,19 @@ public interface TableMappedOrm<T> {
   }
 
   default int[] update(List<T> objects) {
-    return getOrm().updateIn(getTableName(), objects);
+    return getOrm().updateWith(getTableName(), objects);
   }
 
   default int update(T object) {
-    return getOrm().updateIn(getTableName(), object);
+    return getOrm().updateWith(getTableName(), object);
   }
 
   default int[] update(@SuppressWarnings("unchecked") T... objects) {
-    return getOrm().updateIn(getTableName(), objects);
+    return getOrm().updateWith(getTableName(), objects);
   }
 
   default int updateByPrimaryKey(RowMap object, Object... primaryKeyValues) {
-    return getOrm().updateByPrimaryKeyIn(getTableName(), object, primaryKeyValues);
+    return getOrm().updateByPrimaryKey(getTableName(), object, primaryKeyValues);
   }
 
   default <S> List<Tuple2<T, S>> joinUsing(TableMappedOrm<S> other, String... columns) {
