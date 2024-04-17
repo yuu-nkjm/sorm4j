@@ -21,12 +21,20 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>2.1.1</version>
+   <version>2.1.5</version>
  </dependency>
 ```
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`
 
-Create a class with public fields and a default constructor matching a table name. For example:
+Create a Record class that has components and names matching the columns and the table name. For example:
+
+
+```java
+public record Customer (int id, String name, String address){}
+```
+
+You could also use a class with public fields and a default constructor matching a table name. For example:
+
 
 ```java
 public class Customer {
@@ -34,13 +42,7 @@ public class Customer {
   public String name;
   public String address;
 }
-```
 
-You could also use Record class. For example:
-
-```java
- @OrmRecord
- public record Customer (int id, String name, String address){}
 ```
 
 Create an entry point:
