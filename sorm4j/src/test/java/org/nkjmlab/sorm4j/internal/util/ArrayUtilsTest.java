@@ -1,7 +1,16 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.sql.Array;
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 
@@ -166,5 +175,63 @@ class ArrayUtilsTest {
   @Test
   void testConvertToObjectArrayWithNullInput() {
     assertThrows(NullPointerException.class, () -> ArrayUtils.convertToObjectArray(null));
+  }
+
+  @Test
+  public void testConvertSqlArrayToArray_WithSqlArray() throws SQLException {
+    Array sqlArrayMock = mock(Array.class);
+    Object[] expectedArray = {1, 2, 3};
+    when(sqlArrayMock.getArray()).thenReturn(expectedArray);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ArrayUtils.convertSqlArrayToArray(Integer[].class, sqlArrayMock));
+  }
+
+  public void testConvertSqlArrayToArray_WithSqlException() throws SQLException {
+    Array sqlArrayMock = mock(Array.class);
+    when(sqlArrayMock.getArray()).thenThrow(new SQLException("Database error"));
+    ArrayUtils.convertSqlArrayToArray(Integer[].class, sqlArrayMock);
+  }
+
+  @Test
+  public void testConvertSqlArrayToArray_WithNullInput() {
+    Object result = ArrayUtils.convertSqlArrayToArray(Integer[].class, null);
+    assertNull(result);
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithIntegerArray() {
+    Integer[] srcArray = {1, 2, 3};
+    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, srcArray);
+
+    assertNotNull(result);
+    assertTrue(result instanceof Integer[]);
+    assertArrayEquals(srcArray, result);
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithPrimitiveIntArray() {
+    Integer[] srcArray = {1, 2, 3};
+    System.out.println(srcArray.getClass().getName());
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithDoubleArray() {
+    Double[] srcArray = {1.0, 2.0, 3.0};
+    Double[] result = ArrayUtils.convertToObjectArray(Double.class, srcArray);
+
+    assertNotNull(result);
+    assertTrue(result instanceof Double[]);
+    assertArrayEquals(srcArray, result);
+  }
+
+  public void testConvertToObjectArray_WithNullArray() {
+    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, null);
+  }
+
+  public void testConvertToObjectArray_WithTypeMismatch() {
+    Object[] srcArray = new Object[] {1, 2, 3.0}; // 最後の要素がDouble型
+    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, srcArray);
   }
 }

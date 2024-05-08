@@ -150,12 +150,19 @@ public final class ArrayUtils {
    * @param srcArray
    * @return
    */
-  public static Object convertSqlArrayToArray(Class<?> toComponentType, Object srcArray) {
+  public static Object convertSqlArrayToArray(Class<?> toComponentType, java.sql.Array srcArray) {
+    return convertSqlArrayToArrayAux(toComponentType, srcArray);
+  }
+
+  private static Object convertSqlArrayToArrayAux(Class<?> toComponentType, Object srcArray) {
+    if (srcArray == null) {
+      return null;
+    }
     if (srcArray instanceof java.sql.Array) {
       try {
         java.sql.Array sqlArray = (java.sql.Array) srcArray;
         Object array = sqlArray.getArray();
-        return convertSqlArrayToArray(toComponentType, array);
+        return convertSqlArrayToArrayAux(toComponentType, array);
       } catch (SQLException e) {
         throw Try.rethrow(e);
       }
@@ -166,10 +173,10 @@ public final class ArrayUtils {
       Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
       for (int i = 0; i < length; i++) {
         Object v = java.lang.reflect.Array.get(srcArray, i);
-        java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArray(compArrType, v));
+        java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArrayAux(compArrType, v));
       }
       return destArray;
-    } else {
+    } else if (srcArray instanceof Array) {
       int length = java.lang.reflect.Array.getLength(srcArray);
       Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
       for (int i = 0; i < length; i++) {
@@ -177,6 +184,8 @@ public final class ArrayUtils {
         java.lang.reflect.Array.set(destArray, i, v);
       }
       return destArray;
+    } else {
+      throw new IllegalArgumentException("srcArray should be java.sql.Array");
     }
   }
 
