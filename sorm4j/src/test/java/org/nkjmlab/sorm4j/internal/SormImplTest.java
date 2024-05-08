@@ -54,10 +54,18 @@ class SormImplTest {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
     assertThat(sorm.existsByPrimaryKeyIn("players", PLAYER_ALICE.id)).isTrue();
-    sorm.readTupleList(
-        Guest.class,
-        Player.class,
-        ParameterizedSql.of("select * from guests join players on guests.id=players.id"));
+    assertThat(
+            sorm.readTupleList(
+                    Guest.class,
+                    Player.class,
+                    ParameterizedSql.of(
+                        "select * from guests join players on guests.id=players.id"))
+                .size())
+        .isEqualTo(0);
+
+    assertThat(sorm.getTableSql("players")).isNotNull();
+
+    assertThat(sorm.execute("select * from players")).isTrue();
 
     sorm.readTupleList(
         Guest.class,
@@ -69,6 +77,15 @@ class SormImplTest {
 
   @Test
   void testJoin3() {
+    assertThat(
+            sorm.join(
+                    Guest.class,
+                    Player.class,
+                    Sport.class,
+                    "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id")
+                .size())
+        .isEqualTo(0);
+
     List<Tuple3<Guest, Player, Sport>> ret1 =
         sorm.joinOn(
             Guest.class, Player.class, Sport.class, "guests.id=players.id", "players.id=sports.id");

@@ -97,8 +97,8 @@ class OrmConnectionImplTest {
           conn.insert(PLAYER_ALICE);
           assertThat(conn.exists(PLAYER_ALICE)).isTrue();
           assertThat(conn.exists(PLAYER_BOB)).isFalse();
-          assertThat(conn.exists("players", PLAYER_ALICE)).isTrue();
-          assertThat(conn.exists("players", PLAYER_BOB)).isFalse();
+          assertThat(conn.existsIn("players", PLAYER_ALICE)).isTrue();
+          assertThat(conn.existsIn("players", PLAYER_BOB)).isFalse();
           conn.readFirst(Guest.class, "select * from players");
         });
   }
@@ -244,6 +244,9 @@ class OrmConnectionImplTest {
 
   @Test
   void testReadOneExp() {
+    orm.execute(ParameterizedSql.of("select * from players"));
+    orm.existsIn("players", SormTestUtils.PLAYER_ALICE);
+
     assertThrows(SormException.class, () -> orm.readOne(Player.class, "SELECT * FROM PLAYERS"));
   }
 

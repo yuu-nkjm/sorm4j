@@ -226,12 +226,18 @@ class ArrayUtilsTest {
     assertArrayEquals(srcArray, result);
   }
 
+  @Test
   public void testConvertToObjectArray_WithNullArray() {
-    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, null);
+    assertThat(ArrayUtils.convertToObjectArray(Integer.class, null)).isNull();
+    assertThat(ArrayUtils.convertToObjectArray(Integer.class, new int[] {1, 2}))
+        .isEqualTo(new Integer[] {1, 2});
   }
 
+  @Test
   public void testConvertToObjectArray_WithTypeMismatch() {
-    Object[] srcArray = new Object[] {1, 2, 3.0}; // 最後の要素がDouble型
-    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, srcArray);
+    Object[] srcArray = new Object[] {1, 2, 3.0};
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ArrayUtils.convertToObjectArray(Integer.class, srcArray));
   }
 }
