@@ -66,6 +66,10 @@ class TableTest {
       TableConnection<Player> c = TableConnection.of(con, Player.class);
       c.count();
     }
+    try (OrmConnection ocon = playersTable.getOrm().open();
+        TableConnection<Player> con = playersTable.toTableConnection(ocon)) {
+      con.count();
+    }
   }
 
   @Test
