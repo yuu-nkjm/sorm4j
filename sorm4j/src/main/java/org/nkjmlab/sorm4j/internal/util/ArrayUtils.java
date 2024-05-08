@@ -176,7 +176,7 @@ public final class ArrayUtils {
         java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArrayAux(compArrType, v));
       }
       return destArray;
-    } else if (srcArray instanceof Array) {
+    } else {
       int length = java.lang.reflect.Array.getLength(srcArray);
       Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
       for (int i = 0; i < length; i++) {
@@ -184,8 +184,6 @@ public final class ArrayUtils {
         java.lang.reflect.Array.set(destArray, i, v);
       }
       return destArray;
-    } else {
-      throw new IllegalArgumentException("srcArray should be java.sql.Array");
     }
   }
 
