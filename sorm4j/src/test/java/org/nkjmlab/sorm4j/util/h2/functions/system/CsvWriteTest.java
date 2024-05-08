@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.util.h2.functions.system;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
@@ -60,5 +61,14 @@ class CsvWriteTest {
     assertEquals(expectedSql, csvWrite.getSql());
   }
 
-  // Additional tests can be added to cover more scenarios and edge cases.
+  @Test
+  public void testEscapeMethod() {
+    CsvWrite.Builder builder = CsvWrite.builder(new File("/test"));
+    builder.queryEscape(true);
+    builder.escape("'");
+    builder.query("select * from table");
+    builder.caseSensitiveColumnNames("true");
+    assertThat(builder.build().toString()).contains("escape=\\'");
+    assertThat(builder.build().toString()).contains("caseSensitiveColumnNames=true");
+  }
 }
