@@ -69,15 +69,35 @@ public class SystemPropertyUtils {
    *
    * @return
    */
-  private static File getUserHomeDirectory() {
+  static File getUserHomeDirectory() {
     return new File(System.getProperty("user.home"));
   }
 
-  public static String getTildeExpandAbsolutePath(File path) {
-    return (path.getName().equals("~")
-            || path.getPath().startsWith("~/")
-            || path.getPath().startsWith("~\\"))
-        ? path.getPath().replace("~", getUserHomeDirectory().getAbsolutePath())
-        : path.getAbsolutePath();
+  public static File getTempDir() {
+    return new File(System.getProperty("java.io.tmpdir"));
+  }
+
+  public static File convertTildeInFilePath(File filePath) {
+    return new File(
+        (filePath.getName().equals("~")
+                || filePath.getPath().startsWith("~/")
+                || filePath.getPath().startsWith("~\\"))
+            ? filePath.getPath().replace("~", getUserHomeDirectory().getAbsolutePath())
+            : filePath.getAbsolutePath());
+  }
+
+  public static File convertVariableInFilePath(File filePath) {
+    String path = filePath.toString();
+    if (path.startsWith("%TEMP%")) {
+      return new File(getTempDir(), path.replace("%TEMP%", ""));
+    } else if (path.startsWith("$TMPDIR")) {
+      return new File(getTempDir(), path.replace("$TMPDIR", ""));
+    } else if (path.startsWith("%USERPROFILE%")) {
+      return new File(getUserHomeDirectory(), path.replace("%USERPROFILE%", ""));
+    } else if (path.contains("~")) {
+      return SystemPropertyUtils.convertTildeInFilePath(filePath);
+    } else {
+      return filePath;
+    }
   }
 }

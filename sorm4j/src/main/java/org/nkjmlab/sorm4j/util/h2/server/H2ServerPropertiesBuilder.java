@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.util.h2.server;
 
 import java.io.File;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -54,7 +55,7 @@ public abstract class H2ServerPropertiesBuilder<T extends H2ServerPropertiesBuil
   }
 
   public String getH2ClassPath() {
-    return SystemPropertyUtils.getTildeExpandAbsolutePath(new File(h2ClassPath));
+    return SystemPropertyUtils.convertTildeInFilePath(new File(h2ClassPath)).getAbsolutePath();
   }
 
   public abstract H2ServerProperties build();

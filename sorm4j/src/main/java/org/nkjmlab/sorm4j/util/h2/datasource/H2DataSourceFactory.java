@@ -262,7 +262,7 @@ public class H2DataSourceFactory {
   }
 
   public static class Builder {
-    private File databaseDirectory = new File(getTempDir(), "h2db-tmp");
+    private File databaseDirectory = new File(SystemPropertyUtils.getTempDir(), "h2db-tmp");
     private String databaseName = "h2db-tmp";
     private String username = "";
     private String password = "";
@@ -316,34 +316,13 @@ public class H2DataSourceFactory {
                 + databaseDirectoryPath.getPath()
                 + "]");
       }
-      this.databaseDirectory = convertVariableInFilePath(databaseDirectoryPath);
+      this.databaseDirectory = SystemPropertyUtils.convertVariableInFilePath(databaseDirectoryPath);
       return this;
-    }
-
-    private File convertVariableInFilePath(File databaseDirectoryPath) {
-      String databaseDirectoryPathStr = databaseDirectoryPath.toString();
-      if (databaseDirectoryPathStr.startsWith("%TEMP%")) {
-        return new File(getTempDir(), databaseDirectoryPathStr.replace("%TEMP%", ""));
-      } else if (databaseDirectoryPathStr.startsWith("$TMPDIR")) {
-        return new File(getTempDir(), databaseDirectoryPathStr.replace("$TMPDIR", ""));
-      } else if (databaseDirectoryPathStr.startsWith("%USERPROFILE%")) {
-        return new File(getUserHomeDir(), databaseDirectoryPathStr.replace("%USERPROFILE%", ""));
-      } else {
-        return new File(SystemPropertyUtils.getTildeExpandAbsolutePath(databaseDirectoryPath));
-      }
     }
 
     public H2DataSourceFactory.Builder setDatabaseName(String dbName) {
       this.databaseName = dbName;
       return this;
-    }
-
-    private static File getTempDir() {
-      return new File(System.getProperty("java.io.tmpdir"));
-    }
-
-    private static File getUserHomeDir() {
-      return new File(System.getProperty("user.home"));
     }
 
     /**
