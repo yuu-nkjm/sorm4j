@@ -83,6 +83,14 @@ class OrmConnectionImplTest {
   }
 
   @Test
+  public void testGetMetaDataWithSQLException() throws SQLException {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    when(mockConnection.getMetaData()).thenThrow(SQLException.class);
+    assertThrows(
+        SQLException.class, () -> OrmConnection.of(mockConnection).getJdbcDatabaseMetaData());
+  }
+
+  @Test
   void testDelete() {
     orm.acceptHandler(
         conn -> {
@@ -232,6 +240,11 @@ class OrmConnectionImplTest {
             fail();
           }
         });
+  }
+
+  @Test
+  void testReadOneExp() {
+    assertThrows(SormException.class, () -> orm.readOne(Player.class, "SELECT * FROM PLAYERS"));
   }
 
   @Test
@@ -392,6 +405,16 @@ class OrmConnectionImplTest {
           m.deleteIn("players1", List.of(a, b));
           assertThat(m.readList(Player.class, "select * from players1").size()).isEqualTo(0);
         });
+  }
+
+  @Test
+  void testExecute() {
+    assertThat(orm.execute(ParameterizedSql.of("select * from players1"))).isTrue();
+  }
+
+  @Test
+  void testExists() {
+    assertThat(orm.existsByPrimaryKeyIn("guests", 1)).isFalse();
   }
 
   @Test
