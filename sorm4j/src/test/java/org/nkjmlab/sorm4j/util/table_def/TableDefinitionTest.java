@@ -46,6 +46,8 @@ class TableDefinitionTest {
     assertThat(sorm.readFirst(SimpleEnum.class, "SELECT * FROM SIMPLE_ENUMS").enumCol)
         .isInstanceOf(EnumExample.class);
     assertThat(TableDefinition.toTableName(Player.class)).isEqualTo("PLAYERS");
+    assertThat(TableDefinition.builder("").setTableName("tbn").build().getTableName())
+        .isEqualTo("tbn");
   }
 
   @Test
