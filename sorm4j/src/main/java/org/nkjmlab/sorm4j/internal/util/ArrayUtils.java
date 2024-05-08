@@ -187,7 +187,10 @@ public final class ArrayUtils {
     }
   }
 
-  public static <T> T[] convertToObjectArray(Class<?> componentType, Object srcArray) {
+  public static <T> T[] convertToObjectArray(Class<T> componentType, Object srcArray) {
+    if (srcArray == null) {
+      return null;
+    }
     final int length = Array.getLength(srcArray);
     Object destArray =
         Array.newInstance(

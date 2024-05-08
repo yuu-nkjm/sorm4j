@@ -256,8 +256,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> boolean exists(String tableName, T object) {
-    return applyAndClose(conn -> conn.exists(tableName, object));
+  public <T> boolean existsIn(String tableName, T object) {
+    return applyAndClose(conn -> conn.existsIn(tableName, object));
   }
 
   @Override

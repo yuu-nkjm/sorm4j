@@ -279,7 +279,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> boolean exists(String tableName, T object) {
+  public <T> boolean existsIn(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
     return existsHelper(mapping.getSql(), mapping.getPrimaryKeyParameters(object));
   }

@@ -223,7 +223,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> boolean exists(String tableName, T object);
+  <T> boolean existsIn(String tableName, T object);
 
   /**
    * Returns the object which has same primary key exists or not.
