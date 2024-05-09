@@ -16,8 +16,7 @@ public interface TableConnection<T> extends TableMappedOrm<T>, AutoCloseable {
   OrmConnection getOrm();
 
   /**
-   * Gets a {@link TableConnection} wrapping the given JDBC Connection and the given
-   * context.
+   * Gets a {@link TableConnection} wrapping the given JDBC Connection and the given context.
    *
    * @param <T>
    * @param connection
@@ -29,8 +28,7 @@ public interface TableConnection<T> extends TableMappedOrm<T>, AutoCloseable {
   }
 
   /**
-   * Gets a {@link TableConnection} wrapping the given JDBC Connection and the given
-   * context.
+   * Gets a {@link TableConnection} wrapping the given JDBC Connection and the given context.
    *
    * @param <T>
    * @param connection
@@ -38,8 +36,10 @@ public interface TableConnection<T> extends TableMappedOrm<T>, AutoCloseable {
    * @param tableName
    * @return
    */
-  static <T> TableConnection<T> of(
-      OrmConnection connection, Class<T> valueType, String tableName) {
+  static <T> TableConnection<T> of(OrmConnection connection, Class<T> valueType, String tableName) {
     return new TableConnectionImpl<T>(connection, valueType, tableName);
   }
+
+  @Override
+  void close();
 }

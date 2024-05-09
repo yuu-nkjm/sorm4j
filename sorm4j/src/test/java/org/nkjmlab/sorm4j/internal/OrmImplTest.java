@@ -101,7 +101,7 @@ class OrmImplTest {
   void testExists() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
-    assertThat(sorm.exists("guests", PLAYER_ALICE)).isFalse();
+    assertThat(sorm.existsIn("guests", PLAYER_ALICE)).isFalse();
   }
 
   @Test

@@ -223,7 +223,7 @@ public interface Orm {
    * @param object
    * @return
    */
-  <T> boolean exists(String tableName, T object);
+  <T> boolean existsIn(String tableName, T object);
 
   /**
    * Returns the object which has same primary key exists or not.
@@ -240,7 +240,7 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  <T> boolean exists(String tableName, Object... primaryKeyValues);
+  <T> boolean existsByPrimaryKeyIn(String tableName, Object... primaryKeyValues);
 
   /**
    * @param <T>
@@ -248,7 +248,7 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  <T> boolean exists(Class<T> type, Object... primaryKeyValues);
+  <T> boolean existsByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
    * Gets function which traverses and maps the all the rows in the given resultSet to an object
@@ -753,7 +753,7 @@ public interface Orm {
    * @return
    */
   @Experimental
-  int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues);
+  int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues);
 
   /**
    * Updates with objects in the table corresponding to the given table name.

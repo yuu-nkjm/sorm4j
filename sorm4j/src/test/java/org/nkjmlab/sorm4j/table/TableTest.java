@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
@@ -65,6 +68,10 @@ class TableTest {
     try (OrmConnection con = playersTable.getOrm().open()) {
       TableConnection<Player> c = TableConnection.of(con, Player.class);
       c.count();
+    }
+    try (OrmConnection ocon = playersTable.getOrm().open();
+        TableConnection<Player> con = playersTable.toTableConnection(ocon)) {
+      con.count();
     }
   }
 
@@ -387,8 +394,48 @@ class TableTest {
   }
 
   @Test
+  void testAcceptHandlerExp() {
+    @SuppressWarnings("unchecked")
+    ConsumerHandler<TableConnection<Player>> handler = mock(ConsumerHandler.class);
+
+    assertDoesNotThrow(() -> playersTable.acceptHandler(handler));
+  }
+
+  @Test
   void testApplyHandler() {
     FunctionHandler<TableConnection<Player>, String> handler = conn -> "result";
     assertEquals("result", playersTable.applyHandler(handler));
+  }
+
+  @Test
+  void testAcceptHandlerWithException() throws Exception {
+    Sorm orm = mock(Sorm.class);
+    OrmConnection conn = mock(OrmConnection.class);
+    ConsumerHandler<TableConnection<Object>> handler = mock(ConsumerHandler.class);
+
+    when(orm.open()).thenReturn(conn);
+    doThrow(new RuntimeException("Test Exception")).when(handler).accept(any());
+
+    Table<Object> table = Table.create(orm, Object.class);
+
+    Exception exception = assertThrows(RuntimeException.class, () -> table.acceptHandler(handler));
+
+    assertEquals("Test Exception", exception.getMessage());
+  }
+
+  @Test
+  void testApplyHandlerWithException() throws Exception {
+    Sorm orm = mock(Sorm.class);
+    OrmConnection conn = mock(OrmConnection.class);
+    FunctionHandler<TableConnection<Object>, String> handler = mock(FunctionHandler.class);
+
+    when(orm.open()).thenReturn(conn);
+    when(handler.apply(any())).thenThrow(new RuntimeException("Test Exception"));
+
+    Table<Object> table = Table.create(orm, Object.class);
+
+    Exception exception = assertThrows(RuntimeException.class, () -> table.applyHandler(handler));
+
+    assertEquals("Test Exception", exception.getMessage());
   }
 }

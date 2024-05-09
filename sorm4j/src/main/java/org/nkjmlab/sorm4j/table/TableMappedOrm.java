@@ -86,7 +86,7 @@ public interface TableMappedOrm<T> {
   }
 
   default boolean exists(Object... primaryKeyValues) {
-    return getOrm().exists(getValueType(), primaryKeyValues);
+    return getOrm().existsByPrimaryKey(getValueType(), primaryKeyValues);
   }
 
   default int[] delete(List<T> objects) {
@@ -176,7 +176,7 @@ public interface TableMappedOrm<T> {
   }
 
   default int updateByPrimaryKey(RowMap object, Object... primaryKeyValues) {
-    return getOrm().updateByPrimaryKey(getTableName(), object, primaryKeyValues);
+    return getOrm().updateByPrimaryKeyIn(getTableName(), object, primaryKeyValues);
   }
 
   default <S> List<Tuple2<T, S>> joinUsing(TableMappedOrm<S> other, String... columns) {

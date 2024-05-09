@@ -256,18 +256,18 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T> boolean exists(String tableName, T object) {
-    return applyAndClose(conn -> conn.exists(tableName, object));
+  public <T> boolean existsIn(String tableName, T object) {
+    return applyAndClose(conn -> conn.existsIn(tableName, object));
   }
 
   @Override
-  public <T> boolean exists(String tableName, Object... primaryKeyValues) {
-    return applyAndClose(conn -> conn.exists(tableName, primaryKeyValues));
+  public <T> boolean existsByPrimaryKeyIn(String tableName, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.existsByPrimaryKeyIn(tableName, primaryKeyValues));
   }
 
   @Override
-  public <T> boolean exists(Class<T> type, Object... primaryKeyValues) {
-    return applyAndClose(conn -> conn.exists(type, primaryKeyValues));
+  public <T> boolean existsByPrimaryKey(Class<T> type, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.existsByPrimaryKey(type, primaryKeyValues));
   }
 
   @Override
@@ -447,8 +447,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues) {
-    return applyAndClose(conn -> conn.updateByPrimaryKey(tableName, object, primaryKeyValues));
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
+    return applyAndClose(conn -> conn.updateByPrimaryKeyIn(tableName, object, primaryKeyValues));
   }
 
   @Override
