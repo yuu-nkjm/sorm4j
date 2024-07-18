@@ -134,4 +134,57 @@ class JoinSqlTest {
 
     assertEquals(expectedSql, actualSql);
   }
+
+  @Test
+  void testBuilderWithOrderByAndLimit1() {
+    TableMetaData mockTableMetaData = mock(TableMetaData.class);
+    when(mockTableMetaData.getTableName()).thenReturn("table1");
+    when(mockTableMetaData.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    String expectedSql = "select column1,column2 from table1 where column1=1 limit 10";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTableMetaData);
+    String actualSql = builder.where("column1=1").limit(10).build();
+
+    assertEquals(expectedSql, actualSql);
+  }
+
+  @Test
+  public void testBasicInnerJoinWithMock() {
+    TableMetaData table1 = mock(TableMetaData.class);
+    TableMetaData table2 = mock(TableMetaData.class);
+
+    when(table1.getColumnAliases()).thenReturn(List.of("id", "name"));
+    when(table1.getTableName()).thenReturn("table1");
+    when(table2.getColumnAliases()).thenReturn(List.of("table1_id", "description"));
+    when(table2.getTableName()).thenReturn("table2");
+
+    String sql = JoinSql.builder(table1).joinOn(table2, "table1.id = table2.table1_id").build();
+
+    assertEquals(
+        "select id,name,table1_id,description from table1 join table2 on table1.id = table2.table1_id",
+        sql);
+  }
+
+  @Test
+  public void testJoinWithMultipleConditions() {
+    TableMetaData table1 = mock(TableMetaData.class);
+    TableMetaData table2 = mock(TableMetaData.class);
+
+    when(table1.getColumnAliases()).thenReturn(List.of("id", "name"));
+    when(table1.getTableName()).thenReturn("table1");
+    when(table2.getColumnAliases()).thenReturn(List.of("id", "description"));
+    when(table2.getTableName()).thenReturn("table2");
+
+    String sql =
+        JoinSql.builder(table1)
+            .joinOn(table2, "table1.id = table2.id")
+            .where("table1.name = 'Alice'")
+            .orderBy("table2.description")
+            .build();
+
+    assertEquals(
+        "select id,name,id,description from table1 join table2 on table1.id = table2.id where table1.name = 'Alice' order by table2.description",
+        sql);
+  }
 }

@@ -1,3 +1,4 @@
 setlocal
 cd /d %~dp0
-mvn-caller.bat "mvn clean compile"
+call mvn-caller.bat "mvn clean compile"
+endlocal

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
@@ -44,6 +45,9 @@ class TableDefinitionTest {
     sorm.insert(new SimpleEnum(1, EnumExample.A));
     assertThat(sorm.readFirst(SimpleEnum.class, "SELECT * FROM SIMPLE_ENUMS").enumCol)
         .isInstanceOf(EnumExample.class);
+    assertThat(TableDefinition.toTableName(Player.class)).isEqualTo("PLAYERS");
+    assertThat(TableDefinition.builder("").setTableName("tbn").build().getTableName())
+        .isEqualTo("tbn");
   }
 
   @Test

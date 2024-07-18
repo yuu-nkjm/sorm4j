@@ -1,12 +1,16 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static java.sql.Connection.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+
 import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -49,11 +53,19 @@ class SormImplTest {
 
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.exists(PLAYER_ALICE)).isTrue();
+    assertThat(sorm.existsByPrimaryKeyIn("players", PLAYER_ALICE.id)).isTrue();
+    assertThat(
+            sorm.readTupleList(
+                    Guest.class,
+                    Player.class,
+                    ParameterizedSql.of(
+                        "select * from guests join players on guests.id=players.id"))
+                .size())
+        .isEqualTo(0);
 
-    sorm.readTupleList(
-        Guest.class,
-        Player.class,
-        ParameterizedSql.of("select * from guests join players on guests.id=players.id"));
+    assertThat(sorm.getTableSql("players")).isNotNull();
+
+    assertThat(sorm.execute("select * from players")).isTrue();
 
     sorm.readTupleList(
         Guest.class,
@@ -61,6 +73,32 @@ class SormImplTest {
         Sport.class,
         ParameterizedSql.of(
             "select * from guests join players on guests.id=players.id join sports on players.id=sports.id"));
+  }
+
+  @Test
+  void testJoin3() {
+    assertThat(
+            sorm.join(
+                    Guest.class,
+                    Player.class,
+                    Sport.class,
+                    "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id")
+                .size())
+        .isEqualTo(0);
+
+    List<Tuple3<Guest, Player, Sport>> ret1 =
+        sorm.joinOn(
+            Guest.class, Player.class, Sport.class, "guests.id=players.id", "players.id=sports.id");
+    assertThat(ret1.size()).isEqualTo(sorm.selectAll(Guest.class).size());
+  }
+
+  @Test
+  void testExcute() throws SQLException {
+    assertThat(sorm.getTableSql(Player.class)).isNotNull();
+    assertThat(sorm.execute("select * from players")).isTrue();
+    sorm.insert(SormTestUtils.PLAYER_ALICE);
+    sorm.stream(Player.class, "select * from players")
+        .accept(st -> assertThat(st.count()).isEqualTo(1));
   }
 
   @Test

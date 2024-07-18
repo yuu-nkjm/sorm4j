@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalCase;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;

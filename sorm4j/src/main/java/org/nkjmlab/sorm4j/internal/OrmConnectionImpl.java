@@ -279,7 +279,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> boolean exists(String tableName, T object) {
+  public <T> boolean existsIn(String tableName, T object) {
     SqlParametersToTableMapping<T> mapping = getCastedTableMapping(tableName, object.getClass());
     return existsHelper(mapping.getSql(), mapping.getPrimaryKeyParameters(object));
   }
@@ -291,12 +291,12 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> boolean exists(String tableName, Object... primaryKeyValues) {
+  public <T> boolean existsByPrimaryKeyIn(String tableName, Object... primaryKeyValues) {
     return existsHelper(getTableSql(tableName), primaryKeyValues);
   }
 
   @Override
-  public <T> boolean exists(Class<T> type, Object... primaryKeyValues) {
+  public <T> boolean existsByPrimaryKey(Class<T> type, Object... primaryKeyValues) {
     return existsHelper(getTableSql(type), primaryKeyValues);
   }
 
@@ -954,7 +954,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public int updateByPrimaryKey(String tableName, RowMap object, Object... primaryKeyValues) {
+  public int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues) {
     final String sql = getTableSql(tableName).getUpdateSql(object);
     List<Object> params = new ArrayList<>(object.values());
     params.addAll(Arrays.asList(primaryKeyValues));

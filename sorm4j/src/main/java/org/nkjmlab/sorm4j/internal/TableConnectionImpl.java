@@ -40,7 +40,7 @@ public class TableConnectionImpl<T> implements TableConnection<T> {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     try {
       getOrm().getJdbcConnection().close();
     } catch (SQLException e) {

@@ -1,7 +1,16 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.sql.Array;
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 
@@ -165,6 +174,106 @@ class ArrayUtilsTest {
 
   @Test
   void testConvertToObjectArrayWithNullInput() {
-    assertThrows(NullPointerException.class, () -> ArrayUtils.convertToObjectArray(null));
+    assertNull(ArrayUtils.convertToObjectArray(null));
+  }
+
+  @Test
+  public void testConvertSqlArrayToArray_WithSqlArray() throws SQLException {
+    Array sqlArrayMock = mock(Array.class);
+    Object[] expectedArray = {1, 2, 3};
+    when(sqlArrayMock.getArray()).thenReturn(expectedArray);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ArrayUtils.convertSqlArrayToArray(Integer[].class, sqlArrayMock));
+  }
+
+  public void testConvertSqlArrayToArray_WithSqlException() throws SQLException {
+    Array sqlArrayMock = mock(Array.class);
+    when(sqlArrayMock.getArray()).thenThrow(new SQLException("Database error"));
+    ArrayUtils.convertSqlArrayToArray(Integer[].class, sqlArrayMock);
+  }
+
+  @Test
+  public void testConvertSqlArrayToArray_WithNullInput() {
+    Object result = ArrayUtils.convertSqlArrayToArray(Integer[].class, null);
+    assertNull(result);
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithIntegerArray() {
+    Integer[] srcArray = {1, 2, 3};
+    Integer[] result = ArrayUtils.convertToObjectArray(Integer.class, srcArray);
+
+    assertNotNull(result);
+    assertTrue(result instanceof Integer[]);
+    assertArrayEquals(srcArray, result);
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithDoubleArray() {
+    Double[] srcArray = {1.0, 2.0, 3.0};
+    Double[] result = ArrayUtils.convertToObjectArray(Double.class, srcArray);
+
+    assertNotNull(result);
+    assertTrue(result instanceof Double[]);
+    assertArrayEquals(srcArray, result);
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithNullArray() {
+    assertThat(ArrayUtils.convertToObjectArray(Integer.class, null)).isNull();
+    assertThat(ArrayUtils.convertToObjectArray(Integer.class, new int[] {1, 2}))
+        .isEqualTo(new Integer[] {1, 2});
+  }
+
+  @Test
+  public void testConvertToObjectArray_WithTypeMismatch() {
+    Object[] srcArray = new Object[] {1, 2, 3.0};
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ArrayUtils.convertToObjectArray(Integer.class, srcArray));
+  }
+
+  @Test
+  public void testToObjectArrayWithNullInputs() {
+    assertNull(
+        ArrayUtils.toObjectArray((boolean[]) null), "Should return null for null boolean array");
+    assertNull(ArrayUtils.toObjectArray((byte[]) null), "Should return null for null byte array");
+    assertNull(ArrayUtils.toObjectArray((char[]) null), "Should return null for null char array");
+    assertNull(
+        ArrayUtils.toObjectArray((double[]) null), "Should return null for null double array");
+    assertNull(ArrayUtils.toObjectArray((float[]) null), "Should return null for null float array");
+    assertNull(ArrayUtils.toObjectArray((int[]) null), "Should return null for null int array");
+    assertNull(ArrayUtils.toObjectArray((long[]) null), "Should return null for null long array");
+    assertNull(ArrayUtils.toObjectArray((short[]) null), "Should return null for null short array");
+  }
+
+  @Test
+  public void testConvertSqlArrayToArrayWithNull() {
+    assertNull(
+        ArrayUtils.convertSqlArrayToArray(Object.class, null),
+        "Should return null for null SQL array");
+  }
+
+  @Test
+  public void testConvertToObjectArrayWithNullObjectArray() {
+    assertNull(ArrayUtils.convertToObjectArray(null), "Should return null");
+  }
+
+  @Test
+  public void testSplitWithNull() {
+    assertThrows(
+        NullPointerException.class,
+        () -> ArrayUtils.split(1, (Object[]) null),
+        "Should throw NullPointerException for null object split");
+  }
+
+  @Test
+  public void testAddWithNullIntArray() {
+    assertThrows(
+        NullPointerException.class,
+        () -> ArrayUtils.add(null, 1),
+        "Should throw NullPointerException for null int array addition");
   }
 }

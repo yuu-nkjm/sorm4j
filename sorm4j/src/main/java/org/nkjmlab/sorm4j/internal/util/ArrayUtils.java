@@ -150,12 +150,19 @@ public final class ArrayUtils {
    * @param srcArray
    * @return
    */
-  public static Object convertSqlArrayToArray(Class<?> toComponentType, Object srcArray) {
+  public static Object convertSqlArrayToArray(Class<?> toComponentType, java.sql.Array srcArray) {
+    return convertSqlArrayToArrayAux(toComponentType, srcArray);
+  }
+
+  private static Object convertSqlArrayToArrayAux(Class<?> toComponentType, Object srcArray) {
+    if (srcArray == null) {
+      return null;
+    }
     if (srcArray instanceof java.sql.Array) {
       try {
         java.sql.Array sqlArray = (java.sql.Array) srcArray;
         Object array = sqlArray.getArray();
-        return convertSqlArrayToArray(toComponentType, array);
+        return convertSqlArrayToArrayAux(toComponentType, array);
       } catch (SQLException e) {
         throw Try.rethrow(e);
       }
@@ -166,7 +173,7 @@ public final class ArrayUtils {
       Object destArray = java.lang.reflect.Array.newInstance(toComponentType, length);
       for (int i = 0; i < length; i++) {
         Object v = java.lang.reflect.Array.get(srcArray, i);
-        java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArray(compArrType, v));
+        java.lang.reflect.Array.set(destArray, i, convertSqlArrayToArrayAux(compArrType, v));
       }
       return destArray;
     } else {
@@ -180,7 +187,10 @@ public final class ArrayUtils {
     }
   }
 
-  public static <T> T[] convertToObjectArray(Class<?> componentType, Object srcArray) {
+  public static <T> T[] convertToObjectArray(Class<T> componentType, Object srcArray) {
+    if (srcArray == null) {
+      return null;
+    }
     final int length = Array.getLength(srcArray);
     Object destArray =
         Array.newInstance(
@@ -198,6 +208,9 @@ public final class ArrayUtils {
   }
 
   public static Object[] convertToObjectArray(Object srcArray) {
+    if (srcArray == null) {
+      return null;
+    }
     Class<?> componentType = srcArray.getClass().getComponentType();
     if (componentType == null) {
       throw new IllegalArgumentException("the argument could not be convert to an object array.");
