@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.result;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
 import java.time.LocalDate;
@@ -7,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
@@ -109,8 +112,10 @@ public interface RowMap extends Map<String, Object> {
   @Experimental
   static <T extends Record> RowMap fromRecord(T src) {
     try {
-      RecordComponent[] recordComponents = src.getClass().getRecordComponents();
-      BasicRowMap destMap = new BasicRowMap();
+      RecordComponent[] recordComponents =
+          recordComponentsCache.computeIfAbsent(
+              src.getClass(), key -> src.getClass().getRecordComponents());
+      BasicRowMap destMap = new BasicRowMap((int) (recordComponents.length / 0.75f), 0.75f);
       for (int i = 0; i < recordComponents.length; i++) {
         destMap.put(recordComponents[i].getName(), recordComponents[i].getAccessor().invoke(src));
       }
@@ -140,23 +145,46 @@ public interface RowMap extends Map<String, Object> {
   @Experimental
   static <T extends Record> T toRecord(RowMap src, Class<T> toType) {
     try {
-      RecordComponent[] recordComponents = toType.getRecordComponents();
-      Class<?>[] types = new Class<?>[recordComponents.length];
+      RecordComponent[] recordComponents =
+          recordComponentsCache.computeIfAbsent(toType, key -> toType.getRecordComponents());
+
       Object[] args = new Object[recordComponents.length];
       for (int i = 0; i < recordComponents.length; i++) {
-        types[i] = recordComponents[i].getType();
         args[i] = src.get(StringCache.toCanonicalCase(recordComponents[i].getName()));
       }
-      return toType.getDeclaredConstructor(types).newInstance(args);
+
+      return getConstructor(recordComponents, toType).newInstance(args);
     } catch (InstantiationException
         | IllegalAccessException
         | IllegalArgumentException
         | InvocationTargetException
-        | NoSuchMethodException
         | SecurityException e) {
       throw Try.rethrow(e);
     }
   }
+
+  @SuppressWarnings("unchecked")
+  static <T> Constructor<T> getConstructor(RecordComponent[] recordComponents, Class<T> toType) {
+    return (Constructor<T>)
+        constructorCache.computeIfAbsent(
+            toType,
+            key -> {
+              Class<?>[] types = new Class<?>[recordComponents.length];
+              for (int i = 0; i < recordComponents.length; i++) {
+                types[i] = recordComponents[i].getType();
+              }
+              try {
+                return toType.getDeclaredConstructor(types);
+              } catch (NoSuchMethodException | SecurityException e) {
+                throw Try.rethrow(e);
+              }
+            });
+  }
+
+  static final ConcurrentMap<Class<?>, RecordComponent[]> recordComponentsCache =
+      new ConcurrentHashMap<>();
+  static final ConcurrentMap<Class<?>, Constructor<?>> constructorCache = new ConcurrentHashMap<>();
+
   /**
    * The object is converted to a record object.
    *
