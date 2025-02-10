@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
 public class BasicRowMap implements RowMap {
@@ -106,8 +107,12 @@ public class BasicRowMap implements RowMap {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof Map)) return false;
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Map)) {
+      return false;
+    }
     Map<?, ?> other = (Map<?, ?>) obj;
     return Objects.equals(map, other);
   }
@@ -119,111 +124,110 @@ public class BasicRowMap implements RowMap {
 
   @Override
   public String getString(String key) {
-    Object val = get(key);
-    if (val == null) {
-      return null;
-    }
-    if (val instanceof byte[]) {
-      return new String((byte[]) val);
-    }
-    return val.toString();
+    return getHelper(
+        key,
+        String.class,
+        val -> byte[].class.isInstance(val) ? new String((byte[]) val) : val.toString());
   }
 
   @Override
   public Integer getInteger(String key) {
-    return getNumberHelper(
+    return getHelper(
         key,
         Integer.class,
-        (clazz, val) ->
-            Number.class.isAssignableFrom(clazz)
+        val ->
+            Number.class.isInstance(val)
                 ? ((Number) val).intValue()
                 : Integer.valueOf(val.toString()));
   }
 
   @Override
   public Long getLong(String key) {
-    return getNumberHelper(
+    return getHelper(
         key,
         Long.class,
-        (clazz, val) ->
-            Number.class.isAssignableFrom(clazz)
+        val ->
+            Number.class.isInstance(val)
                 ? ((Number) val).longValue()
                 : Long.valueOf(val.toString()));
   }
 
   @Override
   public Float getFloat(String key) {
-    return getNumberHelper(
+    return getHelper(
         key,
         Float.class,
-        (clazz, val) ->
-            Number.class.isAssignableFrom(clazz)
+        val ->
+            Number.class.isInstance(val)
                 ? ((Number) val).floatValue()
                 : Float.valueOf(val.toString()));
   }
 
   @Override
   public Double getDouble(String key) {
-    return getNumberHelper(
+    return getHelper(
         key,
         Double.class,
-        (clazz, val) ->
-            Number.class.isAssignableFrom(clazz)
+        val ->
+            Number.class.isInstance(val)
                 ? ((Number) val).doubleValue()
                 : Double.valueOf(val.toString()));
   }
 
-  private <T> T getNumberHelper(
-      String key, Class<T> toType, BiFunction<Class<?>, Object, T> function) {
+  private <T> T getHelper(String key, Class<T> toType, Function<Object, T> converter) {
     Object val = get(key);
     if (val == null) {
       return null;
     }
-    Class<? extends Object> clazz = val.getClass();
-    return function.apply(clazz, val);
+    if (toType.isInstance(val)) {
+      return toType.cast(val);
+    }
+    return converter.apply(val);
   }
 
   @Override
   public LocalDate getLocalDate(String key) {
-    Object val = get(key);
-    if (val == null) {
-      return null;
-    }
-    if (val instanceof java.sql.Date) {
-      return ((java.sql.Date) val).toLocalDate();
-    }
-    return LocalDate.parse(val.toString());
+    return getHelper(
+        key,
+        LocalDate.class,
+        val ->
+            java.sql.Date.class.isInstance(val)
+                ? ((java.sql.Date) val).toLocalDate()
+                : LocalDate.parse(val.toString()));
   }
 
   @Override
   public LocalTime getLocalTime(String key) {
-    Object val = get(key);
-    if (val == null) {
-      return null;
-    }
-    if (val instanceof java.sql.Time) {
-      return ((java.sql.Time) val).toLocalTime();
-    }
-    return LocalTime.parse(val.toString());
+    return getHelper(
+        key,
+        LocalTime.class,
+        val ->
+            java.sql.Date.class.isInstance(val)
+                ? ((java.sql.Time) val).toLocalTime()
+                : LocalTime.parse(val.toString()));
   }
 
   @Override
   public LocalDateTime getLocalDateTime(String key) {
-    Object val = get(key);
-    if (val == null) {
-      return null;
-    }
-    if (val instanceof java.sql.Timestamp) {
-      return ((java.sql.Timestamp) val).toLocalDateTime();
-    }
-    return LocalDateTime.parse(val.toString());
+    return getHelper(
+        key,
+        LocalDateTime.class,
+        val ->
+            java.sql.Timestamp.class.isInstance(val)
+                ? ((java.sql.Timestamp) val).toLocalDateTime()
+                : LocalDateTime.parse(val.toString()));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T[] getArray(String key, Class<T> componentType) {
     Object val = get(key);
     if (val == null) {
       return null;
+    }
+    if (val instanceof Object[]
+        && componentType.isAssignableFrom(val.getClass().getComponentType())) {
+      return (T[]) val;
     }
     return ArrayUtils.convertToObjectArray(componentType, val);
   }

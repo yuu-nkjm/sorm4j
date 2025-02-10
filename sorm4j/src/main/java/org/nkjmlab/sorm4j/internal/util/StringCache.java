@@ -22,11 +22,18 @@ public final class StringCache {
 
   /**
    * Given a field or class name in the form CompoundName (for classes) or compoundName (for fields)
-   * will return a set of guessed names such as [COMPOUND_NAME].
+   * will return a set of guessed names such as [COMPOUND_NAME]. snake_case will return as
+   * [SNAKE_CASE].
    */
-  public static String toUpperSnakeCase(final String compoundName) {
-    String camelCase = compoundName.substring(0, 1).toLowerCase() + compoundName.substring(1);
-    return StringCache.toUpperCase(camelCase.replaceAll("([A-Z])", "_$1").replace("__", "_"));
+  public static String toUpperSnakeCase(final String name) {
+    String ret =
+        StringCache.toUpperCase(
+            name.contains("_")
+                ? name
+                : name.replaceAll("([0-9]+)([A-Z])", "$1_$2")
+                    .replaceAll("([a-z])([A-Z])", "$1_$2")
+                    .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2"));
+    return ret;
   }
 
   /**
@@ -35,16 +42,20 @@ public final class StringCache {
    * <p><b>Example</b>
    *
    * <pre>
-   * STUDENT_ID = &gt; STUDENTID
-   * studentId = &gt; STUDENTID
+   * STUDENT_ID = &gt; STUDENT_ID
+   * studentId = &gt; STUDENT_ID
    * </pre>
    *
    * @param str
    * @return
    */
-  public static String toCanonicalCase(String str) {
+  public static String toCanonicalName(String str) {
     return canonicalCaseCaches.computeIfAbsent(
-        str, key -> str.replaceAll("[_/\\s]", "").toUpperCase(Locale.ENGLISH));
+        str, key -> toUpperSnakeCase(str.replace("\s", "").replace("/", "")));
+  }
+
+  public static String toCanonicalNameWithPrefix(String columnAliasPrefix, String col) {
+    return toCanonicalName(columnAliasPrefix) + "__" + toCanonicalName(col);
   }
 
   /**
@@ -60,7 +71,7 @@ public final class StringCache {
       return false;
     }
     for (String e : collection) {
-      if (toCanonicalCase(e).equals(toCanonicalCase(str))) {
+      if (toCanonicalName(e).equals(toCanonicalName(str))) {
         return true;
       }
     }

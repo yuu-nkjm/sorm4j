@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalCase;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalName;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 public final class ColumnToAccessorMapping {
 
@@ -31,14 +32,14 @@ public final class ColumnToAccessorMapping {
       String columnAliasPrefix) {
     this.columnToAccessorMap =
         columnToAccessorMap.entrySet().stream()
-            .collect(Collectors.toMap(e -> toCanonicalCase(e.getKey()), e -> e.getValue()));
+            .collect(Collectors.toMap(e -> toCanonicalName(e.getKey()), e -> e.getValue()));
     this.columnAliasPrefix = columnAliasPrefix;
 
     this.aliasColumnToAccessorMap =
         columnAliasPrefix == null || columnAliasPrefix.length() == 0
             ? Collections.emptyMap()
             : createAliasAccessors(columnAliasPrefix, columnToAccessorMap).entrySet().stream()
-                .collect(Collectors.toMap(e -> toCanonicalCase(e.getKey()), e -> e.getValue()));
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
   /**
@@ -48,7 +49,7 @@ public final class ColumnToAccessorMapping {
    * @return
    */
   public FieldAccessor get(String columnName) {
-    String cn = toCanonicalCase(columnName);
+    String cn = toCanonicalName(columnName);
     FieldAccessor ret = columnToAccessorMap.get(cn);
     return ret != null ? ret : aliasColumnToAccessorMap.get(cn);
   }
@@ -170,7 +171,7 @@ public final class ColumnToAccessorMapping {
     Map<String, FieldAccessor> ret = new HashMap<>();
 
     for (String key : accessors.keySet()) {
-      String aKey = toCanonicalCase(prefix + key);
+      String aKey = StringCache.toCanonicalNameWithPrefix(prefix, key);
       if (accessors.containsKey(aKey)) {
         Object[] params = {prefix, key};
         throw new SormException(

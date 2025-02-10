@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 public final class TableMetaDataImpl implements TableMetaData {
 
@@ -62,7 +64,13 @@ public final class TableMetaDataImpl implements TableMetaData {
 
     this.columnsWithAliases =
         columns.stream()
-            .map(col -> tableName + "." + col + " as " + columnAliasPrefix + col)
+            .map(
+                col ->
+                    tableName
+                        + "."
+                        + col
+                        + " as "
+                        + StringCache.toCanonicalNameWithPrefix(columnAliasPrefix, col))
             .collect(Collectors.toList());
   }
 

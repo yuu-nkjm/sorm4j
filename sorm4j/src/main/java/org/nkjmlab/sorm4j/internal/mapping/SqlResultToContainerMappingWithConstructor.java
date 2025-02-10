@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalName;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -13,10 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
 
@@ -37,11 +40,12 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
     for (int i = 0; i < constructorParametersLength; i++) {
       Parameter parameter = parameters[i];
-      String canonicalName = toCanonicalCase(parameterNames[i]);
+      String canonicalName = toCanonicalName(parameterNames[i]);
       ConstructorParameter cp = new ConstructorParameter(canonicalName, i, parameter.getType());
       constructorParametersMap.put(canonicalName, cp);
       if (columnAliasPrefix != null && columnAliasPrefix.length() != 0) {
-        constructorParametersMap.put(toCanonicalCase(columnAliasPrefix + canonicalName), cp);
+        constructorParametersMap.put(
+            StringCache.toCanonicalNameWithPrefix(columnAliasPrefix, parameterNames[i]), cp);
       }
     }
   }
@@ -107,7 +111,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
         objectColumnsStr,
         key ->
             Arrays.stream(columns)
-                .map(col -> constructorParametersMap.get(toCanonicalCase(col)))
+                .map(col -> constructorParametersMap.get(toCanonicalName(col)))
                 .toArray(ConstructorParameter[]::new));
   }
 
@@ -163,6 +167,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
   static final class ConstructorParameter {
     private final String name;
+
     /** Order in the constructor parameter */
     private final int order;
 

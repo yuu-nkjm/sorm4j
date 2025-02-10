@@ -136,6 +136,6 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
     final Class<?> objectClass = bean.getClass();
     return nameToFieldMaps
         .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
-        .get(toCanonicalCase(parameterName));
+        .get(toCanonicalName(parameterName));
   }
 }

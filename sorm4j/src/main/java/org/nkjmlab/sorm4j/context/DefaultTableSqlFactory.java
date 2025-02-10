@@ -110,7 +110,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
       this.tableName = tableName;
       this.whereClauseIdentifyByPrimaryKeys = whereClauseIdentifyByPrimaryKeys;
       this.canonicalNameToDbColumnMap =
-          columns.stream().collect(Collectors.toMap(c -> StringCache.toCanonicalCase(c), c -> c));
+          columns.stream().collect(Collectors.toMap(c -> StringCache.toCanonicalName(c), c -> c));
     }
 
     public String createUpdateSql(Collection<String> columns) {
@@ -129,7 +129,7 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
               columns.stream()
                   .map(
                       col ->
-                          canonicalNameToDbColumnMap.get(StringCache.toCanonicalCase(col)) + "=?")
+                          canonicalNameToDbColumnMap.get(StringCache.toCanonicalName(col)) + "=?")
                   .collect(Collectors.toList()));
     }
   }

@@ -104,11 +104,9 @@ class OrmConnectionImplTest {
   }
 
   @Test
-  void testJoin() {
+  void testJoin2() {
     orm.insert(GUEST_ALICE, GUEST_BOB);
     orm.insert(PLAYER_ALICE, PLAYER_BOB);
-    orm.insert(SormTestUtils.SOCCER);
-    orm.insert(SormTestUtils.TENNIS);
 
     List<Tuple2<Guest, Player>> result =
         orm.joinOn(Guest.class, Player.class, "guests.id=players.id");
@@ -116,6 +114,14 @@ class OrmConnectionImplTest {
     assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
     assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result.get(0).toString()).contains("Alice");
+  }
+
+  @Test
+  void testJoin3() {
+    orm.insert(GUEST_ALICE, GUEST_BOB);
+    orm.insert(PLAYER_ALICE, PLAYER_BOB);
+    orm.insert(SormTestUtils.SOCCER);
+    orm.insert(SormTestUtils.TENNIS);
 
     List<Tuple3<Guest, Player, Sport>> result1 =
         orm.joinOn(
@@ -131,7 +137,27 @@ class OrmConnectionImplTest {
   }
 
   @Test
-  void testTupleList() {
+  void testTupleList2() {
+    orm.acceptHandler(
+        m -> {
+          m.insert(GUEST_ALICE, GUEST_BOB);
+          m.insert(PLAYER_ALICE, PLAYER_BOB);
+
+          List<Tuple2<Guest, Player>> result =
+              m.readTupleList(
+                  Guest.class,
+                  Player.class,
+                  "select g.id as g__id, g.name as g__name, g.address as g__address, "
+                      + "p.id as p__id, p.name as p__name, p.address as p__address from guests g join players p on g.id=p.id");
+
+          assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
+          assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
+          assertThat(result.get(0).toString()).contains("Alice");
+        });
+  }
+
+  @Test
+  void testTupleList3() {
     orm.acceptHandler(
         m -> {
           m.insert(GUEST_ALICE, GUEST_BOB);
@@ -139,24 +165,14 @@ class OrmConnectionImplTest {
           m.insert(SormTestUtils.SOCCER);
           m.insert(SormTestUtils.TENNIS);
 
-          List<Tuple2<Guest, Player>> result =
-              m.readTupleList(
-                  Guest.class,
-                  Player.class,
-                  "select g.id as gid, g.name as gname, g.address as gaddress, p.id as pid, p.name as pname, p.address as paddress from guests g join players p on g.id=p.id");
-
-          assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
-          assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
-          assertThat(result.get(0).toString()).contains("Alice");
-
           List<Tuple3<Guest, Player, Sport>> result1 =
               m.readTupleList(
                   Guest.class,
                   Player.class,
                   Sport.class,
-                  "select g.id as gid, g.name as gname, g.address as gaddress, "
-                      + "p.id as pid, p.name as pname, p.address as paddress, "
-                      + "s.id sportdotid, s.name sportdotname "
+                  "select g.id as g__id, g.name as g__name, g.address as g__address, "
+                      + "p.id as p__id, p.name as p__name, p.address as p__address, "
+                      + "s.id sport__id, s.name sport__name "
                       + "from guests g "
                       + "join players p on g.id=p.id "
                       + "join sports s on g.id=s.id");

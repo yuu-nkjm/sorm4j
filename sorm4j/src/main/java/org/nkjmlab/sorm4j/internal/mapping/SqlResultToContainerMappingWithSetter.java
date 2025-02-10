@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.FieldAccessor;
 
 final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
@@ -29,10 +30,10 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
         k ->
             Arrays.stream(columns)
                 .map(
-                    columnName -> {
-                      FieldAccessor acc = columnToAccessorMap.get(columnName);
-                      return acc != null ? acc.getSetterParameterType() : null;
-                    })
+                    columnName ->
+                        Optional.ofNullable(columnToAccessorMap.get(columnName))
+                            .map(acc -> acc.getSetterParameterType())
+                            .orElse(null))
                 .toArray(Class[]::new));
   }
 

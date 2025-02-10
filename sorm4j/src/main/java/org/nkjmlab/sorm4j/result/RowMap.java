@@ -6,12 +6,14 @@ import java.lang.reflect.RecordComponent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -75,27 +77,128 @@ public interface RowMap extends Map<String, Object> {
    */
   @Experimental
   static String toKey(String key) {
-    return StringCache.toCanonicalCase(key);
+    return StringCache.toCanonicalName(key);
   }
 
+  /**
+   * Retrieves the value associated with the specified key as an array of the specified component
+   * type.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. The conversion is
+   * performed using {@link ArrayUtils#convertToObjectArray(Class, Object)}.
+   *
+   * @param <T> the component type of the array
+   * @param key the key whose associated value is to be retrieved
+   * @param componentType the class of the array component type
+   * @return the value converted to an array of {@code componentType}, or {@code null} if the value
+   *     is absent
+   */
   <T> T[] getArray(String key, Class<T> componentType);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link Double}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is a
+   * subclass of {@link Number}, it is converted using {@code doubleValue()}. Otherwise, the value
+   * is converted to a string and parsed as a double.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link Double}, or {@code null} if the value is absent
+   * @throws NumberFormatException if the value cannot be parsed as a double
+   */
   Double getDouble(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link Float}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is a
+   * subclass of {@link Number}, it is converted using {@code floatValue()}. Otherwise, the value is
+   * converted to a string and parsed as a float.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link Float}, or {@code null} if the value is absent
+   * @throws NumberFormatException if the value cannot be parsed as a float
+   */
   Float getFloat(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as an {@link Integer}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is a
+   * subclass of {@link Number}, it is converted using {@code intValue()}. Otherwise, the value is
+   * converted to a string and parsed as an integer.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link Integer}, or {@code null} if the value is absent
+   * @throws NumberFormatException if the value cannot be parsed as an integer
+   */
   Integer getInteger(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link LocalDate}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is an
+   * instance of {@link java.sql.Date}, it is converted using {@link java.sql.Date#toLocalDate()}.
+   * Otherwise, the value is converted to a string and parsed using {@link LocalDate#parse(String)}.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link LocalDate}, or {@code null} if the value is absent
+   * @throws DateTimeParseException if the value cannot be parsed as a valid date
+   */
   LocalDate getLocalDate(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link LocalDateTime}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is an
+   * instance of {@link java.sql.Timestamp}, it is converted using {@link
+   * java.sql.Timestamp#toLocalDateTime()}. Otherwise, the value is converted to a string and parsed
+   * using {@link LocalDateTime#parse(String)}.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link LocalDateTime}, or {@code null} if the value is absent
+   * @throws DateTimeParseException if the value cannot be parsed as a valid date-time
+   */
   LocalDateTime getLocalDateTime(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link LocalTime}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is an
+   * instance of {@link java.sql.Time}, it is converted using {@link java.sql.Time#toLocalTime()}.
+   * Otherwise, the value is converted to a string and parsed using {@link LocalTime#parse(String)}.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link LocalTime}, or {@code null} if the value is absent
+   * @throws DateTimeParseException if the value cannot be parsed as a valid time
+   */
   LocalTime getLocalTime(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link Long}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is a
+   * subclass of {@link Number}, it is converted using {@code longValue()}. Otherwise, the value is
+   * converted to a string and parsed as a long.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link Long}, or {@code null} if the value is absent
+   * @throws NumberFormatException if the value cannot be parsed as a long
+   */
   Long getLong(String key);
 
   Object getObject(String key);
 
+  /**
+   * Retrieves the value associated with the specified key as a {@link String}.
+   *
+   * <p>If the retrieved value is {@code null}, this method returns {@code null}. If the value is an
+   * instance of {@code byte[]}, it is converted to a string using the default character encoding.
+   * Otherwise, {@code toString()} is used to obtain the string representation.
+   *
+   * @param key the key whose associated value is to be retrieved
+   * @return the value converted to {@link String}, or {@code null} if the value is absent
+   */
   String getString(String key);
 
   List<Object> getObjectList(String... key);
@@ -150,7 +253,7 @@ public interface RowMap extends Map<String, Object> {
 
       Object[] args = new Object[recordComponents.length];
       for (int i = 0; i < recordComponents.length; i++) {
-        args[i] = src.get(StringCache.toCanonicalCase(recordComponents[i].getName()));
+        args[i] = src.get(StringCache.toCanonicalName(recordComponents[i].getName()));
       }
 
       return getConstructor(recordComponents, toType).newInstance(args);

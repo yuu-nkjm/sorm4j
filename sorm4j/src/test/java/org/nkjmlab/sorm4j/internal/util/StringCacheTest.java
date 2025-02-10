@@ -6,6 +6,6 @@ class StringCacheTest {
 
   @Test
   void testClearAll() {
-    StringCache.toCanonicalCase("hoge");
+    StringCache.toCanonicalName("hoge");
   }
 }

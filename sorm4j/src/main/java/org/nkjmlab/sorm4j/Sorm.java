@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+
 import javax.sql.DataSource;
+
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
