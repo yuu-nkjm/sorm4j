@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /**
@@ -27,6 +27,10 @@ public interface RowMap extends Map<String, Object> {
 
   static RowMap create() {
     return new BasicRowMap();
+  }
+
+  static RowMap create(int initialCapacity, float loadFactor) {
+    return new BasicRowMap(initialCapacity, loadFactor);
   }
 
   static RowMap create(Map<String, Object> map) {
@@ -70,15 +74,19 @@ public interface RowMap extends Map<String, Object> {
   }
 
   /**
-   * Key to canonical key
+   * The string is converted to canonical key
    *
-   * @param key
+   * @param str
    * @return
    */
   @Experimental
-  static String toKey(String key) {
-    return StringCache.toCanonicalName(key);
+  public static String toKey(String str) {
+    return SormContext.getDefaultCanonicalStringCache().toCanonicalName(str);
   }
+
+  /** key is converted as canonical case */
+  @Override
+  Object get(Object key);
 
   /**
    * Retrieves the value associated with the specified key as an array of the specified component
@@ -218,7 +226,7 @@ public interface RowMap extends Map<String, Object> {
       RecordComponent[] recordComponents =
           recordComponentsCache.computeIfAbsent(
               src.getClass(), key -> src.getClass().getRecordComponents());
-      BasicRowMap destMap = new BasicRowMap((int) (recordComponents.length / 0.75f), 0.75f);
+      RowMap destMap = RowMap.create((int) (recordComponents.length / 0.75f), 0.75f);
       for (int i = 0; i < recordComponents.length; i++) {
         destMap.put(recordComponents[i].getName(), recordComponents[i].getAccessor().invoke(src));
       }
@@ -253,7 +261,7 @@ public interface RowMap extends Map<String, Object> {
 
       Object[] args = new Object[recordComponents.length];
       for (int i = 0; i < recordComponents.length; i++) {
-        args[i] = src.get(StringCache.toCanonicalName(recordComponents[i].getName()));
+        args[i] = src.get(recordComponents[i].getName());
       }
 
       return getConstructor(recordComponents, toType).newInstance(args);

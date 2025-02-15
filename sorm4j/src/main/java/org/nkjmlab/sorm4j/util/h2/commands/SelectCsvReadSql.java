@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.util.h2.commands.annotation.CsvColumn;
 import org.nkjmlab.sorm4j.util.h2.commands.annotation.SkipCsvRead;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
@@ -152,7 +152,8 @@ public class SelectCsvReadSql {
         for (Annotation ann : anns) {
           if (ann instanceof CsvColumn) {
             mapCsvColumnToTableColumn(
-                ((CsvColumn) ann).value(), StringCache.toUpperSnakeCase(field.getName()));
+                ((CsvColumn) ann).value(),
+                SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
           } else if (ann instanceof SkipCsvRead) {
             csvSkipColumns.add(field);
           }
@@ -161,11 +162,10 @@ public class SelectCsvReadSql {
       tableColumns(
           Stream.of(fields)
               .map(
-                  f -> {
-                    return csvSkipColumns.contains(f)
-                        ? "null as " + StringCache.toUpperSnakeCase(f.getName())
-                        : StringCache.toUpperSnakeCase(f.getName());
-                  })
+                  f ->
+                      (csvSkipColumns.contains(f) ? "null as " : "")
+                          + SormContext.getDefaultCanonicalStringCache()
+                              .toCanonicalName(f.getName()))
               .toArray(String[]::new));
 
       return this;

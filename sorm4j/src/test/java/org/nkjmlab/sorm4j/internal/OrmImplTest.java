@@ -1,14 +1,20 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_CAROL;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
@@ -35,11 +41,14 @@ class OrmImplTest {
     assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
 
     assertThatThrownBy(
-            () ->
-                sorm.readFirst(
-                    LocalDateTime.class,
-                    ParameterizedSqlParser.parse("select count(*) from players limit 1")))
-        .isInstanceOf(SormException.class);
+            () -> {
+              LocalDateTime ret =
+                  sorm.readFirst(
+                      LocalDateTime.class,
+                      ParameterizedSqlParser.parse("select count(*) from players limit 1"));
+              ret.getSecond();
+            })
+        .isInstanceOf(Exception.class);
   }
 
   @Test

@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalName;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -17,16 +15,16 @@ import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
 
   private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
   private final int constructorParametersLength;
 
-  private final Map<String, ConstructorParameter[]> columnAndConstructorParameterMapping =
+  private final Map<List<String>, ConstructorParameter[]> columnAndConstructorParameterMapping =
       new ConcurrentHashMap<>();
 
   public SqlResultToContainerMappingWithConstructor(
@@ -40,12 +38,15 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
 
     for (int i = 0; i < constructorParametersLength; i++) {
       Parameter parameter = parameters[i];
-      String canonicalName = toCanonicalName(parameterNames[i]);
+      String canonicalName =
+          SormContext.getDefaultCanonicalStringCache().toCanonicalName(parameterNames[i]);
       ConstructorParameter cp = new ConstructorParameter(canonicalName, i, parameter.getType());
       constructorParametersMap.put(canonicalName, cp);
       if (columnAliasPrefix != null && columnAliasPrefix.length() != 0) {
         constructorParametersMap.put(
-            StringCache.toCanonicalNameWithPrefix(columnAliasPrefix, parameterNames[i]), cp);
+            SormContext.getDefaultCanonicalStringCache()
+                .toCanonicalNameWithTableName(columnAliasPrefix, parameterNames[i]),
+            cp);
       }
     }
   }
@@ -98,20 +99,22 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
         | InvocationTargetException e) {
       Object[] params = {JdbcTypeUtils.convert(sqlTypes), constructorParameters};
       throw new SormException(
-          ParameterizedStringFormatter.LENGTH_256.format(
+          ParameterizedStringFormatter.NO_LENGTH_LIMIT.format(
               "Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}",
               params),
           e);
     }
   }
 
-  private ConstructorParameter[] getCorrespondingParameter(
-      String[] columns, String objectColumnsStr) {
+  private ConstructorParameter[] getCorrespondingParameter(String[] columns) {
     return columnAndConstructorParameterMapping.computeIfAbsent(
-        objectColumnsStr,
+        Arrays.asList(columns),
         key ->
             Arrays.stream(columns)
-                .map(col -> constructorParametersMap.get(toCanonicalName(col)))
+                .map(
+                    col ->
+                        constructorParametersMap.get(
+                            SormContext.getDefaultCanonicalStringCache().toCanonicalName(col)))
                 .toArray(ConstructorParameter[]::new));
   }
 
@@ -123,8 +126,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
       int[] columnTypes,
       String columnsString)
       throws SQLException {
-    final ConstructorParameter[] constructorParameters =
-        getCorrespondingParameter(columns, columnsString);
+    final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
@@ -142,8 +144,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
       int[] columnTypes,
       String columnsString)
       throws SQLException {
-    final ConstructorParameter[] constructorParameters =
-        getCorrespondingParameter(columns, columnsString);
+    final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
     return createContainerObject(
         columnValueConverter, resultSet, columnTypes, constructorParameters);
   }

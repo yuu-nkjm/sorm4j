@@ -17,16 +17,16 @@ import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
   // https://github.com/yuu-nkjm/sorm4j/issues/26
-  private final Map<String, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
+  private final Map<List<String>, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
 
   public SqlResultToContainerMappingWithSetter(
       ColumnToAccessorMapping columnToAccessorMap, Constructor<T> constructor) {
     super(columnToAccessorMap, constructor);
   }
 
-  private Class<?>[] getSetterTypes(String[] columns, String objectColumnsStr) {
+  private Class<?>[] getSetterTypes(String[] columns) {
     return setterTypesMap.computeIfAbsent(
-        objectColumnsStr,
+        Arrays.asList(columns),
         k ->
             Arrays.stream(columns)
                 .map(
@@ -45,7 +45,7 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
       int[] columnTypes,
       String columnsString)
       throws SQLException {
-    final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
+    final Class<?>[] setterTypes = getSetterTypes(columns);
     return createContainerObject(
         columnValueConverter, resultSet, columns, columnTypes, setterTypes);
   }
@@ -58,7 +58,7 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
       int[] columnTypes,
       String columnsString)
       throws SQLException {
-    final Class<?>[] setterTypes = getSetterTypes(columns, columnsString);
+    final Class<?>[] setterTypes = getSetterTypes(columns);
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(

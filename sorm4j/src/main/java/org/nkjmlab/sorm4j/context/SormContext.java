@@ -3,6 +3,7 @@ package org.nkjmlab.sorm4j.context;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
 import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /**
@@ -40,6 +41,10 @@ public interface SormContext {
    */
   static Builder builder() {
     return new Builder();
+  }
+
+  static CanonicalStringCache getDefaultCanonicalStringCache() {
+    return CanonicalStringCache.getDefault();
   }
 
   static SormContext getDefaultContext() {

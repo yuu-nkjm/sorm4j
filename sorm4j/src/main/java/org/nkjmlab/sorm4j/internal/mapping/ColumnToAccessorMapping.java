@@ -1,7 +1,5 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalName;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 public final class ColumnToAccessorMapping {
 
@@ -32,7 +30,9 @@ public final class ColumnToAccessorMapping {
       String columnAliasPrefix) {
     this.columnToAccessorMap =
         columnToAccessorMap.entrySet().stream()
-            .collect(Collectors.toMap(e -> toCanonicalName(e.getKey()), e -> e.getValue()));
+            .collect(
+                Collectors.toMap(
+                    e -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(e.getKey()), e -> e.getValue()));
     this.columnAliasPrefix = columnAliasPrefix;
 
     this.aliasColumnToAccessorMap =
@@ -49,7 +49,7 @@ public final class ColumnToAccessorMapping {
    * @return
    */
   public FieldAccessor get(String columnName) {
-    String cn = toCanonicalName(columnName);
+    String cn = SormContext.getDefaultCanonicalStringCache().toCanonicalName(columnName);
     FieldAccessor ret = columnToAccessorMap.get(cn);
     return ret != null ? ret : aliasColumnToAccessorMap.get(cn);
   }
@@ -171,7 +171,7 @@ public final class ColumnToAccessorMapping {
     Map<String, FieldAccessor> ret = new HashMap<>();
 
     for (String key : accessors.keySet()) {
-      String aKey = StringCache.toCanonicalNameWithPrefix(prefix, key);
+      String aKey = SormContext.getDefaultCanonicalStringCache().toCanonicalNameWithTableName(prefix, key);
       if (accessors.containsKey(aKey)) {
         Object[] params = {prefix, key};
         throw new SormException(

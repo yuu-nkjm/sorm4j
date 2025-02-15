@@ -1,12 +1,12 @@
 package org.nkjmlab.sorm4j.context;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
@@ -59,18 +59,19 @@ public final class DefaultTableNameMapper implements TableNameMapper {
     }
 
     String className = objectClass.getSimpleName();
-    String cannonicalClassName = toCanonicalName(className);
+    String cannonicalClassName = SormContext.getDefaultCanonicalStringCache().toCanonicalName(className);
 
     List<String> candidates =
         new ArrayList<>(
             List.of(
                 cannonicalClassName,
-                toCanonicalName(cannonicalClassName + "S"),
-                toCanonicalName(cannonicalClassName + "ES")));
+                SormContext.getDefaultCanonicalStringCache().toCanonicalName(cannonicalClassName + "S"),
+                SormContext.getDefaultCanonicalStringCache().toCanonicalName(cannonicalClassName + "ES")));
     if (cannonicalClassName.endsWith("Y")) {
       candidates.add(
-          toCanonicalName(
-              cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES"));
+          SormContext.getDefaultCanonicalStringCache()
+              .toCanonicalName(
+                  cannonicalClassName.substring(0, cannonicalClassName.length() - 1) + "IES"));
     }
     return candidates;
   }
@@ -91,7 +92,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
       while (resultSet.next()) {
         // 3. TABLE_NAME String => table name
         String tableNameOnDb = resultSet.getString(3);
-        if (containsAsCanonical(tableNameCandidates, tableNameOnDb)) {
+        if (SormContext.getDefaultCanonicalStringCache().containsCanonicalName(tableNameCandidates, tableNameOnDb)) {
           return Optional.of(tableNameOnDb);
         }
       }

@@ -233,17 +233,17 @@ public class BasicRowMap implements RowMap {
   }
 
   @Override
-  public Object getObject(String key) {
-    return get(key);
-  }
-
-  @Override
   public List<Object> getObjectList(String... keys) {
-    return Arrays.stream(keys).map(key -> getObject(key)).collect(Collectors.toList());
+    return Arrays.stream(keys).map(key -> get(key)).collect(Collectors.toList());
   }
 
   @Override
   public List<String> getStringList(String... keys) {
     return Arrays.stream(keys).map(key -> getString(key)).collect(Collectors.toList());
+  }
+
+  @Override
+  public Object getObject(String key) {
+    return get(key);
   }
 }

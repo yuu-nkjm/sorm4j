@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
+import org.nkjmlab.sorm4j.context.SormContext;
 
 public final class TableMetaDataImpl implements TableMetaData {
 
@@ -70,7 +70,8 @@ public final class TableMetaDataImpl implements TableMetaData {
                         + "."
                         + col
                         + " as "
-                        + StringCache.toCanonicalNameWithPrefix(columnAliasPrefix, col))
+                        + SormContext.getDefaultCanonicalStringCache()
+                            .toCanonicalNameWithTableName(columnAliasPrefix, col))
             .collect(Collectors.toList());
   }
 

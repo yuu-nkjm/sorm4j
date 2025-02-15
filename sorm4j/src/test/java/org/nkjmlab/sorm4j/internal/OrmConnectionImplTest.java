@@ -147,8 +147,8 @@ class OrmConnectionImplTest {
               m.readTupleList(
                   Guest.class,
                   Player.class,
-                  "select g.id as g__id, g.name as g__name, g.address as g__address, "
-                      + "p.id as p__id, p.name as p__name, p.address as p__address from guests g join players p on g.id=p.id");
+                  "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                      + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address from guests g join players p on g.id=p.id");
 
           assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
           assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
@@ -170,9 +170,9 @@ class OrmConnectionImplTest {
                   Guest.class,
                   Player.class,
                   Sport.class,
-                  "select g.id as g__id, g.name as g__name, g.address as g__address, "
-                      + "p.id as p__id, p.name as p__name, p.address as p__address, "
-                      + "s.id sport__id, s.name sport__name "
+                  "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                      + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address, "
+                      + "s.id sport_DOT_id, s.name sport_DOT_name "
                       + "from guests g "
                       + "join players p on g.id=p.id "
                       + "join sports s on g.id=s.id");

@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.util.table_def;
 
 import static java.lang.String.join;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.toUpperSnakeCase;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -23,6 +22,7 @@ import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.datatype.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.util.table_def.annotation.AutoIncrement;
@@ -108,16 +108,17 @@ public final class TableDefinition {
         } else if (ann instanceof NotNull) {
           opt.add("not null");
         } else if (ann instanceof Index) {
-          builder.addIndexDefinition(toUpperSnakeCase(field.getName()));
+          builder.addIndexDefinition(SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
         } else if (ann instanceof Unique) {
-          builder.addUniqueConstraint(toUpperSnakeCase(field.getName()));
+          builder.addUniqueConstraint(SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
         } else if (ann instanceof Check) {
           opt.add("check (" + ((Check) ann).value() + ")");
         } else if (ann instanceof Default) {
           opt.add("default " + ((Default) ann).value());
         }
       }
-      builder.addColumnDefinition(toUpperSnakeCase(field.getName()), opt.toArray(String[]::new));
+      builder.addColumnDefinition(
+          SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()), opt.toArray(String[]::new));
     }
     return builder;
   }
@@ -129,7 +130,7 @@ public final class TableDefinition {
   public static String toTableName(Class<?> valueType) {
     OrmTable ann = valueType.getAnnotation(OrmTable.class);
     if (ann == null || ann.value().length() == 0) {
-      return toUpperSnakeCase(valueType.getSimpleName() + "s");
+      return SormContext.getDefaultCanonicalStringCache().toCanonicalName(valueType.getSimpleName() + "s");
     } else {
       return ann.value();
     }

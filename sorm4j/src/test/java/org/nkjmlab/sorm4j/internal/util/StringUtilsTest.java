@@ -1,15 +1,17 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.context.SormContext;
 
 class StringUtilsTest {
 
   @Test
   void testContainsIgnoreCase() {
-    assertThat(containsAsCanonical(List.of("a", "b"), null));
+    assertThat(SormContext.getDefaultCanonicalStringCache().containsCanonicalName(List.of("a", "b"), null));
   }
 
   @Test

@@ -1,15 +1,16 @@
 package org.nkjmlab.sorm4j.internal.sql;
 
-import static org.nkjmlab.sorm4j.internal.util.StringCache.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.FieldAccessor;
 import org.nkjmlab.sorm4j.context.NameToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -136,6 +137,6 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
     final Class<?> objectClass = bean.getClass();
     return nameToFieldMaps
         .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
-        .get(toCanonicalName(parameterName));
+        .get(SormContext.getDefaultCanonicalStringCache().toCanonicalName(parameterName));
   }
 }

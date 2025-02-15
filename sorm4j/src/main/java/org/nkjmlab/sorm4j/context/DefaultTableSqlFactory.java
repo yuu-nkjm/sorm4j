@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 
 // "select * " is faster than "select col1, col2, ..., coln" in H2 2.1.210. the former is also
@@ -110,7 +109,11 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
       this.tableName = tableName;
       this.whereClauseIdentifyByPrimaryKeys = whereClauseIdentifyByPrimaryKeys;
       this.canonicalNameToDbColumnMap =
-          columns.stream().collect(Collectors.toMap(c -> StringCache.toCanonicalName(c), c -> c));
+          columns.stream()
+              .collect(
+                  Collectors.toMap(
+                      c -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(c),
+                      c -> c));
     }
 
     public String createUpdateSql(Collection<String> columns) {
@@ -129,7 +132,9 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
               columns.stream()
                   .map(
                       col ->
-                          canonicalNameToDbColumnMap.get(StringCache.toCanonicalName(col)) + "=?")
+                          canonicalNameToDbColumnMap.get(
+                                  SormContext.getDefaultCanonicalStringCache().toCanonicalName(col))
+                              + "=?")
                   .collect(Collectors.toList()));
     }
   }

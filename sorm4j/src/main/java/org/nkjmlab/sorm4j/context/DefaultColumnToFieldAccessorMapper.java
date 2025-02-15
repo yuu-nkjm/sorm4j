@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.context;
 
 import static java.util.Objects.nonNull;
-import static org.nkjmlab.sorm4j.internal.util.StringCache.toCanonicalName;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -20,7 +19,6 @@ import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.annotation.OrmGetter;
 import org.nkjmlab.sorm4j.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.annotation.OrmSetter;
-import org.nkjmlab.sorm4j.internal.util.StringCache;
 
 /**
  * Default implementation of {@link ColumnToFieldAccessorMapper}
@@ -79,7 +77,9 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
                     && m.getName().substring(0, prefix.length()).equals(prefix))
         .collect(
             Collectors.toMap(
-                m -> toCanonicalName(m.getName().substring(prefix.length())),
+                m ->
+                    SormContext.getDefaultCanonicalStringCache()
+                        .toCanonicalName(m.getName().substring(prefix.length())),
                 m -> m,
                 (v1, v2) -> v2));
   }
@@ -89,7 +89,8 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
     return Arrays.stream(objectClass.getFields())
         .filter(
             f -> Objects.isNull(f.getAnnotation(ignoreAnn)) && !Modifier.isStatic(f.getModifiers()))
-        .collect(Collectors.toMap(f -> toCanonicalName(f.getName()), f -> f));
+        .collect(
+            Collectors.toMap(f -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(f.getName()), f -> f));
   }
 
   private Map<String, Method> getAllGetters(Class<?> objectClass) {
@@ -114,21 +115,30 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
     Class<OrmSetter> ann = OrmSetter.class;
     return Arrays.stream(objectClass.getMethods())
         .filter(m -> nonNull(m.getAnnotation(ann)) && nonNull(isValidSetter(m)))
-        .collect(Collectors.toMap(m -> toCanonicalName(m.getAnnotation(ann).value()), m -> m));
+        .collect(
+            Collectors.toMap(
+                m -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(m.getAnnotation(ann).value()),
+                m -> m));
   }
 
   private Map<String, Field> getAnnotatedFieldsMap(Class<?> objectClass) {
     Class<OrmColumn> ann = OrmColumn.class;
     return Arrays.stream(objectClass.getFields())
         .filter(f -> Objects.nonNull(f.getAnnotation(ann)))
-        .collect(Collectors.toMap(f -> toCanonicalName(f.getAnnotation(ann).value()), f -> f));
+        .collect(
+            Collectors.toMap(
+                f -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(f.getAnnotation(ann).value()),
+                f -> f));
   }
 
   private Map<String, Method> getAnnotatedGettersMap(Class<?> objectClass) {
     Class<OrmGetter> ann = OrmGetter.class;
     return Arrays.stream(objectClass.getMethods())
         .filter(m -> Objects.nonNull(m.getAnnotation(ann)) && nonNull(isValidGetter(m)))
-        .collect(Collectors.toMap(m -> toCanonicalName(m.getAnnotation(ann).value()), m -> m));
+        .collect(
+            Collectors.toMap(
+                m -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(m.getAnnotation(ann).value()),
+                m -> m));
   }
 
   private Method isValidGetter(Method getter) {
@@ -170,7 +180,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   @Override
   public String getColumnAliasPrefix(Class<?> objectClass) {
     return Optional.ofNullable(objectClass.getAnnotation(OrmColumnAliasPrefix.class))
-        .map(a -> StringCache.toCanonicalName(a.value()))
-        .orElse(StringCache.toCanonicalName(objectClass.getSimpleName()));
+        .map(a -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(a.value()))
+        .orElse(SormContext.getDefaultCanonicalStringCache().toCanonicalName(objectClass.getSimpleName()));
   }
 }
