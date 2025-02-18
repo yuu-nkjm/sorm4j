@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public interface ColumnValueToJavaObjectConverter {
 
-  boolean test(Class<?> toType) throws SQLException;
+  boolean test(Class<?> toType);
 
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
@@ -27,6 +27,6 @@ public interface ColumnValueToJavaObjectConverter {
    * @param toType {@link java.lang.Class} of the object to be returned
    * @throws SQLException
    */
-  Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+  <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
       throws SQLException;
 }

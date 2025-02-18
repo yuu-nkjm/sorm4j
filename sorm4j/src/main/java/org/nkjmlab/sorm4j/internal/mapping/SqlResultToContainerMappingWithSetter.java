@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 
 final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
@@ -41,29 +42,22 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
   T loadContainerObject(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException {
-    final Class<?>[] setterTypes = getSetterTypes(columns);
-    return createContainerObject(
-        columnValueConverter, resultSet, columns, columnTypes, setterTypes);
+    final Class<?>[] setterTypes = getSetterTypes(columnsAndTypes.getColumns());
+    return createContainerObject(columnValueConverter, resultSet, columnsAndTypes, setterTypes);
   }
 
   @Override
   public List<T> loadContainerObjectList(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException {
-    final Class<?>[] setterTypes = getSetterTypes(columns);
+    final Class<?>[] setterTypes = getSetterTypes(columnsAndTypes.getColumns());
     final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
-      ret.add(
-          createContainerObject(
-              columnValueConverter, resultSet, columns, columnTypes, setterTypes));
+      ret.add(createContainerObject(columnValueConverter, resultSet, columnsAndTypes, setterTypes));
     }
     return ret;
   }
@@ -71,10 +65,11 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
   private T createContainerObject(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] sqlTypes,
+      ColumnsAndTypes columnsAndTypes,
       Class<?>[] setterTypes) {
     try {
+      final String[] columns = columnsAndTypes.getColumns();
+      final int[] sqlTypes = columnsAndTypes.getColumnTypes();
       final T ret = constructor.newInstance();
       for (int i = 1; i <= columns.length; i++) {
         final String columnName = columns[i - 1];

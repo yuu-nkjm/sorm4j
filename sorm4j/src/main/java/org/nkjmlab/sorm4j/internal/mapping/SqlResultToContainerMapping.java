@@ -4,7 +4,9 @@ import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 
 abstract class SqlResultToContainerMapping<T> {
   protected final Constructor<T> constructor;
@@ -19,17 +21,13 @@ abstract class SqlResultToContainerMapping<T> {
   abstract List<T> loadContainerObjectList(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException;
 
   abstract T loadContainerObject(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException;
 
   @Override

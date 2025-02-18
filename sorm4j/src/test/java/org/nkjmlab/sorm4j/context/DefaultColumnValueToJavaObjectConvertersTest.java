@@ -33,10 +33,10 @@ class DefaultColumnValueToJavaObjectConvertersTest {
           }
 
           @Override
-          public Object convertTo(
-              ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+          public <T> T convertTo(
+              ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
               throws SQLException {
-            return resultSet.getString(columnIndex).toString();
+            return toType.cast(resultSet.getString(columnIndex).toString());
           }
         };
 
@@ -135,6 +135,8 @@ class DefaultColumnValueToJavaObjectConvertersTest {
 
     assertThrows(
         SormException.class,
-        () -> converters.convertTo(mockResultSet, 1, JDBCType.ARRAY.getVendorTypeNumber(), int[].class));
+        () ->
+            converters.convertTo(
+                mockResultSet, 1, JDBCType.ARRAY.getVendorTypeNumber(), int[].class));
   }
 }

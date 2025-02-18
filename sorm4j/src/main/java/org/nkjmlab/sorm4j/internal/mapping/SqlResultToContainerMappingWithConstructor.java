@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
@@ -122,16 +123,15 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   List<S> loadContainerObjectList(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException {
+    final String[] columns = columnsAndTypes.getColumns();
+    final int[] sqlTypes = columnsAndTypes.getColumnTypes();
     final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
     final List<S> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
-          createContainerObject(
-              columnValueConverter, resultSet, columnTypes, constructorParameters));
+          createContainerObject(columnValueConverter, resultSet, sqlTypes, constructorParameters));
     }
     return ret;
   }
@@ -140,13 +140,12 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   S loadContainerObject(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
-      String[] columns,
-      int[] columnTypes,
-      String columnsString)
+      ColumnsAndTypes columnsAndTypes)
       throws SQLException {
+    final String[] columns = columnsAndTypes.getColumns();
+    final int[] sqlTypes = columnsAndTypes.getColumnTypes();
     final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
-    return createContainerObject(
-        columnValueConverter, resultSet, columnTypes, constructorParameters);
+    return createContainerObject(columnValueConverter, resultSet, sqlTypes, constructorParameters);
   }
 
   @Override

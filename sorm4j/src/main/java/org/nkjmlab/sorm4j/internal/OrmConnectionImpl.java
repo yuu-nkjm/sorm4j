@@ -617,12 +617,12 @@ public class OrmConnectionImpl implements OrmConnection {
     return getColumnsMapping(objectClass).traverseAndMap(resultSet);
   }
 
-  private final <T> List<T> loadSupportedReturnedTypeList(Class<T> objectClass, ResultSet resultSet)
-      throws SQLException {
+  private final <T> List<T> loadSupportedComponentTypeList(
+      Class<T> objectClass, ResultSet resultSet) throws SQLException {
     final List<T> ret = new ArrayList<>();
     final int sqlType = getOneSqlType(objectClass, resultSet);
     while (resultSet.next()) {
-      ret.add(toSupportedReturnedTypeObject(resultSet, sqlType, objectClass));
+      ret.add(toSupportedComponentTypeObject(resultSet, sqlType, objectClass));
     }
     return ret;
   }
@@ -636,8 +636,8 @@ public class OrmConnectionImpl implements OrmConnection {
   public <T> T mapRowToObject(Class<T> objectClass, ResultSet resultSet) throws SQLException {
     if (objectClass.equals(RowMap.class)) {
       return (T) mapRowToMap(resultSet);
-    } else if (getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)) {
-      return toSupportedReturnedTypeObject(
+    } else if (getColumnValueToJavaObjectConverter().isSupportedComponentType(objectClass)) {
+      return toSupportedComponentTypeObject(
           resultSet, getOneSqlType(objectClass, resultSet), objectClass);
     } else {
       return loadResultContainerObject(objectClass, resultSet);
@@ -905,7 +905,7 @@ public class OrmConnectionImpl implements OrmConnection {
    * @return
    * @throws SQLException
    */
-  private <T> T toSupportedReturnedTypeObject(
+  private <T> T toSupportedComponentTypeObject(
       ResultSet resultSet, int sqlType, Class<T> objectClass) throws SQLException {
     return getColumnValueToJavaObjectConverter().convertTo(resultSet, 1, sqlType, objectClass);
   }
@@ -915,8 +915,8 @@ public class OrmConnectionImpl implements OrmConnection {
       throws SQLException {
     return objectClass.equals(RowMap.class)
         ? (List<T>) traverseAndMapToRowMapList(resultSet)
-        : (getColumnValueToJavaObjectConverter().isSupportedReturnedType(objectClass)
-            ? loadSupportedReturnedTypeList(objectClass, resultSet)
+        : (getColumnValueToJavaObjectConverter().isSupportedComponentType(objectClass)
+            ? loadSupportedComponentTypeList(objectClass, resultSet)
             : loadResultContainerObjectList(objectClass, resultSet));
   }
 
@@ -1180,7 +1180,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public Connection getJdbcConnection() { // TODO Auto-generated method stub
+  public Connection getJdbcConnection() {
     return connection;
   }
 }

@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
@@ -43,6 +45,7 @@ import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.postgresql.util.PGobject;
+
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
@@ -68,10 +71,10 @@ public class TestPostgreSQLSqlMapper {
           }
 
           @Override
-          public Object convertTo(
-              ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+          public <T> T convertTo(
+              ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
               throws SQLException {
-            return PGobject.class.cast(resultSet.getObject(columnIndex));
+            return toType.cast(resultSet.getObject(columnIndex));
           }
         };
 

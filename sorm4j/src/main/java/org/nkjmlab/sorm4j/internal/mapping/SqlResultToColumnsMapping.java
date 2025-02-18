@@ -29,7 +29,7 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 public final class SqlResultToColumnsMapping<T> {
 
   private final Class<T> objectClass;
-  private final Map<Class<?>, ColumnsAndTypesAndString> metaDataForSelectByPrimaryKey =
+  private final Map<Class<?>, ColumnsAndTypes> metaDataForSelectByPrimaryKey =
       new ConcurrentHashMap<>();
   private final ColumnValueToJavaObjectConverters columnValueConverter;
   private final ColumnToAccessorMapping columnToAccessorMap;
@@ -133,69 +133,37 @@ public final class SqlResultToColumnsMapping<T> {
   public List<T> traverseAndMap(ResultSet resultSet) throws SQLException {
     ColumnsAndTypes columnsAndTypes =
         OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
-    String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
 
     return containerObjectCreator.loadContainerObjectList(
-        columnValueConverter,
-        resultSet,
-        columnsAndTypes.getColumns(),
-        columnsAndTypes.getColumnTypes(),
-        columnsString);
+        columnValueConverter, resultSet, columnsAndTypes);
   }
 
   public T loadResultContainerObject(ResultSet resultSet) throws SQLException {
 
     ColumnsAndTypes columnsAndTypes =
         OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
-    String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
 
     return containerObjectCreator.loadContainerObject(
-        columnValueConverter,
-        resultSet,
-        columnsAndTypes.getColumns(),
-        columnsAndTypes.getColumnTypes(),
-        columnsString);
+        columnValueConverter, resultSet, columnsAndTypes);
   }
 
   public T loadResultContainerObjectByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
       throws SQLException {
 
-    ColumnsAndTypesAndString columnsAndTypesAndString =
+    ColumnsAndTypes columnsAndTypes =
         metaDataForSelectByPrimaryKey.computeIfAbsent(
-            objectClass, key -> ColumnsAndTypesAndString.create(resultSet));
+            objectClass, key -> createColumnsAndTypes(resultSet));
 
     return containerObjectCreator.loadContainerObject(
-        columnValueConverter,
-        resultSet,
-        columnsAndTypesAndString.columnsAndTypes.getColumns(),
-        columnsAndTypesAndString.columnsAndTypes.getColumnTypes(),
-        columnsAndTypesAndString.columnsString);
+        columnValueConverter, resultSet, columnsAndTypes);
   }
 
-  private static class ColumnsAndTypesAndString {
-
-    final ColumnsAndTypes columnsAndTypes;
-    final String columnsString;
-
-    public ColumnsAndTypesAndString(ColumnsAndTypes columnsAndTypes, String columnsString) {
-      this.columnsAndTypes = columnsAndTypes;
-      this.columnsString = columnsString;
+  private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) {
+    try {
+      return OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
     }
-
-    static ColumnsAndTypesAndString create(ResultSet resultSet) {
-      try {
-        ColumnsAndTypes columnsAndTypes =
-            OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
-        String columnsString = getObjectColumnsString(columnsAndTypes.getColumns());
-        return new ColumnsAndTypesAndString(columnsAndTypes, columnsString);
-      } catch (SQLException e) {
-        throw Try.rethrow(e);
-      }
-    }
-  }
-
-  private static String getObjectColumnsString(String[] columns) {
-    return String.join("-", columns);
   }
 
   ColumnToAccessorMapping getColumnToAccessorMap() {

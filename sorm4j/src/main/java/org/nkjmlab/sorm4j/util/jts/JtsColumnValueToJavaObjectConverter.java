@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.locationtech.jts.geom.Geometry;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
@@ -29,8 +30,8 @@ public class JtsColumnValueToJavaObjectConverter implements ColumnValueToJavaObj
   }
 
   @Override
-  public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
       throws SQLException {
-    return new GeometryJts((Geometry) resultSet.getObject(columnIndex));
+    return toType.cast(new GeometryJts((Geometry) resultSet.getObject(columnIndex)));
   }
 }

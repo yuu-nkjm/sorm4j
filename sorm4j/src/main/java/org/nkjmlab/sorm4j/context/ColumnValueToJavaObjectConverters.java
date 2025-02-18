@@ -20,10 +20,6 @@ public interface ColumnValueToJavaObjectConverters {
    * <p>This method is used while converting {@link java.sql.ResultSet} rows to objects. The class
    * type is the field type in the target bean.
    *
-   * <p>null's will be respected for any non-native types. This means that if a field is of type
-   * Integer it will be able to receive a null value from the ResultSet; on the other hand, if a
-   * field is of type int it will receive 0 for a null value from the {@link java.sql.ResultSet}.
-   *
    * @param resultSet {@link java.sql.ResultSet} (positioned in the row to be processed)
    * @param columnIndex column index in the result set (starting with 1)
    * @param columnType
@@ -38,5 +34,5 @@ public interface ColumnValueToJavaObjectConverters {
    * @param objectClass
    * @return
    */
-  boolean isSupportedReturnedType(Class<?> objectClass);
+  boolean isSupportedComponentType(Class<?> objectClass);
 }

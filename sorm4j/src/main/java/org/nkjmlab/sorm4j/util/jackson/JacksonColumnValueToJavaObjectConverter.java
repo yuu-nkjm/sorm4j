@@ -55,7 +55,7 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
    * @throws SQLException if a database access error occurs
    */
   @Override
-  public Object convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+  public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
       throws SQLException {
     try {
       return objectMapper.readValue(resultSet.getBytes(columnIndex), toType);
