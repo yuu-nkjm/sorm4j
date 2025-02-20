@@ -411,6 +411,7 @@ class TableTest {
   void testAcceptHandlerWithException() throws Exception {
     Sorm orm = mock(Sorm.class);
     OrmConnection conn = mock(OrmConnection.class);
+    @SuppressWarnings("unchecked")
     ConsumerHandler<TableConnection<Object>> handler = mock(ConsumerHandler.class);
 
     when(orm.open()).thenReturn(conn);
@@ -427,6 +428,7 @@ class TableTest {
   void testApplyHandlerWithException() throws Exception {
     Sorm orm = mock(Sorm.class);
     OrmConnection conn = mock(OrmConnection.class);
+    @SuppressWarnings("unchecked")
     FunctionHandler<TableConnection<Object>, String> handler = mock(FunctionHandler.class);
 
     when(orm.open()).thenReturn(conn);

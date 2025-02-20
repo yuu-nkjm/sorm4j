@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static java.lang.System.*;
+import static java.lang.System.lineSeparator;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
@@ -17,7 +19,6 @@ import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
-import org.nkjmlab.sorm4j.internal.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
@@ -39,7 +40,7 @@ public final class SqlParametersToTableMapping<T> {
   private final SqlParametersSetter sqlParametersSetter;
   private final MultiRowProcessor<T> multiRowProcessor;
 
-  private final TableMetaDataImpl tableMetaData;
+  private final TableMetaData tableMetaData;
   private final TableSql sql;
   private final LoggerContext loggerContext;
 
@@ -51,7 +52,7 @@ public final class SqlParametersToTableMapping<T> {
       MultiRowProcessorFactory multiRowProcessorFactory,
       Class<T> objectClass,
       ColumnToAccessorMapping columnToAccessorMap,
-      TableMetaDataImpl tableMetaData,
+      TableMetaData tableMetaData,
       TableSql sql) {
     this.columnValueConverter = columnValueConverter;
     this.objectClass = objectClass;

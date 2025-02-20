@@ -1004,18 +1004,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return sqlFunc.apply((T[]) objects.toArray(Object[]::new));
   }
 
-  private static Optional<LogPoint> createLogPointAndLogBeforeSql(
-      LoggerContext loggerContext,
-      LoggerContext.Category category,
-      Class<?> clazz,
-      Connection connection,
-      String sql,
-      Object... parameters) {
-    Optional<LogPoint> lp = loggerContext.createLogPoint(category, clazz);
-    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
-    return lp;
-  }
-
   private static <R> R executeQueryAndClose(
       Connection connection,
       ResultSetTraverser<R> resultSetTraverser,
@@ -1053,13 +1041,8 @@ public class OrmConnectionImpl implements OrmConnection {
       Object[] parameters,
       ResultSetTraverser<R> resultSetTraverser) {
     Optional<LogPoint> lp =
-        createLogPointAndLogBeforeSql(
-            loggerContext,
-            Category.EXECUTE_QUERY,
-            OrmConnectionImpl.class,
-            connection,
-            sql,
-            parameters);
+        loggerContext.createLogPoint(Category.EXECUTE_QUERY, OrmConnectionImpl.class);
+    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
     try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       ResultSet resultSet = stmt.executeQuery();
@@ -1079,13 +1062,8 @@ public class OrmConnectionImpl implements OrmConnection {
       String sql,
       Object[] parameters) {
     Optional<LogPoint> lp =
-        createLogPointAndLogBeforeSql(
-            loggerContext,
-            Category.EXECUTE_QUERY,
-            OrmConnectionImpl.class,
-            connection,
-            sql,
-            parameters);
+        loggerContext.createLogPoint(Category.EXECUTE_UPDATE, OrmConnectionImpl.class);
+    lp.ifPresent(_lp -> _lp.logBeforeSql(connection, sql, parameters));
     try (PreparedStatement stmt = statementSupplier.prepareStatement(connection, sql)) {
       sqlParametersSetter.setParameters(stmt, parameters);
       int ret = stmt.executeUpdate();

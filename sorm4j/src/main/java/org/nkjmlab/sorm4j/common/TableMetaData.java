@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.common;
 
 import java.util.List;
+
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 
 /**
