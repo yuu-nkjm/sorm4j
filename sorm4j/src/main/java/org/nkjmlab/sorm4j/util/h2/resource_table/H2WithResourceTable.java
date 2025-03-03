@@ -14,8 +14,6 @@ import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 
 @Experimental
 public class H2WithResourceTable<T> extends H2BasicTable<T> {
-  static final org.apache.logging.log4j.Logger log =
-      org.apache.logging.log4j.LogManager.getLogger();
 
   private final TableResources tableResources;
   private final SqlResources sqlResources;
@@ -49,7 +47,6 @@ public class H2WithResourceTable<T> extends H2BasicTable<T> {
     Path indexSql = sqlResources.getSqlPath(sqlFileName);
     if (indexSql.toFile().exists()) {
       getOrm().executeUpdate(readSql(sqlFileName));
-      log.debug("[EXECUTE] {}.", sqlFileName);
     }
   }
 
@@ -74,7 +71,6 @@ public class H2WithResourceTable<T> extends H2BasicTable<T> {
 
   private void executeInitializationSql(String sqlFileName) {
     getOrm().executeUpdate(readSql(sqlFileName));
-    log.debug("[EXECUTE] {}.", sqlResources.getSqlPath(sqlFileName));
     executeCreateIndexSql();
   }
 
@@ -85,7 +81,6 @@ public class H2WithResourceTable<T> extends H2BasicTable<T> {
   public void loadCsv() {
     File csv = getCsvFile();
     createTableIfNotExists(CsvRead.builderForCsvWithHeader(csv).build());
-    log.debug("[LOAD] {}.", csv);
   }
 
   public void loadCsvAndExecuteCreateIndexSql() {

@@ -1,9 +1,12 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.SQLException;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DriverManagerDataSourceTest {

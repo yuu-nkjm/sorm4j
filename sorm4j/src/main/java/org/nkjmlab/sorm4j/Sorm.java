@@ -6,10 +6,11 @@ import javax.sql.DataSource;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSourceImpl;
 import org.nkjmlab.sorm4j.table.Table;
 
 /**
@@ -39,8 +40,8 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSource} and the
-   * given {@link SormContext}.
+   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSourceImpl} and
+   * the given {@link SormContext}.
    *
    * @param dataSource
    * @param context

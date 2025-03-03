@@ -6,27 +6,28 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
+
+import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 
 /**
  * A database connection source wrapped a {@link DriverManager}
  *
  * @author nkjm
  */
-public final class DriverManagerDataSource implements DataSource {
+public final class DriverManagerDataSourceImpl implements DriverManagerDataSource {
 
   private final String jdbcUrl;
   private final String username;
   private final String password;
 
-  private DriverManagerDataSource(String jdbcUrl, String username, String password) {
+  private DriverManagerDataSourceImpl(String jdbcUrl, String username, String password) {
     this.jdbcUrl = jdbcUrl;
     this.username = username;
     this.password = password;
   }
 
   public static DriverManagerDataSource create(String jdbcUrl, String username, String password) {
-    return new DriverManagerDataSource(jdbcUrl, username, password);
+    return new DriverManagerDataSourceImpl(jdbcUrl, username, password);
   }
 
   @Override
