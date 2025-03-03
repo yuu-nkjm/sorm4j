@@ -152,8 +152,8 @@ public final class DefaultTableSqlFactory implements TableSqlFactory {
     if (databaseMetaData.getDatabaseProductName().toLowerCase().contains("h2")) {
       return String.join(
           ",",
-          tableMetaData.getColumnsWithMetaData().stream()
-              .filter(c -> targetColumns.contains(c.getName()))
+          tableMetaData.getColumnsMetaData().stream()
+              .filter(c -> targetColumns.contains(c.getColumnName()))
               .map(c -> c.getTypeName().equalsIgnoreCase("json") ? "? format json" : "?")
               .toArray(String[]::new));
     } else {
