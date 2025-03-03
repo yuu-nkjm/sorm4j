@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.assertj.core.api.Assertions.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.ColumnName;
 import org.nkjmlab.sorm4j.internal.mapping.TableName;
 
 class ValuesObjectTest {
@@ -22,19 +20,5 @@ class ValuesObjectTest {
     assertThat(v1.equals(v2)).isTrue();
     assertThat(v1.equals("test")).isFalse();
     assertThat(v1.hashCode()).isEqualTo(v2.hashCode());
-  }
-
-  @Test
-  void testColumn() {
-    ColumnName v1 = new ColumnName("test");
-    ColumnName v2 = new ColumnName("test");
-    verify(v1, v2);
-  }
-
-  @Test
-  void testColumnOrder() {
-    ColumnName v1 = new ColumnName("2test");
-    ColumnName v2 = new ColumnName("1test");
-    assertThat(List.of(v1, v2).stream().sorted().collect(Collectors.toList()).get(0)).isEqualTo(v2);
   }
 }

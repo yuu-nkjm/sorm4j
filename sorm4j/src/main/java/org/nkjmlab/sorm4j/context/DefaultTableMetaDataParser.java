@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.common.ColumnMetaData;
-import org.nkjmlab.sorm4j.common.JdbcColumnMetaDataImpl;
+import org.nkjmlab.sorm4j.internal.common.ColumnMetaDataImpl;
 
 public final class DefaultTableMetaDataParser implements TableMetaDataParser {
   /**
@@ -38,43 +38,10 @@ public final class DefaultTableMetaDataParser implements TableMetaDataParser {
         metaData.getColumns(null, getSchemaPattern(metaData), _tableName, "%")) {
       final List<ColumnMetaData> columnsList = new ArrayList<>();
       while (resultSet.next()) {
-        String tableCatalog = resultSet.getString(1);
-        String tableSchema = resultSet.getString(2);
-        String tableName = resultSet.getString(3);
         String columnName = resultSet.getString(4);
-        int dataType = resultSet.getInt(5);
         String typeName = resultSet.getString(6);
-        int columnSize = resultSet.getInt(7);
-        int decimalDigits = resultSet.getInt(9);
-        int numPrecRadix = resultSet.getInt(10);
-        int nullableFlag = resultSet.getInt(11);
-        String remarks = resultSet.getString(12);
-        String columnDefault = resultSet.getString(13);
-        int charOctetLength = resultSet.getInt(16);
-        int ordinalPosition = resultSet.getInt(17);
-        String isNullable = resultSet.getString(18);
-        String isAutoIncremented = resultSet.getString(23);
-        String isGenerated = resultSet.getString(24);
 
-        columnsList.add(
-            new JdbcColumnMetaDataImpl(
-                tableCatalog,
-                tableSchema,
-                tableName,
-                columnName,
-                dataType,
-                typeName,
-                columnSize,
-                numPrecRadix,
-                decimalDigits,
-                ordinalPosition,
-                nullableFlag,
-                charOctetLength,
-                isNullable,
-                columnDefault,
-                remarks,
-                isAutoIncremented,
-                isGenerated));
+        columnsList.add(new ColumnMetaDataImpl(columnName, typeName));
       }
       return columnsList;
     }

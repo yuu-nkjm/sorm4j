@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.internal.mapping.TableName;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
@@ -23,14 +25,15 @@ class JdbcDatabaseMetaDataTest {
         .isEqualTo(Connection.TRANSACTION_READ_COMMITTED);
     assertThat(md.getDriverName()).isEqualTo("H2 JDBC Driver");
     assertThat(md.getDriverVersion()).contains(version);
-    assertThat(md.getJdbcTablesMetaData().get("PLAYERS").get("TABLE_NAME")).isEqualTo("PLAYERS");
+    assertThat(md.getJdbcTablesMetaData().get(TableName.of("PLAYERS")).getTableName())
+        .isEqualTo("PLAYERS");
     assertThat(md.getMaxConnections()).isEqualTo(0);
     assertThat(md.getSearchStringEscape()).isEqualTo("\\");
-    assertThat(md.getTableNames().get(0)).isEqualTo("PLAYERS");
+    assertThat(md.getTableNames().get(0)).isEqualTo(TableName.of("PLAYERS"));
     assertThat(md.toString()).contains("H2");
     assertThat(md.getUrl()).contains("jdbc:h2:mem:test");
     assertThat(md.getUserName()).isEqualTo("SA");
-    assertThat(md.getDriverVersion()).startsWith("4.");
+    assertThat(md.getDriverVersion()).startsWith("2.");
     System.out.println(md);
   }
 }

@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.context;
 
-import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
-import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.common.TableMetaData;
 
 public interface TableSqlFactory {
 
-  TableSql create(JdbcTableMetaData tableMetaData, JdbcDatabaseMetaData databaseMetaData);
+  TableSql create(
+      TableMetaData tableMetaData, org.nkjmlab.sorm4j.common.DatabaseMetaData databaseMetaData);
 }

@@ -8,17 +8,16 @@ import java.util.List;
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -279,12 +278,12 @@ public interface Orm {
   TableMetaData getTableMetaData(Class<?> type);
 
   /**
-   * Gets JDBC table metadata.
+   * Gets table metadata.
    *
    * @param tableName
    * @return
    */
-  JdbcTableMetaData getJdbcTableMetaData(String tableName);
+  TableMetaData getTableMetaData(String tableName);
 
   /**
    * Gets table metadata corresponding to the given object class.

@@ -6,13 +6,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.sql.DataSource;
+
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
 import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
@@ -20,10 +21,10 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
@@ -104,7 +105,6 @@ public final class SormImpl implements Sorm {
   public DataSource getDataSource() {
     return this.dataSource;
   }
-
 
   @Override
   public Connection openJdbcConnection() {
@@ -477,8 +477,8 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public JdbcTableMetaData getJdbcTableMetaData(String tableName) {
-    return applyAndClose(conn -> conn.getJdbcTableMetaData(tableName));
+  public TableMetaData getTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getTableMetaData(tableName));
   }
 
   @Override

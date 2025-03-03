@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.internal.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 

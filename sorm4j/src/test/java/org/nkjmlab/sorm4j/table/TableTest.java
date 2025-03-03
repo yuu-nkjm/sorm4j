@@ -29,6 +29,7 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.internal.mapping.TableName;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -93,7 +94,8 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
+        .contains(TableName.of("PLAYERS"));
   }
 
   @Test
@@ -107,7 +109,8 @@ class TableTest {
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
+        .contains(TableName.of("PLAYERS"));
   }
 
   @Test

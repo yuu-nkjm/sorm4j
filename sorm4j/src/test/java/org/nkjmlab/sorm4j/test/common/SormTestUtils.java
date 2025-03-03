@@ -8,8 +8,8 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 

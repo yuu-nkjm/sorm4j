@@ -6,10 +6,10 @@ import javax.sql.DataSource;
 
 import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.table.Table;
 
 /**
@@ -72,7 +72,7 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates an instance of {@link DriverManagerDataSource}
+   * Creates an instance of {@link DataSource}
    *
    * <p>Example:
    *
@@ -85,8 +85,7 @@ public interface Sorm extends Orm {
    * @param password
    * @return
    */
-  static DriverManagerDataSource createDataSource(
-      String jdbcUrl, String username, String password) {
+  static DataSource createDataSource(String jdbcUrl, String username, String password) {
     return DriverManagerDataSource.create(jdbcUrl, username, password);
   }
 

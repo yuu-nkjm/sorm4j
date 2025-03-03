@@ -234,6 +234,6 @@ class CommandTest {
                     ParameterizedSqlParser.parse(
                         "select * from players where id=:id", Map.of("id", 1)))
                 .readList(Player.class));
-    sorm.applyHandler(conn -> conn.getJdbcTableMetaData("players"));
+    sorm.applyHandler(conn -> conn.getTableMetaData("players"));
   }
 }

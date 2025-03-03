@@ -15,18 +15,14 @@ public class JtsColumnValueToJavaObjectConverter implements ColumnValueToJavaObj
 
   private final Map<Class<?>, Boolean> jtsContainer = new ConcurrentHashMap<>();
 
-  private boolean isJtsContainer(Class<?> type) {
-    return jtsContainer.computeIfAbsent(
-        type,
-        key ->
-            org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(type)
-                || org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(
-                    ArrayUtils.getInternalComponentType(type)));
-  }
-
   @Override
   public boolean test(Class<?> toType) {
-    return isJtsContainer(toType);
+    return jtsContainer.computeIfAbsent(
+        (Class<?>) toType,
+        key ->
+            org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(toType)
+                || org.nkjmlab.sorm4j.util.jts.GeometryJts.class.isAssignableFrom(
+                    ArrayUtils.getInternalComponentType(toType)));
   }
 
   @Override

@@ -40,4 +40,8 @@ public final class TableName {
   public String toString() {
     return name;
   }
+
+  public static TableName of(String tableName) {
+    return new TableName(tableName);
+  }
 }

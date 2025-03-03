@@ -1,10 +1,22 @@
-package org.nkjmlab.sorm4j.common;
-
-import java.util.Objects;
+package org.nkjmlab.sorm4j.internal.jdbc_metadata;
 
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcColumnMetaData;
 
-public class JdbcColumnMetaDataImpl extends ColumnMetaDataImpl implements JdbcColumnMetaData {
+public class JdbcColumnMetaDataImpl implements JdbcColumnMetaData {
+
+  /**
+   * The name of the column. Corresponds to {@code COLUMN_NAME} in {@link
+   * java.sql.DatabaseMetaData#getColumns}.
+   */
+  private final String columnName;
+
+  /**
+   * The database-specific type name of the column. Corresponds to {@code TYPE_NAME} in {@link
+   * java.sql.DatabaseMetaData#getColumns}.
+   */
+  private final String typeName;
+
   /**
    * The catalog name of the table. Corresponds to {@code TABLE_CAT} in {@link
    * java.sql.DatabaseMetaData#getColumns}.
@@ -117,7 +129,8 @@ public class JdbcColumnMetaDataImpl extends ColumnMetaDataImpl implements JdbcCo
       String remarks,
       String isAutoIncremented,
       String isGenerated) {
-    super(columnName, typeName);
+    this.columnName = columnName;
+    this.typeName = typeName;
     this.tableCatalog = tableCatalog;
     this.tableSchema = tableSchema;
     this.tableName = tableName;
@@ -160,113 +173,93 @@ public class JdbcColumnMetaDataImpl extends ColumnMetaDataImpl implements JdbcCo
             params);
   }
 
+  @Override
   public String getTableCatalog() {
     return tableCatalog;
   }
 
+  @Override
   public String getTableSchema() {
     return tableSchema;
   }
 
+  @Override
   public String getTableName() {
     return tableName;
   }
 
+  @Override
   public int getDataType() {
     return dataType;
   }
 
+  @Override
   public int getColumnSize() {
     return columnSize;
   }
 
+  @Override
   public int getDecimalDigits() {
     return decimalDigits;
   }
 
+  @Override
   public int getNumPrecRadix() {
     return numPrecRadix;
   }
 
+  @Override
   public int getOrdinalPosition() {
     return ordinalPosition;
   }
 
+  @Override
   public int getNullableFlag() {
     return nullableFlag;
   }
 
+  @Override
   public int getCharOctetLength() {
     return charOctetLength;
   }
 
+  @Override
   public String getIsNullable() {
     return isNullable;
   }
 
+  @Override
   public String getColumnDefault() {
     return columnDefault;
   }
 
+  @Override
   public String getRemarks() {
     return remarks;
   }
 
+  @Override
   public String getIsAutoIncremented() {
     return isAutoIncremented;
   }
 
+  @Override
   public String getIsGenerated() {
     return isGenerated;
   }
 
   @Override
+  public String getTypeName() {
+    return typeName;
+  }
+
+  @Override
+  public String getColumnName() {
+    return columnName;
+  }
+
+  @Override
   public String toString() {
     return msg;
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode()
-        ^ Objects.hash(
-            tableCatalog,
-            tableSchema,
-            tableName,
-            dataType,
-            columnSize,
-            decimalDigits,
-            numPrecRadix,
-            ordinalPosition,
-            nullableFlag,
-            charOctetLength,
-            isNullable,
-            columnDefault,
-            remarks,
-            isAutoIncremented,
-            isGenerated);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof JdbcColumnMetaDataImpl)) return false;
-    JdbcColumnMetaDataImpl other = (JdbcColumnMetaDataImpl) obj;
-    if (!super.equals(obj)) return false;
-    return super.equals(obj)
-        && dataType == other.dataType
-        && columnSize == other.columnSize
-        && decimalDigits == other.decimalDigits
-        && numPrecRadix == other.numPrecRadix
-        && ordinalPosition == other.ordinalPosition
-        && nullableFlag == other.nullableFlag
-        && charOctetLength == other.charOctetLength
-        && Objects.equals(tableCatalog, other.tableCatalog)
-        && Objects.equals(tableSchema, other.tableSchema)
-        && Objects.equals(tableName, other.tableName)
-        && Objects.equals(isNullable, other.isNullable)
-        && Objects.equals(columnDefault, other.columnDefault)
-        && Objects.equals(remarks, other.remarks)
-        && Objects.equals(isAutoIncremented, other.isAutoIncremented)
-        && Objects.equals(isGenerated, other.isGenerated);
   }
 }

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.internal.jdbc_metadata;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -11,10 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.common.JdbcColumnMetaData;
-import org.nkjmlab.sorm4j.common.JdbcColumnMetaDataImpl;
+import org.nkjmlab.sorm4j.internal.mapping.TableName;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcColumnMetaData;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcForeignKeyMetaData;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcIndexMetaData;
+import org.nkjmlab.sorm4j.jdbc_metadata.JdbcTableMetaData;
 
-public final class JdbcDatabaseMetaData {
+public final class JdbcDatabaseMetaDataImpl implements JdbcDatabaseMetaData {
 
   private final String databaseProductName;
   private final String databaseProductVersion;
@@ -40,16 +44,16 @@ public final class JdbcDatabaseMetaData {
   private final boolean supportsBatchUpdates;
   private final boolean supportsStoredProcedures;
 
-  private final Map<String, JdbcTableMetaData> jdbcTablesMetaData;
-  private final Map<String, Map<String, JdbcIndexMetaData>> jdbcIndexesMetaData;
-  private final Map<String, List<JdbcColumnMetaData>> columnsMetaData;
-  private final List<String> tableNames;
+  private final Map<TableName, JdbcTableMetaData> jdbcTablesMetaData;
+  private final Map<TableName, Map<String, JdbcIndexMetaData>> jdbcIndexesMetaData;
+  private final Map<TableName, List<JdbcColumnMetaData>> columnsMetaData;
+  private final List<TableName> tableNames;
 
   private final Map<String, String> schemasMetaData;
-  private final Map<String, List<String>> primaryKeysMetaData;
-  private final Map<String, List<ForeignKeyMetaData>> foreignKeysMetaData;
+  private final Map<TableName, List<String>> primaryKeysMetaData;
+  private final Map<TableName, List<JdbcForeignKeyMetaData>> foreignKeysMetaData;
 
-  public JdbcDatabaseMetaData(
+  public JdbcDatabaseMetaDataImpl(
       String databaseProductName,
       String databaseProductVersion,
       String driverName,
@@ -70,11 +74,11 @@ public final class JdbcDatabaseMetaData {
       boolean supportsBatchUpdates,
       boolean supportsStoredProcedures,
       Map<String, String> schemasMetaData,
-      Map<String, List<String>> primaryKeysMetaData,
-      Map<String, List<ForeignKeyMetaData>> foreignKeysMetaData,
-      Map<String, JdbcTableMetaData> tablesMetaData,
-      Map<String, Map<String, JdbcIndexMetaData>> indexesMetaData,
-      Map<String, List<JdbcColumnMetaData>> columnsMetaData) {
+      Map<TableName, List<String>> primaryKeysMetaData,
+      Map<TableName, List<JdbcForeignKeyMetaData>> foreignKeysMetaData,
+      Map<TableName, JdbcTableMetaData> tablesMetaData,
+      Map<TableName, Map<String, JdbcIndexMetaData>> indexesMetaData,
+      Map<TableName, List<JdbcColumnMetaData>> columnsMetaData) {
     this.databaseProductName = databaseProductName;
     this.databaseProductVersion = databaseProductVersion;
     this.driverName = driverName;
@@ -107,107 +111,133 @@ public final class JdbcDatabaseMetaData {
     this.tableNames = tablesMetaData.keySet().stream().collect(Collectors.toList());
   }
 
-  public Map<String, List<JdbcColumnMetaData>> getColumnsMetaData() {
+  @Override
+  public Map<TableName, List<JdbcColumnMetaData>> getJdbcColumnsMetaData() {
     return columnsMetaData;
   }
 
+  @Override
   public String getSqlKeywords() {
     return sqlKeywords;
   }
 
+  @Override
   public String getNumericFunctions() {
     return numericFunctions;
   }
 
+  @Override
   public String getStringFunctions() {
     return stringFunctions;
   }
 
+  @Override
   public String getSystemFunctions() {
     return systemFunctions;
   }
 
+  @Override
   public String getTimeDateFunctions() {
     return timeDateFunctions;
   }
 
+  @Override
   public boolean isSupportsTransactions() {
     return supportsTransactions;
   }
 
+  @Override
   public boolean isSupportsBatchUpdates() {
     return supportsBatchUpdates;
   }
 
+  @Override
   public boolean isSupportsStoredProcedures() {
     return supportsStoredProcedures;
   }
 
+  @Override
   public Map<String, String> getSchemasMetaData() {
     return schemasMetaData;
   }
 
-  public Map<String, List<String>> getPrimaryKeysMetaData() {
+  @Override
+  public Map<TableName, List<String>> getPrimaryKeysMetaData() {
     return primaryKeysMetaData;
   }
 
-  public Map<String, List<ForeignKeyMetaData>> getForeignKeysMetaData() {
+  @Override
+  public Map<TableName, List<JdbcForeignKeyMetaData>> getForeignKeysMetaData() {
     return foreignKeysMetaData;
   }
 
+  @Override
   public String getDatabaseProductName() {
     return databaseProductName;
   }
 
+  @Override
   public String getDatabaseProductVersion() {
     return databaseProductVersion;
   }
 
+  @Override
   public String getDriverName() {
     return driverName;
   }
 
+  @Override
   public String getDriverVersion() {
     return driverVersion;
   }
 
+  @Override
   public int getJdbcMajorVersion() {
     return jdbcMajorVersion;
   }
 
+  @Override
   public int getJdbcMinorVersion() {
     return jdbcMinorVersion;
   }
 
+  @Override
   public String getSearchStringEscape() {
     return searchStringEscape;
   }
 
+  @Override
   public String getUrl() {
     return url;
   }
 
+  @Override
   public String getUserName() {
     return userName;
   }
 
+  @Override
   public int getDefaultTransactionIsolation() {
     return defaultTransactionIsolation;
   }
 
+  @Override
   public int getMaxConnections() {
     return maxConnections;
   }
 
-  public Map<String, JdbcTableMetaData> getJdbcTablesMetaData() {
+  @Override
+  public Map<TableName, JdbcTableMetaData> getJdbcTablesMetaData() {
     return jdbcTablesMetaData;
   }
 
-  public Map<String, Map<String, JdbcIndexMetaData>> getJdbcIndexesMetaData() {
+  @Override
+  public Map<TableName, Map<String, JdbcIndexMetaData>> getJdbcIndexesMetaData() {
     return jdbcIndexesMetaData;
   }
 
-  public List<String> getTableNames() {
+  @Override
+  public List<TableName> getTableNames() {
     return tableNames;
   }
 
@@ -274,7 +304,7 @@ public final class JdbcDatabaseMetaData {
     try (ResultSet resultSet =
         metaData.getTables(null, "PUBLIC", null, new String[] {"TABLE", "VIEW"})) {
 
-      Map<String, JdbcTableMetaData> tables =
+      Map<TableName, JdbcTableMetaData> tables =
           mapColumnsInResultSetToMap(
                   resultSet,
                   List.of(
@@ -289,17 +319,19 @@ public final class JdbcDatabaseMetaData {
                       "SELF_REFERENCING_COL_NAME",
                       "REF_GENERATION"))
               .stream()
-              .map(e -> new JdbcTableMetaData(e))
-              .collect(Collectors.toMap(m -> m.get("TABLE_NAME"), m -> m, (v1, v2) -> v1));
+              .map(e -> new JdbcTableMetaDataImpl(e))
+              .collect(
+                  Collectors.toMap(m -> TableName.of(m.getTableName()), m -> m, (v1, v2) -> v1));
 
-      Map<String, List<JdbcColumnMetaData>> columns = new HashMap<>();
-      Map<String, Map<String, JdbcIndexMetaData>> indexes = new HashMap<>();
-      for (Entry<String, JdbcTableMetaData> jdbcTableEntry : tables.entrySet()) {
-        String tableName = jdbcTableEntry.getKey();
+      Map<TableName, List<JdbcColumnMetaData>> columns = new HashMap<>();
+      Map<TableName, Map<String, JdbcIndexMetaData>> indexes = new HashMap<>();
+      for (Entry<TableName, JdbcTableMetaData> jdbcTableEntry : tables.entrySet()) {
+        TableName tableName = jdbcTableEntry.getKey();
 
-        columns.put(tableName, getColumnsMetaData(metaData, tableName));
+        columns.put(tableName, getColumnsMetaData(metaData, tableName.getName()));
 
-        try (ResultSet indexInfo = metaData.getIndexInfo(null, null, tableName, false, false)) {
+        try (ResultSet indexInfo =
+            metaData.getIndexInfo(null, null, tableName.getName(), false, false)) {
           Map<String, JdbcIndexMetaData> l =
               mapColumnsInResultSetToMap(
                       indexInfo,
@@ -318,13 +350,13 @@ public final class JdbcDatabaseMetaData {
                           "PAGES",
                           "FILTER_CONDITION"))
                   .stream()
-                  .map(e -> new JdbcIndexMetaData(e))
-                  .collect(Collectors.toMap(m -> m.get("INDEX_NAME"), m -> m, (v1, v2) -> v1));
+                  .map(e -> new JdbcIndexMetaDataImpl(e))
+                  .collect(Collectors.toMap(m -> m.getIndexName(), m -> m, (v1, v2) -> v1));
           indexes.put(tableName, l);
         }
       }
 
-      return new JdbcDatabaseMetaData(
+      return new JdbcDatabaseMetaDataImpl(
           metaData.getDatabaseProductName(),
           metaData.getDatabaseProductVersion(),
           metaData.getDriverName(),
@@ -363,9 +395,9 @@ public final class JdbcDatabaseMetaData {
     return schemaMap;
   }
 
-  private static Map<String, List<String>> mapPrimaryKeys(DatabaseMetaData metaData)
+  private static Map<TableName, List<String>> mapPrimaryKeys(DatabaseMetaData metaData)
       throws SQLException {
-    Map<String, List<String>> primaryKeys = new HashMap<>();
+    Map<TableName, List<String>> primaryKeys = new HashMap<>();
     ResultSet pkResultSet = metaData.getTables(null, null, "%", new String[] {"TABLE"});
 
     while (pkResultSet.next()) {
@@ -377,24 +409,24 @@ public final class JdbcDatabaseMetaData {
           pkColumns.add(pkColumnsResultSet.getString("COLUMN_NAME"));
         }
       }
-      primaryKeys.put(tableName, pkColumns);
+      primaryKeys.put(new TableName(tableName), pkColumns);
     }
     return primaryKeys;
   }
 
-  private static Map<String, List<ForeignKeyMetaData>> mapForeignKeys(DatabaseMetaData metaData)
-      throws SQLException {
-    Map<String, List<ForeignKeyMetaData>> foreignKeys = new HashMap<>();
+  private static Map<TableName, List<JdbcForeignKeyMetaData>> mapForeignKeys(
+      DatabaseMetaData metaData) throws SQLException {
+    Map<TableName, List<JdbcForeignKeyMetaData>> foreignKeys = new HashMap<>();
     ResultSet tablesResultSet = metaData.getTables(null, null, "%", new String[] {"TABLE"});
 
     while (tablesResultSet.next()) {
       String tableName = tablesResultSet.getString("TABLE_NAME");
-      List<ForeignKeyMetaData> fkList = new ArrayList<>();
+      List<JdbcForeignKeyMetaData> fkList = new ArrayList<>();
 
       try (ResultSet fkResultSet = metaData.getImportedKeys(null, null, tableName)) {
         while (fkResultSet.next()) {
           fkList.add(
-              new ForeignKeyMetaData(
+              new JdbcForeignKeyMetaDataImpl(
                   fkResultSet.getString("FKTABLE_NAME"),
                   fkResultSet.getString("FKCOLUMN_NAME"),
                   fkResultSet.getString("PKTABLE_NAME"),
@@ -403,117 +435,29 @@ public final class JdbcDatabaseMetaData {
                   fkResultSet.getShort("DELETE_RULE")));
         }
       }
-      foreignKeys.put(tableName, fkList);
+      foreignKeys.put(new TableName(tableName), fkList);
     }
     return foreignKeys;
   }
 
-  private static List<Map<String, String>> mapColumnsInResultSetToMap(
+  private static List<Map<String, Object>> mapColumnsInResultSetToMap(
       ResultSet resultSet, List<String> columns) throws SQLException {
-    List<Map<String, String>> result = new ArrayList<>();
+    List<Map<String, Object>> result = new ArrayList<>();
 
     while (resultSet.next()) {
-      Map<String, String> index =
-          columns.stream()
-              .collect(
-                  Collectors.toMap(
-                      col -> col,
-                      col -> {
-                        try {
-                          String s = resultSet.getString(col);
-                          return s != null ? s : "NULL";
-                        } catch (SQLException e) {
-                          return "NA";
-                        }
-                      },
-                      (v1, v2) -> v2,
-                      LinkedHashMap::new));
-      result.add(index);
+      Map<String, Object> tmp = new LinkedHashMap<>();
+      columns.forEach(
+          col -> {
+            try {
+              tmp.put(col, resultSet.getObject(col));
+            } catch (SQLException e) {
+              tmp.put(col, null);
+            }
+          });
+
+      result.add(tmp);
     }
     return result;
-  }
-
-  public static class JdbcTableMetaData {
-
-    private Map<String, String> map;
-
-    public JdbcTableMetaData(Map<String, String> map) {
-      this.map = map;
-    }
-
-    public String get(String key) {
-      return map.get(key);
-    }
-
-    @Override
-    public String toString() {
-      return "JdbcTableMetaData [map=" + map + "]";
-    }
-  }
-
-  public static class ForeignKeyMetaData {
-    private final String fkTable;
-    private final String fkColumn;
-    private final String pkTable;
-    private final String pkColumn;
-    private final short updateRule;
-    private final short deleteRule;
-
-    public ForeignKeyMetaData(
-        String fkTable,
-        String fkColumn,
-        String pkTable,
-        String pkColumn,
-        short updateRule,
-        short deleteRule) {
-      this.fkTable = fkTable;
-      this.fkColumn = fkColumn;
-      this.pkTable = pkTable;
-      this.pkColumn = pkColumn;
-      this.updateRule = updateRule;
-      this.deleteRule = deleteRule;
-    }
-
-    public String getFkTable() {
-      return fkTable;
-    }
-
-    public String getFkColumn() {
-      return fkColumn;
-    }
-
-    public String getPkTable() {
-      return pkTable;
-    }
-
-    public String getPkColumn() {
-      return pkColumn;
-    }
-
-    public short getUpdateRule() {
-      return updateRule;
-    }
-
-    public short getDeleteRule() {
-      return deleteRule;
-    }
-  }
-
-  public static class JdbcIndexMetaData {
-    private Map<String, String> map;
-
-    public JdbcIndexMetaData(Map<String, String> map) {
-      this.map = map;
-    }
-
-    public String get(String key) {
-      return map.get(key);
-    }
-
-    @Override
-    public String toString() {
-      return "JdbcIndexMetaData [map=" + map + "]";
-    }
   }
 
   private static String getSchemaPattern(DatabaseMetaData metaData) throws SQLException {

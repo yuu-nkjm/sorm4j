@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.internal.result;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
+import org.nkjmlab.sorm4j.result.RowMap;
 
 public class BasicRowMap implements RowMap {
 
