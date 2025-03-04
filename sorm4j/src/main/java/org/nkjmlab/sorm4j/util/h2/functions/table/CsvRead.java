@@ -1,16 +1,13 @@
 package org.nkjmlab.sorm4j.util.h2.functions.table;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
-
 import java.io.File;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.grammar.CsvOptions;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
-@Experimental
 public class CsvRead {
 
   private final String sql;
@@ -136,11 +133,11 @@ public class CsvRead {
 
       List<String> l =
           Stream.of(
-                  wrapSingleQuote(file.getAbsolutePath().toString()),
-                  columnsString == null ? null : wrapSingleQuote(columnsString),
+                  SqlStringUtils.quote(file.getAbsolutePath().toString()),
+                  columnsString == null ? null : SqlStringUtils.quote(columnsString),
                   csvOptions == null || csvOptions.getSql() == null
                       ? null
-                      : "stringdecode(" + wrapSingleQuote(csvOptions.getSql()) + ")")
+                      : "stringdecode(" + SqlStringUtils.quote(csvOptions.getSql()) + ")")
               .toList();
 
       return new CsvRead("csvread(" + String.join(", ", l) + ")", columns);

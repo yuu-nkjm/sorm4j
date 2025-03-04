@@ -11,8 +11,6 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
@@ -28,11 +26,13 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class SormContextImplTest {
 
@@ -50,10 +50,10 @@ class SormContextImplTest {
                     .setBatchSize(10)
                     .setBatchSizeWithMultiRow(20)
                     .build())
-            .setLoggerContext(
-                LoggerContext.builder()
-                    .enable(LoggerContext.Category.MAPPING)
-                    .disable(LoggerContext.Category.MAPPING)
+            .setLogContext(
+                LogContext.builder()
+                    .enable(LogContext.Category.MAPPING)
+                    .disable(LogContext.Category.MAPPING)
                     .build())
             .build();
 
@@ -104,7 +104,7 @@ class SormContextImplTest {
         mock(ColumnValueToJavaObjectConverters.class);
     ColumnValueToMapValueConverters mockColumnValueToMapValueConverter =
         mock(ColumnValueToMapValueConverters.class);
-    LoggerContext mockLoggerContext = mock(LoggerContext.class);
+    LogContext mockLoggerContext = mock(LogContext.class);
     MultiRowProcessorFactory mockMultiRowProcessorFactory = mock(MultiRowProcessorFactory.class);
     PreparedStatementSupplier mockPreparedStatementSupplier = mock(PreparedStatementSupplier.class);
     SqlParametersSetter mockSqlParametersSetter = mock(SqlParametersSetter.class);

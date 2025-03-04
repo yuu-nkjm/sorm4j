@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
+import org.nkjmlab.sorm4j.internal.logging.LogContextImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public class ProcessUtils {
-  private static final SormLogger log = LoggerContext.getDefaultLoggerSupplier().get();
+  private static final SormLogger log = LogContextImpl.getDefaultLoggerSupplier().get();
 
   public static boolean isWindowsOs() {
     return System.getProperty("os.name").toLowerCase().indexOf("windows") > -1;

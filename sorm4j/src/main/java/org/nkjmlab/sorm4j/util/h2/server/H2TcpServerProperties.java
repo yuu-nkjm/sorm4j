@@ -3,7 +3,8 @@ package org.nkjmlab.sorm4j.util.h2.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+
+import org.nkjmlab.sorm4j.common.Experimental;
 
 /** @author nkjm */
 @Experimental

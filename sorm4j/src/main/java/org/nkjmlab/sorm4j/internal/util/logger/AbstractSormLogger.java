@@ -3,12 +3,13 @@ package org.nkjmlab.sorm4j.internal.util.logger;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.stream.IntStream;
+
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
+import org.nkjmlab.sorm4j.util.sql.param.ParameterizedSqlParser;
 
 public abstract class AbstractSormLogger implements SormLogger {
 
@@ -20,7 +21,7 @@ public abstract class AbstractSormLogger implements SormLogger {
   @Override
   public void logBeforeSql(String tag, Connection connection, ParameterizedSql psql) {
     Object[] params = {
-      tag, getOutsideInvokerOfLibrary(), psql.getBindedSql(), getDbUrl(connection)
+      tag, getOutsideInvokerOfLibrary(), psql.getParameterBindedSql(), getDbUrl(connection)
     };
     debug(
         ParameterizedStringFormatter.LENGTH_256.format(

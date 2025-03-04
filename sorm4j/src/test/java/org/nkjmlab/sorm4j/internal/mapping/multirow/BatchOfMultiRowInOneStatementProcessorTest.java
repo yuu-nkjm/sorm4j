@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 
@@ -31,8 +31,8 @@ class BatchOfMultiRowInOneStatementProcessorTest {
                 MultiRowProcessorFactory.builder()
                     .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH)
                     .build())
-            .setLoggerContext(
-                LoggerContext.builder()
+            .setLogContext(
+                LogContext.builder()
                     .enableAll()
                     .disableAll()
                     .setLoggerSupplier(() -> Log4jSormLogger.getLogger())

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.util.command;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.command.BasicCommand;
 import org.nkjmlab.sorm4j.util.command.NamedParameterCommand;
 import org.nkjmlab.sorm4j.util.command.OrderedParameterCommand;

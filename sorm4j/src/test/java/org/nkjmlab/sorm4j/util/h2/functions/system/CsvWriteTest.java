@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 class CsvWriteTest {
 
@@ -55,7 +55,7 @@ class CsvWriteTest {
         "csvwrite('"
             + csvFile.getAbsolutePath()
             + "', 'SELECT * FROM table', stringdecode('"
-            + LiteralUtils.escapeJavaString(
+            + SqlStringUtils.escapeJavaString(
                 "charset=UTF-8 fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
             + "'))";
     assertEquals(expectedSql, csvWrite.getSql());

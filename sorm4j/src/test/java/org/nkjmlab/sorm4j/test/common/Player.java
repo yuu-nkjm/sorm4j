@@ -1,8 +1,9 @@
 package org.nkjmlab.sorm4j.test.common;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.annotation.OrmTable;
+
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 
 @OrmTable("PLAYERS")
 @OrmColumnAliasPrefix("p")

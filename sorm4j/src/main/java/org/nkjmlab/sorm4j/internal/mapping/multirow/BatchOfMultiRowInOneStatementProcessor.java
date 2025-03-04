@@ -6,13 +6,13 @@ import java.util.List;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /**
  * A sql statement processor for multirow update and batch. This object could be set ormapper via
@@ -27,7 +27,7 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
   private final int batchSizeWithMultiRow;
 
   public BatchOfMultiRowInOneStatementProcessor(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
       SqlParametersToTableMapping<T> tableMapping,

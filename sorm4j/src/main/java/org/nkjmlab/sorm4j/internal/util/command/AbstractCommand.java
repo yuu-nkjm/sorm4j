@@ -2,11 +2,11 @@ package org.nkjmlab.sorm4j.internal.util.command;
 
 import java.util.List;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.command.Command;
 
 public abstract class AbstractCommand implements Command {

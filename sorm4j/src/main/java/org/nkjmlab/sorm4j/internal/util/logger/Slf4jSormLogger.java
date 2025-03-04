@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.internal.util.logger;
 
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public final class Slf4jSormLogger extends AbstractSormLogger implements SormLogger {
 

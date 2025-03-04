@@ -9,11 +9,11 @@ import java.util.function.Function;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.LogPoint;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public abstract class MultiRowProcessor<T> {
 
@@ -21,10 +21,10 @@ public abstract class MultiRowProcessor<T> {
   private final PreparedStatementSupplier statementSupplier;
   private final SqlParametersSetter sqlParametersSetter;
   private final SqlParametersToTableMapping<T> tableMapping;
-  private final LoggerContext loggerContext;
+  private final LogContext loggerContext;
 
   MultiRowProcessor(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
       SqlParametersToTableMapping<T> tableMapping,
@@ -100,7 +100,7 @@ public abstract class MultiRowProcessor<T> {
       return new int[0];
     }
     Optional<LogPoint> lp =
-        loggerContext.createLogPoint(LoggerContext.Category.MULTI_ROW, MultiRowProcessor.class);
+        loggerContext.createLogPoint(LogContext.Category.MULTI_ROW, MultiRowProcessor.class);
     lp.ifPresent(
         _lp ->
             _lp.logBeforeMultiRow(

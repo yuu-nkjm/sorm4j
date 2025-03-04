@@ -1,13 +1,12 @@
 package org.nkjmlab.sorm4j.util.h2.commands;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.nkjmlab.sorm4j.util.h2.grammar.ScriptCompressionEncryption;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 public class ScriptSql {
   private final String sql;
@@ -109,13 +108,13 @@ public class ScriptSql {
           .ifPresent(c -> ret.add("blocksize " + blockSize));
       if (fileName != null) {
         ret.add("to");
-        ret.add(wrapSingleQuote(fileName.getAbsolutePath()));
+        ret.add(SqlStringUtils.quote(fileName.getAbsolutePath()));
         if (scriptCompressionEncryption != null) {
           ret.add(scriptCompressionEncryption.getSql());
         }
         if (charset != null) {
           ret.add("charset");
-          ret.add(wrapSingleQuote(charset));
+          ret.add(SqlStringUtils.quote(charset));
         }
       }
 

@@ -9,9 +9,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Properties;
+
 import javax.sql.DataSource;
+
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 public class DbEngineTestUtils {
 
@@ -49,7 +51,7 @@ public class DbEngineTestUtils {
       String url = properties.getProperty("url");
       String user = properties.getProperty("username");
       String password = properties.getProperty("password");
-      return Sorm.createDataSource(url, user, password);
+      return DriverManagerDataSource.create(url, user, password);
     } catch (Exception e) {
       return JdbcConnectionPool.create(defaultJdbcUrl, "sorm", "sorm");
     }

@@ -2,9 +2,9 @@ package org.nkjmlab.sorm4j.util.command;
 
 import java.util.Map;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
 import org.nkjmlab.sorm4j.internal.util.command.NamedParameterCommandImpl;
-import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
+import org.nkjmlab.sorm4j.util.sql.param.NamedParameterSqlParser;
 
 /**
  * An executable request with named parameters.

@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableMetaDataParser;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.TableSqlFactory;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 
 final class SormConfig {
 
@@ -21,12 +21,12 @@ final class SormConfig {
   private final ColumnValueToMapValueConverters columnValueToMapValueConverter;
   private final SqlParametersSetter sqlParametersSetter;
   private final PreparedStatementSupplier preparedStatementSupplier;
-  private final LoggerContext loggerContext;
+  private final LogContext loggerContext;
   private final TableSqlFactory tableSqlFactory;
   private final TableMetaDataParser tableMetaDataReader = new DefaultTableMetaDataParser();
 
   SormConfig(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
@@ -66,7 +66,7 @@ final class SormConfig {
     return preparedStatementSupplier;
   }
 
-  LoggerContext getLoggerContext() {
+  LogContext getLoggerContext() {
     return loggerContext;
   }
 

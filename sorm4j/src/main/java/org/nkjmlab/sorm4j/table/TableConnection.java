@@ -1,11 +1,9 @@
 package org.nkjmlab.sorm4j.table;
 
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.TableConnectionImpl;
 
-@Experimental
-public interface TableConnection<T> extends TableMappedOrm<T>, AutoCloseable {
+public interface TableConnection<T> extends TableOrm<T>, AutoCloseable {
 
   /**
    * Gets {@link OrmConnection} object

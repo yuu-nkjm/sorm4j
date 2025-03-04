@@ -19,7 +19,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.util.h2.H2Sorm;
+import org.nkjmlab.sorm4j.util.h2.H2SormFactory;
 
 public class H2Csv {
   private final Csv csv;
@@ -65,7 +65,7 @@ public class H2Csv {
 
   /** See {@link Csv#read(String, String[], String)}. */
   public List<RowMap> readCsvWithHeader(File inputFileName, Charset charset) {
-    return readCsvWithHeader(H2Sorm.createTemporalInMemory(), inputFileName, charset);
+    return readCsvWithHeader(H2SormFactory.createTemporalInMemory(), inputFileName, charset);
   }
 
   /** See {@link Csv#read(String, String[], String)}. */
@@ -84,7 +84,7 @@ public class H2Csv {
 
   /** See {@link Csv#read(Reader, String[])}. */
   public List<RowMap> readCsvWithHeader(Reader in) {
-    return readCsvWithHeader(H2Sorm.createTemporalInMemory(), in);
+    return readCsvWithHeader(H2SormFactory.createTemporalInMemory(), in);
   }
 
   /** See {@link Csv#read(Reader, String[])}. */
@@ -99,7 +99,7 @@ public class H2Csv {
   /** See {@link Csv#read(String, String[], String)}. */
   public List<RowMap> readCsvWithoutHeader(File inputFileName, Charset charset, String[] colNames) {
     try (Reader in = newBufferedReader(inputFileName, charset)) {
-      return readCsvWithoutHeader(H2Sorm.createTemporalInMemory(), in, colNames);
+      return readCsvWithoutHeader(H2SormFactory.createTemporalInMemory(), in, colNames);
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
@@ -127,7 +127,7 @@ public class H2Csv {
 
   /** See {@link Csv#read(Reader, String[])}. */
   public List<RowMap> readCsvWithoutHeader(Reader in, String[] colNames) {
-    return readCsvWithoutHeader(H2Sorm.createTemporalInMemory(), in, colNames);
+    return readCsvWithoutHeader(H2SormFactory.createTemporalInMemory(), in, colNames);
   }
 
   /** See {@link Csv#read(Reader, String[])}. */
@@ -143,7 +143,7 @@ public class H2Csv {
   public List<RowMap> readCsvReplacedHeader(
       File inputFileName, Charset charset, String[] colNames) {
     try (Reader in = newBufferedReader(inputFileName, charset)) {
-      return readCsvReplacedHeader(H2Sorm.createTemporalInMemory(), in, colNames);
+      return readCsvReplacedHeader(H2SormFactory.createTemporalInMemory(), in, colNames);
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
@@ -161,7 +161,7 @@ public class H2Csv {
 
   /** See {@link Csv#read(Reader, String[])}. */
   public List<RowMap> readCsvReplacedHeader(Reader in, String[] colNames) {
-    return readCsvReplacedHeader(H2Sorm.createTemporalInMemory(), in, colNames);
+    return readCsvReplacedHeader(H2SormFactory.createTemporalInMemory(), in, colNames);
   }
 
   /** See {@link Csv#read(Reader, String[])}. */

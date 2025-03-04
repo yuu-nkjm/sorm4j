@@ -3,11 +3,13 @@ package org.nkjmlab.sorm4j.util.jackson;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
-import org.nkjmlab.sorm4j.util.datatype.OrmJsonColumnContainer;
-import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
+import org.nkjmlab.sorm4j.util.datatype.annotation.OrmJsonColumnContainer;
+import org.nkjmlab.sorm4j.util.datatype.jackson.JacksonSormContext;
+import org.nkjmlab.sorm4j.util.h2.table.definition.H2SimpleDefinedTable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +23,7 @@ class JacksonSormContextTest {
             SormTestUtils.createNewDatabaseDataSource(),
             JacksonSormContext.builder(new ObjectMapper()).build());
 
-    H2BasicTable<JacksonRecord> table = new H2BasicTable<>(sorm, JacksonRecord.class);
+    H2SimpleDefinedTable<JacksonRecord> table = new H2SimpleDefinedTable<>(sorm, JacksonRecord.class);
     table.createTableIfNotExists();
     table.insert(new JacksonRecord(new JsonByte("{\"name\":\"Alice\",\"age\":20}")));
     assertThat(table.selectAll().get(0).jsonCol.toString()).contains("Alice");
@@ -42,7 +44,7 @@ class JacksonSormContextTest {
             SormTestUtils.createNewDatabaseDataSource(),
             JacksonSormContext.builder(new ObjectMapper()).build());
 
-    H2BasicTable<HasJsonColumn> table = new H2BasicTable<>(sorm, HasJsonColumn.class);
+    H2SimpleDefinedTable<HasJsonColumn> table = new H2SimpleDefinedTable<>(sorm, HasJsonColumn.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .isEqualTo("create table if not exists HAS_JSON_COLUMNS(ID integer, JSON_COL json)");
 

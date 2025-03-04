@@ -3,8 +3,8 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
   private final MultiRowProcessorType multiRowProcessorType;
@@ -25,7 +25,7 @@ public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
 
   @Override
   public <T> MultiRowProcessor<T> getMultiRowProcessor(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
       Class<T> objectClass,

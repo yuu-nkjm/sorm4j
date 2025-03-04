@@ -18,7 +18,7 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createPlayersTable;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewContext;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSportsTable;
-import static org.nkjmlab.sorm4j.util.sql.SelectSql.selectCountFrom;
+import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.selectCountFrom;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,22 +29,22 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.internal.mapping.TableName;
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.common.TableName;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.JoinSql;
-import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
+import org.nkjmlab.sorm4j.util.sql.builder.JoinSql;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private SimpleTableWithDefinition<Player> playersTable;
-  private SimpleTableWithDefinition<Sport> sportsTable;
+  private SimpleDefinedTable<Player> playersTable;
+  private SimpleDefinedTable<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
@@ -334,14 +334,6 @@ class TableTest {
         .isEqualTo(PLAYER_ALICE.getId());
 
     JoinSql.builder(playersTable.getOrm().getTableMetaData(Player.class));
-    assertThat(
-            playersTable
-                .join(
-                    sportsTable, playersTable.joinSqlBuilder().joinUsing(sportsTable, "id").build())
-                .get(0)
-                .getT1()
-                .getId())
-        .isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test

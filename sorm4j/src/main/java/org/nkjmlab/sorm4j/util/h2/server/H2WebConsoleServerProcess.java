@@ -1,7 +1,8 @@
 package org.nkjmlab.sorm4j.util.h2.server;
 
 import java.util.concurrent.TimeUnit;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+
+import org.nkjmlab.sorm4j.common.Experimental;
 
 @Experimental
 public class H2WebConsoleServerProcess {

@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.context;
 
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /**
  * A context for a {@link Sorm} instance. An instance of this class could be built by {{@link
@@ -22,7 +22,7 @@ public interface SormContext {
 
   SqlParametersSetter getSqlParametersSetter();
 
-  LoggerContext getLoggerContext();
+  LogContext getLogContext();
 
   /**
    * Returns new {@link Builder} which has set values from the given {@link SormContext}
@@ -72,7 +72,7 @@ public interface SormContext {
 
     private static final TableSqlFactory DEFAULT_TABLE_SQL_FACTORY = new DefaultTableSqlFactory();
 
-    private static final LoggerContext DEFAULT_LOGGER_CONTEXT = LoggerContext.builder().build();
+    private static final LogContext DEFAULT_LOGGER_CONTEXT = LogContext.builder().build();
 
     private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_TO_FIELD_ACCESSOR_MAPPAER =
         new DefaultColumnToFieldAccessorMapper();
@@ -88,7 +88,7 @@ public interface SormContext {
 
     private ColumnToFieldAccessorMapper columnFieldMapper =
         DEFAULT_COLUMN_TO_FIELD_ACCESSOR_MAPPAER;
-    private LoggerContext loggerContext = DEFAULT_LOGGER_CONTEXT;
+    private LogContext logContext = DEFAULT_LOGGER_CONTEXT;
 
     private PreparedStatementSupplier statementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
@@ -96,7 +96,7 @@ public interface SormContext {
 
     public SormContext build() {
       return new SormContextImpl(
-          loggerContext,
+          logContext,
           columnFieldMapper,
           tableNameMapper,
           columnValueToJavaObjectConverters,
@@ -149,8 +149,8 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setLoggerContext(LoggerContext loggerContext) {
-      this.loggerContext = loggerContext;
+    public Builder setLogContext(LogContext logContext) {
+      this.logContext = logContext;
       return this;
     }
   }

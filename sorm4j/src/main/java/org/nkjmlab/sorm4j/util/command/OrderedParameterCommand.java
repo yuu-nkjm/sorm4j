@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.util.command;
 
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
 import org.nkjmlab.sorm4j.internal.util.command.OrderedParameterCommandImpl;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
+import org.nkjmlab.sorm4j.util.sql.param.OrderedParameterSqlParser;
 
 /**
  * An executable request with ordered parameters.

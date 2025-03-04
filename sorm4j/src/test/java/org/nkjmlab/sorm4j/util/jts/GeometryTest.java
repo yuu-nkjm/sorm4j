@@ -1,15 +1,18 @@
 package org.nkjmlab.sorm4j.util.jts;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.GeometryString;
-import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
+import org.nkjmlab.sorm4j.util.datatype.jts.GeometryJts;
+import org.nkjmlab.sorm4j.util.datatype.jts.JtsSormContext;
+import org.nkjmlab.sorm4j.util.h2.table.definition.H2SimpleDefinedTable;
 
 class GeometryTest {
 
@@ -18,7 +21,7 @@ class GeometryTest {
 
     Sorm sorm = Sorm.create(SormTestUtils.createNewDatabaseDataSource());
 
-    H2BasicTable<GeometryStringRecord> table = new H2BasicTable<>(sorm, GeometryStringRecord.class);
+    H2SimpleDefinedTable<GeometryStringRecord> table = new H2SimpleDefinedTable<>(sorm, GeometryStringRecord.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_STR geometry");
     table.createTableIfNotExists();
@@ -45,7 +48,7 @@ class GeometryTest {
     Sorm sorm =
         Sorm.create(SormTestUtils.createNewDatabaseDataSource(), JtsSormContext.builder().build());
 
-    H2BasicTable<GeometryJtsRecord> table = new H2BasicTable<>(sorm, GeometryJtsRecord.class);
+    H2SimpleDefinedTable<GeometryJtsRecord> table = new H2SimpleDefinedTable<>(sorm, GeometryJtsRecord.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_JTS geometry");
     table.createTableIfNotExists();

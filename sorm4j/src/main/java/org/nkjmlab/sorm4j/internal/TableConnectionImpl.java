@@ -46,7 +46,7 @@ public class TableConnectionImpl<T> implements TableConnection<T> {
     } catch (SQLException e) {
       getOrm()
           .getContext()
-          .getLoggerContext()
+          .getLogContext()
           .getLogger(TableConnectionImpl.class)
           .warn("jdbc connection close error");
     }

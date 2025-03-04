@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
@@ -18,6 +16,8 @@ import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 
 /**
  * Holds mapping data from a given class and a table. The object reads a query result in {@link

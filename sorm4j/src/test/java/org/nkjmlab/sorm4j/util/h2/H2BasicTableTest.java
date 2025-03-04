@@ -13,20 +13,21 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
+import org.nkjmlab.sorm4j.util.h2.table.definition.H2SimpleDefinedTable;
 
 class H2BasicTableTest {
 
   @Test
   void test2() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    H2BasicTable<OrmRecordExample> table = new H2BasicTable<>(sorm, OrmRecordExample.class);
+    H2SimpleDefinedTable<OrmRecordExample> table = new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
@@ -54,9 +55,9 @@ class H2BasicTableTest {
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
-    H2BasicTable<OrmRecordExample> table = new H2BasicTable<>(sorm, OrmRecordExample.class);
+    H2SimpleDefinedTable<OrmRecordExample> table = new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     {
-      new SimpleTableWithDefinition<>(sorm, OrmRecordExample.class);
+      new SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     }
     table.dropTableIfExists();
     table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());

@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.util.h2.grammar;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.escapeJavaString;
-
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 public class CsvOptions {
 
@@ -151,7 +151,7 @@ public class CsvOptions {
               : String.join(
                   " ",
                   csvOptions.entrySet().stream()
-                      .map(en -> en.getKey() + "=" + escapeJavaString(en.getValue()))
+                      .map(en -> en.getKey() + "=" + SqlStringUtils.escapeJavaString(en.getValue()))
                       .toList());
 
       return new CsvOptions(optionsString, csvOptions.getOrDefault("fieldSeparator", ","));

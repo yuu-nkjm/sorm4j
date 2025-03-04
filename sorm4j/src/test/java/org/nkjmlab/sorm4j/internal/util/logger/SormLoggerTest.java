@@ -21,13 +21,13 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
+import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
+import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.logger.LogPoint;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 class SormLoggerTest {
   private static final StringWriter stringWriter = new StringWriter();
@@ -62,12 +62,12 @@ class SormLoggerTest {
 
   @Test
   void testLogAfterQuery() {
-    org.nkjmlab.sorm4j.util.logger.LoggerContext lc =
-        org.nkjmlab.sorm4j.util.logger.LoggerContext.builder().enableAll().build();
+    org.nkjmlab.sorm4j.context.logging.LogContext lc =
+        org.nkjmlab.sorm4j.context.logging.LogContext.builder().enableAll().build();
 
     Sorm sorm =
         SormTestUtils.createSormWithNewDatabaseAndCreateTables(
-            SormContext.builder().setLoggerContext(lc).build());
+            SormContext.builder().setLogContext(lc).build());
 
     Optional<LogPoint> lp = lc.createLogPoint(Category.EXECUTE_QUERY, getClass());
     {

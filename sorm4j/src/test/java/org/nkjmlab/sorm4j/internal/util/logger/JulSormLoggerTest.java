@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 
 class JulSormLoggerTest {
 

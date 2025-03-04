@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.internal.util.logger;
 
 import org.apache.logging.log4j.Level;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public final class Log4jSormLogger extends AbstractSormLogger implements SormLogger {
 

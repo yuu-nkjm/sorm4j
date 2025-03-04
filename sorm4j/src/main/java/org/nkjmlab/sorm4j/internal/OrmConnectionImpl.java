@@ -20,8 +20,8 @@ import java.util.function.Supplier;
 
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.common.Tuple;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
@@ -31,26 +31,26 @@ import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
-import org.nkjmlab.sorm4j.internal.jdbc_metadata.JdbcDatabaseMetaDataImpl;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
+import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
 import org.nkjmlab.sorm4j.internal.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.result.ResultSetStreamOrmConnection;
+import org.nkjmlab.sorm4j.internal.result.jdbcmetadata.JdbcDatabaseMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.result.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.table.TableConnection;
-import org.nkjmlab.sorm4j.util.logger.LogPoint;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
-import org.nkjmlab.sorm4j.util.sql.SelectSql;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /**
  * A database connection with object-relation mapping function.
@@ -86,7 +86,7 @@ public class OrmConnectionImpl implements OrmConnection {
       getJdbcConnection().close();
     } catch (SQLException e) {
       sormContext
-          .getLoggerContext()
+          .getLogContext()
           .getLogger(OrmConnectionImpl.class)
           .warn("jdbc connection close error");
     }
@@ -341,8 +341,8 @@ public class OrmConnectionImpl implements OrmConnection {
     }
   }
 
-  private LoggerContext getLoggerContext() {
-    return sormContext.getLoggerContext();
+  private LogContext getLoggerContext() {
+    return sormContext.getLogContext();
   }
 
   private PreparedStatementSupplier getPreparedStatementSupplier() {
@@ -533,7 +533,7 @@ public class OrmConnectionImpl implements OrmConnection {
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns) {
     return join(
-        t1, t2, joinSql(JOIN, t1, t2, " using (" + SelectSql.joinCommaAndSpace(columns) + ")"));
+        t1, t2, joinSql(JOIN, t1, t2, " using (" + SqlStringUtils.join(", ", columns) + ")"));
   }
 
   private <T1, T2, T3> String joinSql(
@@ -1017,7 +1017,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   private static <R> boolean executeAndClose(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       Connection connection,
       PreparedStatementSupplier statementSupplier,
       SqlParametersSetter sqlParametersSetter,
@@ -1033,7 +1033,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   private static <R> R executeQueryAndClose(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       Connection connection,
       PreparedStatementSupplier statementSupplier,
       SqlParametersSetter sqlParametersSetter,
@@ -1055,7 +1055,7 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   private static int executeUpdateAndClose(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       Connection connection,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,

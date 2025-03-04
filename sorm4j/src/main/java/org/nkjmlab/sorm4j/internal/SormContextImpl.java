@@ -11,8 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.common.ColumnMetaData;
-import org.nkjmlab.sorm4j.common.TableMetaData;
+import org.nkjmlab.sorm4j.common.TableName;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
@@ -23,13 +22,14 @@ import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.TableSql;
 import org.nkjmlab.sorm4j.context.TableSqlFactory;
-import org.nkjmlab.sorm4j.internal.common.TableMetaDataImpl;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.context.metadata.ColumnMetaData;
+import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.context.metadata.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
-import org.nkjmlab.sorm4j.internal.mapping.TableName;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 public final class SormContextImpl implements SormContext {
 
@@ -53,7 +53,7 @@ public final class SormContextImpl implements SormContext {
   }
 
   public SormContextImpl(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
@@ -105,7 +105,7 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.common.DatabaseMetaData.of(connection.getMetaData()));
+                    org.nkjmlab.sorm4j.context.metadata.DbMetaData.of(connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
           }
@@ -140,7 +140,7 @@ public final class SormContextImpl implements SormContext {
                             createTableMapping(objectClass, tableName.getName(), connection);
                         config
                             .getLoggerContext()
-                            .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
+                            .createLogPoint(LogContext.Category.MAPPING, SormContext.class)
                             .ifPresent(lp -> lp.logMapping(m.toString()));
                         return m;
                       } catch (SQLException e) {
@@ -243,7 +243,7 @@ public final class SormContextImpl implements SormContext {
                   SqlResultToColumnsMapping<T> m = createColumnsMapping(objectClass);
                   config
                       .getLoggerContext()
-                      .createLogPoint(LoggerContext.Category.MAPPING, SormContext.class)
+                      .createLogPoint(LogContext.Category.MAPPING, SormContext.class)
                       .ifPresent(lp -> lp.logMapping(m.toString()));
                   return m;
                 });
@@ -281,7 +281,7 @@ public final class SormContextImpl implements SormContext {
   }
 
   @Override
-  public LoggerContext getLoggerContext() {
+  public LogContext getLogContext() {
     return config.getLoggerContext();
   }
 
@@ -373,7 +373,7 @@ public final class SormContextImpl implements SormContext {
         .setColumnToFieldAccessorMapper(config.getColumnToFieldAccessorMapper())
         .setColumnValueToJavaObjectConverters(config.getColumnValueToJavaObjectConverter())
         .setColumnValueToMapValueConverters(config.getColumnValueToMapValueConverter())
-        .setLoggerContext(config.getLoggerContext())
+        .setLogContext(config.getLoggerContext())
         .setMultiRowProcessorFactory(config.getMultiRowProcessorFactory())
         .setPreparedStatementSupplier(config.getPreparedStatementSupplier())
         .setSqlParametersSetter(config.getSqlParametersSetter())

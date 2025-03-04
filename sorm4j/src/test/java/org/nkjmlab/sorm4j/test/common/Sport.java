@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 
 @OrmRecord
 public class Sport {

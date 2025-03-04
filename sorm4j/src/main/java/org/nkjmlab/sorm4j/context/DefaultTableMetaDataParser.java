@@ -6,8 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.common.ColumnMetaData;
-import org.nkjmlab.sorm4j.internal.common.ColumnMetaDataImpl;
+import org.nkjmlab.sorm4j.context.metadata.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.context.metadata.ColumnMetaDataImpl;
 
 public final class DefaultTableMetaDataParser implements TableMetaDataParser {
   /**

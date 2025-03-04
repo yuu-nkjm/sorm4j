@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.nkjmlab.sorm4j.annotation.OrmTable;
 import org.nkjmlab.sorm4j.common.SormException;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 
 /**
  * Default implementation of {@link TableNameMapper}

@@ -1,16 +1,13 @@
 package org.nkjmlab.sorm4j.util.h2.functions.system;
 
-import static org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils.wrapSingleQuote;
-
 import java.io.File;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.util.h2.grammar.CsvOptions;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /** <a href="https://www.h2database.com/html/functions.html#csvwrite">Functions</a> */
-@Experimental
 public class CsvWrite {
 
   private final String sql;
@@ -119,11 +116,11 @@ public class CsvWrite {
 
       List<String> l =
           Stream.of(
-                  wrapSingleQuote(file.getAbsolutePath().toString()),
-                  wrapSingleQuote(queryEscape ? escapeQuery(query) : query),
+                  SqlStringUtils.quote(file.getAbsolutePath().toString()),
+                  SqlStringUtils.quote(queryEscape ? escapeQuery(query) : query),
                   csvOptions == null || csvOptions.getSql() == null
                       ? null
-                      : "stringdecode(" + wrapSingleQuote(csvOptions.getSql()) + ")")
+                      : "stringdecode(" + SqlStringUtils.quote(csvOptions.getSql()) + ")")
               .toList();
 
       return new CsvWrite("csvwrite(" + String.join(", ", l) + ")");

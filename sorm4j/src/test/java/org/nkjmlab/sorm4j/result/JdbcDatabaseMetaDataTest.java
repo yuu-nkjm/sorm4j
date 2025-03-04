@@ -5,17 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.mapping.TableName;
-import org.nkjmlab.sorm4j.jdbc_metadata.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.common.TableName;
+import org.nkjmlab.sorm4j.result.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 
 class JdbcDatabaseMetaDataTest {
 
   @Test
   void test() {
-    SimpleTableWithDefinition<Player> playersTable =
+    SimpleDefinedTable<Player> playersTable =
         SormTestUtils.createPlayersTable(SormTestUtils.createSormWithNewContext());
     String version = "2.";
     JdbcDatabaseMetaData md = playersTable.getOrm().getJdbcDatabaseMetaData();

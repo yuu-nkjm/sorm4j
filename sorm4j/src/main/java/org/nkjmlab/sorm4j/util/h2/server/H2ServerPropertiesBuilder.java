@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.h2.server;
 
 import java.io.File;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
 import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 

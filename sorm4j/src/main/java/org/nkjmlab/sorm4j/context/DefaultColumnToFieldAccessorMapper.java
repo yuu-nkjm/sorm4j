@@ -14,11 +14,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.annotation.OrmColumn;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.annotation.OrmGetter;
-import org.nkjmlab.sorm4j.annotation.OrmIgnore;
-import org.nkjmlab.sorm4j.annotation.OrmSetter;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumn;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmGetter;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmSetter;
 
 /**
  * Default implementation of {@link ColumnToFieldAccessorMapper}

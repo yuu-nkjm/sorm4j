@@ -7,17 +7,18 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.ResultSetStream;
-import org.nkjmlab.sorm4j.util.logger.LogPoint;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext.Category;
 
 abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
   private final Class<T> objectClass;
@@ -41,7 +42,7 @@ abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
 
   public <R> R apply(OrmConnectionImpl ormConn, FunctionHandler<Stream<T>, R> handler) {
     SormContext context = ormConn.getContext();
-    LoggerContext loggerContext = context.getLoggerContext();
+    LogContext loggerContext = context.getLogContext();
     PreparedStatementSupplier statementSupplier = context.getPreparedStatementSupplier();
     SqlParametersSetter parametersSetter = context.getSqlParametersSetter();
 

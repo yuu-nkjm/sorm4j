@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.util.h2.commands;
 
 import java.io.File;
 
-import org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /** <a href="https://www.h2database.com/html/commands.html#backup">Commands</a> */
 public class BackupSql {
@@ -29,7 +29,7 @@ public class BackupSql {
     }
 
     public BackupSql build() {
-      return new BackupSql("backup to " + LiteralUtils.wrapSingleQuote(file.getAbsolutePath()));
+      return new BackupSql("backup to " + SqlStringUtils.quote(file.getAbsolutePath()));
     }
   }
 }

@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 class DriverManagerDataSourceTest {
 

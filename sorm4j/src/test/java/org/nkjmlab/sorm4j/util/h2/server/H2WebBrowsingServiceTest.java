@@ -5,8 +5,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;

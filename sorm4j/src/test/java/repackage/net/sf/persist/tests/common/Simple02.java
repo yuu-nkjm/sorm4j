@@ -2,7 +2,7 @@
 
 package repackage.net.sf.persist.tests.common;
 
-import org.nkjmlab.sorm4j.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 
 @OrmTable("hello_world") // will blow
 @SuppressWarnings("unused")

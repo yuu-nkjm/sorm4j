@@ -4,14 +4,12 @@ import java.sql.Connection;
 
 import javax.sql.DataSource;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.internal.common.DriverManagerDataSourceImpl;
 import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -40,8 +38,8 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSourceImpl} and
-   * the given {@link SormContext}.
+   * Creates a {@link Sorm} instance which uses the given {@link DataSource} and the given {@link
+   * SormContext}.
    *
    * @param dataSource
    * @param context
@@ -52,7 +50,7 @@ public interface Sorm extends Orm {
   }
 
   /**
-   * Creates a {@link Sorm} instance which uses the given {@link DriverManagerDataSource}.
+   * Creates a {@link Sorm} instance which uses the given jdbc url
    *
    * <p>If you want specified more precise configuration of database access, create {@link
    * DataSource} yourself and use {@link #create(DataSource)} method.
@@ -69,25 +67,7 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(String jdbcUrl) {
-    return create(createDataSource(jdbcUrl, null, null));
-  }
-
-  /**
-   * Creates an instance of {@link DataSource}
-   *
-   * <p>Example:
-   *
-   * <pre>
-   * Sorm.createDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", null, null);
-   * </pre>
-   *
-   * @param jdbcUrl
-   * @param username
-   * @param password
-   * @return
-   */
-  static DataSource createDataSource(String jdbcUrl, String username, String password) {
-    return DriverManagerDataSource.create(jdbcUrl, username, password);
+    return create(DriverManagerDataSource.create(jdbcUrl, null, null));
   }
 
   /**
@@ -192,7 +172,6 @@ public interface Sorm extends Orm {
    * @param objectClass
    * @return
    */
-  @Experimental
   <T> Table<T> getTable(Class<T> objectClass);
 
   /**
@@ -203,6 +182,5 @@ public interface Sorm extends Orm {
    * @param tableName
    * @return
    */
-  @Experimental
   <T> Table<T> getTable(Class<T> type, String tableName);
 }

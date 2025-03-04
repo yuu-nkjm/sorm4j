@@ -8,10 +8,10 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
-import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
+import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
+import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 public class SormTestUtils {
 
@@ -42,7 +42,7 @@ public class SormTestUtils {
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  public static SimpleTableWithDefinition<Guest> createGuestsTable(Sorm sorm) {
+  public static SimpleDefinedTable<Guest> createGuestsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("guests")
             .addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
@@ -52,17 +52,17 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleTableWithDefinition<Guest> tbl =
-        new SimpleTableWithDefinition<>(sorm, Guest.class, schema);
+    SimpleDefinedTable<Guest> tbl =
+        new SimpleDefinedTable<>(sorm, Guest.class, schema);
     tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static SimpleTableWithDefinition<Player> createPlayersTable(Sorm sorm) {
+  public static SimpleDefinedTable<Player> createPlayersTable(Sorm sorm) {
     return createPlayersTable(sorm, "players");
   }
 
-  public static SimpleTableWithDefinition<Player> createPlayersTable(Sorm sorm, String tableName) {
+  public static SimpleDefinedTable<Player> createPlayersTable(Sorm sorm, String tableName) {
 
     TableDefinition schema =
         TableDefinition.builder(tableName)
@@ -73,22 +73,22 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleTableWithDefinition<Player> tbl =
-        new SimpleTableWithDefinition<>(sorm, Player.class, schema);
+    SimpleDefinedTable<Player> tbl =
+        new SimpleDefinedTable<>(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static SimpleTableWithDefinition<Sport> createSportsTable(Sorm sorm) {
+  public static SimpleDefinedTable<Sport> createSportsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("sports")
             .addColumnDefinition("id", INT, PRIMARY_KEY)
             .addColumnDefinition("name", VARCHAR)
             .build();
 
-    SimpleTableWithDefinition<Sport> tbl =
-        new SimpleTableWithDefinition<>(sorm, Sport.class, schema);
+    SimpleDefinedTable<Sport> tbl =
+        new SimpleDefinedTable<>(sorm, Sport.class, schema);
 
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();

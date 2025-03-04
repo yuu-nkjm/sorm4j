@@ -3,8 +3,9 @@ package org.nkjmlab.sorm4j.internal.util.logger;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 public final class JulSormLogger extends AbstractSormLogger implements SormLogger {
 

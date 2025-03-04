@@ -5,14 +5,14 @@ import java.sql.SQLException;
 
 import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
+import org.nkjmlab.sorm4j.internal.logging.LogContextImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 @Experimental
 public class H2WebBrowsingService {
-  private static final SormLogger log = LoggerContext.getDefaultLoggerSupplier().get();
+  private static final SormLogger log = LogContextImpl.getDefaultLoggerSupplier().get();
   private final WebServer webServer;
 
   /**

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.util.h2.H2Sorm;
+import org.nkjmlab.sorm4j.util.h2.H2SormFactory;
 
 class H2CsvTest {
 
@@ -31,7 +31,7 @@ class H2CsvTest {
   @BeforeEach
   void setUp() {
     h2Csv = H2Csv.builder().build();
-    sorm = H2Sorm.createTemporalInMemory();
+    sorm = H2SormFactory.createTemporalInMemory();
     try (Connection conn = sorm.openJdbcConnection()) {
       conn.createStatement().execute("CREATE TABLE test (id INT PRIMARY KEY, name VARCHAR(255))");
       conn.createStatement()

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 public class ScriptCompressionEncryption {
 
@@ -61,7 +61,7 @@ public class ScriptCompressionEncryption {
 
       procProp("compression", (key, val) -> ret.add(key + " " + val));
       procProp("cipher", (key, val) -> ret.add(key + " " + val));
-      procProp("password", (key, val) -> ret.add(key + " " + LiteralUtils.wrapSingleQuote(val)));
+      procProp("password", (key, val) -> ret.add(key + " " + SqlStringUtils.quote(val)));
 
       return new ScriptCompressionEncryption(String.join(" ", ret));
     }

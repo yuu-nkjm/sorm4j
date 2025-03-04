@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
 
 @OrmColumnAliasPrefix("c")
 public class Customer {

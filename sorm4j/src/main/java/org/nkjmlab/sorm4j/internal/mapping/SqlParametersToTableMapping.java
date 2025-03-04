@@ -13,12 +13,14 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.TableMetaData;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.result.InsertResultImpl;
@@ -27,8 +29,6 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.InsertResult;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.util.logger.LogPoint;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 /** Holds mapping data from a given class and a table */
 public final class SqlParametersToTableMapping<T> {
@@ -42,10 +42,10 @@ public final class SqlParametersToTableMapping<T> {
 
   private final TableMetaData tableMetaData;
   private final TableSql sql;
-  private final LoggerContext loggerContext;
+  private final LogContext loggerContext;
 
   public SqlParametersToTableMapping(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       ColumnValueToJavaObjectConverters columnValueConverter,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
@@ -147,7 +147,7 @@ public final class SqlParametersToTableMapping<T> {
 
       Optional<LogPoint> lp =
           loggerContext.createLogPoint(
-              LoggerContext.Category.EXECUTE_UPDATE, SqlParametersToTableMapping.class);
+              LogContext.Category.EXECUTE_UPDATE, SqlParametersToTableMapping.class);
       lp.ifPresent(_lp -> _lp.logBeforeSql(connection, insertSql, parameters));
 
       int rowsModified = stmt.executeUpdate();

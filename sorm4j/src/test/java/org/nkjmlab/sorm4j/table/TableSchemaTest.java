@@ -3,11 +3,12 @@ package org.nkjmlab.sorm4j.table;
 import static org.assertj.core.api.Assertions.*;
 import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.*;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 class TableSchemaTest {
 

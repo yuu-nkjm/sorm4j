@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
 
 /**
  * @see <a href="http://www.h2database.com/html/tutorial.html#console_settings">Settings of the H2

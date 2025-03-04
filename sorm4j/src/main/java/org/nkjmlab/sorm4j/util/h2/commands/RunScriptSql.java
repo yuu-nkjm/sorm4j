@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.nkjmlab.sorm4j.util.h2.grammar.ScriptCompressionEncryption;
-import org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 public class RunScriptSql {
   private final String sql;
@@ -53,7 +53,7 @@ public class RunScriptSql {
     public RunScriptSql build() {
       List<String> ret = new ArrayList<>();
       ret.add("RUNSCRIPT FROM");
-      ret.add(LiteralUtils.wrapSingleQuote(fileName.getAbsolutePath()));
+      ret.add(SqlStringUtils.quote(fileName.getAbsolutePath()));
       if (scriptCompressionEncryption != null) {
         ret.add(scriptCompressionEncryption.getSql());
       }

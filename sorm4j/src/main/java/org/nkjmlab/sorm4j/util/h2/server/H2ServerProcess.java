@@ -5,14 +5,15 @@ import java.net.ServerSocket;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.nkjmlab.sorm4j.annotation.Experimental;
+
+import org.nkjmlab.sorm4j.common.Experimental;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
+import org.nkjmlab.sorm4j.internal.logging.LogContextImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
-import org.nkjmlab.sorm4j.util.logger.SormLogger;
 
 @Experimental
 public abstract class H2ServerProcess {
-  private static final SormLogger log = LoggerContext.getDefaultLoggerSupplier().get();
+  private static final SormLogger log = LogContextImpl.getDefaultLoggerSupplier().get();
 
   static final long DEFAULT_TIMEOUT = Long.MAX_VALUE;
   static final TimeUnit DEFAULT_TIMEUNIT = TimeUnit.SECONDS;

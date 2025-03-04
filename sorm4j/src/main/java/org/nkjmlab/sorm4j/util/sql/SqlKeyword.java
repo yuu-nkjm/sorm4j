@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.util.sql;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
+import org.nkjmlab.sorm4j.common.Experimental;
 
 /**
  * Sql keywords wrapped with space.

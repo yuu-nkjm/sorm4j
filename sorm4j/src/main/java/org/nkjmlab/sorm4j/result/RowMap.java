@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
@@ -80,7 +79,6 @@ public interface RowMap extends Map<String, Object> {
    * @param str
    * @return
    */
-  @Experimental
   public static String toKey(String str) {
     return SormContext.getDefaultCanonicalStringCache().toCanonicalName(str);
   }
@@ -221,7 +219,6 @@ public interface RowMap extends Map<String, Object> {
    * @param src
    * @return
    */
-  @Experimental
   static <T extends Record> RowMap fromRecord(T src) {
     try {
       RecordComponent[] recordComponents =
@@ -245,7 +242,7 @@ public interface RowMap extends Map<String, Object> {
    *
    * <pre>
    * A key of the map is included in the record components. =>  the record component set the value.
-   * A key of the map is not included in the record components. => the entry of the map is ignore.
+   * A key of the map is not included in the record components. => the entry of the map is ignore and skipped.
    * A record component does not exists in the key set of the map => the record component set as null. if the component is primitive type, an exception is thrown.
    * </pre>
    *
@@ -254,7 +251,6 @@ public interface RowMap extends Map<String, Object> {
    * @param toType
    * @return
    */
-  @Experimental
   static <T extends Record> T toRecord(RowMap src, Class<T> toType) {
     try {
       RecordComponent[] recordComponents =
@@ -310,7 +306,6 @@ public interface RowMap extends Map<String, Object> {
    * @param toType
    * @return
    */
-  @Experimental
   default <T extends Record> T toRecord(Class<T> toType) {
     return toRecord(this, toType);
   }

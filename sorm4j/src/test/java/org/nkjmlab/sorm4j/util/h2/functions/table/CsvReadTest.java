@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.util.h2.internal.LiteralUtils;
+import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 class CsvReadTest {
 
@@ -78,7 +78,7 @@ class CsvReadTest {
             + csvFile.getAbsolutePath()
             + "', 'col1;col2', "
             + "stringdecode('"
-            + LiteralUtils.escapeJavaString(
+            + SqlStringUtils.escapeJavaString(
                 "charset=UTF-8 fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
             + "'))";
     assertEquals(expectedSql, csvRead.getSql());
