@@ -16,7 +16,6 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +35,6 @@ import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.command.Command;
 import org.nkjmlab.sorm4j.util.sql.param.NamedParameterSqlParser;
 import org.nkjmlab.sorm4j.util.sql.param.OrderedParameterSqlParser;
 
@@ -188,40 +186,10 @@ class OrmConnectionImplTest {
   }
 
   @Test
-  void testNamedRequest1() {
-    int row =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bindBean(new Player(1, "Frank", "Tokyo"))
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
-  }
-
-  @Test
   void testNamedRequest() {
     AtomicInteger id = new AtomicInteger(10);
 
     int row =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bindAll(
-                        Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-    row =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bind("id", id.incrementAndGet())
-                    .bind("name", "Frank")
-                    .bind("address", "Tokyo")
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-    row =
         orm.applyHandler(
             conn -> {
               NamedParameterSqlParser sql =
@@ -234,15 +202,6 @@ class OrmConnectionImplTest {
               return conn.executeUpdate(sql.parse());
             });
     assertThat(row).isEqualTo(1);
-
-    var ret =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "select * from players where id=:id")
-                    .bind("id", id.get())
-                    .executeQuery(conn.getResultSetTraverser(Player.class)));
-
-    assertThat(ret.size()).isEqualTo(1);
   }
 
   @Test
