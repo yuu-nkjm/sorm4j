@@ -22,12 +22,29 @@ import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.util.h2.table.definition.H2SimpleDefinedTable;
 
-class H2BasicTableTest {
+class H2SimpleDefinedTableTest {
+
+  @Test
+  void test3() throws InterruptedException {
+    Sorm sorm = SormTestUtils.createSormWithNewContext();
+    H2SimpleDefinedTable<Example> table = new H2SimpleDefinedTable<>(sorm, Example.class);
+    table.dropTableIfExists();
+    table.createTableIfNotExists();
+    table.getOrm();
+    table.getTableName();
+    table.getTableDefinition();
+    table.getValueType();
+    table.insert(new Example(0, "name"));
+  }
+
+  @OrmRecord
+  public record Example(int id, String name) {}
 
   @Test
   void test2() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    H2SimpleDefinedTable<OrmRecordExample> table = new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
+    H2SimpleDefinedTable<OrmRecordExample> table =
+        new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
@@ -55,7 +72,8 @@ class H2BasicTableTest {
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
-    H2SimpleDefinedTable<OrmRecordExample> table = new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
+    H2SimpleDefinedTable<OrmRecordExample> table =
+        new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     {
       new SimpleDefinedTable<>(sorm, OrmRecordExample.class);
     }

@@ -1,7 +1,10 @@
-package org.nkjmlab.sorm4j.util.h2.server;
+package org.nkjmlab.sorm4j.util.h2.tools.server;
 
 import java.sql.SQLException;
 
+import org.nkjmlab.sorm4j.common.Experimental;
+
+@Experimental
 public class H2Startup {
   private H2Startup() {}
 

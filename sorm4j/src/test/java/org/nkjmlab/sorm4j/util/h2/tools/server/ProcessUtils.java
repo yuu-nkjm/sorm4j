@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.h2.server;
+package org.nkjmlab.sorm4j.util.h2.tools.server;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

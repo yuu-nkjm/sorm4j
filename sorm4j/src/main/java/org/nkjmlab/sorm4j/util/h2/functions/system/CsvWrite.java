@@ -117,7 +117,7 @@ public class CsvWrite {
       List<String> l =
           Stream.of(
                   SqlStringUtils.quote(file.getAbsolutePath().toString()),
-                  SqlStringUtils.quote(queryEscape ? escapeQuery(query) : query),
+                  SqlStringUtils.quote(query),
                   csvOptions == null || csvOptions.getSql() == null
                       ? null
                       : "stringdecode(" + SqlStringUtils.quote(csvOptions.getSql()) + ")")
@@ -125,9 +125,5 @@ public class CsvWrite {
 
       return new CsvWrite("csvwrite(" + String.join(", ", l) + ")");
     }
-  }
-
-  private static String escapeQuery(String query) {
-    return query.replace("'", "''");
   }
 }

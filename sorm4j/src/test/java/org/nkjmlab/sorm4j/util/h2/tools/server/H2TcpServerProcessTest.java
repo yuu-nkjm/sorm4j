@@ -1,7 +1,10 @@
-package org.nkjmlab.sorm4j.util.h2.server;
+package org.nkjmlab.sorm4j.util.h2.tools.server;
 
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.util.h2.tools.server.H2TcpServerProcess;
+import org.nkjmlab.sorm4j.util.h2.tools.server.H2TcpServerProperties;
+
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;

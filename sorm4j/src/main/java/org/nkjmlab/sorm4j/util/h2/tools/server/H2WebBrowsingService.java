@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.h2.server;
+package org.nkjmlab.sorm4j.util.h2.tools.server;
 
 import java.sql.Connection;
 import java.sql.SQLException;
