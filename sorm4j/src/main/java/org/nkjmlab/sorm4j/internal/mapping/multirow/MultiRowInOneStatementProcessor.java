@@ -3,17 +3,18 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
 
-public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessorBase<T> {
 
   private final int multiRowSize;
 

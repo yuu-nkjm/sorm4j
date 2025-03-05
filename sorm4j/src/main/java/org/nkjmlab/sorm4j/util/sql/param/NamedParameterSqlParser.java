@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.nkjmlab.sorm4j.common.Experimental;
 import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.util.paramsql_parser.NamedParameterSqlParserImpl;
 
 /**

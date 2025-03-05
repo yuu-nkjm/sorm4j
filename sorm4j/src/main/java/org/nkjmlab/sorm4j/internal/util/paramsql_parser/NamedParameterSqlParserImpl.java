@@ -8,11 +8,11 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.context.FieldAccessor;
-import org.nkjmlab.sorm4j.context.NameToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.common.ParameterizedSqlImpl;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.util.sql.param.NamedParameterSqlParser;
 
@@ -27,7 +27,7 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   private static final Map<Class<?>, Map<String, FieldAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
 
-  private static final NameToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
+  private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
   private static final char DEFAULT_PREFIX = ':';
@@ -36,12 +36,12 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   private final String sql;
   private final char prefix;
   private final char suffix;
-  private final NameToFieldAccessorMapper nameToFieldMapper;
+  private final ColumnToFieldAccessorMapper nameToFieldMapper;
   private final Map<String, Object> parameters;
   private Object bean;
 
   public NamedParameterSqlParserImpl(
-      String sql, char prefix, char suffix, NameToFieldAccessorMapper nameToFieldMapper) {
+      String sql, char prefix, char suffix, ColumnToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;

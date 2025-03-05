@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.common.Experimental;
-import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.context.common.TableMetaData;
 import org.nkjmlab.sorm4j.table.TableOrm;
 import org.nkjmlab.sorm4j.util.sql.builder.SelectSql.Condition;
 

@@ -12,21 +12,17 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
-import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToMapValueConverters;
-import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
-import org.nkjmlab.sorm4j.context.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
-import org.nkjmlab.sorm4j.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -40,11 +36,7 @@ class SormContextImplTest {
   void testBuild() {
     SormContext context =
         SormContext.builder()
-            .setColumnToFieldAccessorMapper(new DefaultColumnToFieldAccessorMapper())
             .setTableNameMapper(new DefaultTableNameMapper())
-            .setColumnValueToMapValueConverters(new DefaultColumnValueToMapValueConverters())
-            .setColumnValueToJavaObjectConverters(new DefaultColumnValueToJavaObjectConverters())
-            .setSqlParametersSetter(new DefaultSqlParametersSetter())
             .setMultiRowProcessorFactory(
                 MultiRowProcessorFactory.builder()
                     .setBatchSize(10)

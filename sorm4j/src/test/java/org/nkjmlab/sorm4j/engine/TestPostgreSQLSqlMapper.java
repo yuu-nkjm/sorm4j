@@ -37,8 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
@@ -99,9 +97,8 @@ public class TestPostgreSQLSqlMapper {
 
     context =
         SormContext.builder()
-            .setColumnValueToJavaObjectConverters(
-                new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
-            .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter))
+            .addColumnValueToJavaObjectConverter(columnValueConverter)
+            .addSqlParameterSetter(parameterSetter)
             .build();
   }
 

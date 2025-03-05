@@ -13,13 +13,13 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.context.common.TableMetaData;
+import org.nkjmlab.sorm4j.context.common.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.result.BasicRowMap;
@@ -63,7 +63,7 @@ public final class SqlParametersToTableMapping<T> {
     this.sqlParametersSetter = sqlParametersSetter;
     this.statementSupplier = statementSupplier;
     this.multiRowProcessor =
-        multiRowProcessorFactory.getMultiRowProcessor(
+        multiRowProcessorFactory.createMultiRowProcessor(
             loggerContext, sqlParametersSetter, statementSupplier, objectClass, this);
   }
 

@@ -22,14 +22,13 @@ import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
-import org.nkjmlab.sorm4j.table.definition.annotation.CheckConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
 import org.nkjmlab.sorm4j.table.definition.annotation.Index;
-import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumnPair;
 import org.nkjmlab.sorm4j.table.definition.annotation.NotNull;
 import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
 import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
-import org.nkjmlab.sorm4j.table.definition.annotation.UniqueColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
@@ -73,7 +72,8 @@ class TableDefinitionTest {
                     .build()
                     .getSql());
 
-    H2SimpleDefinedTable<TableDefExample> table = new H2SimpleDefinedTable<>(sorm, TableDefExample.class, def);
+    H2SimpleDefinedTable<TableDefExample> table =
+        new H2SimpleDefinedTable<>(sorm, TableDefExample.class, def);
     table.insertMapIn(csvRows);
 
     assertThat(sorm.selectAll(TableDefExample.class).get(0).phoneNumber).isEqualTo("000-000-0000");
@@ -100,11 +100,11 @@ class TableDefinitionTest {
   }
 
   @OrmRecord
-  @IndexColumns({"boolean_col", "byte_col"})
-  @IndexColumns({"boolean_col", "char_col"})
-  @UniqueColumns({"boolean_col", "byte_col"})
-  @UniqueColumns({"boolean_col", "char_col"})
-  @CheckConstraint("int_col>=0")
+  @IndexColumnPair({"boolean_col", "byte_col"})
+  @IndexColumnPair({"boolean_col", "char_col"})
+  @UniqueConstraint({"boolean_col", "byte_col"})
+  @UniqueConstraint({"boolean_col", "char_col"})
+  @Check("int_col>=0")
   public static class TableDefExample {
     public final Long id;
     public final Boolean booleanCol;

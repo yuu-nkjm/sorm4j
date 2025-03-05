@@ -12,20 +12,20 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.TableName;
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
-import org.nkjmlab.sorm4j.context.TableSql;
-import org.nkjmlab.sorm4j.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.context.common.TableMetaData;
+import org.nkjmlab.sorm4j.context.common.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.context.metadata.ColumnMetaData;
-import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
-import org.nkjmlab.sorm4j.internal.context.metadata.TableMetaDataImpl;
+import org.nkjmlab.sorm4j.internal.common.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.internal.context.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
@@ -105,7 +105,7 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.context.metadata.DbMetaData.of(connection.getMetaData()));
+                    org.nkjmlab.sorm4j.internal.common.DbMetaData.of(connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
           }
@@ -370,13 +370,8 @@ public final class SormContextImpl implements SormContext {
 
   public SormContext.Builder builder() {
     return SormContext.builder()
-        .setColumnToFieldAccessorMapper(config.getColumnToFieldAccessorMapper())
-        .setColumnValueToJavaObjectConverters(config.getColumnValueToJavaObjectConverter())
-        .setColumnValueToMapValueConverters(config.getColumnValueToMapValueConverter())
         .setLogContext(config.getLoggerContext())
         .setMultiRowProcessorFactory(config.getMultiRowProcessorFactory())
-        .setPreparedStatementSupplier(config.getPreparedStatementSupplier())
-        .setSqlParametersSetter(config.getSqlParametersSetter())
         .setTableNameMapper(config.getTableNameMapper())
         .setTableSqlFactory(config.getTableSqlFactory());
   }

@@ -1,9 +1,26 @@
 package org.nkjmlab.sorm4j.context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.Internal;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnValueToMapValueConverters;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultPreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultSqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableNameMapper;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableSqlFactory;
 import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
 
 /**
@@ -14,15 +31,14 @@ import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
  */
 public interface SormContext {
 
-  ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter();
-
-  ColumnValueToMapValueConverters getColumnValueToMapValueConverter();
-
-  PreparedStatementSupplier getPreparedStatementSupplier();
-
-  SqlParametersSetter getSqlParametersSetter();
-
-  LogContext getLogContext();
+  /**
+   * Returns new {@link Builder}
+   *
+   * @return
+   */
+  static Builder builder() {
+    return new Builder();
+  }
 
   /**
    * Returns new {@link Builder} which has set values from the given {@link SormContext}
@@ -34,15 +50,6 @@ public interface SormContext {
     return ctx.builder();
   }
 
-  /**
-   * Returns new {@link Builder}
-   *
-   * @return
-   */
-  static Builder builder() {
-    return new Builder();
-  }
-
   static CanonicalStringCache getDefaultCanonicalStringCache() {
     return CanonicalStringCache.getDefault();
   }
@@ -51,19 +58,23 @@ public interface SormContext {
     return SormImpl.DEFAULT_CONTEXT;
   }
 
+  ColumnValueToJavaObjectConverters getColumnValueToJavaObjectConverter();
+
+  ColumnValueToMapValueConverters getColumnValueToMapValueConverter();
+
+  LogContext getLogContext();
+
+  PreparedStatementSupplier getPreparedStatementSupplier();
+
+  SqlParametersSetter getSqlParametersSetter();
+
   public static class Builder {
 
     private static final MultiRowProcessorFactory DEFAULT_MULTI_ROW_PROCESSOR_FACTORY =
         MultiRowProcessorFactory.builder().build();
 
-    private static final SqlParametersSetter DEFAULT_SQL_PARAMETER_SETTER =
-        new DefaultSqlParametersSetter();
-
     private static final PreparedStatementSupplier DEFAULT_STATEMENT_SUPPLIER =
         new DefaultPreparedStatementSupplier();
-
-    private static final ColumnValueToJavaObjectConverters DEFAULT_RESULT_SET_CONVERTERS =
-        new DefaultColumnValueToJavaObjectConverters();
 
     public static final ColumnValueToMapValueConverters
         DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTERS = new DefaultColumnValueToMapValueConverters();
@@ -78,11 +89,8 @@ public interface SormContext {
         new DefaultColumnToFieldAccessorMapper();
 
     private TableNameMapper tableNameMapper = DEFAULT_TABLE_NAME_MAPPER;
-    private ColumnValueToJavaObjectConverters columnValueToJavaObjectConverters =
-        DEFAULT_RESULT_SET_CONVERTERS;
     private ColumnValueToMapValueConverters columnValueToMapValueConverter =
         DEFAULT_COLUMN_VALUE_TO_MAP_VALUE_CONVERTERS;
-    private SqlParametersSetter sqlParametersSetter = DEFAULT_SQL_PARAMETER_SETTER;
     private MultiRowProcessorFactory multiRowProcessorFactory = DEFAULT_MULTI_ROW_PROCESSOR_FACTORY;
     private TableSqlFactory tableSqlFactory = DEFAULT_TABLE_SQL_FACTORY;
 
@@ -92,6 +100,11 @@ public interface SormContext {
 
     private PreparedStatementSupplier statementSupplier = DEFAULT_STATEMENT_SUPPLIER;
 
+    private List<SqlParameterSetter> sqlParameterSettersList = new ArrayList<>();
+
+    private List<ColumnValueToJavaObjectConverter> columnValueToJavaObjectConvertersList =
+        new ArrayList<>();
+
     private Builder() {}
 
     public SormContext build() {
@@ -99,48 +112,24 @@ public interface SormContext {
           logContext,
           columnFieldMapper,
           tableNameMapper,
-          columnValueToJavaObjectConverters,
+          new DefaultColumnValueToJavaObjectConverters(
+              columnValueToJavaObjectConvertersList.toArray(
+                  ColumnValueToJavaObjectConverter[]::new)),
           columnValueToMapValueConverter,
-          sqlParametersSetter,
+          new DefaultSqlParametersSetter(
+              sqlParameterSettersList.toArray(SqlParameterSetter[]::new)),
           statementSupplier,
           tableSqlFactory,
           multiRowProcessorFactory);
     }
 
-    public Builder setColumnToFieldAccessorMapper(ColumnToFieldAccessorMapper fieldNameMapper) {
-      this.columnFieldMapper = fieldNameMapper;
+    public Builder addColumnValueToJavaObjectConverter(ColumnValueToJavaObjectConverter converter) {
+      this.columnValueToJavaObjectConvertersList.add(converter);
       return this;
     }
 
-    public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
-      this.tableNameMapper = tableNameMapper;
-      return this;
-    }
-
-    public Builder setColumnValueToJavaObjectConverters(
-        ColumnValueToJavaObjectConverters converters) {
-      this.columnValueToJavaObjectConverters = converters;
-      return this;
-    }
-
-    public Builder setColumnValueToMapValueConverters(ColumnValueToMapValueConverters converters) {
-      this.columnValueToMapValueConverter = converters;
-      return this;
-    }
-
-    public Builder setSqlParametersSetter(SqlParametersSetter sqlParametersSetter) {
-      this.sqlParametersSetter = sqlParametersSetter;
-      return this;
-    }
-
-    public Builder setPreparedStatementSupplier(
-        PreparedStatementSupplier preparedStatementSupplier) {
-      this.statementSupplier = preparedStatementSupplier;
-      return this;
-    }
-
-    public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
-      this.tableSqlFactory = tableSqlFactory;
+    public Builder setLogContext(LogContext logContext) {
+      this.logContext = logContext;
       return this;
     }
 
@@ -149,8 +138,19 @@ public interface SormContext {
       return this;
     }
 
-    public Builder setLogContext(LogContext logContext) {
-      this.logContext = logContext;
+    public Builder addSqlParameterSetter(SqlParameterSetter sqlParameterSetter) {
+      this.sqlParameterSettersList.add(sqlParameterSetter);
+      return this;
+    }
+
+    public Builder setTableNameMapper(TableNameMapper tableNameMapper) {
+      this.tableNameMapper = tableNameMapper;
+      return this;
+    }
+
+    @Internal
+    public Builder setTableSqlFactory(TableSqlFactory tableSqlFactory) {
+      this.tableSqlFactory = tableSqlFactory;
       return this;
     }
   }

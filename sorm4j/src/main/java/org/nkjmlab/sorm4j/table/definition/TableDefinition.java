@@ -21,28 +21,25 @@ import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.common.Experimental;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
-import org.nkjmlab.sorm4j.table.definition.annotation.CheckConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
 import org.nkjmlab.sorm4j.table.definition.annotation.Index;
-import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumnPair;
 import org.nkjmlab.sorm4j.table.definition.annotation.NotNull;
 import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
-import org.nkjmlab.sorm4j.table.definition.annotation.UniqueColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
 import org.nkjmlab.sorm4j.util.datatype.annotation.OrmJsonColumnContainer;
 
 /**
- * This class represent a table schema. This class is a utility for users to define tables and
- * indexes. It should be noted that there is no guarantee that this object will match the table
- * definition in the database.
+ * This class represent a table schema and indexes. This class is a utility for users to define
+ * tables and indexes. It should be noted that there is no guarantee that this object will match the
+ * table definition in the database.
  *
- * @see {@link TableMetaData}
  * @author nkjm
  */
 @Experimental
@@ -64,18 +61,18 @@ public final class TableDefinition {
   public static TableDefinition.Builder builder(Class<?> valueType, String tableName) {
     Builder builder = TableDefinition.builder(tableName);
 
-    Optional.ofNullable(valueType.getAnnotation(PrimaryKeyColumns.class))
+    Optional.ofNullable(valueType.getAnnotation(PrimaryKeyConstraint.class))
         .map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumns.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumnPair.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(UniqueColumns.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(UniqueConstraint.class))
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(CheckConstraint.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
     Annotation[][] parameterAnnotationsOfConstructor =

@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 
 final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.

@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.context;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter.toSqlArray;
+import static org.nkjmlab.sorm4j.internal.context.impl.DefaultSqlParametersSetter.toSqlArray;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
 
 import java.io.StringReader;
@@ -13,6 +13,7 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.TestUtils;

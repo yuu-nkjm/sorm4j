@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.context.FieldAccessor;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
 public final class ColumnToAccessorMapping {

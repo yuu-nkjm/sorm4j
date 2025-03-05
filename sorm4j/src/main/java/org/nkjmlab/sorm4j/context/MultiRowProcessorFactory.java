@@ -1,14 +1,23 @@
 package org.nkjmlab.sorm4j.context;
 
 import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessorFactoryImpl;
 
 public interface MultiRowProcessorFactory {
 
+  <T> MultiRowProcessor<T> createMultiRowProcessor(
+      LogContext loggerContext,
+      SqlParametersSetter sqlParametersSetter,
+      PreparedStatementSupplier statementSupplier,
+      Class<T> objectClass,
+      SqlParametersToTableMapping<T> sqlParametersToTableMapping);
+
   /** Type of how to execute multi-row update SQL statements. */
-  public enum MultiRowProcessorType {
+  enum MultiRowProcessorType {
     SIMPLE_BATCH,
     MULTI_ROW,
     MULTI_ROW_AND_BATCH;
@@ -18,9 +27,10 @@ public interface MultiRowProcessorFactory {
     return new Builder();
   }
 
-  public static class Builder {
+  public class Builder {
 
-    private MultiRowProcessorType multiRowProcessorType = MultiRowProcessorType.MULTI_ROW;
+    private MultiRowProcessorFactory.MultiRowProcessorType multiRowProcessorType =
+        MultiRowProcessorFactory.MultiRowProcessorType.MULTI_ROW;
     private int batchSize = 32;
     private int multiRowSize = 32;
     private int batchSizeWithMultiRow = 5;
@@ -40,7 +50,7 @@ public interface MultiRowProcessorFactory {
       return this;
     }
 
-    public Builder setMultiRowProcessorType(MultiRowProcessorType type) {
+    public Builder setMultiRowProcessorType(MultiRowProcessorFactory.MultiRowProcessorType type) {
       this.multiRowProcessorType = type;
       return this;
     }
@@ -50,11 +60,4 @@ public interface MultiRowProcessorFactory {
           multiRowProcessorType, batchSize, multiRowSize, batchSizeWithMultiRow);
     }
   }
-
-  <T> MultiRowProcessor<T> getMultiRowProcessor(
-      LogContext loggerContext,
-      SqlParametersSetter sqlParametersSetter,
-      PreparedStatementSupplier statementSupplier,
-      Class<T> objectClass,
-      SqlParametersToTableMapping<T> sqlParametersToTableMapping);
 }

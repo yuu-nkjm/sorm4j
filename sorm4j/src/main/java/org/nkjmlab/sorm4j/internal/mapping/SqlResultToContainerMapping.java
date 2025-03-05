@@ -5,8 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 
 abstract class SqlResultToContainerMapping<T> {
   protected final Constructor<T> constructor;

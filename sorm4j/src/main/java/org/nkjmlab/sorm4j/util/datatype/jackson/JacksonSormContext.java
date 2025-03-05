@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.nkjmlab.sorm4j.common.Experimental;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.util.datatype.annotation.OrmJsonColumnContainer;
@@ -25,12 +23,9 @@ public class JacksonSormContext {
     OrmJsonContainers ormJsonContainers = new OrmJsonContainers(ormJsonColumnContainerClasses);
 
     return SormContext.builder()
-        .setColumnValueToJavaObjectConverters(
-            new DefaultColumnValueToJavaObjectConverters(
-                new JacksonColumnValueToJavaObjectConverter(objectMapper, ormJsonContainers)))
-        .setSqlParametersSetter(
-            new DefaultSqlParametersSetter(
-                new JacksonSqlParameterSetter(objectMapper, ormJsonContainers)));
+        .addColumnValueToJavaObjectConverter(
+            new JacksonColumnValueToJavaObjectConverter(objectMapper, ormJsonContainers))
+        .addSqlParameterSetter(new JacksonSqlParameterSetter(objectMapper, ormJsonContainers));
   }
 
   public static class OrmJsonContainers {
