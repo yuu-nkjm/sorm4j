@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.CheckConstraint;

@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.common.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
 import org.nkjmlab.sorm4j.table.Table;
-import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 /**
  * An interface of executing object-relation mapping. Object-relation mapping functions with an
@@ -67,7 +67,11 @@ public interface Sorm extends Orm {
    * @return
    */
   static Sorm create(String jdbcUrl) {
-    return create(DriverManagerDataSource.create(jdbcUrl, null, null));
+    return create(DataSourceFactory.create(jdbcUrl, null, null));
+  }
+
+  static Sorm create(String jdbcUrl, SormContext context) {
+    return SormImpl.create(DataSourceFactory.create(jdbcUrl, null, null), context);
   }
 
   /**

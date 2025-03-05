@@ -1,8 +1,10 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

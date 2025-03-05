@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j.internal.result;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.metadata.TableMetaData;

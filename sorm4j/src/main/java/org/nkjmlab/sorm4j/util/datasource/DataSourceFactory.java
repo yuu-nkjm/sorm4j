@@ -3,29 +3,16 @@ package org.nkjmlab.sorm4j.util.datasource;
 import javax.sql.DataSource;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.internal.util.datasource.DriverManagerDataSourceImpl;
+import org.nkjmlab.sorm4j.internal.util.datasource.DriverManagerDataSource;
 
-/**
- * A {@link DataSource} implementation that provides a simple way to create a database connection
- * using a JDBC URL, with optional username and password.
- *
- * <p>This interface offers factory methods to create a {@link DriverManagerDataSource} instance.
- *
- * <p>For example:
- *
- * <pre>
- * <code>
- *    DriverManagerDataSource dataSource = DriverManagerDataSource.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
- * </code>
- * </pre>
- */
-public interface DriverManagerDataSource extends DataSource {
+public class DataSourceFactory {
+  private DataSourceFactory() {}
 
   /**
    * Creates a {@link DriverManagerDataSource} using the specified JDBC URL.
    *
-   * <p>This method is a shorthand for calling {@link #create(String, String, String)} with {@code
-   * null} for the username and password.
+   * <p>This method is a shorthand for calling {@link DataSourceFactory#create(String, String,
+   * String)} with {@code null} for the username and password.
    *
    * <p>Example usage:
    *
@@ -38,8 +25,8 @@ public interface DriverManagerDataSource extends DataSource {
    * @param jdbcUrl the JDBC URL for connecting to the database
    * @return a new instance of {@link DriverManagerDataSource}
    */
-  public static DriverManagerDataSource create(String jdbcUrl) {
-    return create(jdbcUrl, null, null);
+  public static DataSource create(String jdbcUrl) {
+    return DriverManagerDataSource.create(jdbcUrl, null, null);
   }
 
   /**
@@ -49,7 +36,7 @@ public interface DriverManagerDataSource extends DataSource {
    * database using the given credentials.
    *
    * <p>If you need more precise control over database access, consider creating a {@link
-   * DataSource} manually and using {@link #create(DataSource)} instead.
+   * DataSource} manually and using {@link create} instead.
    *
    * <p>Example usage:
    *
@@ -65,7 +52,7 @@ public interface DriverManagerDataSource extends DataSource {
    * @param password the password for authentication (can be {@code null})
    * @return a new instance of {@link DriverManagerDataSource}
    */
-  public static DriverManagerDataSource create(String jdbcUrl, String username, String password) {
-    return DriverManagerDataSourceImpl.create(jdbcUrl, username, password);
+  public static DataSource create(String jdbcUrl, String username, String password) {
+    return DriverManagerDataSource.create(jdbcUrl, username, password);
   }
 }

@@ -1,9 +1,8 @@
 package org.nkjmlab.sorm4j.util.h2.tools.server;
 
 import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.util.h2.tools.server.H2WebConsoleServerProcess;
-import org.nkjmlab.sorm4j.util.h2.tools.server.H2WebConsoleServerProperties;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;

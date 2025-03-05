@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j.context;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;

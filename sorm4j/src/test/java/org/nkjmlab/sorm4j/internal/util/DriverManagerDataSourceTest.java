@@ -5,13 +5,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
 
 class DriverManagerDataSourceTest {
 
-  private static DriverManagerDataSource ds = SormTestUtils.createNewDatabaseDataSource();
+  private static DataSource ds = SormTestUtils.createNewDatabaseDataSource();
 
   @Test
   void testGetParentLogger() {

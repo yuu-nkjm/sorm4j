@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.util.logger;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -9,6 +10,7 @@ import java.io.Writer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
@@ -23,8 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;

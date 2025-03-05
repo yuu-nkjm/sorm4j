@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.util.h2.table.definition;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
+import org.nkjmlab.sorm4j.table.definition.DefinedTableBase;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
 
@@ -13,28 +13,28 @@ import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
  *
  * @param <T> the entity type
  */
-public abstract class H2DefinedTableBase<T> extends SimpleDefinedTable<T>
+public abstract class H2DefinedTableBase<T> extends DefinedTableBase<T>
     implements H2DefinedTable<T> {
 
   /**
    * This table instance is bind to the table name defined in the given {@link TableDefinition}.
    *
-   * @param sorm
+   * @param orm
    * @param valueType
    * @param tableDefinition
    */
-  public H2DefinedTableBase(Sorm sorm, Class<T> valueType, TableDefinition tableDefinition) {
-    super(sorm, valueType, tableDefinition);
+  public H2DefinedTableBase(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
+    super(orm, valueType, tableDefinition);
   }
 
   /**
    * This table instance is bind to the table name defined in the given class.
    *
-   * @param sorm
+   * @param orm
    * @param valueType
    */
-  public H2DefinedTableBase(Sorm sorm, Class<T> valueType) {
-    this(sorm, valueType, TableDefinition.builder(valueType).build());
+  public H2DefinedTableBase(Sorm orm, Class<T> valueType) {
+    this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 
   public H2DefinedTable<T> createTableIfNotExists(CsvRead csvRead) {

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.common;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple1;
 import org.nkjmlab.sorm4j.common.Tuple.Tuple2;

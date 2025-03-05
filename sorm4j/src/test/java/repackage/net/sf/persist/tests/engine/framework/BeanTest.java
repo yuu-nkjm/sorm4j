@@ -5,6 +5,7 @@ package repackage.net.sf.persist.tests.engine.framework;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.result.RowMap;

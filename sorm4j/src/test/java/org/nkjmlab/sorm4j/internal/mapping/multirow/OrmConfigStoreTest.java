@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;

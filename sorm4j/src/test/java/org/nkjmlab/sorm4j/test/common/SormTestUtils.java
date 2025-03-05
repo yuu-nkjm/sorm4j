@@ -7,11 +7,13 @@ import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.sql.DataSource;
+
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
-import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
+import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 public class SormTestUtils {
 
@@ -52,8 +54,7 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleDefinedTable<Guest> tbl =
-        new SimpleDefinedTable<>(sorm, Guest.class, schema);
+    SimpleDefinedTable<Guest> tbl = new SimpleDefinedTable<>(sorm, Guest.class, schema);
     tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
@@ -73,8 +74,7 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleDefinedTable<Player> tbl =
-        new SimpleDefinedTable<>(sorm, Player.class, schema);
+    SimpleDefinedTable<Player> tbl = new SimpleDefinedTable<>(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
@@ -87,8 +87,7 @@ public class SormTestUtils {
             .addColumnDefinition("name", VARCHAR)
             .build();
 
-    SimpleDefinedTable<Sport> tbl =
-        new SimpleDefinedTable<>(sorm, Sport.class, schema);
+    SimpleDefinedTable<Sport> tbl = new SimpleDefinedTable<>(sorm, Sport.class, schema);
 
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
@@ -113,12 +112,12 @@ public class SormTestUtils {
 
   private static final AtomicInteger urlSuffuix = new AtomicInteger();
 
-  public static DriverManagerDataSource createNewDatabaseDataSource() {
+  public static DataSource createNewDatabaseDataSource() {
     final String JDBC_URL =
         "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1";
     final String USER = "sa";
     final String PASSWORD = "";
-    return DriverManagerDataSource.create(JDBC_URL, USER, PASSWORD);
+    return DataSourceFactory.create(JDBC_URL, USER, PASSWORD);
   }
 
   private static Sorm createSormWithNewDatabase(SormContext sormContext) {

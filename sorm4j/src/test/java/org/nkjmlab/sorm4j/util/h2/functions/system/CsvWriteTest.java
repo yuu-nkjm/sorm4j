@@ -64,7 +64,6 @@ class CsvWriteTest {
   @Test
   public void testEscapeMethod() {
     CsvWrite.Builder builder = CsvWrite.builder(new File("/test"));
-    builder.queryEscape(true);
     builder.escape("'");
     builder.query("select * from table");
     builder.caseSensitiveColumnNames("true");

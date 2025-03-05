@@ -1,7 +1,9 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.JDBCType;
+
 import org.junit.jupiter.api.Test;
 
 class JdbcTypeUtilsTest {

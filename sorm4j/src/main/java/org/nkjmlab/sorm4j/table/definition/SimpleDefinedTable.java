@@ -2,31 +2,15 @@ package org.nkjmlab.sorm4j.table.definition;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.Experimental;
-import org.nkjmlab.sorm4j.table.SimpleTable;
 
 @Experimental
-public class SimpleDefinedTable<T> extends SimpleTable<T> implements DefinedTable<T> {
-
-  private final TableDefinition tableDefinition;
-
-  /**
-   * This table instance is bind to the table name defined in the given {@link TableDefinition}.
-   *
-   * @param orm
-   * @param valueType
-   * @param tableDefinition
-   */
-  public SimpleDefinedTable(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
-    super(orm, valueType, tableDefinition.getTableName());
-    this.tableDefinition = tableDefinition;
-  }
+public final class SimpleDefinedTable<T> extends DefinedTableBase<T> {
 
   public SimpleDefinedTable(Sorm orm, Class<T> valueType) {
-    this(orm, valueType, TableDefinition.builder(valueType).build());
+    super(orm, valueType);
   }
 
-  @Override
-  public TableDefinition getTableDefinition() {
-    return tableDefinition;
+  public SimpleDefinedTable(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
+    super(orm, valueType, tableDefinition);
   }
 }

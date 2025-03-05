@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.util.jackson;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;

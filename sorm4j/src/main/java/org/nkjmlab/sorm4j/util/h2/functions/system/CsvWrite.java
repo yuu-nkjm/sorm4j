@@ -39,15 +39,9 @@ public class CsvWrite {
     private String query;
     private final org.nkjmlab.sorm4j.util.h2.grammar.CsvOptions.Builder csvOptionsBuilder =
         new CsvOptions.Builder();
-    private boolean queryEscape = true;
 
     public CsvWrite.Builder query(String query) {
       this.query = query;
-      return this;
-    }
-
-    public CsvWrite.Builder queryEscape(boolean queryEscape) {
-      this.queryEscape = queryEscape;
       return this;
     }
 

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.datasource.DriverManagerDataSource;
-import org.nkjmlab.sorm4j.util.h2.tools.server.H2WebBrowsingService;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -16,7 +16,7 @@ class H2WebBrowsingServiceTest {
 
   @Test
   void test() throws StreamReadException, DatabindException, IOException, SQLException {
-    DriverManagerDataSource ds = SormTestUtils.createNewDatabaseDataSource();
+    DataSource ds = SormTestUtils.createNewDatabaseDataSource();
     H2WebBrowsingService server = new H2WebBrowsingService(true);
     Connection conn = ds.getConnection();
     conn.close();
