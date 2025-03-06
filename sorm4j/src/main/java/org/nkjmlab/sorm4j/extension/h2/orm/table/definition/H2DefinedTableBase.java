@@ -37,6 +37,7 @@ public abstract class H2DefinedTableBase<T> extends DefinedTableBase<T>
     this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 
+  @Override
   public H2DefinedTable<T> createTableIfNotExists(CsvRead csvRead) {
     getOrm()
         .execute(
@@ -44,5 +45,29 @@ public abstract class H2DefinedTableBase<T> extends DefinedTableBase<T>
                 + " as select * from "
                 + csvRead);
     return this;
+  }
+
+  static final class H2SimpleDefinedTable<T> extends H2DefinedTableBase<T> {
+
+    /**
+     * This table instance is bind to the table name defined in the given {@link TableDefinition}.
+     *
+     * @param orm
+     * @param valueType
+     * @param tableDefinition
+     */
+    public H2SimpleDefinedTable(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
+      super(orm, valueType, tableDefinition);
+    }
+
+    /**
+     * This table instance is bind to the table name defined in the given class.
+     *
+     * @param orm
+     * @param valueType
+     */
+    public H2SimpleDefinedTable(Sorm orm, Class<T> valueType) {
+      this(orm, valueType, TableDefinition.builder(valueType).build());
+    }
   }
 }

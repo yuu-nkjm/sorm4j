@@ -16,18 +16,18 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.container.datatype.JsonByte;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
+import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
-import org.nkjmlab.sorm4j.table.orm.SimpleDefinedTable;
+import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
-class H2SimpleDefinedTableTest {
+class H2DefinedTableTest {
 
   @Test
   void test3() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    H2SimpleDefinedTable<Example> table = new H2SimpleDefinedTable<>(sorm, Example.class);
+    H2DefinedTable<Example> table = H2DefinedTable.of(sorm, Example.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
     table.getOrm();
@@ -43,8 +43,7 @@ class H2SimpleDefinedTableTest {
   @Test
   void test2() throws InterruptedException {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
-    H2SimpleDefinedTable<OrmRecordExample> table =
-        new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
+    H2DefinedTable<OrmRecordExample> table = H2DefinedTable.of(sorm, OrmRecordExample.class);
     table.dropTableIfExists();
     table.createTableIfNotExists();
 
@@ -72,10 +71,9 @@ class H2SimpleDefinedTableTest {
     } catch (IOException e) {
       throw Try.rethrow(e);
     }
-    H2SimpleDefinedTable<OrmRecordExample> table =
-        new H2SimpleDefinedTable<>(sorm, OrmRecordExample.class);
+    H2DefinedTable<OrmRecordExample> table = H2DefinedTable.of(sorm, OrmRecordExample.class);
     {
-      new SimpleDefinedTable<>(sorm, OrmRecordExample.class);
+      DefinedTable.of(sorm, OrmRecordExample.class);
     }
     table.dropTableIfExists();
     table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());

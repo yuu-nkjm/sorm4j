@@ -1,6 +1,7 @@
-package org.nkjmlab.sorm4j.table.orm;
+package org.nkjmlab.sorm4j.internal.table.orm;
 
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.table.orm.TableBase;
 
 public final class SimpleTable<T> extends TableBase<T> {
 

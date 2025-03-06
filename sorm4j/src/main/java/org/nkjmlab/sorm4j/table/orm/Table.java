@@ -5,6 +5,7 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public interface Table<T> extends TableOrm<T> {
@@ -69,5 +70,13 @@ public interface Table<T> extends TableOrm<T> {
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
+  }
+
+  public static <T> Table<T> of(Sorm orm, Class<T> valueType) {
+    return new SimpleTable<>(orm, valueType);
+  }
+
+  public static <T> Table<T> of(Sorm orm, Class<T> valueType, String tableName) {
+    return new SimpleTable<>(orm, valueType, tableName);
   }
 }

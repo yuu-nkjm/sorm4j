@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
-import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
 
 /**
  * Mapping a csv column to a table column.

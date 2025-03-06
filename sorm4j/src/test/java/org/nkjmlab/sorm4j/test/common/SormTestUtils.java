@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
-import org.nkjmlab.sorm4j.table.orm.SimpleDefinedTable;
+import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 public class SormTestUtils {
@@ -44,7 +44,7 @@ public class SormTestUtils {
   public static final Sport TENNIS = new Sport(1, Sport.Sports.TENNIS);
   public static final Sport SOCCER = new Sport(2, Sport.Sports.SOCCER);
 
-  public static SimpleDefinedTable<Guest> createGuestsTable(Sorm sorm) {
+  public static DefinedTable<Guest> createGuestsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("guests")
             .addColumnDefinition("id", INT, AUTO_INCREMENT, PRIMARY_KEY)
@@ -54,16 +54,16 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleDefinedTable<Guest> tbl = new SimpleDefinedTable<>(sorm, Guest.class, schema);
+    DefinedTable<Guest> tbl = DefinedTable.of(sorm, Guest.class, schema);
     tbl.dropTableIfExists().createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static SimpleDefinedTable<Player> createPlayersTable(Sorm sorm) {
+  public static DefinedTable<Player> createPlayersTable(Sorm sorm) {
     return createPlayersTable(sorm, "players");
   }
 
-  public static SimpleDefinedTable<Player> createPlayersTable(Sorm sorm, String tableName) {
+  public static DefinedTable<Player> createPlayersTable(Sorm sorm, String tableName) {
 
     TableDefinition schema =
         TableDefinition.builder(tableName)
@@ -74,20 +74,20 @@ public class SormTestUtils {
             .addIndexDefinition("name")
             .build();
 
-    SimpleDefinedTable<Player> tbl = new SimpleDefinedTable<>(sorm, Player.class, schema);
+    DefinedTable<Player> tbl = DefinedTable.of(sorm, Player.class, schema);
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();
     return tbl;
   }
 
-  public static SimpleDefinedTable<Sport> createSportsTable(Sorm sorm) {
+  public static DefinedTable<Sport> createSportsTable(Sorm sorm) {
     TableDefinition schema =
         TableDefinition.builder("sports")
             .addColumnDefinition("id", INT, PRIMARY_KEY)
             .addColumnDefinition("name", VARCHAR)
             .build();
 
-    SimpleDefinedTable<Sport> tbl = new SimpleDefinedTable<>(sorm, Sport.class, schema);
+    DefinedTable<Sport> tbl = DefinedTable.of(sorm, Sport.class, schema);
 
     tbl.dropTableIfExists();
     tbl.createTableIfNotExists().createIndexesIfNotExists();

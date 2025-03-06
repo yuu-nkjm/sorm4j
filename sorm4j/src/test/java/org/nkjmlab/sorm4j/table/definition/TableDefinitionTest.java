@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
+import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
@@ -72,8 +72,7 @@ class TableDefinitionTest {
                     .build()
                     .getSql());
 
-    H2SimpleDefinedTable<TableDefExample> table =
-        new H2SimpleDefinedTable<>(sorm, TableDefExample.class, def);
+    H2DefinedTable<TableDefExample> table = H2DefinedTable.of(sorm, TableDefExample.class, def);
     table.insertMapIn(csvRows);
 
     assertThat(sorm.selectAll(TableDefExample.class).get(0).phoneNumber).isEqualTo("000-000-0000");

@@ -1,5 +1,7 @@
 package org.nkjmlab.sorm4j.table.orm;
 
+import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 
 public interface DefinedTable<T> extends Table<T> {
@@ -29,5 +31,14 @@ public interface DefinedTable<T> extends Table<T> {
   default DefinedTable<T> dropTableIfExistsCascade() {
     getTableDefinition().dropTableIfExistsCascade(getOrm());
     return this;
+  }
+
+  public static <T> DefinedTable<T> of(Sorm orm, Class<T> valueType) {
+    return new SimpleDefinedTable<>(orm, valueType);
+  }
+
+  public static <T> DefinedTable<T> of(
+      Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
+    return new SimpleDefinedTable<>(orm, valueType, tableDefinition);
   }
 }

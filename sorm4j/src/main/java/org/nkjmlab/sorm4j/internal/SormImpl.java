@@ -25,10 +25,10 @@ import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.container.sql.result.ResultSetStreamSorm;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.table.orm.Table;
 
 /**

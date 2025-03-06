@@ -32,8 +32,8 @@ import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.container.sql.TableName;
-import org.nkjmlab.sorm4j.table.orm.SimpleDefinedTable;
-import org.nkjmlab.sorm4j.table.orm.SimpleTable;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
+import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.table.orm.Table;
 import org.nkjmlab.sorm4j.table.orm.TableConnection;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -46,8 +46,8 @@ class TableTest {
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
       ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private SimpleDefinedTable<Player> playersTable;
-  private SimpleDefinedTable<Sport> sportsTable;
+  private DefinedTable<Player> playersTable;
+  private DefinedTable<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
