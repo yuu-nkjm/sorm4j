@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.nkjmlab.sorm4j.extension.datatype.SupportTypeCache;
+import org.nkjmlab.sorm4j.extension.datatype.SupportTypes;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
-class JacksonSupportTypeCache implements SupportTypeCache {
+class JacksonSupportTypes implements SupportTypes {
   private final Set<Class<?>> cache = ConcurrentHashMap.newKeySet();
 
   @Override

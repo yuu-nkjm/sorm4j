@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.datatype.SupportTypeCache;
+import org.nkjmlab.sorm4j.extension.datatype.SupportTypes;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,17 +12,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JacksonSqlParameterSetter implements SqlParameterSetter {
   private final ObjectMapper objectMapper;
-  private final SupportTypeCache cache;
+  private final SupportTypes supportTypes;
 
   public JacksonSqlParameterSetter(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
-    this.cache = new JacksonSupportTypeCache();
+    this.supportTypes = new JacksonSupportTypes();
   }
 
   @Override
   public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
       throws SQLException {
-    return cache.isSupport(parameter.getClass());
+    return supportTypes.isSupport(parameter.getClass());
   }
 
   @Override
