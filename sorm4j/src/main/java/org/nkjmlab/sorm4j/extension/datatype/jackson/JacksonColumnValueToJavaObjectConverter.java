@@ -28,13 +28,10 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
    * container classes.
    *
    * @param objectMapper the Jackson object mapper to use for conversion
-   * @param ormJsonColumnContainerClasses
-   * @param ormJsonColumnContainerClasses classes that should be treated as JSON containers
    */
-  public JacksonColumnValueToJavaObjectConverter(
-      ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
+  public JacksonColumnValueToJavaObjectConverter(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
-    this.cache = new JacksonSupportTypeCache(ormJsonColumnContainerClasses);
+    this.cache = new JacksonSupportTypeCache();
   }
 
   @Override

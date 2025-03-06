@@ -14,10 +14,9 @@ public class JacksonSqlParameterSetter implements SqlParameterSetter {
   private final ObjectMapper objectMapper;
   private final SupportTypeCache cache;
 
-  public JacksonSqlParameterSetter(
-      ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
+  public JacksonSqlParameterSetter(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
-    this.cache = new JacksonSupportTypeCache(ormJsonColumnContainerClasses);
+    this.cache = new JacksonSupportTypeCache();
   }
 
   @Override

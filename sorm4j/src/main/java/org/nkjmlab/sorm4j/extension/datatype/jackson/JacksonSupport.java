@@ -8,18 +8,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonSupport implements DataTypeSupport {
 
   private final ObjectMapper objectMapper;
-  private final Class<?>[] jsonColumns;
 
-  public JacksonSupport(ObjectMapper objectMapper, Class<?>... jsonColumns) {
+  public JacksonSupport(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
-    this.jsonColumns = jsonColumns;
   }
 
   @Override
   public SormContext.Builder addSupport(SormContext.Builder builder) {
     return builder
         .addColumnValueToJavaObjectConverter(
-            new JacksonColumnValueToJavaObjectConverter(objectMapper, jsonColumns))
-        .addSqlParameterSetter(new JacksonSqlParameterSetter(objectMapper, jsonColumns));
+            new JacksonColumnValueToJavaObjectConverter(objectMapper))
+        .addSqlParameterSetter(new JacksonSqlParameterSetter(objectMapper));
   }
 }

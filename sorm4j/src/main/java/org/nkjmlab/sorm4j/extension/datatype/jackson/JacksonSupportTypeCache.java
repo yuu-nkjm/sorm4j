@@ -1,6 +1,5 @@
 package org.nkjmlab.sorm4j.extension.datatype.jackson;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,15 +11,6 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
 class JacksonSupportTypeCache implements SupportTypeCache {
   private final Set<Class<?>> cache = ConcurrentHashMap.newKeySet();
-
-  /**
-   * Initializes the cache with the specified container classes.
-   *
-   * @param containerClasses The classes that should be initially recognized as JSON-compatible.
-   */
-  public JacksonSupportTypeCache(Class<?>... containerClasses) {
-    cache.addAll(Arrays.asList(containerClasses));
-  }
 
   @Override
   public boolean isSupport(Class<?> toType) {
