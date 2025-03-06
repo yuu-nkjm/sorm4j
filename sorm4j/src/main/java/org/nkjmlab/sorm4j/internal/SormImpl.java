@@ -24,7 +24,7 @@ import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamSorm;
+import org.nkjmlab.sorm4j.internal.container.sql.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;

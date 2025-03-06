@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.extension.datatype.SupportTypeCache;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,9 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * ResultSet} into Java objects.
  *
  * <p>This implementation supports JSON serialization and deserialization for types such as lists,
- * maps, and arrays where components are annotated with {@link OrmJsonColumnContainer}.
+ * maps, and arrays where components are annotated with {@link OrmJacksonColumn}.
  */
-@Experimental
 public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJavaObjectConverter {
 
   private final ObjectMapper objectMapper;
@@ -36,7 +34,7 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
   public JacksonColumnValueToJavaObjectConverter(
       ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
     this.objectMapper = objectMapper;
-    this.cache = new JsonSupportTypeCache(ormJsonColumnContainerClasses);
+    this.cache = new JacksonSupportTypeCache(ormJsonColumnContainerClasses);
   }
 
   @Override

@@ -9,7 +9,6 @@ import org.nkjmlab.sorm4j.common.annotation.Experimental;
  * @see <a href="https://en.wikipedia.org/wiki/SQL_reserved_words">SQL reserved words -
  *     Wikipedia</a>
  */
-@Experimental
 public interface SqlKeyword {
 
   public static final String ALL = wrapSpace("all");

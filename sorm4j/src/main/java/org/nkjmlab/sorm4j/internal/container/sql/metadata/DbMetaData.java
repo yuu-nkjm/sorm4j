@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.container;
+package org.nkjmlab.sorm4j.internal.container.sql.metadata;
 
 import java.sql.DatabaseMetaData;
 

@@ -1,8 +1,9 @@
-package org.nkjmlab.sorm4j.internal.result;
+package org.nkjmlab.sorm4j.internal.container.sql.result;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 

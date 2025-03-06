@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension.datatype.jts;
 
 import java.util.Objects;
+
 import org.locationtech.jts.geom.Geometry;
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
 

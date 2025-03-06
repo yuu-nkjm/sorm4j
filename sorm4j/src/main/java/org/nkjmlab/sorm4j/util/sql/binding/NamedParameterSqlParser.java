@@ -26,7 +26,6 @@ import org.nkjmlab.sorm4j.internal.util.sql.binding.NamedParameterSqlParserImpl;
  *
  * @author yuu_nkjm
  */
-@Experimental
 public interface NamedParameterSqlParser extends ParameterizedSqlParser {
 
   /**

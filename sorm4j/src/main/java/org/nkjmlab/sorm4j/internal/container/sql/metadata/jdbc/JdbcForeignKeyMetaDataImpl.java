@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.result.jdbc;
+package org.nkjmlab.sorm4j.internal.container.sql.metadata.jdbc;
 
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcForeignKeyMetaData;
 

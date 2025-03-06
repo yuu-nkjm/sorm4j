@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import static java.util.Map.*;
+import static java.util.Map.entry;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 

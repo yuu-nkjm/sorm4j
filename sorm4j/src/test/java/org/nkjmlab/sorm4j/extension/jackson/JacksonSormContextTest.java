@@ -7,7 +7,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.datatype.JsonByte;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSupport;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -75,7 +75,7 @@ class JacksonSormContextTest {
     }
   }
 
-  @OrmJsonColumnContainer
+  @OrmJacksonColumn
   public static class SimpleOrmJsonContainer {
     public final String name;
     public final int age;
@@ -96,7 +96,7 @@ class JacksonSormContextTest {
   @OrmRecord
   public static class HasJsonColumn {
     public int id;
-    @OrmJsonColumnContainer public SimpleOrmJsonContainer jsonCol;
+    public SimpleOrmJsonContainer jsonCol;
 
     public HasJsonColumn() {}
 

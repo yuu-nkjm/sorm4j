@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.Orm;
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
+import org.nkjmlab.sorm4j.internal.container.sql.result.TableDefinitionImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
@@ -42,129 +42,82 @@ import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
  *
  * @author nkjm
  */
-@Experimental
-public final class TableDefinition {
+public interface TableDefinition {
+
+  TableDefinition createIndexesIfNotExists(Orm orm);
+
+  TableDefinition createTableIfNotExists(Orm orm);
+
+  TableDefinition dropTableIfExists(Orm orm);
+
+  void dropTableIfExistsCascade(Orm orm);
+
+  List<String> getColumnNames();
 
   /**
-   * Creates a new {@link TableDefinition.Builder} with the given table name.
+   * Gets create index if not exists statements.
+   *
+   * Example.
+   *
+   * <pre>
+   * TableDefinition.builder("reports") .addColumnDefinition("id", VARCHAR,
+   * PRIMARY_KEY).addColumnDefinition("score", INT)
+   * .addIndexDefinition("score").addIndexDefinition("id",
+   * "score").build().getCreateIndexIfNotExistsStatements();
+   *
+   * generates
+   *
+   * "[create index if not exists index_reports_score on reports(score), create index if not exists
+   * index_reports_id_score on reports(id, score)]"
    *
    * @return
    */
-  public static TableDefinition.Builder builder(String tableName) {
-    return new TableDefinition.Builder(tableName);
-  }
-
-  public static TableDefinition.Builder builder(Class<?> valueType) {
-    return builder(valueType, toTableName(valueType));
-  }
-
-  public static TableDefinition.Builder builder(Class<?> valueType, String tableName) {
-    Builder builder = TableDefinition.builder(tableName);
-
-    Optional.ofNullable(valueType.getAnnotation(PrimaryKeyConstraint.class))
-        .map(a -> a.value())
-        .ifPresent(val -> builder.setPrimaryKey(val));
-
-    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumnPair.class))
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
-
-    Optional.ofNullable(valueType.getAnnotationsByType(UniqueConstraint.class))
-        .ifPresent(
-            vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
-
-    Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
-
-    Annotation[][] parameterAnnotationsOfConstructor =
-        getCanonicalConstructor(valueType)
-            .map(constructor -> constructor.getParameterAnnotations())
-            .orElse(null);
-
-    Field[] fields =
-        Stream.of(valueType.getDeclaredFields())
-            .filter(f -> !Modifier.isStatic(f.getModifiers()))
-            .toArray(Field[]::new);
-
-    for (int i = 0; i < fields.length; i++) {
-      Field field = fields[i];
-      List<String> opt = new ArrayList<>();
-
-      Set<Annotation> anns = new LinkedHashSet<>();
-      Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
-
-      if (parameterAnnotationsOfConstructor != null) {
-        Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
-      }
-
-      opt.add(
-          anns.stream().filter(ann -> ann instanceof OrmJsonColumnContainer).count() > 0
-              ? "json"
-              : TableDefinition.toSqlDataType(field.getType()));
-
-      for (Annotation ann : anns) {
-        if (ann instanceof PrimaryKey) {
-          opt.add("primary key");
-        } else if (ann instanceof AutoIncrement) {
-          opt.add("auto_increment");
-        } else if (ann instanceof NotNull) {
-          opt.add("not null");
-        } else if (ann instanceof Index) {
-          builder.addIndexDefinition(
-              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
-        } else if (ann instanceof Unique) {
-          builder.addUniqueConstraint(
-              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
-        } else if (ann instanceof Check) {
-          opt.add("check (" + ((Check) ann).value() + ")");
-        } else if (ann instanceof Default) {
-          opt.add("default " + ((Default) ann).value());
-        }
-      }
-      builder.addColumnDefinition(
-          SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()),
-          opt.toArray(String[]::new));
-    }
-    return builder;
-  }
-
-  public static String toTableName(Class<?> valueType) {
-    OrmTable ann = valueType.getAnnotation(OrmTable.class);
-    if (ann == null || ann.value().length() == 0) {
-      return SormContext.getDefaultCanonicalStringCache()
-          .toCanonicalName(valueType.getSimpleName() + "s");
-    } else {
-      return ann.value();
-    }
-  }
+  List<String> getCreateIndexIfNotExistsStatements();
 
   /**
-   * Retrieves the canonical constructor of the given record class, if available.
+   * Returns a {@code String} object representing this {@link TableDefinitionImpl}'s value.
    *
-   * @param recordClass the record class to retrieve the canonical constructor from
-   * @return an {@code Optional} containing the canonical constructor if found, otherwise an empty
-   *     {@code Optional}
+   * <pre>
+   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
+   * .addColumnDefinition("score", INT).build().getTableSchema();
+   *
+   * generates
+   *
+   * "create table if not exists reports(id varchar primary key, score int)"
+   *
+   * @return
    */
-  public static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
-    try {
-      Class<?>[] componentTypes =
-          Arrays.stream(recordClass.getDeclaredFields())
-              .filter(
-                  f ->
-                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
-                          && !f.getName().startsWith(("this$")))
-              .map(f -> f.getType())
-              .toArray(Class[]::new);
-      return Optional.of(recordClass.getDeclaredConstructor(componentTypes));
-    } catch (NoSuchMethodException | SecurityException e) {
-      return Optional.empty();
-    }
-  }
+  String getCreateTableIfNotExistsStatement();
 
-  public static String toSqlDataType(Class<?> type) {
-    if (type.getAnnotation(OrmJsonColumnContainer.class) != null) {
+  /**
+   * Gets drop table if exists statement.
+   *
+   * @return
+   */
+  String getDropTableIfExistsStatement();
+
+  String getTableName();
+
+  /**
+   * Returns a {@code String} object representing this {@link TableDefinitionImpl}'s value.
+   *
+   * <pre>
+   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
+   * .addColumnDefinition("score", INT).build().getTableSchema();
+   *
+   * generates
+   *
+   * "reports(id varchar primary key, score int)"
+   *
+   * @return
+   */
+  String getTableNameAndColumnDefinitions();
+
+  static String toSqlDataType(Class<?> type) {
+    if (type.getAnnotation(OrmJacksonColumn.class) != null) {
       return "json";
     }
-    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJsonColumnContainer.class)
+    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJacksonColumn.class)
         != null) {
       return "json";
     }
@@ -238,139 +191,119 @@ public final class TableDefinition {
     }
   }
 
-  private final String tableName;
-  private final String tableNameAndColumnDefinitions;
-
-  private final List<String> columnNames;
-
-  private final String createTableStatement;
-
-  private final String dropTableStatement;
-
-  private final List<String> createIndexStatements;
-
-  private TableDefinition(
-      String tableName,
-      String tableSchema,
-      List<String> columnNames,
-      String createTableStatement,
-      String dropTableStatement,
-      List<String> createIndexStatements) {
-    this.tableName = tableName;
-    this.tableNameAndColumnDefinitions = tableSchema;
-    this.columnNames = Collections.unmodifiableList(columnNames);
-    this.createTableStatement = createTableStatement;
-    this.dropTableStatement = dropTableStatement;
-    this.createIndexStatements = Collections.unmodifiableList(createIndexStatements);
+  /**
+   * Retrieves the canonical constructor of the given record class, if available.
+   *
+   * @param recordClass the record class to retrieve the canonical constructor from
+   * @return an {@code Optional} containing the canonical constructor if found, otherwise an empty
+   *     {@code Optional}
+   */
+  static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
+    try {
+      Class<?>[] componentTypes =
+          Arrays.stream(recordClass.getDeclaredFields())
+              .filter(
+                  f ->
+                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
+                          && !f.getName().startsWith(("this$")))
+              .map(f -> f.getType())
+              .toArray(Class[]::new);
+      return Optional.of(recordClass.getDeclaredConstructor(componentTypes));
+    } catch (NoSuchMethodException | SecurityException e) {
+      return Optional.empty();
+    }
   }
 
-  @Override
-  public String toString() {
-    return "TableDefinition [tableName="
-        + tableName
-        + ", tableNameAndColumnDefinitions="
-        + tableNameAndColumnDefinitions
-        + ", columnNames="
-        + columnNames
-        + ", createTableStatement="
-        + createTableStatement
-        + ", dropTableStatement="
-        + dropTableStatement
-        + ", createIndexStatements="
-        + createIndexStatements
-        + "]";
+  static String toTableName(Class<?> valueType) {
+    OrmTable ann = valueType.getAnnotation(OrmTable.class);
+    if (ann == null || ann.value().length() == 0) {
+      return SormContext.getDefaultCanonicalStringCache()
+          .toCanonicalName(valueType.getSimpleName() + "s");
+    } else {
+      return ann.value();
+    }
   }
 
-  public TableDefinition createIndexesIfNotExists(Orm orm) {
-    getCreateIndexIfNotExistsStatements().forEach(s -> orm.executeUpdate(s));
-    return this;
+  static TableDefinition.Builder builder(Class<?> valueType, String tableName) {
+    TableDefinitionImpl.Builder builder = builder(tableName);
+
+    Optional.ofNullable(valueType.getAnnotation(PrimaryKeyConstraint.class))
+        .map(a -> a.value())
+        .ifPresent(val -> builder.setPrimaryKey(val));
+
+    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumnPair.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
+
+    Optional.ofNullable(valueType.getAnnotationsByType(UniqueConstraint.class))
+        .ifPresent(
+            vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
+
+    Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
+        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
+
+    Annotation[][] parameterAnnotationsOfConstructor =
+        TableDefinition.getCanonicalConstructor(valueType)
+            .map(constructor -> constructor.getParameterAnnotations())
+            .orElse(null);
+
+    Field[] fields =
+        Stream.of(valueType.getDeclaredFields())
+            .filter(f -> !Modifier.isStatic(f.getModifiers()))
+            .toArray(Field[]::new);
+
+    for (int i = 0; i < fields.length; i++) {
+      Field field = fields[i];
+      List<String> opt = new ArrayList<>();
+
+      Set<Annotation> anns = new LinkedHashSet<>();
+      Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
+
+      if (parameterAnnotationsOfConstructor != null) {
+        Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
+      }
+
+      opt.add(
+          anns.stream().filter(ann -> ann instanceof OrmJacksonColumn).count() > 0
+              ? "json"
+              : TableDefinition.toSqlDataType(field.getType()));
+
+      for (Annotation ann : anns) {
+        if (ann instanceof PrimaryKey) {
+          opt.add("primary key");
+        } else if (ann instanceof AutoIncrement) {
+          opt.add("auto_increment");
+        } else if (ann instanceof NotNull) {
+          opt.add("not null");
+        } else if (ann instanceof Index) {
+          builder.addIndexDefinition(
+              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
+        } else if (ann instanceof Unique) {
+          builder.addUniqueConstraint(
+              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
+        } else if (ann instanceof Check) {
+          opt.add("check (" + ((Check) ann).value() + ")");
+        } else if (ann instanceof Default) {
+          opt.add("default " + ((Default) ann).value());
+        }
+      }
+      builder.addColumnDefinition(
+          SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()),
+          opt.toArray(String[]::new));
+    }
+    return builder;
   }
 
-  public TableDefinition createTableIfNotExists(Orm orm) {
-    orm.executeUpdate(getCreateTableIfNotExistsStatement());
-    return this;
-  }
-
-  public TableDefinition dropTableIfExists(Orm orm) {
-    orm.executeUpdate(getDropTableIfExistsStatement());
-    return this;
-  }
-
-  public void dropTableIfExistsCascade(Orm orm) {
-    orm.executeUpdate(getDropTableIfExistsStatement() + " cascade");
-  }
-
-  public List<String> getColumnNames() {
-    return columnNames;
+  static TableDefinitionImpl.Builder builder(Class<?> valueType) {
+    return TableDefinition.builder(valueType, TableDefinition.toTableName(valueType));
   }
 
   /**
-   * Gets create index if not exists statements.
-   *
-   * Example.
-   *
-   * <pre>
-   * TableDefinition.builder("reports") .addColumnDefinition("id", VARCHAR,
-   * PRIMARY_KEY).addColumnDefinition("score", INT)
-   * .addIndexDefinition("score").addIndexDefinition("id",
-   * "score").build().getCreateIndexIfNotExistsStatements();
-   *
-   * generates
-   *
-   * "[create index if not exists index_reports_score on reports(score), create index if not exists
-   * index_reports_id_score on reports(id, score)]"
+   * Creates a new {@link TableDefinitionImpl.Builder} with the given table name.
    *
    * @return
    */
-  public List<String> getCreateIndexIfNotExistsStatements() {
-    return createIndexStatements;
-  }
-
-  /**
-   * Returns a {@code String} object representing this {@link TableDefinition}'s value.
-   *
-   * <pre>
-   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
-   * .addColumnDefinition("score", INT).build().getTableSchema();
-   *
-   * generates
-   *
-   * "create table if not exists reports(id varchar primary key, score int)"
-   *
-   * @return
-   */
-  public String getCreateTableIfNotExistsStatement() {
-    return createTableStatement;
-  }
-
-  /**
-   * Gets drop table if exists statement.
-   *
-   * @return
-   */
-  public String getDropTableIfExistsStatement() {
-    return dropTableStatement;
-  }
-
-  public String getTableName() {
-    return tableName;
-  }
-
-  /**
-   * Returns a {@code String} object representing this {@link TableDefinition}'s value.
-   *
-   * <pre>
-   * TableDefinition.builder("reports").addColumnDefinition("id", VARCHAR, PRIMARY_KEY)
-   * .addColumnDefinition("score", INT).build().getTableSchema();
-   *
-   * generates
-   *
-   * "reports(id varchar primary key, score int)"
-   *
-   * @return
-   */
-  public String getTableNameAndColumnDefinitions() {
-    return tableNameAndColumnDefinitions;
+  static TableDefinitionImpl.Builder builder(String tableName) {
+    return new TableDefinitionImpl.Builder(tableName);
   }
 
   public static class Builder {
@@ -466,7 +399,7 @@ public final class TableDefinition {
 
     private final List<String> checkConditions;
 
-    private Builder(String tableName) {
+    Builder(String tableName) {
       this.columnDefinitions = new LinkedHashMap<>();
       this.uniqueColumnPairs = new ArrayList<>();
       this.indexColumns = new ArrayList<>();
@@ -560,13 +493,13 @@ public final class TableDefinition {
     }
 
     /**
-     * Builds a {@link TableDefinition}.
+     * Builds a {@link TableDefinitionImpl}.
      *
      * @return
      */
     public TableDefinition build() {
       if (columnDefinitions.isEmpty()) {
-        return new TableDefinition(
+        return new TableDefinitionImpl(
             tableName, "", Collections.emptyList(), "", "", Collections.emptyList());
       } else {
         String tableSchema =
@@ -574,7 +507,7 @@ public final class TableDefinition {
                 tableName, columnDefinitions, primaryKeys, uniqueColumnPairs, checkConditions);
         String createTableStatement = "create table if not exists " + tableSchema;
         String dropTableStatement = "drop table if exists " + tableName;
-        return new TableDefinition(
+        return new TableDefinitionImpl(
             tableName,
             tableSchema,
             getColumunNames(),

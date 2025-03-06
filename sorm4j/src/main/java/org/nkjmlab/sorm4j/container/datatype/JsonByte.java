@@ -2,9 +2,6 @@ package org.nkjmlab.sorm4j.container.datatype;
 
 import java.nio.charset.StandardCharsets;
 
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
-
-@Experimental
 public class JsonByte {
 
   private final byte[] bytes;

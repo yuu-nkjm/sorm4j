@@ -17,8 +17,8 @@ import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.container.ColumnMetaData;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
@@ -105,7 +105,7 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.internal.container.DbMetaData.of(connection.getMetaData()));
+                    org.nkjmlab.sorm4j.internal.container.sql.metadata.DbMetaData.of(connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
           }

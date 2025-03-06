@@ -2,15 +2,12 @@ package org.nkjmlab.sorm4j.container.datatype;
 
 import java.util.Objects;
 
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
-
 /**
  * @see <a href=
  *     "https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">Well-known text
  *     representation of geometry - Wikipedia</a>
  * @author nkjm
  */
-@Experimental
 public class GeometryString {
 
   private String text;

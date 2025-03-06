@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.internal.context.common;
 
-import org.nkjmlab.sorm4j.internal.container.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
 
 public class ColumnMetaDataImpl implements ColumnMetaData {
   /**

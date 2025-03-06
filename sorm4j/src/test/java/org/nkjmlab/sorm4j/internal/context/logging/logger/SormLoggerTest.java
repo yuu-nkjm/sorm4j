@@ -25,12 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
+import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
-import org.nkjmlab.sorm4j.internal.context.logging.logger.JulSormLogger;
-import org.nkjmlab.sorm4j.internal.context.logging.logger.Log4jSormLogger;
-import org.nkjmlab.sorm4j.internal.context.logging.logger.Slf4jSormLogger;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 

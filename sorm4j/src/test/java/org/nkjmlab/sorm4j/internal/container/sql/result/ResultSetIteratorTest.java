@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.result;
+package org.nkjmlab.sorm4j.internal.container.sql.result;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

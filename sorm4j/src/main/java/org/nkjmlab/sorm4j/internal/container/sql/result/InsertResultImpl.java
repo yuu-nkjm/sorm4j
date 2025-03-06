@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.result;
+package org.nkjmlab.sorm4j.internal.container.sql.result;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j;
 
 import java.sql.Connection;
+
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
