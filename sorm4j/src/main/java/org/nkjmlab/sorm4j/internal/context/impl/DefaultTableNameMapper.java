@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.context.logging;
 
 import java.sql.Connection;
 
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 
 public interface SormLogger {
 

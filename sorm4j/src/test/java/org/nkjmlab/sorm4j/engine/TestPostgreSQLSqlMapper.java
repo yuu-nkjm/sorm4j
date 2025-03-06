@@ -35,13 +35,13 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.util.sql.param.OrderedParameterSqlParser;
+import org.nkjmlab.sorm4j.util.sql.binding.OrderedParameterSqlParser;
 import org.postgresql.util.PGobject;
 
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;

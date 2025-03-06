@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Internal;
+import org.nkjmlab.sorm4j.common.annotation.Internal;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;

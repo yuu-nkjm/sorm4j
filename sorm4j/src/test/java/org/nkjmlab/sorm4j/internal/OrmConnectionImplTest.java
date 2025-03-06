@@ -23,20 +23,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.exception.SormException;
+import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.param.NamedParameterSqlParser;
-import org.nkjmlab.sorm4j.util.sql.param.OrderedParameterSqlParser;
+import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
+import org.nkjmlab.sorm4j.util.sql.binding.OrderedParameterSqlParser;
 
 class OrmConnectionImplTest {
   private Sorm orm;

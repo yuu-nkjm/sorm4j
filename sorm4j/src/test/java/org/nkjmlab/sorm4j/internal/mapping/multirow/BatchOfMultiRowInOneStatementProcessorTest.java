@@ -16,7 +16,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.internal.context.logging.logger.Log4jSormLogger;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 

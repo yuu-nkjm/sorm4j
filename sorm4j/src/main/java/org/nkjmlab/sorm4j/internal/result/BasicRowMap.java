@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.result.RowMap;
 
 public class BasicRowMap implements RowMap {
 

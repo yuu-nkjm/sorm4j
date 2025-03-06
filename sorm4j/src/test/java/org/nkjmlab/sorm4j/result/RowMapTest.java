@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.container.RowMap;
 
 class RowMapTest {
 

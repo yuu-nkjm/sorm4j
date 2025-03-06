@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
 
 class FieldAccessorTest {

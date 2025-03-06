@@ -13,9 +13,9 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.TestUtils;
 
 class DefaultSqlParametersSetterTest {

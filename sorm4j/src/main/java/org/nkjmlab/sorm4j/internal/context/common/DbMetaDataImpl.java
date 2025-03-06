@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.context.common;
 
 import java.sql.SQLException;
 
-import org.nkjmlab.sorm4j.internal.common.DbMetaData;
+import org.nkjmlab.sorm4j.internal.container.DbMetaData;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public class DbMetaDataImpl implements DbMetaData {

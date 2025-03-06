@@ -3,8 +3,8 @@ package org.nkjmlab.sorm4j.table;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public interface Table<T> extends TableOrm<T> {

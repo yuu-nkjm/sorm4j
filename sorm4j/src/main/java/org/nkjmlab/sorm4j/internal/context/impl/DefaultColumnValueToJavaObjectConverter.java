@@ -6,14 +6,14 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
 
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
+import org.nkjmlab.sorm4j.container.datatype.GeometryString;
+import org.nkjmlab.sorm4j.container.datatype.JsonByte;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.datatype.GeometryString;
-import org.nkjmlab.sorm4j.util.datatype.JsonByte;
 
 public final class DefaultColumnValueToJavaObjectConverter
     implements ColumnValueToJavaObjectConverter {
@@ -54,8 +54,8 @@ public final class DefaultColumnValueToJavaObjectConverter
           java.time.OffsetDateTime.class,
           java.util.Date.class,
           java.util.UUID.class,
-          org.nkjmlab.sorm4j.util.datatype.JsonByte.class,
-          org.nkjmlab.sorm4j.util.datatype.GeometryString.class);
+          org.nkjmlab.sorm4j.container.datatype.JsonByte.class,
+          org.nkjmlab.sorm4j.container.datatype.GeometryString.class);
 
   @Override
   public boolean test(Class<?> objectClass) {

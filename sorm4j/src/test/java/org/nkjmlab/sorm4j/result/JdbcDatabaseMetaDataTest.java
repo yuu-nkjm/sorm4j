@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.TableName;
-import org.nkjmlab.sorm4j.result.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.container.sql.TableName;
+import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;

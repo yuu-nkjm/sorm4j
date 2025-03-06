@@ -3,7 +3,8 @@ package org.nkjmlab.sorm4j.internal.context.impl;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.nkjmlab.sorm4j.common.SormException;
+
+import org.nkjmlab.sorm4j.common.exception.SormException;
 
 /**
  * Field accessor mapping to the columnName.

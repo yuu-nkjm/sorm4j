@@ -18,8 +18,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
+import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
-import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -31,8 +33,6 @@ import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
 import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.h2.table.definition.H2SimpleDefinedTable;
 
 class TableDefinitionTest {
 

@@ -2,8 +2,9 @@ package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.RowMap;
+
+import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 
 /** Represents a result from an insert operation with auto-generated keys. */
 public final class InsertResultImpl implements InsertResult {

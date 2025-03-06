@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
 
 class NamedParameterSqlParserTest {
 

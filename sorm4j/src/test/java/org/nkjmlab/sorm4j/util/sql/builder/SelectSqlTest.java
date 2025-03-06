@@ -2,27 +2,28 @@ package org.nkjmlab.sorm4j.util.sql.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.and;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.as;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.avg;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.castAs;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.columnWithTableName;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.cond;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.count;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.func;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.op;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.or;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.orderByDesc;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.select;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.selectDistinct;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.sum;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.where;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.and;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.as;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.avg;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.castAs;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.columnWithTableName;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.cond;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.count;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.func;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.op;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.or;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.orderByDesc;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.select;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.selectDistinct;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.sum;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.where;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.util.sql.statement.SelectSql;
 
 class SelectSqlTest {
 

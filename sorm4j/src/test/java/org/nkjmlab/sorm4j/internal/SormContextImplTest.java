@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
@@ -44,8 +44,8 @@ class SormContextImplTest {
                     .build())
             .setLogContext(
                 LogContext.builder()
-                    .enable(LogContext.Category.MAPPING)
-                    .disable(LogContext.Category.MAPPING)
+                    .enable(LogContext.Category.MAPPING_TO_COLUMNS)
+                    .disable(LogContext.Category.MAPPING_TO_COLUMNS)
                     .build())
             .build();
 

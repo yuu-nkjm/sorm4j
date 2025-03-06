@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 

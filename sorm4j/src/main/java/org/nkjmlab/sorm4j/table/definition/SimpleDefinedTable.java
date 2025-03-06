@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.table.definition;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Experimental;
+import org.nkjmlab.sorm4j.common.annotation.Experimental;
 
 @Experimental
 public final class SimpleDefinedTable<T> extends DefinedTableBase<T> {

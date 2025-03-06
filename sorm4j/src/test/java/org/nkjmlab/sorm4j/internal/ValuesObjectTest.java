@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.TableName;
+import org.nkjmlab.sorm4j.container.sql.TableName;
 
 class ValuesObjectTest {
 

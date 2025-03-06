@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.util.sql.binding.ParameterizedSqlParser;
 
 class ParameterizedSqlParserTest {
 

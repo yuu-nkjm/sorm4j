@@ -19,8 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.Orm;
-import org.nkjmlab.sorm4j.common.Experimental;
+import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
@@ -33,7 +34,6 @@ import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
 import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
 import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
-import org.nkjmlab.sorm4j.util.datatype.annotation.OrmJsonColumnContainer;
 
 /**
  * This class represent a table schema and indexes. This class is a utility for users to define

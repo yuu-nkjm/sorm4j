@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.nkjmlab.sorm4j.context.common.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.logging.LogPoint;
+import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -38,10 +38,10 @@ public abstract class MultiRowProcessorBase<T> implements MultiRowProcessor<T> {
   }
 
   @Override
-public abstract int[] multiRowInsert(Connection con, T[] objects);
+  public abstract int[] multiRowInsert(Connection con, T[] objects);
 
   @Override
-public abstract int[] multiRowMerge(Connection con, T[] objects);
+  public abstract int[] multiRowMerge(Connection con, T[] objects);
 
   protected final TableSql getSql() {
     return tableMapping.getSql();
@@ -56,7 +56,7 @@ public abstract int[] multiRowMerge(Connection con, T[] objects);
   }
 
   @Override
-public final void setPrametersOfMultiRow(PreparedStatement stmt, T[] objects)
+  public final void setPrametersOfMultiRow(PreparedStatement stmt, T[] objects)
       throws SQLException {
     Object[] parameters =
         Arrays.stream(objects)
@@ -67,7 +67,7 @@ public final void setPrametersOfMultiRow(PreparedStatement stmt, T[] objects)
   }
 
   @Override
-public final int[] batch(
+  public final int[] batch(
       Connection con, String sql, Function<T, Object[]> parameterCreator, T[] objects) {
     return execMultiRowProcIfValidObjects(
         con,
@@ -105,7 +105,8 @@ public final int[] batch(
       return new int[0];
     }
     Optional<LogPoint> lp =
-        loggerContext.createLogPoint(LogContext.Category.MULTI_ROW, MultiRowProcessorBase.class);
+        loggerContext.createLogPoint(
+            LogContext.Category.EXECUTE_MULTI_ROW_UPDATE, MultiRowProcessorBase.class);
     lp.ifPresent(
         _lp ->
             _lp.logBeforeMultiRow(

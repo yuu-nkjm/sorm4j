@@ -165,12 +165,12 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
         return;
       case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
         stmt.setObject(
-            parameterIndex, ((org.nkjmlab.sorm4j.util.datatype.JsonByte) parameter).getBytes());
+            parameterIndex, ((org.nkjmlab.sorm4j.container.datatype.JsonByte) parameter).getBytes());
         return;
       case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
         stmt.setString(
             parameterIndex,
-            ((org.nkjmlab.sorm4j.util.datatype.GeometryString) parameter).getText());
+            ((org.nkjmlab.sorm4j.container.datatype.GeometryString) parameter).getText());
         return;
       default:
         if (type.isArray()) {

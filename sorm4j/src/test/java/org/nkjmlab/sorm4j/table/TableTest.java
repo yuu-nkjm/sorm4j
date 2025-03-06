@@ -18,7 +18,7 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createPlayersTable;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewContext;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSportsTable;
-import static org.nkjmlab.sorm4j.util.sql.builder.SelectSql.selectCountFrom;
+import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.selectCountFrom;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,16 +27,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.common.TableName;
-import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
+import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.TableName;
 import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.builder.JoinSql;
+import org.nkjmlab.sorm4j.util.sql.statement.JoinSql;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";

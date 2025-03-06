@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.result.RowMap;
 import org.slf4j.Logger;
 
 public class BeanTest {

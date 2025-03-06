@@ -11,14 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.common.TableName;
+import org.nkjmlab.sorm4j.container.sql.TableName;
+import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
-import org.nkjmlab.sorm4j.context.common.TableMetaData;
-import org.nkjmlab.sorm4j.context.common.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.common.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
@@ -105,7 +105,7 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.internal.common.DbMetaData.of(connection.getMetaData()));
+                    org.nkjmlab.sorm4j.internal.container.DbMetaData.of(connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
           }
@@ -140,7 +140,7 @@ public final class SormContextImpl implements SormContext {
                             createTableMapping(objectClass, tableName.getName(), connection);
                         config
                             .getLoggerContext()
-                            .createLogPoint(LogContext.Category.MAPPING, SormContext.class)
+                            .createLogPoint(LogContext.Category.MAPPING_TO_TABLE, SormContext.class)
                             .ifPresent(lp -> lp.logMapping(m.toString()));
                         return m;
                       } catch (SQLException e) {
@@ -243,7 +243,7 @@ public final class SormContextImpl implements SormContext {
                   SqlResultToColumnsMapping<T> m = createColumnsMapping(objectClass);
                   config
                       .getLoggerContext()
-                      .createLogPoint(LogContext.Category.MAPPING, SormContext.class)
+                      .createLogPoint(LogContext.Category.MAPPING_TO_COLUMNS, SormContext.class)
                       .ifPresent(lp -> lp.logMapping(m.toString()));
                   return m;
                 });

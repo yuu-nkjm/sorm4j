@@ -1,8 +1,8 @@
 package org.nkjmlab.sorm4j.internal.context;
 
-import org.nkjmlab.sorm4j.context.common.TableMetaData;
-import org.nkjmlab.sorm4j.context.common.TableSql;
-import org.nkjmlab.sorm4j.internal.common.DbMetaData;
+import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.container.DbMetaData;
+import org.nkjmlab.sorm4j.internal.container.TableSql;
 
 public interface TableSqlFactory {
 

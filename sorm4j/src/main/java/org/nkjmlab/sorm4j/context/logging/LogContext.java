@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.nkjmlab.sorm4j.internal.logging.LogContextImpl;
-import org.nkjmlab.sorm4j.internal.logging.LogPoint;
+import org.nkjmlab.sorm4j.internal.context.logging.LogContextImpl;
+import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 
 /**
  * Logger for Sorm4j.
@@ -18,10 +18,12 @@ public interface LogContext {
 
   /** Logging Categories */
   public enum Category {
-    MAPPING,
+    MAPPING_TO_TABLE,
+    MAPPING_TO_COLUMNS,
     EXECUTE_QUERY,
-    MULTI_ROW,
-    EXECUTE_UPDATE;
+    EXECUTE_UPDATE,
+    EXECUTE_MULTI_ROW_UPDATE,
+    ;
   }
 
   public static LogContext.Builder builder() {

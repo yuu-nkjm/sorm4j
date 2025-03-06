@@ -12,7 +12,8 @@ import java.util.List;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.sql.binding.OrderedParameterSqlParser;
 
 class OrderedParameterSqlTest {
   private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();

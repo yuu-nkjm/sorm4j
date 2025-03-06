@@ -4,7 +4,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.internal.common.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.ColumnMetaData;
 
 public interface TableMetaDataParser {
   /**

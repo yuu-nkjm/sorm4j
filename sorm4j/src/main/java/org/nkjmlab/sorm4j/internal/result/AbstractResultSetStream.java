@@ -8,17 +8,17 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
+import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.logging.LogPoint;
+import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
 
 abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
   private final Class<T> objectClass;

@@ -13,10 +13,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ParameterizedSql;
-import org.nkjmlab.sorm4j.common.SormException;
+import org.nkjmlab.sorm4j.common.exception.SormException;
+import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Customer;
 import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
 
 class NamedParameterSqlTest {
   private String sql = "select * from simple where id=:idid and name=:name";

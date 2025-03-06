@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.result;
 
 import java.util.stream.Stream;
 
-import org.nkjmlab.sorm4j.common.FunctionHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 
 /**

@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
-import org.nkjmlab.sorm4j.result.RowMap;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DefaultResultSetValueGetterTest {

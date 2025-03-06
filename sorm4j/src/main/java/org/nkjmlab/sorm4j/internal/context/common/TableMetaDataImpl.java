@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.common.TableMetaData;
-import org.nkjmlab.sorm4j.internal.common.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.ColumnMetaData;
 
 public final class TableMetaDataImpl implements TableMetaData {
 
