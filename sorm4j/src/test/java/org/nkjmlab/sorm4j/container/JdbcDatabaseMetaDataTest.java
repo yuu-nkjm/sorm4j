@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.result;
+package org.nkjmlab.sorm4j.container;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

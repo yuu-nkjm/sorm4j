@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.datatype.JsonByte;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSormContext;
+import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSupport;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
@@ -22,9 +23,10 @@ class JacksonSormContextTest {
     Sorm sorm =
         Sorm.create(
             SormTestUtils.createNewDatabaseDataSource(),
-            JacksonSormContext.builder(new ObjectMapper()).build());
+            new JacksonSupport(new ObjectMapper()).addSupport(SormContext.builder()).build());
 
-    H2SimpleDefinedTable<JacksonRecord> table = new H2SimpleDefinedTable<>(sorm, JacksonRecord.class);
+    H2SimpleDefinedTable<JacksonRecord> table =
+        new H2SimpleDefinedTable<>(sorm, JacksonRecord.class);
     table.createTableIfNotExists();
     table.insert(new JacksonRecord(new JsonByte("{\"name\":\"Alice\",\"age\":20}")));
     assertThat(table.selectAll().get(0).jsonCol.toString()).contains("Alice");
@@ -43,9 +45,10 @@ class JacksonSormContextTest {
     Sorm sorm =
         Sorm.create(
             SormTestUtils.createNewDatabaseDataSource(),
-            JacksonSormContext.builder(new ObjectMapper()).build());
+            new JacksonSupport(new ObjectMapper()).addSupport(SormContext.builder()).build());
 
-    H2SimpleDefinedTable<HasJsonColumn> table = new H2SimpleDefinedTable<>(sorm, HasJsonColumn.class);
+    H2SimpleDefinedTable<HasJsonColumn> table =
+        new H2SimpleDefinedTable<>(sorm, HasJsonColumn.class);
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .isEqualTo("create table if not exists HAS_JSON_COLUMNS(ID integer, JSON_COL json)");
 

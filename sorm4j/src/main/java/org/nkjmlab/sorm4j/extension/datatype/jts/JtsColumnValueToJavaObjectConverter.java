@@ -10,15 +10,15 @@ import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 @Experimental
 public class JtsColumnValueToJavaObjectConverter implements ColumnValueToJavaObjectConverter {
 
-  private final ContainerCache cache;
+  private final JtsSupportTypeCache cache;
 
   public JtsColumnValueToJavaObjectConverter() {
-    this.cache = new ContainerCache();
+    this.cache = new JtsSupportTypeCache();
   }
 
   @Override
   public boolean test(Class<?> toType) {
-    return cache.isContainer(toType);
+    return cache.isSupport(toType);
   }
 
   @Override

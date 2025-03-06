@@ -1,11 +1,13 @@
 package org.nkjmlab.sorm4j.extension.datatype.jts;
 
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.datatype.DataTypeSupport;
 
-public class JtsContext {
+public class JtsSupport implements DataTypeSupport {
 
-  public static SormContext.Builder builder() {
-    return SormContext.builder()
+  @Override
+  public SormContext.Builder addSupport(SormContext.Builder builder) {
+    return builder
         .addColumnValueToJavaObjectConverter(new JtsColumnValueToJavaObjectConverter())
         .addSqlParameterSetter(new JtsSqlParameterSetter());
   }

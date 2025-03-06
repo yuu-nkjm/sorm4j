@@ -6,14 +6,14 @@ import java.sql.SQLException;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 
 public class JtsSqlParameterSetter implements SqlParameterSetter {
-  private final ContainerCache cache;
+  private final JtsSupportTypeCache cache;
 
   public JtsSqlParameterSetter() {
-    this.cache = new ContainerCache();
+    this.cache = new JtsSupportTypeCache();
   }
 
   private boolean isJtsContainer(Class<?> type) {
-    return cache.isContainer(type);
+    return cache.isSupport(type);
   }
 
   @Override

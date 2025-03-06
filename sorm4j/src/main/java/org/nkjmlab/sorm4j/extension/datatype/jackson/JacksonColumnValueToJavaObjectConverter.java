@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
+import org.nkjmlab.sorm4j.extension.datatype.SupportTypeCache;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJsonColumnContainer;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJavaObjectConverter {
 
   private final ObjectMapper objectMapper;
-  private final ContainerCache cache;
+  private final SupportTypeCache cache;
 
   /**
    * Constructs a new converter with the specified {@link ObjectMapper} and optional JSON column
@@ -35,12 +36,12 @@ public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJav
   public JacksonColumnValueToJavaObjectConverter(
       ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
     this.objectMapper = objectMapper;
-    this.cache = new ContainerCache(ormJsonColumnContainerClasses);
+    this.cache = new JsonSupportTypeCache(ormJsonColumnContainerClasses);
   }
 
   @Override
   public boolean test(Class<?> toType) {
-    return cache.isContainer(toType);
+    return cache.isSupport(toType);
   }
 
   /**

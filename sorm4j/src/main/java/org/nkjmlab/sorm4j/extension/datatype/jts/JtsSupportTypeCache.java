@@ -4,16 +4,18 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.nkjmlab.sorm4j.extension.datatype.SupportTypeCache;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
-class ContainerCache {
+class JtsSupportTypeCache implements SupportTypeCache {
   private final Map<Class<?>, Boolean> cache = new ConcurrentHashMap<>();
 
-  public ContainerCache(Class<?>... containerClasses) {
+  public JtsSupportTypeCache(Class<?>... containerClasses) {
     Arrays.stream(containerClasses).forEach(c -> cache.put(c, true));
   }
 
-  public boolean isContainer(Class<?> toType) {
+  @Override
+  public boolean isSupport(Class<?> toType) {
     return cache.computeIfAbsent(
         (Class<?>) toType,
         key ->

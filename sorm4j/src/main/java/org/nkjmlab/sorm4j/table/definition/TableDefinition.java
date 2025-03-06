@@ -220,10 +220,10 @@ public final class TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
-      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
-      case "org.nkjmlab.sorm4j.util.datatype.jts.GeometryJts":
+      case "org.nkjmlab.sorm4j.container.datatype.GeometryString":
+      case "org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts":
         return "geometry";
-      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
+      case "org.nkjmlab.sorm4j.container.datatype.JsonByte":
       case "java.util.List":
       case "java.util.Map":
         return "json";

@@ -148,6 +148,10 @@ public final class DefaultColumnValueToJavaObjectConverter
         return resultSet.getBlob(columnIndex);
       case "java.sql.Clob":
         return resultSet.getClob(columnIndex);
+      case "org.nkjmlab.sorm4j.container.datatype.JsonByte":
+        return new JsonByte(resultSet.getBytes(columnIndex));
+      case "org.nkjmlab.sorm4j.container.datatype.GeometryString":
+        return new GeometryString(resultSet.getString(columnIndex));
       //      case "java.util.Date":
       //      case "java.time.LocalTime":
       //      case "java.time.LocalDate":
@@ -157,10 +161,6 @@ public final class DefaultColumnValueToJavaObjectConverter
       //      case "java.time.OffsetTime":
       //      case "java.time.OffsetDateTime":
       //        return resultSet.getObject(columnIndex, toType);
-      case "org.nkjmlab.sorm4j.util.datatype.JsonByte":
-        return new JsonByte(resultSet.getBytes(columnIndex));
-      case "org.nkjmlab.sorm4j.util.datatype.GeometryString":
-        return new GeometryString(resultSet.getString(columnIndex));
       default:
         return resultSet.getObject(columnIndex, toType);
     }
