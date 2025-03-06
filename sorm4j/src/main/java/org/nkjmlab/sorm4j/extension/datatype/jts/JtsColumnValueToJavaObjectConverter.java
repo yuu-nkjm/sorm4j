@@ -6,15 +6,14 @@ import java.sql.SQLException;
 import org.locationtech.jts.geom.Geometry;
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
-import org.nkjmlab.sorm4j.extension.datatype.jts.JtsSormContext.ContainerCache;
 
 @Experimental
 public class JtsColumnValueToJavaObjectConverter implements ColumnValueToJavaObjectConverter {
 
   private final ContainerCache cache;
 
-  public JtsColumnValueToJavaObjectConverter(ContainerCache cache) {
-    this.cache = cache;
+  public JtsColumnValueToJavaObjectConverter() {
+    this.cache = new ContainerCache();
   }
 
   @Override

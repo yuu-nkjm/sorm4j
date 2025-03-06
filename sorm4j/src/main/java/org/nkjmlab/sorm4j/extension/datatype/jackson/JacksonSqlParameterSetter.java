@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSormContext.ContainerCache;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,17 +13,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Experimental
 public class JacksonSqlParameterSetter implements SqlParameterSetter {
   private final ObjectMapper objectMapper;
-  private final ContainerCache ormJsonContainers;
+  private final ContainerCache cache;
 
-  public JacksonSqlParameterSetter(ObjectMapper objectMapper, ContainerCache ormJsonContainers) {
+  public JacksonSqlParameterSetter(
+      ObjectMapper objectMapper, Class<?>... ormJsonColumnContainerClasses) {
     this.objectMapper = objectMapper;
-    this.ormJsonContainers = ormJsonContainers;
+    this.cache = new ContainerCache(ormJsonColumnContainerClasses);
   }
 
   @Override
   public boolean test(PreparedStatement stmt, int parameterIndex, Object parameter)
       throws SQLException {
-    return ormJsonContainers.isContainer(parameter.getClass());
+    return cache.isContainer(parameter.getClass());
   }
 
   @Override
