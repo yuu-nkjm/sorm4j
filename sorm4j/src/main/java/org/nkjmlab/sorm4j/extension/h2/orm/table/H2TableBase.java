@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.extension.h2.orm.table;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.table.TableBase;
+import org.nkjmlab.sorm4j.table.orm.TableBase;
 
 public abstract class H2TableBase<T> extends TableBase<T> implements H2Table<T> {
   public H2TableBase(Sorm orm, Class<T> valueType) {

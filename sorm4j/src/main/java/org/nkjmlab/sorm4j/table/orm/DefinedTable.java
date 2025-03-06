@@ -1,6 +1,6 @@
-package org.nkjmlab.sorm4j.table.definition;
+package org.nkjmlab.sorm4j.table.orm;
 
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 
 public interface DefinedTable<T> extends Table<T> {
 

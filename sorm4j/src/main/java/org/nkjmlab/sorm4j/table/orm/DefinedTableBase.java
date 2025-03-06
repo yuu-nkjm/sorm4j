@@ -1,7 +1,7 @@
-package org.nkjmlab.sorm4j.table.definition;
+package org.nkjmlab.sorm4j.table.orm;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.table.TableBase;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 
 public class DefinedTableBase<T> extends TableBase<T> implements DefinedTable<T> {
   private final TableDefinition tableDefinition;

@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.SormContextImpl;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.table.TableConnection;
+import org.nkjmlab.sorm4j.table.orm.TableConnection;
 
 /** @author yuu_nkjm */
 public interface OrmConnection extends Orm, AutoCloseable {

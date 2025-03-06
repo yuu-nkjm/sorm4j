@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.table;
+package org.nkjmlab.sorm4j.table.orm;
 
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AND;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.WHERE;

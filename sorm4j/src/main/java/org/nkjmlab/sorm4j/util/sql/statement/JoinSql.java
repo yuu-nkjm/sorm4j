@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
-import org.nkjmlab.sorm4j.table.TableOrm;
+import org.nkjmlab.sorm4j.table.orm.TableOrm;
 import org.nkjmlab.sorm4j.util.sql.statement.SelectSql.Condition;
 
 @Experimental

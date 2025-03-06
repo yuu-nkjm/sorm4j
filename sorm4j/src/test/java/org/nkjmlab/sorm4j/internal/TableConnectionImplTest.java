@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.table.TableConnection;
+import org.nkjmlab.sorm4j.table.orm.TableConnection;
 import org.nkjmlab.sorm4j.test.common.Player;
 
 class TableConnectionImplTest {

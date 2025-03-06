@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.SormImpl;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.table.orm.Table;
 import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 /**

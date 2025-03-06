@@ -19,7 +19,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.table.orm.Table;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;

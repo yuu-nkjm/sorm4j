@@ -19,7 +19,7 @@ import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2SimpleDefinedTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
-import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
+import org.nkjmlab.sorm4j.table.orm.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class H2SimpleDefinedTableTest {

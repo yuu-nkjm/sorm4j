@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.table;
+package org.nkjmlab.sorm4j.table.orm;
 
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.internal.TableConnectionImpl;

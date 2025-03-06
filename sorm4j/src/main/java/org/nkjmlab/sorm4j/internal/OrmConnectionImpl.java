@@ -49,7 +49,7 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.table.TableConnection;
+import org.nkjmlab.sorm4j.table.orm.TableConnection;
 import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /**

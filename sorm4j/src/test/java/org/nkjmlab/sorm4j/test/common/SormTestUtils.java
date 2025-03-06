@@ -11,8 +11,8 @@ import javax.sql.DataSource;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.table.definition.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
+import org.nkjmlab.sorm4j.table.orm.SimpleDefinedTable;
 import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 public class SormTestUtils {

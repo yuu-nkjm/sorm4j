@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.extension.h2.orm.table.definition;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.table.definition.DefinedTableBase;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
+import org.nkjmlab.sorm4j.table.orm.DefinedTableBase;
 
 /**
  * A base class for H2 database tables with predefined schema.

@@ -28,8 +28,8 @@ import org.nkjmlab.sorm4j.internal.container.sql.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.table.SimpleTable;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.table.orm.SimpleTable;
+import org.nkjmlab.sorm4j.table.orm.Table;
 
 /**
  * An entry point of object-relation mapping.
