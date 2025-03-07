@@ -9,7 +9,7 @@ import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSupport;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -58,7 +58,7 @@ class JacksonSormContextTest {
     assertThat(table.selectAll().get(0).jsonCol.age).isEqualTo(20);
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   public static class JacksonRecord {
 
     public final JsonByte jsonCol;
@@ -91,7 +91,7 @@ class JacksonSormContextTest {
   }
 
   // @SuppressWarnings("exports")
-  @OrmRecord
+  @OrmRecordCompatible
   public static class HasJsonColumn {
     public int id;
     public SimpleOrmJsonContainer jsonCol;

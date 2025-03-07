@@ -21,7 +21,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -85,7 +85,7 @@ class TableDefinitionTest {
     C
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   public static class SimpleEnum {
     public final long id;
     // @SuppressWarnings("exports")
@@ -98,7 +98,7 @@ class TableDefinitionTest {
     }
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   @IndexColumnPair({"boolean_col", "byte_col"})
   @IndexColumnPair({"boolean_col", "char_col"})
   @UniqueConstraint({"boolean_col", "byte_col"})

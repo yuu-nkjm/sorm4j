@@ -17,7 +17,7 @@ import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnValueToJavaObjectCo
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 
 /**
  * Holds mapping data from a given class and a table. The object reads a query result in {@link
@@ -67,10 +67,10 @@ public final class SqlResultToColumnsMapping<T> {
   }
 
   private Constructor<T> getOrmRecordConstructor(Class<T> objectClass) {
-    if (!objectClass.isRecord() && objectClass.getAnnotation(OrmRecord.class) == null) {
+    if (!objectClass.isRecord() && objectClass.getAnnotation(OrmRecordCompatible.class) == null) {
       return null;
     }
-    Object[] params = {objectClass, OrmRecord.class.getSimpleName()};
+    Object[] params = {objectClass, OrmRecordCompatible.class.getSimpleName()};
     return Try.getOrElseThrow(
         () ->
             objectClass.getConstructor(
@@ -118,7 +118,7 @@ public final class SqlResultToColumnsMapping<T> {
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
     Object[] params = {
-      objectClass, OrmConstructor.class.getSimpleName(), OrmRecord.class.getSimpleName()
+      objectClass, OrmConstructor.class.getSimpleName(), OrmRecordCompatible.class.getSimpleName()
     };
     return Try.getOrElseThrow(
         () -> objectClass.getConstructor(),

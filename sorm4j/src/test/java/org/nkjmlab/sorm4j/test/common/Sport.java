@@ -1,8 +1,8 @@
 package org.nkjmlab.sorm4j.test.common;
 
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 
-@OrmRecord
+@OrmRecordCompatible
 public class Sport {
 
   public enum Sports {

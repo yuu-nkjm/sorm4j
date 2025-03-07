@@ -12,7 +12,7 @@ import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
 import org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts;
 import org.nkjmlab.sorm4j.extension.datatype.jts.JtsSupport;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class GeometryTest {
@@ -72,7 +72,7 @@ class GeometryTest {
     assertThat(ret).isEqualTo(g);
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   public static class GeometryStringRecord {
 
     public final GeometryString geoStr;
@@ -87,7 +87,7 @@ class GeometryTest {
     }
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   public static class GeometryJtsRecord {
 
     public final GeometryJts geoJts;

@@ -24,7 +24,7 @@ import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecord;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -119,7 +119,7 @@ class SormContextImplTest {
     assertNotNull(builder);
   }
 
-  @OrmRecord
+  @OrmRecordCompatible
   public static class Temp {
     public int id;
     public String name;
