@@ -7,13 +7,14 @@ import java.sql.PreparedStatement;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.Orm;
+import org.nkjmlab.sorm4j.common.annotation.Internal;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
@@ -74,6 +75,7 @@ public interface TableOrm<T> {
     return getOrm().getResultSetTraverser(getValueType());
   }
 
+  @Internal
   default TableMetaData getTableMetaData() {
     return getOrm().getTableMetaData(getValueType());
   }

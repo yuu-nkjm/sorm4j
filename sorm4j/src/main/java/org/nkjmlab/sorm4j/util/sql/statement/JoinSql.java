@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
-import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.common.annotation.Internal;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.table.orm.TableOrm;
 import org.nkjmlab.sorm4j.util.sql.statement.SelectSql.Condition;
 
@@ -13,11 +14,11 @@ public class JoinSql {
 
   private JoinSql() {}
 
-  @Experimental
   public static JoinSql.Builder builder(TableOrm<?> firstTable) {
     return new Builder(firstTable);
   }
 
+  @Internal
   public static JoinSql.Builder builder(TableMetaData firstTable) {
     return new Builder(firstTable);
   }

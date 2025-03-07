@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.container.sql.metadata.DbMetaData;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
 
 // "select * " is faster than "select col1, col2, ..., coln" in H2 2.1.210. the former is also

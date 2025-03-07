@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.container.datatype;
+package org.nkjmlab.sorm4j.extension.datatype.container;
 
 import java.util.Objects;
 
@@ -15,7 +15,7 @@ public class GeometryString {
   /**
    * @param text is quoted string containing a WKT/EWKT (Well-known text representation of geometry)
    */
-  public GeometryString(String text) {
+  private GeometryString(String text) {
     this.text = text;
   }
 
@@ -44,5 +44,9 @@ public class GeometryString {
     if (!(obj instanceof GeometryString)) return false;
     GeometryString other = (GeometryString) obj;
     return Objects.equals(text, other.text);
+  }
+
+  public static GeometryString of(String text) {
+    return new GeometryString(text);
   }
 }

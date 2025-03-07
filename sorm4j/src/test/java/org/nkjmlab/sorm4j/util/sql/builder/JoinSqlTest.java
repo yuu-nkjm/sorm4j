@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.util.sql.statement.JoinSql;
 
 class JoinSqlTest {

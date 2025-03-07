@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.nkjmlab.sorm4j.common.exception.SormException;
-import org.nkjmlab.sorm4j.container.datatype.GeometryString;
-import org.nkjmlab.sorm4j.container.datatype.JsonByte;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
+import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
+import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
@@ -54,8 +54,8 @@ public final class DefaultColumnValueToJavaObjectConverter
           java.time.OffsetDateTime.class,
           java.util.Date.class,
           java.util.UUID.class,
-          org.nkjmlab.sorm4j.container.datatype.JsonByte.class,
-          org.nkjmlab.sorm4j.container.datatype.GeometryString.class);
+          org.nkjmlab.sorm4j.extension.datatype.container.JsonByte.class,
+          org.nkjmlab.sorm4j.extension.datatype.container.GeometryString.class);
 
   @Override
   public boolean test(Class<?> objectClass) {
@@ -148,10 +148,10 @@ public final class DefaultColumnValueToJavaObjectConverter
         return resultSet.getBlob(columnIndex);
       case "java.sql.Clob":
         return resultSet.getClob(columnIndex);
-      case "org.nkjmlab.sorm4j.container.datatype.JsonByte":
-        return new JsonByte(resultSet.getBytes(columnIndex));
-      case "org.nkjmlab.sorm4j.container.datatype.GeometryString":
-        return new GeometryString(resultSet.getString(columnIndex));
+      case "org.nkjmlab.sorm4j.extension.datatype.container.JsonByte":
+        return JsonByte.of(resultSet.getBytes(columnIndex));
+      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryString":
+        return GeometryString.of(resultSet.getString(columnIndex));
       //      case "java.util.Date":
       //      case "java.time.LocalTime":
       //      case "java.time.LocalDate":

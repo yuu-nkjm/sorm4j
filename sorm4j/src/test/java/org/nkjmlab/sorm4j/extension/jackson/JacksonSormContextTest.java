@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.container.datatype.JsonByte;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSupport;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
@@ -27,7 +27,7 @@ class JacksonSormContextTest {
 
     H2DefinedTable<JacksonRecord> table = H2DefinedTable.of(sorm, JacksonRecord.class);
     table.createTableIfNotExists();
-    table.insert(new JacksonRecord(new JsonByte("{\"name\":\"Alice\",\"age\":20}")));
+    table.insert(new JacksonRecord(JsonByte.of("{\"name\":\"Alice\",\"age\":20}")));
     assertThat(table.selectAll().get(0).jsonCol.toString()).contains("Alice");
     assertThat(table.selectAll().get(0).jsonCol.toString()).contains(Integer.toString(20));
 

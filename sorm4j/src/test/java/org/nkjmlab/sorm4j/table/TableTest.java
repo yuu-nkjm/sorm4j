@@ -31,7 +31,7 @@ import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.container.sql.TableName;
+import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
 import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.table.orm.Table;
@@ -55,6 +55,13 @@ class TableTest {
     playersTable = createPlayersTable(sorm);
     sportsTable = createSportsTable(sorm);
     createGuestsTable(sorm);
+  }
+
+  @Test
+  void testOf() {
+    Sorm sorm = createSormWithNewContext();
+    Table.of(sorm, Player.class);
+    Table.of(sorm, Player.class, "PLAYERS1");
   }
 
   @Test

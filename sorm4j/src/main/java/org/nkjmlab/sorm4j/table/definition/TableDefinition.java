@@ -117,8 +117,7 @@ public interface TableDefinition {
     if (type.getAnnotation(OrmJacksonColumn.class) != null) {
       return "json";
     }
-    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJacksonColumn.class)
-        != null) {
+    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJacksonColumn.class) != null) {
       return "json";
     }
 
@@ -173,10 +172,10 @@ public interface TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
-      case "org.nkjmlab.sorm4j.container.datatype.GeometryString":
+      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryString":
       case "org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts":
         return "geometry";
-      case "org.nkjmlab.sorm4j.container.datatype.JsonByte":
+      case "org.nkjmlab.sorm4j.extension.datatype.container.JsonByte":
       case "java.util.List":
       case "java.util.Map":
         return "json";

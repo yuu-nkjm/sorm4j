@@ -7,8 +7,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.container.datatype.GeometryString;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
 import org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts;
 import org.nkjmlab.sorm4j.extension.datatype.jts.JtsSupport;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
@@ -27,8 +27,8 @@ class GeometryTest {
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_STR geometry");
     table.createTableIfNotExists();
-    GeometryString g = new GeometryString("POINT (30 10)");
-    GeometryString g1 = new GeometryString("POINT (30 10)");
+    GeometryString g = GeometryString.of("POINT (30 10)");
+    GeometryString g1 = GeometryString.of("POINT (30 10)");
 
     assertThat(g.equals(g1)).isTrue();
     assertThat(g.hashCode() == g1.hashCode()).isTrue();

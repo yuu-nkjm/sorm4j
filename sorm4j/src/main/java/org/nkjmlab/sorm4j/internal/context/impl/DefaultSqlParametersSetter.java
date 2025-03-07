@@ -163,15 +163,15 @@ public final class DefaultSqlParametersSetter implements SqlParametersSetter {
       case "java.util.UUID":
         stmt.setObject(parameterIndex, parameter);
         return;
-      case "org.nkjmlab.sorm4j.container.datatype.JsonByte":
+      case "org.nkjmlab.sorm4j.extension.datatype.container.JsonByte":
         stmt.setObject(
             parameterIndex,
-            ((org.nkjmlab.sorm4j.container.datatype.JsonByte) parameter).getBytes());
+            ((org.nkjmlab.sorm4j.extension.datatype.container.JsonByte) parameter).getBytes());
         return;
-      case "org.nkjmlab.sorm4j.container.datatype.GeometryString":
+      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryString":
         stmt.setString(
             parameterIndex,
-            ((org.nkjmlab.sorm4j.container.datatype.GeometryString) parameter).getText());
+            ((org.nkjmlab.sorm4j.extension.datatype.container.GeometryString) parameter).getText());
         return;
       default:
         if (type.isArray()) {

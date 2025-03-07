@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.container.sql.TableName;
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcColumnMetaData;
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcForeignKeyMetaData;

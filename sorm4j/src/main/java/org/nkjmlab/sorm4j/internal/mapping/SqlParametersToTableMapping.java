@@ -14,11 +14,11 @@ import java.util.function.Function;
 
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.container.RowMap;
-import org.nkjmlab.sorm4j.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.container.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.container.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;

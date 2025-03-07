@@ -1,9 +1,8 @@
-package org.nkjmlab.sorm4j.container.sql.metadata;
+package org.nkjmlab.sorm4j.internal.container.sql.metadata;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
 
 /**
