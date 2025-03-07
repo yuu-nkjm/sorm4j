@@ -9,8 +9,8 @@ class ValuesObjectTest {
 
   @Test
   void testTableName() {
-    TableName v1 = new TableName("test");
-    TableName v2 = new TableName("test");
+    TableName v1 = TableName.of("test");
+    TableName v2 = TableName.of("test");
     verify(v1, v2);
   }
 

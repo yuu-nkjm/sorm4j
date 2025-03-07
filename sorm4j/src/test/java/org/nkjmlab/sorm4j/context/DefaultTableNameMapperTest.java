@@ -47,7 +47,7 @@ class DefaultTableNameMapperTest {
           String name =
               new DefaultTableNameMapper()
                   .getTableName(Guest.class, m.getJdbcConnection().getMetaData());
-          assertThat(name).isEqualTo(new TableName("GUESTS").getName());
+          assertThat(name).isEqualTo(TableName.of("GUESTS").getName());
         });
   }
 }

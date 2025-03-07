@@ -409,7 +409,7 @@ public final class JdbcDatabaseMetaDataImpl implements JdbcDatabaseMetaData {
           pkColumns.add(pkColumnsResultSet.getString("COLUMN_NAME"));
         }
       }
-      primaryKeys.put(new TableName(tableName), pkColumns);
+      primaryKeys.put(TableName.of(tableName), pkColumns);
     }
     return primaryKeys;
   }
@@ -435,7 +435,7 @@ public final class JdbcDatabaseMetaDataImpl implements JdbcDatabaseMetaData {
                   fkResultSet.getShort("DELETE_RULE")));
         }
       }
-      foreignKeys.put(new TableName(tableName), fkList);
+      foreignKeys.put(TableName.of(tableName), fkList);
     }
     return foreignKeys;
   }

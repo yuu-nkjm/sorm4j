@@ -105,7 +105,8 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.internal.container.sql.metadata.DbMetaData.of(connection.getMetaData()));
+                    org.nkjmlab.sorm4j.internal.container.sql.metadata.DbMetaData.of(
+                        connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
           }
@@ -255,7 +256,7 @@ public final class SormContextImpl implements SormContext {
         objectClass,
         k -> {
           try {
-            return new TableName(
+            return TableName.of(
                 config.getTableNameMapper().getTableName(objectClass, connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);
@@ -272,7 +273,7 @@ public final class SormContextImpl implements SormContext {
         tableName,
         k -> {
           try {
-            return new TableName(
+            return TableName.of(
                 config.getTableNameMapper().getTableName(tableName, connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);

@@ -1,16 +1,18 @@
 package org.nkjmlab.sorm4j.container.sql;
 
+import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
+
 /**
  * Value object of table name.
  *
  * @author nkjm
  */
-public final class TableName {
+public final class TableName implements Comparable<TableName> {
 
   private final String name;
 
-  public TableName(String name) {
-    this.name = name;
+  private TableName(String name) {
+    this.name = CanonicalStringCache.getDefault().toCanonicalName(name);
   }
 
   @Override
@@ -43,5 +45,10 @@ public final class TableName {
 
   public static TableName of(String tableName) {
     return new TableName(tableName);
+  }
+
+  @Override
+  public int compareTo(TableName other) {
+    return this.name.compareTo(other.name);
   }
 }
