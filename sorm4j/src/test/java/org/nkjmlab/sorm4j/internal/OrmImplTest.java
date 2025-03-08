@@ -326,12 +326,12 @@ class OrmImplTest {
 
   @Test
   void testGetTableMetaDataClassOfQ() {
-    sorm.getTableMetaData(Player.class);
+    sorm.getOrmTableMetaData(Player.class);
   }
 
   @Test
   void testGetTableMetaDataClassOfQString() {
-    sorm.getTableMetaData(PLAYERS1);
+    sorm.getOrmTableMetaData(PLAYERS1);
   }
 
   @Test

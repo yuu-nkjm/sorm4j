@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -16,11 +17,13 @@ class ColumnMetaDataTest {
   @Test
   void testCompareTo() {
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
-    List<ColumnMetaData> t1 = sorm.getTableMetaData(Guest.class).getColumnsMetaData();
+    List<ColumnMetaData> t1 =
+        ((TableMetaData) sorm.getOrmTableMetaData(Guest.class)).getColumnsMetaData();
     ColumnMetaData c1 = t1.get(0);
     ColumnMetaData c2 = t1.get(0);
     ColumnMetaData c3 = t1.get(1);
-    List<ColumnMetaData> t2 = sorm.getTableMetaData(Player.class).getColumnsMetaData();
+    List<ColumnMetaData> t2 =
+        ((TableMetaData) sorm.getOrmTableMetaData(Player.class)).getColumnsMetaData();
     ColumnMetaData c4 = t2.get(0);
 
     // c1 and c2 are same object

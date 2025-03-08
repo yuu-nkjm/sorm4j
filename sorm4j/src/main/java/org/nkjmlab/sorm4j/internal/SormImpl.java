@@ -18,12 +18,12 @@ import org.nkjmlab.sorm4j.container.RowMap;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.container.TableSql;
-import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.container.sql.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
@@ -472,13 +472,13 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass) {
-    return applyAndClose(conn -> conn.getTableMetaData(objectClass));
+  public OrmTableMetaData getOrmTableMetaData(Class<?> objectClass) {
+    return applyAndClose(conn -> conn.getOrmTableMetaData(objectClass));
   }
 
   @Override
-  public TableMetaData getTableMetaData(String tableName) {
-    return applyAndClose(conn -> conn.getTableMetaData(tableName));
+  public OrmTableMetaData getOrmTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getOrmTableMetaData(tableName));
   }
 
   @Override

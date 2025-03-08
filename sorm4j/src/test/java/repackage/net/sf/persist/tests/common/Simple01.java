@@ -3,9 +3,9 @@
 package repackage.net.sf.persist.tests.common;
 
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumn;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 
-@OrmTable("simple")
+@OrmTableName("simple")
 public class Simple01 {
 
   public long id;

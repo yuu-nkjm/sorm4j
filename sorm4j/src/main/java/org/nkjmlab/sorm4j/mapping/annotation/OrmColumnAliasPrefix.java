@@ -10,7 +10,7 @@ import org.nkjmlab.sorm4j.Orm;
 /**
  * Defines a prefix for field alias. When "name" field mapped to "name" column and the value of
  * {@link OrmColumnAliasPrefix}} is "customer", "customername" column also mapped to "name" field.
- * It is mainly designed for {@link Orm#readTupleList} method.
+ * It is mainly designed for {@link Orm#readTupleList} method and {@link Orm#join}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

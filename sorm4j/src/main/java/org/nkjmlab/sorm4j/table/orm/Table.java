@@ -18,14 +18,12 @@ public interface Table<T> extends TableOrm<T> {
   @Override
   Sorm getOrm();
 
-  /**
-   * @param <T>
-   * @param orm
-   * @param valueType
-   * @return
-   */
-  static <T> Table<T> create(Sorm orm, Class<T> valueType) {
+  public static <T> Table<T> of(Sorm orm, Class<T> valueType) {
     return new SimpleTable<>(orm, valueType);
+  }
+
+  public static <T> Table<T> of(Sorm orm, Class<T> valueType, String tableName) {
+    return new SimpleTable<>(orm, valueType, tableName);
   }
 
   default TableConnection<T> toTableConnection(OrmConnection conn) {
@@ -70,13 +68,5 @@ public interface Table<T> extends TableOrm<T> {
     } catch (Exception e) {
       throw Try.rethrow(e);
     }
-  }
-
-  public static <T> Table<T> of(Sorm orm, Class<T> valueType) {
-    return new SimpleTable<>(orm, valueType);
-  }
-
-  public static <T> Table<T> of(Sorm orm, Class<T> valueType, String tableName) {
-    return new SimpleTable<>(orm, valueType, tableName);
   }
 }

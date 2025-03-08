@@ -72,7 +72,7 @@ class SormContextImplTest {
             e ->
                 assertThat(e.getMessage())
                     .isEqualTo(
-                        "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temp] annotated by @OrmRecord should have the canonical constructor."));
+                        "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temp] annotated by @OrmRecordCompatible should have the canonical constructor."));
 
     assertThatThrownBy(() -> sorm.readList(Temporary.class, "select * from guests"))
         .isInstanceOfSatisfying(

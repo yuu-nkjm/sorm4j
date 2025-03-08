@@ -26,6 +26,7 @@ import org.nkjmlab.sorm4j.container.Tuple;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.container.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
@@ -384,13 +385,21 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getTableSql(connection, getTableMetaData(tableName));
   }
 
+  public OrmTableMetaData getTableMetaData(Class<?> objectClass) {
+    return getTableMapping(objectClass).getTableMetaData();
+  }
+
+  private TableMetaData getTableMetaData(String tableName) {
+    return sormContext.getTableMetaData(connection, tableName);
+  }
+
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass) {
+  public OrmTableMetaData getOrmTableMetaData(Class<?> objectClass) {
     return getTableMapping(objectClass).getTableMetaData();
   }
 
   @Override
-  public TableMetaData getTableMetaData(String tableName) {
+  public OrmTableMetaData getOrmTableMetaData(String tableName) {
     return sormContext.getTableMetaData(connection, tableName);
   }
 

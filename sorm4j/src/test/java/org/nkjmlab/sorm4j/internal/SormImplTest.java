@@ -105,7 +105,7 @@ class SormImplTest {
   void readMapOne() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
 
-    Table.create(sorm, Guest.class);
+    Table.of(sorm, Guest.class);
     try (Connection conn = sorm.openJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("CsvColumn");

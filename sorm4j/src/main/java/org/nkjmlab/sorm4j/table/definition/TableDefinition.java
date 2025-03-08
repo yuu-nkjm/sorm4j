@@ -23,7 +23,7 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.internal.container.sql.result.TableDefinitionImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -214,7 +214,7 @@ public interface TableDefinition {
   }
 
   static String toTableName(Class<?> valueType) {
-    OrmTable ann = valueType.getAnnotation(OrmTable.class);
+    OrmTableName ann = valueType.getAnnotation(OrmTableName.class);
     if (ann == null || ann.value().length() == 0) {
       return SormContext.getDefaultCanonicalStringCache()
           .toCanonicalName(valueType.getSimpleName() + "s");

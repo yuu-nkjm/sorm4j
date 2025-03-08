@@ -11,7 +11,7 @@ import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 
 /**
  * Default implementation of {@link TableNameMapper}
@@ -26,7 +26,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public String getTableName(String tableName, DatabaseMetaData metaData) {
     List<String> candidates = List.of(tableName);
-    Object[] params = {tableName, OrmTable.class.getSimpleName(), candidates};
+    Object[] params = {tableName, OrmTableName.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates)
         .orElseThrow(
             () ->
@@ -37,7 +37,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   @Override
   public String getTableName(Class<?> objectClass, DatabaseMetaData metaData) {
     List<String> candidates = guessTableNameCandidates(objectClass);
-    Object[] params = {objectClass.getName(), OrmTable.class.getSimpleName(), candidates};
+    Object[] params = {objectClass.getName(), OrmTableName.class.getSimpleName(), candidates};
     return convertToExactTableName(metaData, candidates)
         .orElseThrow(
             () ->
@@ -54,7 +54,7 @@ public final class DefaultTableNameMapper implements TableNameMapper {
   private List<String> guessTableNameCandidates(Class<?> objectClass) {
 
     Optional<String> annotatedTableName =
-        Optional.ofNullable(objectClass.getAnnotation(OrmTable.class)).map(a -> a.value());
+        Optional.ofNullable(objectClass.getAnnotation(OrmTableName.class)).map(a -> a.value());
 
     if (annotatedTableName.isPresent()) {
       return List.of(annotatedTableName.get());

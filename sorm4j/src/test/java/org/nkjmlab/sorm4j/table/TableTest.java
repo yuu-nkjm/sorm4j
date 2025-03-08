@@ -58,13 +58,6 @@ class TableTest {
   }
 
   @Test
-  void testOf() {
-    Sorm sorm = createSormWithNewContext();
-    Table.of(sorm, Player.class);
-    Table.of(sorm, Player.class, "PLAYERS1");
-  }
-
-  @Test
   void testGetTableSchema() {
     Sorm sorm = createSormWithNewDatabaseAndCreateTables();
     playersTable.getTableDefinition();
@@ -309,7 +302,7 @@ class TableTest {
 
   @Test
   void testGetTableMetaData() {
-    assertThat(playersTable.getTableMetaData()).isNotNull();
+    assertThat(playersTable.getOrmTableMetaData()).isNotNull();
   }
 
   @Test
@@ -343,7 +336,7 @@ class TableTest {
     assertThat(playersTable.joinUsing(sportsTable, "id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
 
-    JoinSql.builder(playersTable.getOrm().getTableMetaData(Player.class));
+    JoinSql.builder(playersTable.getOrm().getOrmTableMetaData(Player.class));
   }
 
   @Test
@@ -372,7 +365,7 @@ class TableTest {
     Sorm mockSorm = mock(Sorm.class);
     Class<?> valueType = Player.class;
 
-    Table<?> table = Table.create(mockSorm, valueType);
+    Table<?> table = Table.of(mockSorm, valueType);
 
     assertNotNull(table);
     assertTrue(table instanceof Table);
@@ -384,7 +377,7 @@ class TableTest {
     OrmConnection mockOrmConnection = mock(OrmConnection.class);
     when(mockSorm.open()).thenReturn(mockOrmConnection);
 
-    Table<?> table = Table.create(mockSorm, Player.class);
+    Table<?> table = Table.of(mockSorm, Player.class);
     TableConnection<?> tableConnection = table.open();
 
     assertNotNull(tableConnection);
@@ -422,7 +415,7 @@ class TableTest {
     when(orm.open()).thenReturn(conn);
     doThrow(new RuntimeException("Test Exception")).when(handler).accept(any());
 
-    Table<Object> table = Table.create(orm, Object.class);
+    Table<Object> table = Table.of(orm, Object.class);
 
     Exception exception = assertThrows(RuntimeException.class, () -> table.acceptHandler(handler));
 
@@ -439,7 +432,7 @@ class TableTest {
     when(orm.open()).thenReturn(conn);
     when(handler.apply(any())).thenThrow(new RuntimeException("Test Exception"));
 
-    Table<Object> table = Table.create(orm, Object.class);
+    Table<Object> table = Table.of(orm, Object.class);
 
     Exception exception = assertThrows(RuntimeException.class, () -> table.applyHandler(handler));
 

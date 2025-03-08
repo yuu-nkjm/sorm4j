@@ -2,9 +2,9 @@
 
 package repackage.net.sf.persist.tests.common;
 
-import org.nkjmlab.sorm4j.mapping.annotation.OrmTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 
-@OrmTable("hello_world") // will blow
+@OrmTableName("hello_world") // will blow
 @SuppressWarnings("unused")
 public class Simple02 {
 
