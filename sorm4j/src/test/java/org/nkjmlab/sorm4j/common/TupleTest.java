@@ -3,10 +3,10 @@ package org.nkjmlab.sorm4j.common;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.container.Tuple;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple1;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.container.Tuple;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple1;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 
 class TupleTest {
 

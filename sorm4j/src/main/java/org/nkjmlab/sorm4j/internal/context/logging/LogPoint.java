@@ -2,8 +2,8 @@ package org.nkjmlab.sorm4j.internal.context.logging;
 
 import java.sql.Connection;
 
-import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.logging.SormLogger;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 public final class LogPoint {
 

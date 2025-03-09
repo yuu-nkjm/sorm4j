@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.nkjmlab.sorm4j.OrmConnection;
-import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.slf4j.Logger;
 

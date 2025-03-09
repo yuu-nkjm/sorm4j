@@ -6,21 +6,21 @@ import java.sql.ResultSet;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.common.annotation.Internal;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
-import org.nkjmlab.sorm4j.container.RowMap;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
-import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.container.sql.TableSql;
-import org.nkjmlab.sorm4j.container.sql.metadata.OrmTableMetaData;
-import org.nkjmlab.sorm4j.container.sql.metadata.jdbc.JdbcDatabaseMetaData;
-import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
-import org.nkjmlab.sorm4j.container.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
 
 /**
  * Main API for object relation mapping.

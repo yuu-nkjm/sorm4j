@@ -11,14 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.container.sql.TableName;
-import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
-import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
@@ -29,7 +25,11 @@ import org.nkjmlab.sorm4j.internal.context.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.mapping.result.ResultsToContainerMapper;
+import org.nkjmlab.sorm4j.internal.sql.TableName;
+import org.nkjmlab.sorm4j.internal.sql.metadata.ColumnMetaData;
+import org.nkjmlab.sorm4j.internal.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.sql.TableSql;
 
 public final class SormContextImpl implements SormContext {
 
@@ -105,7 +105,7 @@ public final class SormContextImpl implements SormContext {
                 .getTableSqlFactory()
                 .create(
                     tableMetaData,
-                    org.nkjmlab.sorm4j.internal.container.sql.metadata.DbMetaData.of(
+                    org.nkjmlab.sorm4j.internal.sql.metadata.DbMetaData.of(
                         connection.getMetaData()));
           } catch (SQLException e) {
             throw Try.rethrow(e);

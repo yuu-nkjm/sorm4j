@@ -23,20 +23,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.common.exception.SormException;
-import org.nkjmlab.sorm4j.container.RowMap;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.container.Tuple.Tuple3;
-import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
-import org.nkjmlab.sorm4j.util.sql.binding.OrderedParameterSqlParser;
 
 class OrmConnectionImplTest {
   private Sorm orm;
@@ -192,14 +192,14 @@ class OrmConnectionImplTest {
     int row =
         orm.applyHandler(
             conn -> {
-              NamedParameterSqlParser sql =
-                  NamedParameterSqlParser.of(
+              NamedParameterSqlFactory sql =
+                  NamedParameterSqlFactory.of(
                       "insert into players values(`id`, `name`, `address`)",
                       '`',
                       '`',
                       new DefaultColumnToFieldAccessorMapper());
               sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
-              return conn.executeUpdate(sql.parse());
+              return conn.executeUpdate(sql.create());
             });
     assertThat(row).isEqualTo(1);
   }
@@ -520,7 +520,7 @@ class OrmConnectionImplTest {
           assertThat(
                   m.readOne(
                       Player.class,
-                      OrderedParameterSqlParser.parse("select * from players where id=?", 1)))
+                      OrderedParameterSqlFactory.create("select * from players where id=?", 1)))
               .isEqualTo(a);
           assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
         });
@@ -538,7 +538,7 @@ class OrmConnectionImplTest {
             Guest g =
                 m.readOne(
                     Guest.class,
-                    OrderedParameterSqlParser.parse("select * from guests where id=?", 1));
+                    OrderedParameterSqlFactory.create("select * from guests where id=?", 1));
             assertThat(g.getAddress()).isEqualTo(a.getAddress());
             assertThat(g.getName()).isEqualTo(a.getName());
             g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));

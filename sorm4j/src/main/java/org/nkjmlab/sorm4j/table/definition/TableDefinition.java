@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
-import org.nkjmlab.sorm4j.internal.container.sql.result.TableDefinitionImpl;
+import org.nkjmlab.sorm4j.internal.sql.result.TableDefinitionImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;

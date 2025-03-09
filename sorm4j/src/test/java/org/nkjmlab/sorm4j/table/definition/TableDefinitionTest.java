@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;

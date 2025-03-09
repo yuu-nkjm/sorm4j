@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
@@ -15,6 +14,7 @@ import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.sql.TableSql;
 
 public abstract class MultiRowProcessorBase<T> implements MultiRowProcessor<T> {
 

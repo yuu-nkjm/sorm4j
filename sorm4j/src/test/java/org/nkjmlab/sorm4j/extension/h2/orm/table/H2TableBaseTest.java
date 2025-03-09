@@ -2,6 +2,9 @@ package org.nkjmlab.sorm4j.extension.h2.orm.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -11,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
+import org.nkjmlab.sorm4j.extension.h2.functions.system.CsvWrite;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
 
 class H2TableBaseTest {
@@ -25,12 +29,12 @@ class H2TableBaseTest {
   }
 
   private Sorm sorm;
-  private H2TableBase<TestEntity> table;
+  private H2Table<TestEntity> table;
 
   @BeforeEach
   void setUp() {
     sorm = H2SormFactory.createTemporalInMemory(SormContext.getDefaultContext());
-    table = new H2TableBase.H2SimpleTable<>(sorm, TestEntity.class, "TEST_ENTITY");
+    table = H2Table.of(sorm, TestEntity.class, "TEST_ENTITY");
 
     try (Connection conn = sorm.openJdbcConnection()) {
       conn.createStatement()
@@ -50,7 +54,7 @@ class H2TableBaseTest {
   }
 
   @Test
-  void testInsertAndSelect() {
+  void testInsertAndSelect() throws IOException {
     table.insert(new TestEntity(1, "Alice"));
     table.insert(new TestEntity(2, "Bob"));
 
@@ -58,6 +62,9 @@ class H2TableBaseTest {
     assertThat(results).hasSize(2);
     assertThat(results.get(0).name).isEqualTo("Alice");
     assertThat(results.get(1).name).isEqualTo("Bob");
+    File f = Files.createTempFile("a", "test.csv").toFile();
+    table.writeCsv(f);
+    table.writeCsv(CsvWrite.builder(f).query("select * from TEST_ENTITY").build());
   }
 
   @Test

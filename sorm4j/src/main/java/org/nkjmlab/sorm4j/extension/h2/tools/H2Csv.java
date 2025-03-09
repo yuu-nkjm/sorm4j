@@ -16,7 +16,7 @@ import java.util.List;
 import org.h2.store.fs.FileUtils;
 import org.h2.tools.Csv;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;

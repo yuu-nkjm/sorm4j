@@ -4,24 +4,24 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.stream.IntStream;
 
-import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.sql.binding.ParameterizedSqlParser;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlFactory;
 
 public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logBeforeSql(String tag, Connection connection, String sql, Object... parameters) {
-    logBeforeSql(tag, connection, ParameterizedSqlParser.parse(sql, parameters));
+    logBeforeSql(tag, connection, ParameterizedSqlFactory.create(sql, parameters));
   }
 
   @Override
   public void logBeforeSql(String tag, Connection connection, ParameterizedSql psql) {
     Object[] params = {
-      tag, getOutsideInvokerOfLibrary(), psql.getParameterBindedSql(), getDbUrl(connection)
+      tag, getOutsideInvokerOfLibrary(), psql.getExecutableSql(), getDbUrl(connection)
     };
     debug(
         ParameterizedStringFormatter.LENGTH_256.format(

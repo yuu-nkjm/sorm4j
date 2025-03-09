@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.internal.container.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
+import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
+import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 /**
  * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The
@@ -22,7 +22,7 @@ import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
  *
  * @author nkjm
  */
-public final class NamedParameterSqlParserImpl implements NamedParameterSqlParser {
+public final class NamedParameterSqlParserImpl implements NamedParameterSqlFactory {
 
   private static final Map<Class<?>, Map<String, FieldAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
@@ -30,18 +30,21 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
-  private static final char DEFAULT_PREFIX = ':';
-  private static final char DEFAULT_SUFFIX = Character.MIN_VALUE;
+  private static final Character DEFAULT_PREFIX = ':';
+  private static final Character DEFAULT_SUFFIX = null;
 
   private final String sql;
-  private final char prefix;
-  private final char suffix;
+  private final Character prefix;
+  private final Character suffix;
   private final ColumnToFieldAccessorMapper nameToFieldMapper;
   private final Map<String, Object> parameters;
-  private Object bean;
+  private Object parametersContainer;
 
   public NamedParameterSqlParserImpl(
-      String sql, char prefix, char suffix, ColumnToFieldAccessorMapper nameToFieldMapper) {
+      String sql,
+      Character prefix,
+      Character suffix,
+      ColumnToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.prefix = prefix;
     this.suffix = suffix;
@@ -54,25 +57,25 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   }
 
   @Override
-  public NamedParameterSqlParser bindAll(Map<String, Object> namedParams) {
+  public NamedParameterSqlFactory bind(Map<String, Object> namedParams) {
     this.parameters.putAll(namedParams);
     return this;
   }
 
   @Override
-  public NamedParameterSqlParser bind(String key, Object value) {
+  public NamedParameterSqlFactory bind(String key, Object value) {
     this.parameters.put(key, value);
     return this;
   }
 
   @Override
-  public NamedParameterSqlParser bindBean(Object bean) {
-    this.bean = bean;
+  public NamedParameterSqlFactory bind(Object parametersContainer) {
+    this.parametersContainer = parametersContainer;
     return this;
   }
 
   @Override
-  public ParameterizedSql parse() {
+  public ParameterizedSql create() {
     // Ordered by position in the sentence
     TreeMap<Integer, Object> orderdParams = new TreeMap<>();
     String resultSql = this.sql;
@@ -80,31 +83,30 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
     List<String> parameterNameList = createParameters();
 
     for (String parameterName : parameterNameList) {
-      String namedPlaceholder = prefix + parameterName;
-      namedPlaceholder = suffix != 0 ? namedPlaceholder + suffix : namedPlaceholder;
+      String namedPlaceholder = prefix + parameterName + (suffix != null ? suffix : "");
       int pos = resultSql.indexOf(namedPlaceholder);
       if (pos == -1) {
         continue;
       }
-      if (bean != null) {
+      if (parametersContainer != null) {
         FieldAccessor acc = getAccessor(parameterName);
         if (acc != null) {
-          orderdParams.put(pos, Try.getOrElseNull(() -> acc.get(bean)));
+          orderdParams.put(pos, Try.getOrElseNull(() -> acc.get(parametersContainer)));
         }
         if (parameters.containsKey(parameterName)) {
           orderdParams.put(pos, parameters.get(parameterName));
         }
         if (acc != null || parameters.containsKey(parameterName)) {
-          resultSql = resultSql.replaceAll(namedPlaceholder, "?");
+          resultSql = resultSql.replace(namedPlaceholder, "?");
         }
       } else {
         if (parameters.containsKey(parameterName)) {
           orderdParams.put(pos, parameters.get(parameterName));
-          resultSql = resultSql.replaceAll(namedPlaceholder, "?");
+          resultSql = resultSql.replace(namedPlaceholder, "?");
         }
       }
     }
-    return ParameterizedSqlImpl.parse(resultSql, orderdParams.values().toArray());
+    return ParameterizedSqlImpl.of(resultSql, orderdParams.values().toArray());
   }
 
   private List<String> createParameters() {
@@ -135,7 +137,7 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlParse
   }
 
   private FieldAccessor getAccessor(String parameterName) {
-    final Class<?> objectClass = bean.getClass();
+    final Class<?> objectClass = parametersContainer.getClass();
     return nameToFieldMaps
         .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
         .get(SormContext.getDefaultCanonicalStringCache().toCanonicalName(parameterName));

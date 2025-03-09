@@ -12,23 +12,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.common.exception.SormException;
-import org.nkjmlab.sorm4j.container.RowMap;
-import org.nkjmlab.sorm4j.container.sql.TableSql;
-import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
-import org.nkjmlab.sorm4j.internal.container.sql.result.BasicRowMap;
-import org.nkjmlab.sorm4j.internal.container.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.multirow.MultiRowProcessor;
+import org.nkjmlab.sorm4j.internal.sql.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
+import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 /** Holds mapping data from a given class and a table */
 public final class ContainerToTableMapper<T> {
