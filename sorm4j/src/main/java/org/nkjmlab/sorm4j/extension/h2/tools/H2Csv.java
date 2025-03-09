@@ -35,7 +35,7 @@ public class H2Csv {
    *
    * @param csv the CSV configuration
    */
-  public H2Csv(Csv csv) {
+  private H2Csv(Csv csv) {
     this.csv = csv;
   }
 
@@ -288,7 +288,7 @@ public class H2Csv {
     private final List<String> columns;
     private static final int bs = 8192;
 
-    public HeaderSkippingReader(Reader input) throws IOException {
+    private HeaderSkippingReader(Reader input) throws IOException {
       this.reader = new BufferedReader(input, bs);
       String firstLine = reader.readLine();
       if (firstLine == null) {

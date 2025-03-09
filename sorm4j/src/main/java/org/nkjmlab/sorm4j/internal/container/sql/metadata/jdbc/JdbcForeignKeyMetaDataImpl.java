@@ -54,4 +54,21 @@ public class JdbcForeignKeyMetaDataImpl implements JdbcForeignKeyMetaData {
   public short getDeleteRule() {
     return deleteRule;
   }
+
+  @Override
+  public String toString() {
+    return "JdbcForeignKeyMetaDataImpl [fkTable="
+        + fkTable
+        + ", fkColumn="
+        + fkColumn
+        + ", pkTable="
+        + pkTable
+        + ", pkColumn="
+        + pkColumn
+        + ", updateRule="
+        + updateRule
+        + ", deleteRule="
+        + deleteRule
+        + "]";
+  }
 }

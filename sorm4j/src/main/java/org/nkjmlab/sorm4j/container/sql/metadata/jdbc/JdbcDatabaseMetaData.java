@@ -1,9 +1,12 @@
 package org.nkjmlab.sorm4j.container.sql.metadata.jdbc;
 
+import java.sql.DatabaseMetaData;
 import java.util.List;
 import java.util.Map;
 
+import org.nkjmlab.sorm4j.internal.container.sql.metadata.jdbc.JdbcDatabaseMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
+import org.nkjmlab.sorm4j.internal.util.Try;
 
 public interface JdbcDatabaseMetaData {
 
@@ -58,6 +61,10 @@ public interface JdbcDatabaseMetaData {
   boolean isSupportsStoredProcedures();
 
   boolean isSupportsTransactions();
+
+  public static JdbcDatabaseMetaData of(DatabaseMetaData metaData) {
+    return Try.getOrElseThrow(() -> JdbcDatabaseMetaDataImpl.of(metaData), e -> Try.rethrow(e));
+  }
 
   public static final class TableName implements Comparable<TableName> {
 
