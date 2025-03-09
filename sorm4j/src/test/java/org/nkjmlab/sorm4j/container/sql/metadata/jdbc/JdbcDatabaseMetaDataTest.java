@@ -31,7 +31,7 @@ class JdbcDatabaseMetaDataTest {
     assertThat(md.getTableNames().get(0)).isEqualTo(TableName.of("PLAYERS"));
     assertThat(md.toString()).contains("H2");
     assertThat(md.getUrl()).contains("jdbc:h2:mem:test");
-    assertThat(md.getUserName()).isEqualTo("SA");
+    assertThat(md.getUserName()).isEqualTo("");
     assertThat(md.getDriverVersion()).startsWith("2.");
     System.out.println(md);
   }
@@ -76,7 +76,7 @@ class JdbcDatabaseMetaDataTest {
     TableName t1 = TableName.of("Test");
     TableName t2 = TableName.of("Test");
 
-    assertThat(t1.getName()).isSameAs(t2.getName()); // キャッシュされている場合、同じインスタンスが参照される
+    assertThat(t1.getName()).isSameAs(t2.getName());
   }
 
   @Test

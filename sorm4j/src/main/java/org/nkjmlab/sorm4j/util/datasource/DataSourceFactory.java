@@ -26,7 +26,7 @@ public class DataSourceFactory {
    * @return a new instance of {@link DriverManagerDataSource}
    */
   public static DataSource create(String jdbcUrl) {
-    return DriverManagerDataSource.create(jdbcUrl, null, null);
+    return create(jdbcUrl, null, null);
   }
 
   /**

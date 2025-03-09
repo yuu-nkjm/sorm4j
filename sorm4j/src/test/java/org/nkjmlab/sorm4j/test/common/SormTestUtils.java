@@ -115,9 +115,7 @@ public class SormTestUtils {
   public static DataSource createNewDatabaseDataSource() {
     final String JDBC_URL =
         "jdbc:h2:mem:test" + urlSuffuix.incrementAndGet() + ";DB_CLOSE_DELAY=-1";
-    final String USER = "sa";
-    final String PASSWORD = "";
-    return DataSourceFactory.create(JDBC_URL, USER, PASSWORD);
+    return DataSourceFactory.create(JDBC_URL);
   }
 
   private static Sorm createSormWithNewDatabase(SormContext sormContext) {

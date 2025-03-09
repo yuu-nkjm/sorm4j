@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
 
 class H2TableBaseTest {
@@ -28,7 +29,7 @@ class H2TableBaseTest {
 
   @BeforeEach
   void setUp() {
-    sorm = H2SormFactory.createTemporalInMemory();
+    sorm = H2SormFactory.createTemporalInMemory(SormContext.getDefaultContext());
     table = new H2TableBase.H2SimpleTable<>(sorm, TestEntity.class, "TEST_ENTITY");
 
     try (Connection conn = sorm.openJdbcConnection()) {

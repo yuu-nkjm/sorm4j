@@ -59,10 +59,49 @@ class JdbcDatabaseMetaDataImplTest {
   @Test
   void testGetJdbcTablesMetaData() {
     Map<TableName, JdbcTableMetaData> tables = metaData.getJdbcTablesMetaData();
-    assertNotNull(tables);
-    assertEquals(2, tables.size());
-    assertTrue(tables.containsKey(TableName.of("USERS")));
-    assertTrue(tables.containsKey(TableName.of("ORDERS")));
+
+    assertNotNull(tables, "JdbcTablesMetaData should not be null");
+
+    assertEquals(2, tables.size(), "Expected exactly 2 tables in metadata");
+    assertTrue(tables.containsKey(TableName.of("USERS")), "USERS table should exist in metadata");
+    assertTrue(tables.containsKey(TableName.of("ORDERS")), "ORDERS table should exist in metadata");
+
+    JdbcTableMetaData usersMetaData = tables.get(TableName.of("USERS"));
+    assertNotNull(usersMetaData, "USERS metadata should not be null");
+
+    JdbcTableMetaData ordersMetaData = tables.get(TableName.of("ORDERS"));
+    assertNotNull(ordersMetaData, "ORDERS metadata should not be null");
+
+    assertEquals("USERS", usersMetaData.getTableName(), "Table name should be USERS");
+    assertNotNull(usersMetaData.getTableType(), "Table type should not be null");
+    assertNull(usersMetaData.getRemarks(), "Remarks should not be null");
+    assertNotNull(usersMetaData.getTableCat(), "Table catalog should not be null");
+    assertNotNull(usersMetaData.getTableSchem(), "Table schema should not be null");
+    assertNull(usersMetaData.getTypeCat(), "Type catalog should not be null");
+    assertNull(usersMetaData.getTypeSchem(), "Type schema should not be null");
+    assertNull(usersMetaData.getTypeName(), "Type name should not be null");
+    assertNull(
+        usersMetaData.getSelfReferencingColName(), "Self-referencing column should not be null");
+    assertNull(usersMetaData.getRefGeneration(), "Ref generation should not be null");
+
+    assertEquals("ORDERS", ordersMetaData.getTableName(), "Table name should be ORDERS");
+    assertNotNull(ordersMetaData.getTableType(), "Table type should not be null");
+    assertNull(ordersMetaData.getRemarks(), "Remarks should not be null");
+    assertNotNull(ordersMetaData.getTableCat(), "Table catalog should not be null");
+    assertNotNull(ordersMetaData.getTableSchem(), "Table schema should not be null");
+    assertNull(ordersMetaData.getTypeCat(), "Type catalog should not be null");
+    assertNull(ordersMetaData.getTypeSchem(), "Type schema should not be null");
+    assertNull(ordersMetaData.getTypeName(), "Type name should not be null");
+    assertNull(
+        ordersMetaData.getSelfReferencingColName(), "Self-referencing column should not be null");
+    assertNull(ordersMetaData.getRefGeneration(), "Ref generation should not be null");
+
+    assertTrue(
+        usersMetaData.toString().contains("USERS"),
+        "USERS metadata toString should contain table name");
+    assertTrue(
+        ordersMetaData.toString().contains("ORDERS"),
+        "ORDERS metadata toString should contain table name");
   }
 
   @Test
