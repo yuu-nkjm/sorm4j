@@ -67,7 +67,7 @@ class NamedParameterSqlParserTest {
     private final int id;
     private final String name;
 
-    TestBean(int id, String name) {
+    public TestBean(int id, String name) {
       this.id = id;
       this.name = name;
     }

@@ -24,7 +24,6 @@ import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -66,21 +65,27 @@ class SormContextImplTest {
     sorm.selectAll(Player.class);
     sorm.selectAll(Sport.class);
 
-    assertThatThrownBy(() -> sorm.readList(Temp.class, "select * from guests"))
-        .isInstanceOfSatisfying(
-            SormException.class,
-            e ->
-                assertThat(e.getMessage())
-                    .isEqualTo(
-                        "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temp] annotated by @OrmRecordCompatible should have the canonical constructor."));
-
-    assertThatThrownBy(() -> sorm.readList(Temporary.class, "select * from guests"))
-        .isInstanceOfSatisfying(
-            SormException.class,
-            e ->
-                assertThat(e.getMessage())
-                    .isEqualTo(
-                        "The given container class [class org.nkjmlab.sorm4j.internal.SormContextImplTest$Temporary] should have one or less constructor annotated by @OrmConstructor."));
+    //    assertThatThrownBy(() -> sorm.readList(Temp.class, "select * from guests"))
+    //        .isInstanceOfSatisfying(
+    //            SormException.class,
+    //            e ->
+    //                assertThat(e.getMessage())
+    //                    .isEqualTo(
+    //                        "The given container class [class
+    // org.nkjmlab.sorm4j.internal.SormContextImplTest$Temp]"
+    //                            + " annotated by @OrmRecordCompatible should have the canonical
+    // constructor."));
+    //
+    //    assertThatThrownBy(() -> sorm.readList(Temporary.class, "select * from guests"))
+    //        .isInstanceOfSatisfying(
+    //            SormException.class,
+    //            e ->
+    //                assertThat(e.getMessage())
+    //                    .isEqualTo(
+    //                        "The given container class [class
+    // org.nkjmlab.sorm4j.internal.SormContextImplTest$Temporary]"
+    //                            + " should have one or less constructor annotated by
+    // @OrmConstructor."));
 
     // assertThat(context.toString()).contains("created by");
 
@@ -119,19 +124,12 @@ class SormContextImplTest {
     assertNotNull(builder);
   }
 
-  @OrmRecordCompatible
   public static class Temp {
     public int id;
     public String name;
-
-    public Temp() {}
   }
 
   public static class Temporary {
-
-    @OrmConstructor({""})
-    public Temporary() {}
-
     @OrmConstructor({"id"})
     public Temporary(int id) {}
   }

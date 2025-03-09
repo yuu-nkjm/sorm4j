@@ -18,7 +18,6 @@ import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -37,7 +36,6 @@ class H2DefinedTableTest {
     table.insert(new Example(0, "name"));
   }
 
-  @OrmRecordCompatible
   public record Example(int id, String name) {}
 
   @Test
@@ -90,7 +88,6 @@ class H2DefinedTableTest {
     table.insert(rows);
   }
 
-  @OrmRecordCompatible
   public static class OrmRecordExample {
     private final int id;
     private final String name;

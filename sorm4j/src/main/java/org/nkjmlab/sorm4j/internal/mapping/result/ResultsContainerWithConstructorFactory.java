@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal.mapping.result;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -17,10 +17,12 @@ import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
-final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToContainerMapping<S> {
+final class ResultsContainerWithConstructorFactory<T>
+    implements ResultsContainerFactory<T> {
 
   private final Map<String, ConstructorParameter> constructorParametersMap = new HashMap<>();
   private final int constructorParametersLength;
@@ -28,11 +30,13 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   private final Map<List<String>, ConstructorParameter[]> columnAndConstructorParameterMapping =
       new ConcurrentHashMap<>();
 
-  public SqlResultToContainerMappingWithConstructor(
+  private final Constructor<T> constructor;
+
+  public ResultsContainerWithConstructorFactory(
       ColumnToAccessorMapping columnToAccessorMap,
-      Constructor<S> constructor,
+      Constructor<T> constructor,
       String[] parameterNames) {
-    super(columnToAccessorMap, constructor);
+    this.constructor = constructor;
     String columnAliasPrefix = columnToAccessorMap.getColumnAliasPrefix();
     Parameter[] parameters = constructor.getParameters();
     this.constructorParametersLength = parameters.length;
@@ -75,7 +79,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
    *     parameter, the value is null.
    * @return
    */
-  private S createContainerObject(
+  private T createContainerObject(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
       int[] sqlTypes,
@@ -98,10 +102,12 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
         | InstantiationException
         | IllegalAccessException
         | InvocationTargetException e) {
-      Object[] params = {JdbcTypeUtils.convert(sqlTypes), constructorParameters};
+      Object[] params = {
+        constructor.getDeclaringClass(), JdbcTypeUtils.convert(sqlTypes), constructorParameters
+      };
       throw new SormException(
           ParameterizedStringFormatter.NO_LENGTH_LIMIT.format(
-              "Constructor with parameters of container class for object-relation mapping is not match with columns. param={}, sqltypes={}",
+              "Constructor with parameters of container class [{}] for object-relation mapping is not match with columns. param={}, sqltypes={}",
               params),
           e);
     }
@@ -120,7 +126,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   }
 
   @Override
-  List<S> loadContainerObjectList(
+  public List<T> createContainerList(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
       ColumnsAndTypes columnsAndTypes)
@@ -128,7 +134,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
     final String[] columns = columnsAndTypes.getColumns();
     final int[] sqlTypes = columnsAndTypes.getColumnTypes();
     final ConstructorParameter[] constructorParameters = getCorrespondingParameter(columns);
-    final List<S> ret = new ArrayList<>();
+    final List<T> ret = new ArrayList<>();
     while (resultSet.next()) {
       ret.add(
           createContainerObject(columnValueConverter, resultSet, sqlTypes, constructorParameters));
@@ -137,7 +143,7 @@ final class SqlResultToContainerMappingWithConstructor<S> extends SqlResultToCon
   }
 
   @Override
-  S loadContainerObject(
+  public T createContainer(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
       ColumnsAndTypes columnsAndTypes)

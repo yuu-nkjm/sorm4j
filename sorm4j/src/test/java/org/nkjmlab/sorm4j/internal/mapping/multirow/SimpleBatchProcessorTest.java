@@ -35,7 +35,7 @@ class SimpleBatchProcessorTest {
             .setMultiRowProcessorFactory(
                 MultiRowProcessorFactory.builder()
                     .setMultiRowProcessorType(
-                        MultiRowProcessorFactory.MultiRowProcessorType.SIMPLE_BATCH)
+                        MultiRowProcessorFactory.ProcessorType.SIMPLE_BATCH)
                     .build())
             .build();
     sorm = Sorm.create(ds, context);

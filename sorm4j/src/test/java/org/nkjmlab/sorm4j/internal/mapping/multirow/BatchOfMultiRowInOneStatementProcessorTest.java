@@ -34,7 +34,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
             .setMultiRowProcessorFactory(
                 MultiRowProcessorFactory.builder()
                     .setMultiRowProcessorType(
-                        MultiRowProcessorFactory.MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+                        MultiRowProcessorFactory.ProcessorType.MULTI_ROW_AND_BATCH)
                     .build())
             .setLogContext(
                 LogContext.builder()
@@ -45,7 +45,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
             .build();
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
     assertThat(sorm.getContext().toString())
-        .contains(MultiRowProcessorFactory.MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
+        .contains(MultiRowProcessorFactory.ProcessorType.MULTI_ROW_AND_BATCH.name());
   }
 
   @BeforeEach

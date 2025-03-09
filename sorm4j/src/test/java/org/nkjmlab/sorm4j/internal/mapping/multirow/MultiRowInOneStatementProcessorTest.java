@@ -2,9 +2,9 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType.MULTI_ROW;
-import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType.MULTI_ROW_AND_BATCH;
-import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType.SIMPLE_BATCH;
+import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.ProcessorType.MULTI_ROW;
+import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.ProcessorType.MULTI_ROW_AND_BATCH;
+import static org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.ProcessorType.SIMPLE_BATCH;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.container;
+package org.nkjmlab.sorm4j.container.sql;
 
 import org.nkjmlab.sorm4j.container.RowMap;
 

@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  *   private final String name;
  *   private final String address;
  *
- *   {@literal @}OrmConstructor({"id", "name", "address"})
+ *   {@literal @}OrmConstructor({"id", "guestName", "address"})
  *   public Guest(int id, String name, String address) {
  *       this.id = id;
  *       this.name = name;

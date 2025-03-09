@@ -4,16 +4,16 @@ import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 
 public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
-  private final MultiRowProcessorFactory.MultiRowProcessorType multiRowProcessorType;
+  private final MultiRowProcessorFactory.ProcessorType multiRowProcessorType;
   private final int batchSize;
   private final int batchSizeWithMultiRow;
   private final int multiRowSize;
 
   public MultiRowProcessorFactoryImpl(
-      MultiRowProcessorFactory.MultiRowProcessorType multiRowProcessorType,
+      MultiRowProcessorFactory.ProcessorType multiRowProcessorType,
       int batchSize,
       int multiRowSize,
       int batchSizeWithMultiRow) {
@@ -29,7 +29,7 @@ public class MultiRowProcessorFactoryImpl implements MultiRowProcessorFactory {
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
       Class<T> objectClass,
-      SqlParametersToTableMapping<T> tableMapping) {
+      ContainerToTableMapper<T> tableMapping) {
     switch (multiRowProcessorType) {
       case SIMPLE_BATCH:
         return new SimpleBatchProcessor<>(

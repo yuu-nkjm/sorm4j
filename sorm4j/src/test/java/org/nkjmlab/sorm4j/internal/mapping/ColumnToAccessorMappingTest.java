@@ -61,7 +61,7 @@ class ColumnToAccessorMappingTest {
       sorm.acceptHandler(
           m -> {
             Guest a = SormTestUtils.GUEST_ALICE;
-            SqlParametersToTableMapping<Guest> tm = getTableMapping(m, Guest.class);
+            ContainerToTableMapper<Guest> tm = getTableMapping(m, Guest.class);
             tm.insertAndGet(conMock, a);
           });
     } catch (Exception e) {
@@ -111,7 +111,7 @@ class ColumnToAccessorMappingTest {
         });
   }
 
-  public static <T> SqlParametersToTableMapping<T> getTableMapping(
+  public static <T> ContainerToTableMapper<T> getTableMapping(
       OrmConnection conn, Class<T> objectClass) {
     return ((OrmConnectionImpl) conn).getTableMapping(objectClass);
   }

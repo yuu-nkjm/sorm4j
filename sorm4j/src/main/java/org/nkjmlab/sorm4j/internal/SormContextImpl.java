@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
+import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.container.sql.TableName;
 import org.nkjmlab.sorm4j.internal.container.sql.metadata.ColumnMetaData;
 import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
@@ -27,8 +27,8 @@ import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.context.common.TableMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
-import org.nkjmlab.sorm4j.internal.mapping.SqlResultToColumnsMapping;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
+import org.nkjmlab.sorm4j.internal.mapping.result.ResultsToContainerMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public final class SormContextImpl implements SormContext {
@@ -37,9 +37,9 @@ public final class SormContextImpl implements SormContext {
   private final ConcurrentMap<String, TableSql> tableSqlMap;
   private final ConcurrentMap<Class<?>, TableName> classNameToValidTableNameMap;
   private final ConcurrentMap<String, TableName> tableNameToValidTableNameMap;
-  private final ConcurrentMap<Class<?>, Map<String, SqlParametersToTableMapping<?>>>
+  private final ConcurrentMap<Class<?>, Map<String, ContainerToTableMapper<?>>>
       sqlParametersToTableMappings;
-  private final ConcurrentMap<Class<?>, SqlResultToColumnsMapping<?>> sqlResultToColumnsMappings;
+  private final ConcurrentMap<Class<?>, ResultsToContainerMapper<?>> sqlResultToColumnsMappings;
   private final SormConfig config;
 
   SormContextImpl(SormConfig sormConfig) {
@@ -113,7 +113,7 @@ public final class SormContextImpl implements SormContext {
         });
   }
 
-  <T> SqlParametersToTableMapping<T> getTableMapping(Connection connection, Class<T> objectClass) {
+  <T> ContainerToTableMapper<T> getTableMapping(Connection connection, Class<T> objectClass) {
     return getTableMapping(connection, toTableName(connection, objectClass), objectClass);
   }
 
@@ -121,23 +121,23 @@ public final class SormContextImpl implements SormContext {
    * Get table mapping by the table name and the object class. When there is no mapping, the method
    * create a mapping and register it.
    */
-  <T> SqlParametersToTableMapping<T> getTableMapping(
+  <T> ContainerToTableMapper<T> getTableMapping(
       Connection connection, String tableName, Class<T> objectClass) {
     return getTableMapping(connection, toTableName(connection, tableName), objectClass);
   }
 
   @SuppressWarnings("unchecked")
-  <T> SqlParametersToTableMapping<T> getTableMapping(
+  <T> ContainerToTableMapper<T> getTableMapping(
       Connection connection, TableName tableName, Class<T> objectClass) {
-    SqlParametersToTableMapping<T> ret =
-        (SqlParametersToTableMapping<T>)
+    ContainerToTableMapper<T> ret =
+        (ContainerToTableMapper<T>)
             sqlParametersToTableMappings
                 .computeIfAbsent(objectClass, _k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(
                     tableName.getName(),
                     _k -> {
                       try {
-                        SqlParametersToTableMapping<T> m =
+                        ContainerToTableMapper<T> m =
                             createTableMapping(objectClass, tableName.getName(), connection);
                         config
                             .getLoggerContext()
@@ -151,7 +151,7 @@ public final class SormContextImpl implements SormContext {
     return ret;
   }
 
-  <T> SqlResultToColumnsMapping<T> createColumnsMapping(Class<T> objectClass) {
+  <T> ResultsToContainerMapper<T> createColumnsMapping(Class<T> objectClass) {
 
     ColumnToAccessorMapping columnToAccessorMap =
         new ColumnToAccessorMapping(
@@ -159,11 +159,11 @@ public final class SormContextImpl implements SormContext {
             config.getColumnToFieldAccessorMapper().createMapping(objectClass),
             config.getColumnToFieldAccessorMapper().getColumnAliasPrefix(objectClass));
 
-    return new SqlResultToColumnsMapping<>(
+    return new ResultsToContainerMapper<>(
         config.getColumnValueToJavaObjectConverter(), objectClass, columnToAccessorMap);
   }
 
-  <T> SqlParametersToTableMapping<T> createTableMapping(
+  <T> ContainerToTableMapper<T> createTableMapping(
       Class<T> objectClass, String tableName, Connection connection) throws SQLException {
 
     ColumnToAccessorMapping columnToAccessorMap =
@@ -178,7 +178,7 @@ public final class SormContextImpl implements SormContext {
 
     // validate(objectClass, tableMetaData, columnToAccessorMap.keySet());
 
-    return new SqlParametersToTableMapping<>(
+    return new ContainerToTableMapper<>(
         config.getLoggerContext(),
         config.getColumnValueToJavaObjectConverter(),
         config.getSqlParametersSetter(),
@@ -223,25 +223,25 @@ public final class SormContextImpl implements SormContext {
   }
 
   @SuppressWarnings("unchecked")
-  <T> SqlParametersToTableMapping<T> getCastedTableMapping(
+  <T> ContainerToTableMapper<T> getCastedTableMapping(
       Connection connection, Class<?> objectClass) {
-    return (SqlParametersToTableMapping<T>) getTableMapping(connection, objectClass);
+    return (ContainerToTableMapper<T>) getTableMapping(connection, objectClass);
   }
 
   @SuppressWarnings("unchecked")
-  <T> SqlParametersToTableMapping<T> getCastedTableMapping(
+  <T> ContainerToTableMapper<T> getCastedTableMapping(
       Connection connection, String tableName, Class<?> objectClass) {
-    return (SqlParametersToTableMapping<T>) getTableMapping(connection, tableName, objectClass);
+    return (ContainerToTableMapper<T>) getTableMapping(connection, tableName, objectClass);
   }
 
-  <T> SqlResultToColumnsMapping<T> getColumnsMapping(Class<T> objectClass) {
+  <T> ResultsToContainerMapper<T> getColumnsMapping(Class<T> objectClass) {
     @SuppressWarnings("unchecked")
-    SqlResultToColumnsMapping<T> ret =
-        (SqlResultToColumnsMapping<T>)
+    ResultsToContainerMapper<T> ret =
+        (ResultsToContainerMapper<T>)
             sqlResultToColumnsMappings.computeIfAbsent(
                 objectClass,
                 _k -> {
-                  SqlResultToColumnsMapping<T> m = createColumnsMapping(objectClass);
+                  ResultsToContainerMapper<T> m = createColumnsMapping(objectClass);
                   config
                       .getLoggerContext()
                       .createLogPoint(LogContext.Category.MAPPING_TO_COLUMNS, SormContext.class)
@@ -352,7 +352,7 @@ public final class SormContextImpl implements SormContext {
   }
 
   private String convertNestedMapToString(
-      Map<Class<?>, Map<String, SqlParametersToTableMapping<?>>> sqlParametersToTableMappings) {
+      Map<Class<?>, Map<String, ContainerToTableMapper<?>>> sqlParametersToTableMappings) {
     return sqlParametersToTableMappings.entrySet().stream()
         .map(
             entry -> {

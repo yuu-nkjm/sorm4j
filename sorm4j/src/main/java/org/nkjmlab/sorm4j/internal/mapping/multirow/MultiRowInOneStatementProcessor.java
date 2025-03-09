@@ -8,7 +8,7 @@ import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
@@ -22,7 +22,7 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessorB
       LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping,
+      ContainerToTableMapper<T> tableMapping,
       int batchSize,
       int multiRowSize) {
     super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);

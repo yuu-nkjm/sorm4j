@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.container.RowMap;
-import org.nkjmlab.sorm4j.internal.container.TableSql;
+import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableSqlFactory.UpdateSqlFactory;
 import org.nkjmlab.sorm4j.internal.util.ConcurrentCache;

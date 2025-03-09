@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.mapping;
+package org.nkjmlab.sorm4j.internal.mapping.result;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -14,15 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 
-final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContainerMapping<T> {
+final class ResultsContainerWithSetterFactory<T>
+    implements ResultsContainerFactory<T> {
   // 2021-03-26 Effectiveness of this cache is confirmed by JMH.
   // https://github.com/yuu-nkjm/sorm4j/issues/26
   private final Map<List<String>, Class<?>[]> setterTypesMap = new ConcurrentHashMap<>();
+  private final Constructor<T> constructor;
+  private final ColumnToAccessorMapping columnToAccessorMap;
 
-  public SqlResultToContainerMappingWithSetter(
+  public ResultsContainerWithSetterFactory(
       ColumnToAccessorMapping columnToAccessorMap, Constructor<T> constructor) {
-    super(columnToAccessorMap, constructor);
+    this.columnToAccessorMap = columnToAccessorMap;
+    this.constructor = constructor;
   }
 
   private Class<?>[] getSetterTypes(String[] columns) {
@@ -39,7 +44,7 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
   }
 
   @Override
-  T loadContainerObject(
+  public T createContainer(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
       ColumnsAndTypes columnsAndTypes)
@@ -49,7 +54,7 @@ final class SqlResultToContainerMappingWithSetter<T> extends SqlResultToContaine
   }
 
   @Override
-  public List<T> loadContainerObjectList(
+  public List<T> createContainerList(
       ColumnValueToJavaObjectConverters columnValueConverter,
       ResultSet resultSet,
       ColumnsAndTypes columnsAndTypes)

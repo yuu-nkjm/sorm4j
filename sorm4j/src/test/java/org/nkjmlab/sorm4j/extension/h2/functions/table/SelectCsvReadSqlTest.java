@@ -21,7 +21,6 @@ import org.nkjmlab.sorm4j.extension.h2.sql.statement.InsertSelectCsvReadSql;
 import org.nkjmlab.sorm4j.extension.h2.sql.statement.SelectCsvReadSql;
 import org.nkjmlab.sorm4j.extension.h2.sql.statement.annotation.CsvColumn;
 import org.nkjmlab.sorm4j.extension.h2.sql.statement.annotation.SkipCsvRead;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatible;
 
 @SuppressWarnings("deprecation")
 class SelectCsvReadSqlTest {
@@ -142,7 +141,7 @@ class SelectCsvReadSqlTest {
                 + "', null, stringdecode('charset=UTF-8 fieldSeparator=\\t'))");
   }
 
-  @OrmRecordCompatible
+   
   public static class Item {
     @CsvColumn("parsedatetime(delivery_date, 'y/MM/d')")
     public LocalDate deliveryDate;
@@ -151,7 +150,7 @@ class SelectCsvReadSqlTest {
     public int price;
   }
 
-  @OrmRecordCompatible
+   
   public static class OrmRecordExample {
     private final int id;
     private final String name;

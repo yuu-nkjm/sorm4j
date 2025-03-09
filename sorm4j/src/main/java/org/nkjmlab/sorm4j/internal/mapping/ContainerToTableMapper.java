@@ -14,10 +14,10 @@ import java.util.function.Function;
 
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.container.RowMap;
+import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.container.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
-import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.container.sql.metadata.TableMetaData;
 import org.nkjmlab.sorm4j.internal.container.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.container.sql.result.InsertResultImpl;
@@ -31,7 +31,7 @@ import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 /** Holds mapping data from a given class and a table */
-public final class SqlParametersToTableMapping<T> {
+public final class ContainerToTableMapper<T> {
 
   private final Class<T> objectClass;
   private final ColumnValueToJavaObjectConverters columnValueConverter;
@@ -44,7 +44,7 @@ public final class SqlParametersToTableMapping<T> {
   private final TableSql sql;
   private final LogContext loggerContext;
 
-  public SqlParametersToTableMapping(
+  public ContainerToTableMapper(
       LogContext loggerContext,
       ColumnValueToJavaObjectConverters columnValueConverter,
       SqlParametersSetter sqlParametersSetter,
@@ -147,7 +147,7 @@ public final class SqlParametersToTableMapping<T> {
 
       Optional<LogPoint> lp =
           loggerContext.createLogPoint(
-              LogContext.Category.EXECUTE_UPDATE, SqlParametersToTableMapping.class);
+              LogContext.Category.EXECUTE_UPDATE, ContainerToTableMapper.class);
       lp.ifPresent(_lp -> _lp.logBeforeSql(connection, insertSql, parameters));
 
       int rowsModified = stmt.executeUpdate();

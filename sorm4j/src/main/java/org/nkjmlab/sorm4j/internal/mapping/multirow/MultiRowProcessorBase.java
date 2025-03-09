@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.nkjmlab.sorm4j.container.sql.TableSql;
 import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.container.TableSql;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
 public abstract class MultiRowProcessorBase<T> implements MultiRowProcessor<T> {
@@ -21,14 +21,14 @@ public abstract class MultiRowProcessorBase<T> implements MultiRowProcessor<T> {
   private final int batchSize;
   private final PreparedStatementSupplier statementSupplier;
   private final SqlParametersSetter sqlParametersSetter;
-  private final SqlParametersToTableMapping<T> tableMapping;
+  private final ContainerToTableMapper<T> tableMapping;
   private final LogContext loggerContext;
 
   MultiRowProcessorBase(
       LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping,
+      ContainerToTableMapper<T> tableMapping,
       int batchSize) {
     this.loggerContext = loggerContext;
     this.statementSupplier = statementSupplier;

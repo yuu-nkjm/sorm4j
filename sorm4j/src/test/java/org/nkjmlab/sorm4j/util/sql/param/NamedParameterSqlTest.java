@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.container.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.test.common.Customer;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.util.sql.binding.NamedParameterSqlParser;
 
@@ -42,7 +41,7 @@ class NamedParameterSqlTest {
           NamedParameterSqlParser.parse(
               "select * from guests where name like {:name} and address in(<:address>) and id=:id",
               Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
-      sorm.applyHandler(conn -> conn.readList(Customer.class, statement));
+      sorm.applyHandler(conn -> conn.readList(Guest.class, statement));
     }
   }
 
