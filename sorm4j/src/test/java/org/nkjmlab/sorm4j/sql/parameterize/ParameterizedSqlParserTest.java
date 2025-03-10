@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlFactory;
 import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 class ParameterizedSqlParserTest {
@@ -74,6 +72,6 @@ class ParameterizedSqlParserTest {
 
     String sql = "select * from guest where name={:name} and id={:id}";
     ParameterizedSql p = ParameterizedSqlFactory.create(sql, Map.of("name", 1));
-    assertThat(p.getSql()).doesNotContain("{:name}").contains("{:id}");
+    assertThat(p.getSql()).doesNotContain("{:name}").doesNotContain("{:id}");
   }
 }

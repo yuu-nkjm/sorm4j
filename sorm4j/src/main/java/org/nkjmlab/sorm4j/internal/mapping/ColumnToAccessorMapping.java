@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
+import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 
 public final class ColumnToAccessorMapping {
 
-  private final Map<String, FieldAccessor> columnToAccessorMap;
-  private final Map<String, FieldAccessor> aliasColumnToAccessorMap;
+  private final Map<String, ContainerAccessor> columnToAccessorMap;
+  private final Map<String, ContainerAccessor> aliasColumnToAccessorMap;
   private final String columnAliasPrefix;
 
   /**
@@ -26,7 +26,7 @@ public final class ColumnToAccessorMapping {
    */
   public ColumnToAccessorMapping(
       Class<?> objectClass,
-      Map<String, FieldAccessor> columnToAccessorMap,
+      Map<String, ContainerAccessor> columnToAccessorMap,
       String columnAliasPrefix) {
     this.columnToAccessorMap =
         columnToAccessorMap.entrySet().stream()
@@ -48,9 +48,9 @@ public final class ColumnToAccessorMapping {
    * @param columnName
    * @return
    */
-  public FieldAccessor get(String columnName) {
+  public ContainerAccessor get(String columnName) {
     String cn = SormContext.getDefaultCanonicalStringCache().toCanonicalName(columnName);
-    FieldAccessor ret = columnToAccessorMap.get(cn);
+    ContainerAccessor ret = columnToAccessorMap.get(cn);
     return ret != null ? ret : aliasColumnToAccessorMap.get(cn);
   }
 
@@ -94,7 +94,7 @@ public final class ColumnToAccessorMapping {
   }
 
   public final void setValue(Object object, String columnName, Object value) {
-    final FieldAccessor acc = get(columnName);
+    final ContainerAccessor acc = get(columnName);
     if (acc == null) {
       Object[] params = {
         value,
@@ -127,8 +127,8 @@ public final class ColumnToAccessorMapping {
     }
   }
 
-  private final FieldAccessor getAccessor(Object object, String columnName) {
-    final FieldAccessor acc = get(columnName);
+  private final ContainerAccessor getAccessor(Object object, String columnName) {
+    final ContainerAccessor acc = get(columnName);
     if (acc == null) {
       Object[] params = {object.getClass(), columnName, this};
       throw new SormException(
@@ -140,7 +140,7 @@ public final class ColumnToAccessorMapping {
   }
 
   public final Object getValue(Object object, String columnName) {
-    FieldAccessor acc = getAccessor(object, columnName);
+    ContainerAccessor acc = getAccessor(object, columnName);
     try {
       return acc.get(object);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -162,13 +162,13 @@ public final class ColumnToAccessorMapping {
     return columnToAccessorMap.keySet();
   }
 
-  private Map<String, FieldAccessor> createAliasAccessors(
-      String prefix, Map<String, FieldAccessor> accessors) {
+  private Map<String, ContainerAccessor> createAliasAccessors(
+      String prefix, Map<String, ContainerAccessor> accessors) {
     if (prefix.length() == 0) {
       return Collections.emptyMap();
     }
 
-    Map<String, FieldAccessor> ret = new HashMap<>();
+    Map<String, ContainerAccessor> ret = new HashMap<>();
 
     for (String key : accessors.keySet()) {
       String aKey = SormContext.getDefaultCanonicalStringCache().toCanonicalNameWithTableName(prefix, key);

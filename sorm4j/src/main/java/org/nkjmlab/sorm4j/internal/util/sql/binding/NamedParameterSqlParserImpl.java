@@ -1,16 +1,17 @@
 package org.nkjmlab.sorm4j.internal.util.sql.binding;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
 import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
@@ -24,36 +25,29 @@ import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
  */
 public final class NamedParameterSqlParserImpl implements NamedParameterSqlFactory {
 
-  private static final Map<Class<?>, Map<String, FieldAccessor>> nameToFieldMaps =
+  private static final Map<Class<?>, Map<String, ContainerAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
 
   private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
-  private static final Character DEFAULT_PREFIX = ':';
-  private static final Character DEFAULT_SUFFIX = null;
+  private static final String DEFAULT_NAMED_PARAMETER_PREFIX = ":";
 
   private final String sql;
-  private final Character prefix;
-  private final Character suffix;
+  private final Pattern pattern;
   private final ColumnToFieldAccessorMapper nameToFieldMapper;
-  private final Map<String, Object> parameters;
+  private final RowMap parameters;
   private Object parametersContainer;
 
-  public NamedParameterSqlParserImpl(
-      String sql,
-      Character prefix,
-      Character suffix,
-      ColumnToFieldAccessorMapper nameToFieldMapper) {
+  public NamedParameterSqlParserImpl(String sql, ColumnToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
-    this.prefix = prefix;
-    this.suffix = suffix;
     this.nameToFieldMapper = nameToFieldMapper;
-    this.parameters = new HashMap<>();
+    this.parameters = RowMap.of();
+    this.pattern = Pattern.compile(DEFAULT_NAMED_PARAMETER_PREFIX + "([a-zA-Z0-9_]+)");
   }
 
   public NamedParameterSqlParserImpl(String sql) {
-    this(sql, DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_COLUMN_FIELD_MAPPER);
+    this(sql, DEFAULT_COLUMN_FIELD_MAPPER);
   }
 
   @Override
@@ -76,70 +70,48 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlFacto
 
   @Override
   public ParameterizedSql create() {
-    // Ordered by position in the sentence
-    TreeMap<Integer, Object> orderdParams = new TreeMap<>();
-    String resultSql = this.sql;
+    List<Object> orderedParams = extractParameterNames(sql).stream().map(e -> getParam(e)).toList();
+    return ParameterizedSqlImpl.of(
+        replaceNamedParameterToPlaceholder(sql), orderedParams.toArray());
+  }
 
-    List<String> parameterNameList = createParameters();
-
-    for (String parameterName : parameterNameList) {
-      String namedPlaceholder = prefix + parameterName + (suffix != null ? suffix : "");
-      int pos = resultSql.indexOf(namedPlaceholder);
-      if (pos == -1) {
-        continue;
-      }
-      if (parametersContainer != null) {
-        FieldAccessor acc = getAccessor(parameterName);
-        if (acc != null) {
-          orderdParams.put(pos, Try.getOrElseNull(() -> acc.get(parametersContainer)));
-        }
-        if (parameters.containsKey(parameterName)) {
-          orderdParams.put(pos, parameters.get(parameterName));
-        }
-        if (acc != null || parameters.containsKey(parameterName)) {
-          resultSql = resultSql.replace(namedPlaceholder, "?");
-        }
-      } else {
-        if (parameters.containsKey(parameterName)) {
-          orderdParams.put(pos, parameters.get(parameterName));
-          resultSql = resultSql.replace(namedPlaceholder, "?");
-        }
+  private Object getParam(String parameterName) {
+    if (parametersContainer != null) {
+      ContainerAccessor acc = getAccessor(parametersContainer, parameterName);
+      if (acc != null) {
+        return Try.getOrElseNull(() -> acc.get(parametersContainer));
       }
     }
-    return ParameterizedSqlImpl.of(resultSql, orderdParams.values().toArray());
+    return parameters.get(parameterName);
   }
 
-  private List<String> createParameters() {
-    final char[] arry = sql.toCharArray();
-    final List<String> ret = new ArrayList<>();
-
-    int i = 0;
-    while (i < arry.length) {
-      if (arry[i] == prefix) {
-        int j = i + 1;
-        for (; j < arry.length; j++) {
-          char c = arry[j];
-          if (!isNamedParameterElement(c) || c == suffix) {
-            break;
-          }
-        }
-        ret.add(sql.substring(i + 1, j));
-        i = j + 1;
-      } else {
-        i++;
-      }
-    }
-    return ret;
-  }
-
-  private boolean isNamedParameterElement(char c) {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_';
-  }
-
-  private FieldAccessor getAccessor(String parameterName) {
+  private ContainerAccessor getAccessor(Object parametersContainer, String parameterName) {
     final Class<?> objectClass = parametersContainer.getClass();
     return nameToFieldMaps
         .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
         .get(SormContext.getDefaultCanonicalStringCache().toCanonicalName(parameterName));
+  }
+
+  private List<String> extractParameterNames(String sql) {
+    List<String> parameterNames = new ArrayList<>();
+    Matcher matcher = pattern.matcher(sql);
+
+    while (matcher.find()) {
+      parameterNames.add(matcher.group(1));
+    }
+    return parameterNames;
+  }
+
+  private String replaceNamedParameterToPlaceholder(String sql) {
+
+    Matcher matcher = pattern.matcher(sql);
+    StringBuffer replacedSql = new StringBuffer();
+
+    while (matcher.find()) {
+      matcher.appendReplacement(replacedSql, "?");
+    }
+    matcher.appendTail(replacedSql);
+
+    return replacedSql.toString();
   }
 }

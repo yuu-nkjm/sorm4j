@@ -137,5 +137,5 @@ class RowMapTest {
     assertThrows(RuntimeException.class, () -> rowMap.toRecord(TestRecord.class));
   }
 
-  record TestRecord(LocalDate date, LocalDateTime dateTime, LocalTime time) {}
+  public record TestRecord(LocalDate date, LocalDateTime dateTime, LocalTime time) {}
 }

@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
@@ -33,39 +35,59 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
       Set.of("NOTIFY", "NOTIFYALL", "WAIT", "TOSTRING", "HASHCODE");
 
   @Override
-  public Map<String, FieldAccessor> createMapping(Class<?> objectClass) {
+  public Map<String, ContainerAccessor> createMapping(Class<?> objectClass) {
     Set<String> acceptableColumnNames = createAcceptableColumnNames(objectClass);
     Map<String, Field> fields = getAllFields(objectClass);
     Map<String, Method> getters = getAllGetters(objectClass);
-    Map<String, Method> allMethods = getAllMethods(objectClass);
+    Map<String, Method> recordAccessors = getAllRecordAccessors(objectClass);
     Map<String, Method> setters = getAllSetters(objectClass);
     Map<String, Field> annotatedFields = getAnnotatedFieldsMap(objectClass);
     Map<String, Method> annotatedGetters = getAnnotatedGettersMap(objectClass);
     Map<String, Method> annotatedSetters = getAnnotatatedSettersMap(objectClass);
 
-    Map<String, FieldAccessor> ret = new HashMap<>();
+    Map<String, ContainerAccessor> ret = new HashMap<>();
     for (String acceptableColName : acceptableColumnNames) {
-      Field f =
-          nonNull(annotatedFields.get(acceptableColName))
-              ? annotatedFields.get(acceptableColName)
-              : fields.get(acceptableColName);
-      Method g =
-          nonNull(annotatedGetters.get(acceptableColName))
-              ? annotatedGetters.get(acceptableColName)
-              : nonNull(getters.get(acceptableColName))
-                  ? getters.get(acceptableColName)
-                  : allMethods.get(acceptableColName);
-      Method s =
-          nonNull(annotatedSetters.get(acceptableColName))
-              ? annotatedSetters.get(acceptableColName)
-              : setters.get(acceptableColName);
+      Field f = procField(annotatedFields, fields, acceptableColName);
+      Method g = procGetter(annotatedGetters, recordAccessors, getters, acceptableColName);
+      Method s = procSetter(annotatedSetters, setters, acceptableColName);
 
       if (f == null && (g == null && s == null)) {
       } else {
-        ret.put(acceptableColName, new FieldAccessor(acceptableColName, f, g, s));
+        ret.put(acceptableColName, new ContainerAccessor(acceptableColName, f, g, s));
       }
     }
     return ret;
+  }
+
+  private Field procField(
+      Map<String, Field> annotatedFields, Map<String, Field> fields, String acceptableColName) {
+    return Stream.of(annotatedFields.get(acceptableColName), fields.get(acceptableColName))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private Method procGetter(
+      Map<String, Method> annotatedGetters,
+      Map<String, Method> recordAccessors,
+      Map<String, Method> getters,
+      String acceptableColName) {
+
+    return Stream.of(
+            annotatedGetters.get(acceptableColName),
+            recordAccessors.get(acceptableColName),
+            getters.get(acceptableColName))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private Method procSetter(
+      Map<String, Method> annotatedSetters, Map<String, Method> setters, String acceptableColName) {
+    return Stream.of(annotatedSetters.get(acceptableColName), setters.get(acceptableColName))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
   }
 
   private Map<String, Method> extractedMethodStartWith(Class<?> objectClass, String prefix) {
@@ -103,10 +125,12 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
-  private Map<String, Method> getAllMethods(Class<?> objectClass) {
-    return extractedMethodStartWith(objectClass, "").entrySet().stream()
-        .filter(e -> !e.getKey().startsWith("GET") && nonNull(isValidGetter(e.getValue())))
-        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+  private Map<String, Method> getAllRecordAccessors(Class<?> objectClass) {
+    if (!objectClass.isRecord()) {
+      return Collections.emptyMap();
+    }
+    return Arrays.stream(objectClass.getRecordComponents())
+        .collect(Collectors.toMap(e -> e.getName(), e -> e.getAccessor()));
   }
 
   private Map<String, Method> getAllSetters(Class<?> objectClass) {
@@ -169,7 +193,7 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
     acceptableColumnNames.addAll(getAllFields(objectClass).keySet());
     acceptableColumnNames.addAll(getAllGetters(objectClass).keySet());
     acceptableColumnNames.addAll(getAllSetters(objectClass).keySet());
-    acceptableColumnNames.addAll(getAllMethods(objectClass).keySet());
+    acceptableColumnNames.addAll(getAllRecordAccessors(objectClass).keySet());
     acceptableColumnNames.addAll(getAnnotatedFieldsMap(objectClass).keySet());
     acceptableColumnNames.addAll(getAnnotatedGettersMap(objectClass).keySet());
     acceptableColumnNames.addAll(getAnnotatatedSettersMap(objectClass).keySet());

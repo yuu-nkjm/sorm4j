@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.exception.SormException;
-import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
+import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 
 class FieldAccessorTest {
 
   @Test
   void testAccessor() {
-    FieldAccessor ac = new FieldAccessor(null, null, null, null);
+    ContainerAccessor ac = new ContainerAccessor(null, null, null, null);
     assertThatThrownBy(() -> ac.get("foo"))
         .isInstanceOfSatisfying(
             SormException.class,

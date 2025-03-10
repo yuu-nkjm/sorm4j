@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.internal.context;
 
 import java.util.Map;
 
-import org.nkjmlab.sorm4j.internal.context.impl.FieldAccessor;
+import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
 
 /**
@@ -13,12 +13,12 @@ import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
 public interface ColumnToFieldAccessorMapper {
 
   /**
-   * Creates mapping between name and {@link FieldAccessor}
+   * Creates mapping between name and {@link ContainerAccessor}
    *
    * @param objectClass
    * @return Keys in map is written in the canonical case.
    */
-  Map<String, FieldAccessor> createMapping(Class<?> objectClass);
+  Map<String, ContainerAccessor> createMapping(Class<?> objectClass);
 
   /**
    * Gets column alias prefix based on {@link OrmColumnAliasPrefix} annotation or the given object

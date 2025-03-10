@@ -28,7 +28,6 @@ import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
 import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlFactory;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
@@ -193,11 +192,7 @@ class OrmConnectionImplTest {
         orm.applyHandler(
             conn -> {
               NamedParameterSqlFactory sql =
-                  NamedParameterSqlFactory.of(
-                      "insert into players values(`id`, `name`, `address`)",
-                      '`',
-                      '`',
-                      new DefaultColumnToFieldAccessorMapper());
+                  NamedParameterSqlFactory.of("insert into players values(:id, :name, :address)");
               sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
               return conn.executeUpdate(sql.create());
             });
