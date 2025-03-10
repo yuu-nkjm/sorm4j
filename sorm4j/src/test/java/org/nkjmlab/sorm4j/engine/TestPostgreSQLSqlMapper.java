@@ -40,8 +40,8 @@ import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlBuilder;
 import org.postgresql.util.PGobject;
 
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -313,7 +313,7 @@ public class TestPostgreSQLSqlMapper {
     String messagePrefix = "bindIn: " + column + "(" + param.getClass() + ") ";
     try {
       ParameterizedSql statement =
-          OrderedParameterSqlBuilder.builder(
+          ParameterizedSqlBuilder.orderedParameterBuilder(
                   "SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
               .addParameter(param)
               .build();

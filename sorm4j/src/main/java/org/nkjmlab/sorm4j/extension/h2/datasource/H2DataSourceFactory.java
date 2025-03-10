@@ -10,7 +10,6 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
 
@@ -24,7 +23,6 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  *
  * @author nkjm
  */
-@Experimental
 public class H2DataSourceFactory {
 
   private final File databaseDirectory;

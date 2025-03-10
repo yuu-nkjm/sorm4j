@@ -73,7 +73,7 @@ class NamedParameterSqlTest {
   void testBind() {
 
     ParameterizedSql sp =
-        NamedParameterSqlBuilder.builder(sql)
+        ParameterizedSqlBuilder.namedParameterBuilder(sql)
             .bindParameter("name", "foo")
             .bindParameter("id", 1)
             .bindParameter("idid", 2)

@@ -9,8 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.h2.store.fs.FileUtils;
@@ -166,7 +164,7 @@ public class H2Csv {
 
   /** See {@link Csv#read(Reader, String[])}. */
   public List<RowMap> readCsvReplacedHeader(Sorm sorm, Reader in, String[] colNames) {
-    try (ResultSet rs = csv.read(new HeaderSkippingReader(in), colNames)) {
+    try (ResultSet rs = csv.read(toHeaderSkippingReader(in), colNames)) {
       return traverseAndMap(sorm, rs);
     } catch (IOException | SQLException e) {
       throw Try.rethrow(e);
@@ -283,52 +281,11 @@ public class H2Csv {
     }
   }
 
-  public static class HeaderSkippingReader extends Reader {
-    private final BufferedReader reader;
-    private final List<String> columns;
-    private static final int bs = 8192;
-
-    private HeaderSkippingReader(Reader input) throws IOException {
-      this.reader = new BufferedReader(input, bs);
-      String firstLine = reader.readLine();
-      if (firstLine == null) {
-        columns = Collections.emptyList();
-      } else {
-        if (firstLine.startsWith("\uFEFF")) {
-          firstLine = firstLine.substring(1);
-        }
-        this.columns = Arrays.asList(firstLine.split(","));
-      }
-      reader.mark(bs);
-    }
-
-    @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
-      return reader.read(cbuf, off, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-      reader.close();
-    }
-
-    @Override
-    public void mark(int readAheadLimit) throws IOException {
-      reader.mark(readAheadLimit);
-    }
-
-    @Override
-    public void reset() throws IOException {
-      reader.reset();
-    }
-
-    @Override
-    public boolean markSupported() {
-      return reader.markSupported();
-    }
-
-    public List<String> getColumns() {
-      return columns;
-    }
+  private static Reader toHeaderSkippingReader(Reader input) throws IOException {
+    final int bs = 8192;
+    BufferedReader reader = new BufferedReader(input, bs);
+    reader.readLine();
+    reader.mark(bs);
+    return reader;
   }
 }
