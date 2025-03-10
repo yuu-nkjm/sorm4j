@@ -28,8 +28,8 @@ import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
 import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
-import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlBuilder;
+import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.test.common.Guest;
@@ -191,10 +191,11 @@ class OrmConnectionImplTest {
     int row =
         orm.applyHandler(
             conn -> {
-              NamedParameterSqlFactory sql =
-                  NamedParameterSqlFactory.of("insert into players values(:id, :name, :address)");
-              sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
-              return conn.executeUpdate(sql.create());
+              NamedParameterSqlBuilder sql =
+                  NamedParameterSqlBuilder.builder(
+                      "insert into players values(:id, :name, :address)");
+              sql.bindParameter("id", id.incrementAndGet()).bindParameter("name", "Frank").bindParameter("address", "Tokyo");
+              return conn.executeUpdate(sql.build());
             });
     assertThat(row).isEqualTo(1);
   }
@@ -397,7 +398,9 @@ class OrmConnectionImplTest {
           m.insert(PLAYER_ALICE);
           assertThat(m.executeUpdate("delete from players")).isEqualTo(1);
           m.insert(PLAYER_ALICE, PLAYER_BOB);
-          assertThat(m.executeUpdate(ParameterizedSql.of("delete from players", new Object[0])))
+          assertThat(
+                  m.executeUpdate(
+                      ParameterizedSql.withOrderedParameters("delete from players", new Object[0])))
               .isEqualTo(2);
           ;
         });
@@ -515,7 +518,9 @@ class OrmConnectionImplTest {
           assertThat(
                   m.readOne(
                       Player.class,
-                      OrderedParameterSqlFactory.create("select * from players where id=?", 1)))
+                      OrderedParameterSqlBuilder.builder("select * from players where id=?")
+                          .addParameter(1)
+                          .build()))
               .isEqualTo(a);
           assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
         });
@@ -533,7 +538,7 @@ class OrmConnectionImplTest {
             Guest g =
                 m.readOne(
                     Guest.class,
-                    OrderedParameterSqlFactory.create("select * from guests where id=?", 1));
+                    ParameterizedSql.withOrderedParameters("select * from guests where id=?", 1));
             assertThat(g.getAddress()).isEqualTo(a.getAddress());
             assertThat(g.getName()).isEqualTo(a.getName());
             g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));

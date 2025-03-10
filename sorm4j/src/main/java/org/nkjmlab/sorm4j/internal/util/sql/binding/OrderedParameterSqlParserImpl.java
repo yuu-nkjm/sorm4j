@@ -5,15 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
-import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 /**
- * An implementation of {@link OrderedParameterSqlFactory}
+ * An implementation of {@link OrderedParameterSqlBuilder}
  *
  * @author nkjm
  */
-public final class OrderedParameterSqlParserImpl implements OrderedParameterSqlFactory {
+public final class OrderedParameterSqlParserImpl implements OrderedParameterSqlBuilder {
 
   private final String sql;
   private final List<Object> parameters = new ArrayList<>();
@@ -23,19 +23,19 @@ public final class OrderedParameterSqlParserImpl implements OrderedParameterSqlF
   }
 
   @Override
-  public OrderedParameterSqlFactory addParameters(Object... parameters) {
+  public OrderedParameterSqlBuilder addParameters(Object... parameters) {
     this.parameters.addAll(Arrays.asList(parameters));
     return this;
   }
 
   @Override
-  public OrderedParameterSqlFactory addParameter(Object parameter) {
+  public OrderedParameterSqlBuilder addParameter(Object parameter) {
     this.parameters.add(parameter);
     return this;
   }
 
   @Override
-  public ParameterizedSql create() {
+  public ParameterizedSql build() {
     return ParameterizedSqlImpl.of(sql, parameters.toArray());
   }
 }

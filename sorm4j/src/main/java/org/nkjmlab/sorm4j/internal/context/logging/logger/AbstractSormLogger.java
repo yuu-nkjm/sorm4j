@@ -9,13 +9,12 @@ import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlFactory;
 
 public abstract class AbstractSormLogger implements SormLogger {
 
   @Override
   public void logBeforeSql(String tag, Connection connection, String sql, Object... parameters) {
-    logBeforeSql(tag, connection, ParameterizedSqlFactory.create(sql, parameters));
+    logBeforeSql(tag, connection, ParameterizedSql.withOrderedParameters(sql, parameters));
   }
 
   @Override

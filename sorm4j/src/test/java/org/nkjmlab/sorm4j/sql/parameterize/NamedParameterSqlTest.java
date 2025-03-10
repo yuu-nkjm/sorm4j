@@ -14,8 +14,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.exception.SormException;
-import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.Guest;
 
 class NamedParameterSqlTest {
@@ -33,21 +31,24 @@ class NamedParameterSqlTest {
     {
       String sql = "select * from guests where id=:id and address=:address";
       ParameterizedSql statement =
-          NamedParameterSqlFactory.of(sql).bind("id", 1).bind("address", "Kyoto").create();
+          NamedParameterSqlBuilder.builder(sql)
+              .bindParameter("id", 1)
+              .bindParameter("address", "Kyoto")
+              .build();
       sorm.readList(Guest.class, statement);
     }
     {
       ParameterizedSql statement =
-          NamedParameterSqlFactory.create(
-              "select * from guests where name like {:name} and address in(<:address>) and id=:id",
-              Map.of("id", 1, "address", List.of("Tokyo", "Kyoto"), "name", "'A%'"));
+          ParameterizedSql.withNamedParameters(
+              "select * from guests where address in(<:address>) and id=:id",
+              Map.of("id", 1, "address", List.of("Tokyo", "Kyoto")));
       sorm.applyHandler(conn -> conn.readList(Guest.class, statement));
     }
   }
 
   @Test
-  void testCreate() {
-    ParameterizedSql sp = NamedParameterSqlFactory.create(sql, namedParams);
+  void testbuild() {
+    ParameterizedSql sp = ParameterizedSql.withNamedParameters(sql, namedParams);
 
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
@@ -62,7 +63,7 @@ class NamedParameterSqlTest {
 
   @Test
   void testBindAll() {
-    ParameterizedSql sp = NamedParameterSqlFactory.of(sql).bind(namedParams).create();
+    ParameterizedSql sp = NamedParameterSqlBuilder.builder(sql).bindParameters(namedParams).build();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
     org.assertj.core.api.Assertions.assertThat(sp.getParameters())
         .isEqualTo(new Object[] {2, "foo"});
@@ -72,7 +73,11 @@ class NamedParameterSqlTest {
   void testBind() {
 
     ParameterizedSql sp =
-        NamedParameterSqlFactory.of(sql).bind("name", "foo").bind("id", 1).bind("idid", 2).create();
+        NamedParameterSqlBuilder.builder(sql)
+            .bindParameter("name", "foo")
+            .bindParameter("id", 1)
+            .bindParameter("idid", 2)
+            .build();
     assertThat(sp.getSql()).isEqualTo("select * from simple where id=? and name=?");
 
     assertThat(sp.getParameters()).isEqualTo(new Object[] {2, "foo"});
@@ -82,9 +87,9 @@ class NamedParameterSqlTest {
   void testBindList() {
 
     ParameterizedSql sp =
-        NamedParameterSqlFactory.of("select * from where ID in(<:player_names_1>)")
-            .bind("player_names_1", List.of("foo", "bar"))
-            .create();
+        NamedParameterSqlBuilder.builder("select * from where ID in(<:player_names_1>)")
+            .bindParameter("player_names_1", List.of("foo", "bar"))
+            .build();
 
     assertThat(sp.getSql()).contains("?,?");
     assertThat(sp.getParameters()[0]).isEqualTo("foo");
@@ -95,9 +100,9 @@ class NamedParameterSqlTest {
   void testBindListFail() {
     assertThatThrownBy(
             () ->
-                NamedParameterSqlFactory.of("select * from where ID in(<:names>)")
-                    .bind("names", "foo")
-                    .create())
+                NamedParameterSqlBuilder.builder("select * from where ID in(<:names>)")
+                    .bindParameter("names", "foo")
+                    .build())
         .isInstanceOfSatisfying(
             SormException.class,
             e ->

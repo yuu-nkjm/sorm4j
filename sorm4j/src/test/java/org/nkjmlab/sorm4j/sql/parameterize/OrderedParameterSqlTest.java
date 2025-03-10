@@ -12,8 +12,6 @@ import java.util.List;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlFactory;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 class OrderedParameterSqlTest {
   private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
@@ -25,12 +23,10 @@ class OrderedParameterSqlTest {
   @Test
   void testParse() {
     ParameterizedSql statement =
-        OrderedParameterSqlFactory.create(
-            "select * from guests where name like {?} and address in(<?>)",
-            "'A%'",
+        ParameterizedSql.withOrderedParameters(
+            "select * from guests where address in(<?>)",
             List.of(GUEST_ALICE.getAddress(), GUEST_BOB.getAddress()));
-    assertThat(statement.getSql())
-        .isEqualTo("select * from guests where name like 'A%' and address in(?,?)");
+    assertThat(statement.getSql()).isEqualTo("select * from guests where address in(?,?)");
     assertThat(Arrays.asList(statement.getParameters()))
         .isEqualTo(List.of(GUEST_ALICE.getAddress(), GUEST_BOB.getAddress()));
   }

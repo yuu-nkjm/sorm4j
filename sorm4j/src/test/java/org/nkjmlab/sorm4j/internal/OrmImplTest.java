@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlFactory;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.test.common.Player;
@@ -45,7 +44,7 @@ class OrmImplTest {
               LocalDateTime ret =
                   sorm.readFirst(
                       LocalDateTime.class,
-                      ParameterizedSqlFactory.create("select count(*) from players limit 1"));
+                      ParameterizedSql.of("select count(*) from players limit 1"));
               ret.getSecond();
             })
         .isInstanceOf(Exception.class);
@@ -60,9 +59,7 @@ class OrmImplTest {
   @Test
   void testReadFirstClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(
-            sorm.readFirst(
-                Player.class, ParameterizedSqlFactory.create("select * from players limit 1")))
+    assertThat(sorm.readFirst(Player.class, ParameterizedSql.of("select * from players limit 1")))
         .isEqualTo(PLAYER_ALICE);
   }
 
@@ -77,8 +74,7 @@ class OrmImplTest {
   void testReadListClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-            sorm.readList(
-                    Player.class, ParameterizedSqlFactory.create("select * from players limit 1"))
+            sorm.readList(Player.class, ParameterizedSql.of("select * from players limit 1"))
                 .get(0))
         .isEqualTo(PLAYER_ALICE);
   }
@@ -93,9 +89,7 @@ class OrmImplTest {
   @Test
   void testReadOneClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(
-            sorm.readOne(
-                Player.class, ParameterizedSqlFactory.create("select * from players limit 1")))
+    assertThat(sorm.readOne(Player.class, ParameterizedSql.of("select * from players limit 1")))
         .isEqualTo(PLAYER_ALICE);
   }
 
@@ -384,18 +378,16 @@ class OrmImplTest {
   @Test
   void testExecuteQueryParameterizedSqlResultSetTraverserOfT() {
     sorm.executeQuery(
-        ParameterizedSqlFactory.create("select * from players"),
-        sorm.getResultSetTraverser(Player.class));
+        ParameterizedSql.of("select * from players"), sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
     sorm.executeQuery(
-        ParameterizedSqlFactory.create("select * from players"), sorm.getRowMapper(Player.class));
+        ParameterizedSql.of("select * from players"), sorm.getRowMapper(Player.class));
 
     sorm.executeQuery(
-        ParameterizedSqlFactory.create("select * from players"),
-        sorm.getResultSetTraverser(Player.class));
+        ParameterizedSql.of("select * from players"), sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
@@ -406,6 +398,6 @@ class OrmImplTest {
   @Test
   void testExecuteUpdateParameterizedSql() {
     sorm.executeUpdate(
-        ParameterizedSqlFactory.create("insert into players values(?,?,?)", 9, "A", "B"));
+        ParameterizedSql.withOrderedParameters("insert into players values(?,?,?)", 9, "A", "B"));
   }
 }

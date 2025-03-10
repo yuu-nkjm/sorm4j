@@ -12,13 +12,13 @@ class NamedParameterSqlParserTest {
 
   @Test
   void testBindAll() {
-    NamedParameterSqlFactory parser =
-        NamedParameterSqlFactory.of("SELECT * FROM table WHERE id = :id AND name = :name");
+    NamedParameterSqlBuilder parser =
+        NamedParameterSqlBuilder.builder("SELECT * FROM table WHERE id = :id AND name = :name");
     Map<String, Object> params = new HashMap<>();
     params.put("id", 99);
     params.put("name", "John");
 
-    ParameterizedSql result = parser.bind(params).create();
+    ParameterizedSql result = parser.bindParameters(params).build();
 
     assertEquals("SELECT * FROM table WHERE id = ? AND name = ?", result.getSql());
     assertArrayEquals(new Object[] {99, "John"}, result.getParameters());
@@ -26,9 +26,9 @@ class NamedParameterSqlParserTest {
 
   @Test
   void testBind() {
-    NamedParameterSqlFactory parser =
-        NamedParameterSqlFactory.of("SELECT * FROM table WHERE id = :id and guest_id = :id");
-    ParameterizedSql result = parser.bind("id", 99).create();
+    NamedParameterSqlBuilder parser =
+        NamedParameterSqlBuilder.builder("SELECT * FROM table WHERE id = :id and guest_id = :id");
+    ParameterizedSql result = parser.bindParameter("id", 99).build();
 
     assertEquals("SELECT * FROM table WHERE id = ? and guest_id = ?", result.getSql());
     assertArrayEquals(new Object[] {99, 99}, result.getParameters());
@@ -39,9 +39,9 @@ class NamedParameterSqlParserTest {
     TestBean bean = new TestBean(99, "John");
 
     ParameterizedSql result =
-        NamedParameterSqlFactory.of("SELECT * FROM table WHERE id = :id AND name = :name")
-            .bind(bean)
-            .create();
+        NamedParameterSqlBuilder.builder("SELECT * FROM table WHERE id = :id AND name = :name")
+            .bindParameters(bean)
+            .build();
 
     assertEquals("SELECT * FROM table WHERE id = ? AND name = ?", result.getSql());
     assertArrayEquals(new Object[] {99, "John"}, result.getParameters());
@@ -54,7 +54,7 @@ class NamedParameterSqlParserTest {
     params.put("name", "John");
 
     ParameterizedSql result =
-        NamedParameterSqlFactory.create(
+        ParameterizedSql.withNamedParameters(
             "SELECT * FROM table WHERE id = :id AND name = :name", params);
 
     assertEquals("SELECT * FROM table WHERE id = ? AND name = ?", result.getSql());

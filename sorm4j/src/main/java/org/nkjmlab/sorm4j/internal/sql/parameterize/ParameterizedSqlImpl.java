@@ -48,18 +48,10 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     return parameters;
   }
 
-  private static char PREPROCESSED_PLACEHOLDER_LEFT = '{';
-  private static char PREPROCESSED_PLACEHOLDER_CENTER = '?';
-  private static char PREPROCESSED_PLACEHOLDER_RIGHT = '}';
   private static char LIST_PLACEHOLDER_LEFT = '<';
   private static char LIST_PLACEHOLDER_CENTER = '?';
   private static char LIST_PLACEHOLDER_RIGHT = '>';
 
-  private static final String PREPROCESSED_PLACEHOLDER =
-      ""
-          + PREPROCESSED_PLACEHOLDER_LEFT
-          + PREPROCESSED_PLACEHOLDER_CENTER
-          + PREPROCESSED_PLACEHOLDER_RIGHT;
   private static final String LIST_PLACEHOLDER =
       "" + LIST_PLACEHOLDER_LEFT + LIST_PLACEHOLDER_CENTER + LIST_PLACEHOLDER_RIGHT;
 
@@ -69,21 +61,13 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
   }
 
   private static ParameterizedSql parse(String sql, Object... parameters) {
-    if (parameters.length == 0) {
-      return new ParameterizedSqlImpl(sql, parameters);
-    }
-
-    ParameterizedSql embeddedSql =
-        sql.contains(PREPROCESSED_PLACEHOLDER)
-            ? parseEmbeddedPlaceholder(sql, parameters)
-            : new ParameterizedSqlImpl(sql, parameters);
-
     return sql.contains(LIST_PLACEHOLDER)
-        ? parseListPlaceholder(embeddedSql.getSql(), embeddedSql.getParameters())
-        : embeddedSql;
+        ? createExpandedListPlaceholdersSql(sql, parameters)
+        : new ParameterizedSqlImpl(sql, parameters);
   }
 
-  private static ParameterizedSql parseListPlaceholder(String sql, Object[] parameters) {
+  private static ParameterizedSql createExpandedListPlaceholdersSql(
+      String sql, Object[] parameters) {
     final List<Integer> specialParameterIndexes =
         createSpecialParameterIndexes(
             sql, LIST_PLACEHOLDER_LEFT, LIST_PLACEHOLDER_CENTER, LIST_PLACEHOLDER_RIGHT);
@@ -128,34 +112,6 @@ public final class ParameterizedSqlImpl implements ParameterizedSql {
     } else {
       throw new SormException(LIST_PLACEHOLDER + " parameter should be bind Collection or Array");
     }
-  }
-
-  private static ParameterizedSql parseEmbeddedPlaceholder(String sql, Object... parameters) {
-
-    final List<Integer> specialParameterIndexes =
-        createSpecialParameterIndexes(
-            sql,
-            PREPROCESSED_PLACEHOLDER_LEFT,
-            PREPROCESSED_PLACEHOLDER_CENTER,
-            PREPROCESSED_PLACEHOLDER_RIGHT);
-
-    List<Object> removedEmbeddedParams = new ArrayList<>();
-    for (int i = 0; i < parameters.length; i++) {
-      if (!specialParameterIndexes.contains(i)) {
-        removedEmbeddedParams.add(parameters[i]);
-      }
-    }
-    String _sql =
-        ParameterizedStringFormatter.newString(
-            sql,
-            PREPROCESSED_PLACEHOLDER,
-            specialParameterIndexes.size(),
-            index ->
-                parameters[specialParameterIndexes.get(index)] == null
-                    ? "null"
-                    : parameters[specialParameterIndexes.get(index)].toString());
-
-    return new ParameterizedSqlImpl(_sql, removedEmbeddedParams.toArray());
   }
 
   private static List<Integer> createSpecialParameterIndexes(

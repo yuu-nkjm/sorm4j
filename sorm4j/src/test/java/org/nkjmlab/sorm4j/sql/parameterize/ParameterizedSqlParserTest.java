@@ -22,8 +22,8 @@ class ParameterizedSqlParserTest {
   @Test
   void testParseAsOrdered() {
     String sql = "select * from guest where id=?";
-    Object[] params = {1};
-    ParameterizedSql ps = ParameterizedSqlFactory.create(sql, params);
+    Object[] params = {99};
+    ParameterizedSql ps = ParameterizedSql.withOrderedParameters(sql, params);
     assertThat(ps.getSql()).isEqualTo(sql);
     assertThat(ps.getParameters()).isEqualTo(params);
   }
@@ -32,7 +32,7 @@ class ParameterizedSqlParserTest {
   void testParseAsNamed() {
     String sql = "select * from guest where id=:id";
     Map<String, Object> map = Map.of("id", 1);
-    ParameterizedSql ps = ParameterizedSqlFactory.create(sql, map);
+    ParameterizedSql ps = ParameterizedSql.withNamedParameters(sql, map);
 
     String sql1 = "select * from guest where id=?";
     Object[] params = {1};
@@ -45,33 +45,26 @@ class ParameterizedSqlParserTest {
 
   @Test
   void testEmbeddedOrdered() {
-    String sql = "select * from guest where id={?}";
-    Object[] params = {1};
-    assertThat(ParameterizedSqlFactory.create(sql, params).getSql())
-        .contains("select * from guest where id=1");
+    String sql = "select * from guest where id=?";
+    Object[] params = {99};
+    assertThat(ParameterizedSql.withOrderedParameters(sql, params).getExecutableSql())
+        .contains("select * from guest where id=99");
   }
 
   @Test
   void testEmbeddedMap() {
-    String sql = "select * from guest where name={:name} and id={:id}";
-    Map<String, Object> params = Map.of("id", 1, "name", "'a'");
+    String sql = "select * from guest where name=:name and id=:id";
+    Map<String, Object> params = Map.of("id", 99, "name", "a");
 
-    assertThat(ParameterizedSqlFactory.create(sql, params).getExecutableSql())
-        .contains("select * from guest where name='a' and id=1");
-  }
-
-  @Test
-  void testEmbeddedOrderFail() {
-    String sql = "select * from guest where id={?}";
-    ParameterizedSqlFactory.create(sql);
-    System.out.println(ParameterizedSqlFactory.create(sql));
+    assertThat(ParameterizedSql.withNamedParameters(sql, params).getExecutableSql())
+        .contains("select * from guest where name='a' and id=99");
   }
 
   @Test
   void testEmbeddedMapFail() {
 
-    String sql = "select * from guest where name={:name} and id={:id}";
-    ParameterizedSql p = ParameterizedSqlFactory.create(sql, Map.of("name", 1));
-    assertThat(p.getSql()).doesNotContain("{:name}").doesNotContain("{:id}");
+    String sql = "select * from guest where name=:name and id=:id";
+    ParameterizedSql p = ParameterizedSql.withNamedParameters(sql, Map.of("name", 1));
+    assertThat(p.getSql()).doesNotContain(":name").doesNotContain(":id");
   }
 }

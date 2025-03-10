@@ -2,7 +2,6 @@ package org.nkjmlab.sorm4j.sql.parameterize;
 
 import java.util.List;
 
-import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.sql.binding.OrderedParameterSqlParserImpl;
 
 /**
@@ -11,7 +10,7 @@ import org.nkjmlab.sorm4j.internal.util.sql.binding.OrderedParameterSqlParserImp
  *
  * @author nkjm
  */
-public interface OrderedParameterSqlFactory extends ParameterizedSqlFactory {
+public interface OrderedParameterSqlBuilder extends ParameterizedSqlBuilder {
 
   /**
    * Add one parameter to the SQL statement sequentially.
@@ -19,7 +18,7 @@ public interface OrderedParameterSqlFactory extends ParameterizedSqlFactory {
    * @param parameter
    * @return
    */
-  OrderedParameterSqlFactory addParameter(Object parameter);
+  OrderedParameterSqlBuilder addParameter(Object parameter);
 
   /**
    * Add parameters to the SQL statement sequentially.
@@ -27,26 +26,15 @@ public interface OrderedParameterSqlFactory extends ParameterizedSqlFactory {
    * @param parameters
    * @return
    */
-  OrderedParameterSqlFactory addParameters(Object... parameters);
+  OrderedParameterSqlBuilder addParameters(Object... parameters);
 
   /**
-   * Creates a {@link OrderedParameterSqlFactory} object with parameters.
-   *
-   * @param sql
-   * @param parameters
-   * @return
-   */
-  static ParameterizedSql create(String sql, Object... parameters) {
-    return ParameterizedSqlImpl.of(sql, parameters);
-  }
-
-  /**
-   * Creates a {@link OrderedParameterSqlFactory} object.
+   * Creates a {@link OrderedParameterSqlBuilder} object.
    *
    * @param sql
    * @return
    */
-  static OrderedParameterSqlFactory of(String sql) {
+  static OrderedParameterSqlBuilder builder(String sql) {
     return new OrderedParameterSqlParserImpl(sql);
   }
 }

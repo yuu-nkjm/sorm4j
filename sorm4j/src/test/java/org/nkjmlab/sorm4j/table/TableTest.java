@@ -44,7 +44,7 @@ import org.nkjmlab.sorm4j.util.sql.statement.JoinSql;
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
-      ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
+      ParameterizedSql.withOrderedParameters(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
   private DefinedTable<Player> playersTable;
   private DefinedTable<Sport> sportsTable;

@@ -252,7 +252,7 @@ public interface TableOrm<T> {
       parameters[i] = tupplesOfNameAndValue[i * 2 + 1];
     }
 
-    return ParameterizedSql.of(
+    return ParameterizedSql.withOrderedParameters(
         SelectSql.selectStarFrom(getTableName()) + WHERE + String.join(AND, conditions),
         parameters);
   }

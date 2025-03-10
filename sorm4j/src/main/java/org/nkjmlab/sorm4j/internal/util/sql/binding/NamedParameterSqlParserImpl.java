@@ -14,7 +14,7 @@ import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlFactory;
+import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 /**
@@ -23,7 +23,7 @@ import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
  *
  * @author nkjm
  */
-public final class NamedParameterSqlParserImpl implements NamedParameterSqlFactory {
+public final class NamedParameterSqlParserImpl implements NamedParameterSqlBuilder {
 
   private static final Map<Class<?>, Map<String, ContainerAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
@@ -51,25 +51,25 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlFacto
   }
 
   @Override
-  public NamedParameterSqlFactory bind(Map<String, Object> namedParams) {
+  public NamedParameterSqlBuilder bindParameters(Map<String, Object> namedParams) {
     this.parameters.putAll(namedParams);
     return this;
   }
 
   @Override
-  public NamedParameterSqlFactory bind(String key, Object value) {
+  public NamedParameterSqlBuilder bindParameter(String key, Object value) {
     this.parameters.put(key, value);
     return this;
   }
 
   @Override
-  public NamedParameterSqlFactory bind(Object parametersContainer) {
+  public NamedParameterSqlBuilder bindParameters(Object parametersContainer) {
     this.parametersContainer = parametersContainer;
     return this;
   }
 
   @Override
-  public ParameterizedSql create() {
+  public ParameterizedSql build() {
     List<Object> orderedParams = extractParameterNames(sql).stream().map(e -> getParam(e)).toList();
     return ParameterizedSqlImpl.of(
         replaceNamedParameterToPlaceholder(sql), orderedParams.toArray());
