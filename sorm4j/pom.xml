@@ -44,6 +44,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<downloadSources>true</downloadSources>
 		<downloadJavadocs>true</downloadJavadocs>
+	    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 	</properties>
 
 	<dependencies>
@@ -208,7 +209,6 @@
 						<additionalClasspathElement>src/test/java/</additionalClasspathElement>
 					</additionalClasspathElements>
 					<argLine>
-						--add-opens java.base/java.lang=ALL-UNNAMED
 						${argLine}
 					</argLine>
 				</configuration>
