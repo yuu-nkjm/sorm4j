@@ -61,8 +61,7 @@ public interface ParameterizedSql {
   /**
    * Creates a {@link ParameterizedSql} instance from the given SQL string and ordered parameters.
    * The parameters must be simple ordered values corresponding to the placeholders in the SQL
-   * statement. This method does not support named parameters, list parameters, or embedded
-   * parameters.
+   * statement. This method does not support named parameters.
    *
    * <p><strong>Example usage:</strong>
    *

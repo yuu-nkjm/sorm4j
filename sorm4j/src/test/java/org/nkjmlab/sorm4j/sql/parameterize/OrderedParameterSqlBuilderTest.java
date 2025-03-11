@@ -13,7 +13,7 @@ import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 
-class OrderedParameterSqlTest {
+class OrderedParameterSqlBuilderTest {
   private static Sorm sorm = createSormWithNewDatabaseAndCreateTables();
 
   static {

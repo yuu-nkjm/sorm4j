@@ -8,7 +8,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
-class ParameterizedSqlParserTest {
+class ParameterizedSqlTest {
 
   @Test
   void testLietral() {
