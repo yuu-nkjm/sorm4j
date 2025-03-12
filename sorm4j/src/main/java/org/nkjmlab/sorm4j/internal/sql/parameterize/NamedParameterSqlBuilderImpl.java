@@ -24,29 +24,24 @@ import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
  */
 public final class NamedParameterSqlBuilderImpl implements NamedParameterSqlBuilder {
 
+  private static final String DEFAULT_NAMED_PARAMETER_PREFIX = ":";
+  private static final Pattern pattern =
+      Pattern.compile(DEFAULT_NAMED_PARAMETER_PREFIX + "([a-zA-Z0-9_]+)");
+
   private static final Map<Class<?>, Map<String, ContainerAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
 
   private static final ColumnToFieldAccessorMapper DEFAULT_COLUMN_FIELD_MAPPER =
       new DefaultColumnToFieldAccessorMapper();
 
-  private static final String DEFAULT_NAMED_PARAMETER_PREFIX = ":";
-
   private final String sql;
-  private final Pattern pattern;
-  private final ColumnToFieldAccessorMapper nameToFieldMapper;
   private final RowMap parameters;
-  private Object parametersContainer;
-
-  public NamedParameterSqlBuilderImpl(String sql, ColumnToFieldAccessorMapper nameToFieldMapper) {
-    this.sql = sql;
-    this.nameToFieldMapper = nameToFieldMapper;
-    this.parameters = RowMap.of();
-    this.pattern = Pattern.compile(DEFAULT_NAMED_PARAMETER_PREFIX + "([a-zA-Z0-9_]+)");
-  }
+  private final List<String> parameterNames;
 
   public NamedParameterSqlBuilderImpl(String sql) {
-    this(sql, DEFAULT_COLUMN_FIELD_MAPPER);
+    this.sql = sql;
+    this.parameters = RowMap.of();
+    this.parameterNames = extractParameterNames(sql);
   }
 
   @Override
@@ -63,35 +58,35 @@ public final class NamedParameterSqlBuilderImpl implements NamedParameterSqlBuil
 
   @Override
   public NamedParameterSqlBuilder bindParameters(Object parametersContainer) {
-    this.parametersContainer = parametersContainer;
+    parameterNames.forEach(
+        parameterName -> {
+          ContainerAccessor acc = getAccessor(parametersContainer, parameterName);
+          if (acc != null) {
+            parameters.put(parameterName, Try.getOrElseNull(() -> acc.get(parametersContainer)));
+          }
+        });
     return this;
   }
 
   @Override
   public ParameterizedSql build() {
-    List<Object> orderedParams = extractParameterNames(sql).stream().map(e -> getParam(e)).toList();
+    List<Object> orderedParams = parameterNames.stream().map(e -> getParam(e)).toList();
     return ParameterizedSqlImpl.of(
         replaceNamedParameterToPlaceholder(sql), orderedParams.toArray());
   }
 
   private Object getParam(String parameterName) {
-    if (parametersContainer != null) {
-      ContainerAccessor acc = getAccessor(parametersContainer, parameterName);
-      if (acc != null) {
-        return Try.getOrElseNull(() -> acc.get(parametersContainer));
-      }
-    }
     return parameters.get(parameterName);
   }
 
   private ContainerAccessor getAccessor(Object parametersContainer, String parameterName) {
     final Class<?> objectClass = parametersContainer.getClass();
     return nameToFieldMaps
-        .computeIfAbsent(objectClass, k -> nameToFieldMapper.createMapping(objectClass))
+        .computeIfAbsent(objectClass, k -> DEFAULT_COLUMN_FIELD_MAPPER.createMapping(objectClass))
         .get(SormContext.getDefaultCanonicalStringCache().toCanonicalName(parameterName));
   }
 
-  private List<String> extractParameterNames(String sql) {
+  private static List<String> extractParameterNames(String sql) {
     List<String> parameterNames = new ArrayList<>();
     Matcher matcher = pattern.matcher(sql);
 
