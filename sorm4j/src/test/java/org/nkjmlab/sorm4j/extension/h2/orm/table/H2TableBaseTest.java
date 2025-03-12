@@ -16,12 +16,15 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.h2.functions.system.CsvWrite;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 
 class H2TableBaseTest {
+
   public static class TestEntity {
     public int id;
     public String name;
 
+    @OrmRecordCompatibleConstructor
     public TestEntity(int id, String name) {
       this.id = id;
       this.name = name;

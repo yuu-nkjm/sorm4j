@@ -21,6 +21,8 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -84,20 +86,17 @@ class TableDefinitionTest {
     C
   }
 
-   
   public static class SimpleEnum {
     public final long id;
-    // @SuppressWarnings("exports")
     public final EnumExample enumCol;
 
-    // @SuppressWarnings("exports")
+    @OrmConstructor({"id", "enumCol"})
     public SimpleEnum(long id, EnumExample en) {
       this.id = id;
       this.enumCol = en;
     }
   }
 
-   
   @IndexColumnPair({"boolean_col", "byte_col"})
   @IndexColumnPair({"boolean_col", "char_col"})
   @UniqueConstraint({"boolean_col", "byte_col"})
@@ -125,6 +124,7 @@ class TableDefinitionTest {
     public final java.io.Reader reader;
     public final String[] strArray;
 
+    @OrmRecordCompatibleConstructor
     public TableDefExample(
         @PrimaryKey @AutoIncrement Long id,
         Boolean booleanCol,

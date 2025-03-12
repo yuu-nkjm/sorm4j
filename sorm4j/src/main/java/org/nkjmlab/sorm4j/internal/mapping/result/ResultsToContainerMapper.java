@@ -14,19 +14,32 @@ import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 
 /**
- * Holds mapping data from a given class and a table. The object reads a query result in {@link
- * ResultSet} via {@link DefaultColumnValueToJavaObjectConverters}.
+ * Maps query results from a {@link ResultSet} to container objects of type {@code T}. This class
+ * determines the appropriate constructor for creating instances of {@code T} and applies the
+ * corresponding mapping strategy.
  *
+ * <p>The constructor selection follows the priority order below:
+ *
+ * <ol>
+ *   <li>If a constructor is annotated with {@link OrmConstructor}, it is selected.
+ *   <li>If a constructor is annotated with {@link OrmRecordCompatibleConstructor}, it is selected.
+ *   <li>If the class is a {@code record}, its canonical constructor is used.
+ *   <li>Otherwise, the default constructor is used, and field values are set via setters.
+ * </ol>
+ *
+ * <p>This design ensures compatibility with different class structures, including records,
+ * annotated constructors, and traditional JavaBeans-style objects.
+ *
+ * @param <T> the type of the container class
  * @author nkjm
- * @param <T>
  */
 public final class ResultsToContainerMapper<T> {
 
@@ -35,7 +48,7 @@ public final class ResultsToContainerMapper<T> {
       new ConcurrentHashMap<>();
   private final ColumnValueToJavaObjectConverters columnValueConverter;
   private final ColumnToAccessorMapping columnToAccessorMap;
-  private final ResultsContainerFactory<T> containerObjectCreator;
+  private final ResultsContainerFactory<T> resultsContainerFactory;
 
   public ResultsToContainerMapper(
       ColumnValueToJavaObjectConverters converter,
@@ -45,31 +58,31 @@ public final class ResultsToContainerMapper<T> {
     this.objectClass = objectClass;
     this.columnToAccessorMap = columnToAccessorMap;
 
-    this.containerObjectCreator = createContainerObjectCreator();
+    this.resultsContainerFactory = createResultsContainerFactory();
   }
 
-  private ResultsContainerFactory<T> createContainerObjectCreator() {
+  private ResultsContainerFactory<T> createResultsContainerFactory() {
     Constructor<T> ormConstructor = getAnnotatedOrmConstructor(objectClass);
     if (ormConstructor != null) {
-      return createAnnotatedOrmConstructorCreator(objectClass, ormConstructor);
+      return createAnnotatedOrmConstructorFactory(objectClass, ormConstructor);
+    }
+    Constructor<T> ormCanonicalConstructor = getOrmRecordCompatibleConstructor(objectClass);
+    if (ormCanonicalConstructor != null) {
+      return createOrmRecordCompatibleConstructorFactory(objectClass, ormCanonicalConstructor);
     }
     Constructor<T> recordConstructor = getRecordConstructor(objectClass);
     if (recordConstructor != null) {
-      return createRecordConstructorCreator(objectClass, recordConstructor);
+      return createRecordConstructorFactory(objectClass, recordConstructor);
     }
-    Constructor<T> ormCanonicalConstructor = getOrmCanonicalConstructor(objectClass);
-    if (ormCanonicalConstructor != null) {
-      return createOrmCanonicalConstructorCreator(objectClass, ormCanonicalConstructor);
-    }
-    return createDefaultConstructorCreator(objectClass);
+    return createDefaultConstructorFactory(objectClass);
   }
 
-  private ResultsContainerFactory<T> createDefaultConstructorCreator(Class<T> objectClass) {
+  private ResultsContainerFactory<T> createDefaultConstructorFactory(Class<T> objectClass) {
     return new ResultsContainerWithSetterFactory<>(
         getColumnToAccessorMap(), getDefaultConstructor(objectClass));
   }
 
-  private ResultsContainerFactory<T> createRecordConstructorCreator(
+  private ResultsContainerFactory<T> createRecordConstructorFactory(
       Class<T> objectClass, Constructor<T> constructor) {
     String[] parameterNames =
         Arrays.stream(objectClass.getRecordComponents())
@@ -79,8 +92,9 @@ public final class ResultsToContainerMapper<T> {
         getColumnToAccessorMap(), constructor, parameterNames);
   }
 
-  private ResultsContainerFactory<T> createOrmCanonicalConstructorCreator(
+  private ResultsContainerFactory<T> createOrmRecordCompatibleConstructorFactory(
       Class<T> objectClass, Constructor<T> constructor) {
+
     String[] parameterNames =
         Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
     return new ResultsContainerWithConstructorFactory<>(
@@ -103,21 +117,13 @@ public final class ResultsToContainerMapper<T> {
     }
   }
 
-  private Constructor<T> getOrmCanonicalConstructor(Class<T> objectClass) {
-    Constructor<T> constructor =
-        Try.getOrElseNull(
-            () ->
-                objectClass.getConstructor(
-                    Arrays.stream(objectClass.getDeclaredFields())
-                        .filter(
-                            f ->
-                                !java.lang.reflect.Modifier.isStatic(f.getModifiers())
-                                    && !f.getName().startsWith(("this$")))
-                        .map(feild -> feild.getType())
-                        .toArray(Class[]::new)));
-    return constructor != null && constructor.getAnnotation(OrmIgnore.class) == null
-        ? constructor
-        : null;
+  @SuppressWarnings("unchecked")
+  private Constructor<T> getOrmRecordCompatibleConstructor(Class<T> objectClass) {
+    Optional<Constructor<?>> constructor =
+        Arrays.stream(objectClass.getConstructors())
+            .filter(c -> c.getAnnotation(OrmRecordCompatibleConstructor.class) != null)
+            .findFirst();
+    return constructor.isEmpty() ? null : (Constructor<T>) constructor.get();
   }
 
   @SuppressWarnings("unchecked")
@@ -129,7 +135,7 @@ public final class ResultsToContainerMapper<T> {
     return constructor.isEmpty() ? null : (Constructor<T>) constructor.get();
   }
 
-  private ResultsContainerFactory<T> createAnnotatedOrmConstructorCreator(
+  private ResultsContainerFactory<T> createAnnotatedOrmConstructorFactory(
       Class<T> objectClass, Constructor<T> constructor) {
     String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
     return new ResultsContainerWithConstructorFactory<>(
@@ -138,14 +144,18 @@ public final class ResultsToContainerMapper<T> {
 
   private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
     Object[] params = {
-      objectClass, OrmConstructor.class.getSimpleName(), "Record canonical constructor"
+      objectClass,
+      OrmConstructor.class.getSimpleName(),
+      OrmRecordCompatibleConstructor.class.getSimpleName()
     };
+
     return Try.getOrElseThrow(
         () -> objectClass.getConstructor(),
         e ->
             new SormException(
                 ParameterizedStringFormatter.LENGTH_256.format(
-                    "The given container class [{}] should have the public default constructor or the constructor annotated by @{}. Or the container class should be annotated by @{}.",
+                    "The given container class [{}] should be record class, "
+                        + "must be a record class, have a constructor annotated with @{}, have a constructor annotated with @{}, or have a default constructor.",
                     params),
                 e));
   }
@@ -154,7 +164,7 @@ public final class ResultsToContainerMapper<T> {
     ColumnsAndTypes columnsAndTypes =
         OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
 
-    return containerObjectCreator.createContainerList(
+    return resultsContainerFactory.createContainerList(
         columnValueConverter, resultSet, columnsAndTypes);
   }
 
@@ -163,7 +173,8 @@ public final class ResultsToContainerMapper<T> {
     ColumnsAndTypes columnsAndTypes =
         OrmConnectionImpl.ColumnsAndTypes.createColumnsAndTypes(resultSet);
 
-    return containerObjectCreator.createContainer(columnValueConverter, resultSet, columnsAndTypes);
+    return resultsContainerFactory.createContainer(
+        columnValueConverter, resultSet, columnsAndTypes);
   }
 
   public T mapResultsToContainerByPrimaryKey(Class<T> objectClass, ResultSet resultSet)
@@ -173,7 +184,8 @@ public final class ResultsToContainerMapper<T> {
         metaDataForSelectByPrimaryKey.computeIfAbsent(
             objectClass, key -> createColumnsAndTypes(resultSet));
 
-    return containerObjectCreator.createContainer(columnValueConverter, resultSet, columnsAndTypes);
+    return resultsContainerFactory.createContainer(
+        columnValueConverter, resultSet, columnsAndTypes);
   }
 
   private static ColumnsAndTypes createColumnsAndTypes(ResultSet resultSet) {
@@ -192,8 +204,8 @@ public final class ResultsToContainerMapper<T> {
   public String toString() {
     Object[] params = {
       objectClass.getName(),
-      containerObjectCreator.getClass().getSimpleName(),
-      containerObjectCreator.toString()
+      resultsContainerFactory.getClass().getSimpleName(),
+      resultsContainerFactory.toString()
     };
     return ParameterizedStringFormatter.LENGTH_256.format(
         "[{}] instance used as SQL result container will be created by [{}]"

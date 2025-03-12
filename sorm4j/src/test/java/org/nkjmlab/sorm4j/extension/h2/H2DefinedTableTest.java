@@ -18,6 +18,7 @@ import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -93,6 +94,7 @@ class H2DefinedTableTest {
     private final String name;
     private final JsonByte jsonCol;
 
+    @OrmRecordCompatibleConstructor
     public OrmRecordExample(int id, String name, JsonByte jsonCol) {
       this.id = id;
       this.name = name;
