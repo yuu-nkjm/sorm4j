@@ -3,19 +3,16 @@ package org.nkjmlab.sorm4j.util.sql.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
 import org.nkjmlab.sorm4j.common.annotation.Internal;
 import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.table.orm.TableOrm;
-import org.nkjmlab.sorm4j.util.sql.statement.SelectSql.Condition;
 
-@Experimental
 public class JoinSql {
 
   private JoinSql() {}
 
   public static JoinSql.Builder builder(TableOrm<?> firstTable) {
-    return new Builder(firstTable);
+    return new Builder(firstTable.getOrmTableMetaData());
   }
 
   @Internal
@@ -35,10 +32,6 @@ public class JoinSql {
     private Builder(OrmTableMetaData tableMetaData) {
       this.columns.addAll(tableMetaData.getColumnAliases());
       this.froms.add(tableMetaData.getTableName());
-    }
-
-    private Builder(TableOrm<?> first) {
-      this(first.getOrmTableMetaData());
     }
 
     public Builder distinct() {
@@ -105,7 +98,7 @@ public class JoinSql {
      * @param condition
      * @return
      */
-    public Builder where(Condition condition) {
+    public Builder where(ConditionSql condition) {
       where(condition.toString());
       return this;
     }

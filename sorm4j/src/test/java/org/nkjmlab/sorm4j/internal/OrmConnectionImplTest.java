@@ -129,7 +129,7 @@ class OrmConnectionImplTest {
     assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
     assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
-    assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
+    assertThat(result1.get(0).getT3().name()).isEqualTo(TENNIS.name());
     assertThat(result1.get(0).toString()).contains("Alice");
   }
 
@@ -179,7 +179,7 @@ class OrmConnectionImplTest {
           assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
           assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
           assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
-          assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
+          assertThat(result1.get(0).getT3().name()).isEqualTo(TENNIS.name());
           assertThat(result1.get(0).toString()).contains("Alice");
         });
   }
@@ -194,7 +194,9 @@ class OrmConnectionImplTest {
               NamedParameterSqlBuilder sql =
                   NamedParameterSqlBuilder.builder(
                       "insert into players values(:id, :name, :address)");
-              sql.bindParameter("id", id.incrementAndGet()).bindParameter("name", "Frank").bindParameter("address", "Tokyo");
+              sql.bindParameter("id", id.incrementAndGet())
+                  .bindParameter("name", "Frank")
+                  .bindParameter("address", "Tokyo");
               return conn.executeUpdate(sql.build());
             });
     assertThat(row).isEqualTo(1);

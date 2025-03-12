@@ -34,7 +34,7 @@ public class DriverManagerDataSource implements DataSource {
     this.password = password;
   }
 
-  public static DriverManagerDataSource create(String jdbcUrl, String username, String password) {
+  public static DriverManagerDataSource of(String jdbcUrl, String username, String password) {
     return new DriverManagerDataSource(jdbcUrl, username, password);
   }
 

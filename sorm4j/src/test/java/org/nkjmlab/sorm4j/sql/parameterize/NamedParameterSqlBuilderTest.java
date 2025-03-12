@@ -31,6 +31,14 @@ class NamedParameterSqlBuilderTest {
   }
 
   @Test
+  void testContainer() {
+    ParameterizedSql ps =
+        ParameterizedSql.withParametersContainer(
+            "select * from guests where name=:name", GUEST_ALICE);
+    assertThat(sorm.readFirst(Guest.class, ps).getName()).isEqualTo(GUEST_ALICE.getName());
+  }
+
+  @Test
   void testCustomer() {
     {
       String sql = "select * from guests where id=:id and address=:address";

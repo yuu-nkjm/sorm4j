@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class ColumnToAccessorMappingTest {
@@ -94,10 +93,10 @@ class ColumnToAccessorMappingTest {
       sorm.acceptHandler(
           m -> {
             ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
-            tm.setValue(new Player(), "name", 1);
+            tm.setValue(new Guest(), "name", 1);
           });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("No valid setter for");
+      assertThat(e.getMessage()).contains("Could not set");
     }
   }
 

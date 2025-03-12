@@ -450,11 +450,6 @@ public interface Orm {
    */
   <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects);
 
-  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
-
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
-      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters);
-
   <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
   <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns);

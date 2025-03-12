@@ -1,0 +1,6 @@
+{
+  "username": "sa",
+  "password": "password",
+  "databaseDirectory": "~/h2db/testdir",
+  "databaseName": "testdb1"
+}

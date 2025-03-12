@@ -49,6 +49,10 @@ public final class ResultsToContainerMapper<T> {
   }
 
   private ResultsContainerFactory<T> createContainerObjectCreator() {
+    Constructor<T> ormConstructor = getAnnotatedOrmConstructor(objectClass);
+    if (ormConstructor != null) {
+      return createAnnotatedOrmConstructorCreator(objectClass, ormConstructor);
+    }
     Constructor<T> recordConstructor = getRecordConstructor(objectClass);
     if (recordConstructor != null) {
       return createRecordConstructorCreator(objectClass, recordConstructor);
@@ -56,10 +60,6 @@ public final class ResultsToContainerMapper<T> {
     Constructor<T> ormCanonicalConstructor = getOrmCanonicalConstructor(objectClass);
     if (ormCanonicalConstructor != null) {
       return createOrmCanonicalConstructorCreator(objectClass, ormCanonicalConstructor);
-    }
-    Constructor<T> ormConstructor = getOrmConstructor(objectClass);
-    if (ormConstructor != null) {
-      return createOrmConstructorCreator(objectClass, ormConstructor);
     }
     return createDefaultConstructorCreator(objectClass);
   }
@@ -121,7 +121,7 @@ public final class ResultsToContainerMapper<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private Constructor<T> getOrmConstructor(Class<T> objectClass) {
+  private Constructor<T> getAnnotatedOrmConstructor(Class<T> objectClass) {
     Optional<Constructor<?>> constructor =
         Arrays.stream(objectClass.getConstructors())
             .filter(c -> c.getAnnotation(OrmConstructor.class) != null)
@@ -129,7 +129,7 @@ public final class ResultsToContainerMapper<T> {
     return constructor.isEmpty() ? null : (Constructor<T>) constructor.get();
   }
 
-  private ResultsContainerFactory<T> createOrmConstructorCreator(
+  private ResultsContainerFactory<T> createAnnotatedOrmConstructorCreator(
       Class<T> objectClass, Constructor<T> constructor) {
     String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
     return new ResultsContainerWithConstructorFactory<>(

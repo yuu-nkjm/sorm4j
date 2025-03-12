@@ -9,13 +9,21 @@ import org.nkjmlab.sorm4j.context.SormContext;
 
 class StringCacheTest {
   @Test
+  void test() {
+    SormContext.getDefaultCanonicalStringCache().toCanonicalName("user");
+    assertThat(SormContext.getDefaultCanonicalStringCache().getCache().containsKey("user"))
+        .isTrue();
+    assertThat(SormContext.getDefaultCanonicalStringCache().toString()).isNotNull();
+  }
+
+  @Test
   void testToCanonicalName() {
 
     Map<String, String> map =
         Map.ofEntries(
             Map.entry("User Name (USD)", "USER_NAME_USD"),
             Map.entry("Café Déjà-vu!", "CAFÉ_DÉJÀ_VU"),
-            Map.entry("商品価格（円）", "商品価格_円"),
+            Map.entry("価格（円）", "価格_円"),
             Map.entry("data-set#1", "DATA_SET_1"),
             Map.entry("Test__Value__", "TEST_VALUE"),
             Map.entry("ユーザ　ID", "ユーザ_ID"),
@@ -57,9 +65,9 @@ class StringCacheTest {
             Map.entry("Xml/Http\\Request", "XML_HTTP_REQUEST"),
             Map.entry("Parse.URL.123", "PARSE_URL_123"),
             Map.entry("Http Status Code", "HTTP_STATUS_CODE"),
-            Map.entry("合格A", "合格A"),
-            Map.entry("データID", "データID"),
-            Map.entry("得点率%", "得点率"),
+            Map.entry("ユーザA", "ユーザA"),
+            Map.entry("ユーザID", "ユーザID"),
+            Map.entry("価格%", "価格"),
             Map.entry("ユーザー名", "ユーザー名"));
 
     map.keySet()

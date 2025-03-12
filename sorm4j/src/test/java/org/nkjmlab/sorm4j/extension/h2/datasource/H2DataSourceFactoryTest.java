@@ -21,6 +21,36 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class H2DataSourceFactoryTest {
 
   @Test
+  void testServerMode() throws StreamReadException, DatabindException, IOException, SQLException {
+    H2DataSourceFactory factory =
+        new ObjectMapper()
+            .readValue(
+                H2DataSourceFactoryTest.class.getResourceAsStream("h2.json1.sample"),
+                H2DataSourceFactory.Builder.class)
+            .build();
+    factory.getDatabaseFile().delete();
+    factory.makeFileDatabaseIfNotExists();
+    factory.makeFileDatabaseIfNotExists();
+
+    assertThat(factory.getServerModeJdbcUrl())
+        .isEqualTo("jdbc:h2:tcp://localhost/" + userHomeDir() + "/h2db/testdir/testdb1");
+
+    assertThat(factory.toString()).contains("jdbc:h2:mem:testdb1;DB_CLOSE_DELAY=-1");
+
+    H2DataSourceFactory.builder();
+    H2DataSourceFactory.builder(
+        factory.getDatabaseDirectory(),
+        factory.getDatabaseName(),
+        factory.getUsername(),
+        factory.getPassword());
+
+    H2DataSourceFactory.createTemporalInMemoryDataSource();
+
+    factory.createServerModeDataSource().getConnection().close();
+    factory.createServerModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
+  }
+
+  @Test
   void test() throws StreamReadException, DatabindException, IOException, SQLException {
     H2DataSourceFactory factory =
         new ObjectMapper()
@@ -37,9 +67,6 @@ class H2DataSourceFactoryTest {
 
     assertThat(factory.getInMemoryModeJdbcUrl()).isEqualTo("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
 
-    assertThat(factory.getServerModeJdbcUrl())
-        .isEqualTo("jdbc:h2:tcp://localhost/" + userHomeDir() + "/h2db/testdir/testdb");
-
     assertThat(factory.getMixedModeJdbcUrl())
         .isEqualTo("jdbc:h2:" + userHomeDir() + "/h2db/testdir/testdb;AUTO_SERVER=TRUE");
 
@@ -54,15 +81,12 @@ class H2DataSourceFactoryTest {
 
     H2DataSourceFactory.createTemporalInMemoryDataSource();
 
-    factory.createEmbeddedModeDataSource().getConnection();
-    factory.createInMemoryModeDataSource().getConnection();
-    factory.createMixedModeDataSource().getConnection();
-    // factory.createServerModeDataSource().getConnection();
+    factory.createEmbeddedModeDataSource().getConnection().close();
+    factory.createInMemoryModeDataSource().getConnection().close();
+    factory.createMixedModeDataSource().getConnection().close();
     factory.createEmbeddedModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
     factory.createInMemoryModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
     factory.createMixedModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
-    // factory.createServerModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
-
   }
 
   private String userHomeDir() {

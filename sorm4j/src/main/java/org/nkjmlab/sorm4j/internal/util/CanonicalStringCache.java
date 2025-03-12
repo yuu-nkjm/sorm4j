@@ -128,7 +128,7 @@ public final class CanonicalStringCache {
    * <pre>
    * replaceInvalidCharacters("User Name (USD)");  // "User_Name_USD"
    * replaceInvalidCharacters("Café Déjà-vu!");   // "Café_Déjà_vu"
-   * replaceInvalidCharacters("商品価格（円）");  // "商品価格_円"
+   * replaceInvalidCharacters("価格（円）");  // "価格_円"
    * replaceInvalidCharacters("data-set#1");      // "data_set_1"
    * replaceInvalidCharacters("Test__Value__");   // "Test_Value"
    * </pre>

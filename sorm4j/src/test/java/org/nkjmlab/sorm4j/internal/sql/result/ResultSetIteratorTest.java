@@ -45,7 +45,7 @@ class ResultSetIteratorTest {
 
   @Test
   void testNext() throws SQLException {
-    Player expectedObject = new Player();
+    Player expectedObject = new Player(1, "", "");
     when(mockOrmConnection.mapRowToObject(Player.class, mockResultSet)).thenReturn(expectedObject);
 
     assertEquals(expectedObject, resultSetIterator.next());

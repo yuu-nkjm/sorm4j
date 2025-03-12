@@ -14,6 +14,7 @@ import java.util.List;
 import org.h2.tools.Csv;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
@@ -56,8 +57,7 @@ public class H2CsvReader implements H2Csv {
 
   private ResultSet readCsv(Reader in, String[] colNames) throws IOException {
     if (used) {
-      throw new IllegalStateException(
-          "This H2Csv instance has already been used and cannot be reused.");
+      throw new SormException("This H2Csv instance has already been used and cannot be reused.");
     }
     used = true;
     return csv.read(in, colNames);

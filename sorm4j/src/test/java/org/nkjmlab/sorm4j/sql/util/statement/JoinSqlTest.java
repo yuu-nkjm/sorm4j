@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.sql.util.statement;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -7,10 +8,74 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.sql.metadata.TableMetaData;
+import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.test.common.Player;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.sql.statement.ConditionSql;
 import org.nkjmlab.sorm4j.util.sql.statement.JoinSql;
 
 class JoinSqlTest {
+  @Test
+  void testLeftJoinUsingTable() {
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    String sql =
+        JoinSql.builder(sorm.getTable(Player.class))
+            .leftJoinUsing(sorm.getTable(Guest.class), "id")
+            .build();
+    assertThat(sql)
+        .isEqualTo(
+            "select PLAYERS.ID as P_DOT_ID,PLAYERS.NAME as P_DOT_NAME,PLAYERS.ADDRESS as P_DOT_ADDRESS,GUESTS.ID as G_DOT_ID,GUESTS.NAME as G_DOT_NAME,GUESTS.ADDRESS as G_DOT_ADDRESS from PLAYERS left join GUESTS using (id)");
+  }
+
+  @Test
+  void testLeftJoinOnTable() {
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    String sql =
+        JoinSql.builder(sorm.getTable(Player.class))
+            .leftJoinOn(sorm.getTable(Guest.class), "player.id=guests.id")
+            .build();
+    assertThat(sql)
+        .isEqualTo(
+            "select PLAYERS.ID as P_DOT_ID,PLAYERS.NAME as P_DOT_NAME,PLAYERS.ADDRESS as P_DOT_ADDRESS,GUESTS.ID as G_DOT_ID,GUESTS.NAME as G_DOT_NAME,GUESTS.ADDRESS as G_DOT_ADDRESS from PLAYERS left join GUESTS on player.id=guests.id");
+  }
+
+  @Test
+  void testJoinUsingTable() {
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    String sql =
+        JoinSql.builder(sorm.getTable(Player.class))
+            .joinUsing(sorm.getTable(Guest.class), "id")
+            .build();
+    assertThat(sql)
+        .isEqualTo(
+            "select PLAYERS.ID as P_DOT_ID,PLAYERS.NAME as P_DOT_NAME,PLAYERS.ADDRESS as P_DOT_ADDRESS,GUESTS.ID as G_DOT_ID,GUESTS.NAME as G_DOT_NAME,GUESTS.ADDRESS as G_DOT_ADDRESS from PLAYERS join GUESTS using (id)");
+  }
+
+  @Test
+  void testJoinOnTable() {
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    String sql =
+        JoinSql.builder(sorm.getTable(Player.class))
+            .joinOn(sorm.getTable(Guest.class), "player.id=guests.id")
+            .build();
+    assertThat(sql)
+        .isEqualTo(
+            "select PLAYERS.ID as P_DOT_ID,PLAYERS.NAME as P_DOT_NAME,PLAYERS.ADDRESS as P_DOT_ADDRESS,GUESTS.ID as G_DOT_ID,GUESTS.NAME as G_DOT_NAME,GUESTS.ADDRESS as G_DOT_ADDRESS from PLAYERS join GUESTS on player.id=guests.id");
+  }
+
+  @Test
+  void testJoinTable() {
+    Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+    String sql =
+        JoinSql.builder(sorm.getTable(Player.class))
+            .join("join", sorm.getTable(Guest.class), "on player.id=guests.id")
+            .build();
+    assertThat(sql)
+        .isEqualTo(
+            "select PLAYERS.ID as P_DOT_ID,PLAYERS.NAME as P_DOT_NAME,PLAYERS.ADDRESS as P_DOT_ADDRESS,GUESTS.ID as G_DOT_ID,GUESTS.NAME as G_DOT_NAME,GUESTS.ADDRESS as G_DOT_ADDRESS from PLAYERS join GUESTS on player.id=guests.id");
+  }
 
   @Test
   void testBuilder() {
@@ -38,10 +103,15 @@ class JoinSqlTest {
     when(mockTableMetaData.getColumnAliases()).thenReturn(List.of("column1", "column2"));
 
     String expectedSql =
-        "select column1,column2 from table1 where column1 > 100 order by column2 limit 10 offset 5";
+        "select column1,column2 from table1 where (column1 > 100 and column2 > 100) order by column2 limit 10 offset 5";
 
     JoinSql.Builder builder = JoinSql.builder(mockTableMetaData);
-    String actualSql = builder.where("column1 > 100").orderBy("column2").limit(10, 5).build();
+    String actualSql =
+        builder
+            .where(ConditionSql.and("column1 > 100", "column2 > 100"))
+            .orderBy("column2")
+            .limit(10, 5)
+            .build();
 
     assertEquals(expectedSql, actualSql);
   }
@@ -187,5 +257,101 @@ class JoinSqlTest {
     assertEquals(
         "select id,name,id,description from table1 join table2 on table1.id = table2.id where table1.name = 'Alice' order by table2.description",
         sql);
+  }
+
+  @Test
+  void testLeftJoinUsing() {
+    TableMetaData mockTable1 = mock(TableMetaData.class);
+    when(mockTable1.getTableName()).thenReturn("table1");
+    when(mockTable1.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    TableMetaData mockTable2 = mock(TableMetaData.class);
+    when(mockTable2.getTableName()).thenReturn("table2");
+    when(mockTable2.getColumnAliases()).thenReturn(List.of("column3", "column4"));
+
+    String expectedSql =
+        "select column1,column2,column3,column4 from table1 left join table2 using (column1,column2)";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTable1);
+    String actualSql = builder.leftJoinUsing(mockTable2, "column1", "column2").build();
+
+    assertEquals(expectedSql, actualSql);
+  }
+
+  @Test
+  void testLeftJoinOn() {
+    TableMetaData mockTable1 = mock(TableMetaData.class);
+    when(mockTable1.getTableName()).thenReturn("table1");
+    when(mockTable1.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    TableMetaData mockTable2 = mock(TableMetaData.class);
+    when(mockTable2.getTableName()).thenReturn("table2");
+    when(mockTable2.getColumnAliases()).thenReturn(List.of("column3", "column4"));
+
+    String expectedSql =
+        "select column1,column2,column3,column4 from table1 left join table2 on table1.column1 = table2.column3";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTable1);
+    String actualSql = builder.leftJoinOn(mockTable2, "table1.column1 = table2.column3").build();
+
+    assertEquals(expectedSql, actualSql);
+  }
+
+  @Test
+  void testJoinUsing() {
+    TableMetaData mockTable1 = mock(TableMetaData.class);
+    when(mockTable1.getTableName()).thenReturn("table1");
+    when(mockTable1.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    TableMetaData mockTable2 = mock(TableMetaData.class);
+    when(mockTable2.getTableName()).thenReturn("table2");
+    when(mockTable2.getColumnAliases()).thenReturn(List.of("column3", "column4"));
+
+    String expectedSql =
+        "select column1,column2,column3,column4 from table1 join table2 using (column1,column2)";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTable1);
+    String actualSql = builder.joinUsing(mockTable2, "column1", "column2").build();
+
+    assertEquals(expectedSql, actualSql);
+  }
+
+  @Test
+  void testJoinOn() {
+    TableMetaData mockTable1 = mock(TableMetaData.class);
+    when(mockTable1.getTableName()).thenReturn("table1");
+    when(mockTable1.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    TableMetaData mockTable2 = mock(TableMetaData.class);
+    when(mockTable2.getTableName()).thenReturn("table2");
+    when(mockTable2.getColumnAliases()).thenReturn(List.of("column3", "column4"));
+
+    String expectedSql =
+        "select column1,column2,column3,column4 from table1 join table2 on table1.column1 = table2.column3";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTable1);
+    String actualSql = builder.joinOn(mockTable2, "table1.column1 = table2.column3").build();
+
+    assertEquals(expectedSql, actualSql);
+  }
+
+  @Test
+  void testJoin() {
+    TableMetaData mockTable1 = mock(TableMetaData.class);
+    when(mockTable1.getTableName()).thenReturn("table1");
+    when(mockTable1.getColumnAliases()).thenReturn(List.of("column1", "column2"));
+
+    TableMetaData mockTable2 = mock(TableMetaData.class);
+    when(mockTable2.getTableName()).thenReturn("table2");
+    when(mockTable2.getColumnAliases()).thenReturn(List.of("column3", "column4"));
+
+    String expectedSql =
+        "select column1,column2,column3,column4 from table1 inner join table2 on table1.column1 = table2.column3";
+
+    JoinSql.Builder builder = JoinSql.builder(mockTable1);
+    String actualSql =
+        builder.join("inner join", mockTable2, "on table1.column1 = table2.column3").build();
+
+    assertEquals(expectedSql, actualSql);
   }
 }

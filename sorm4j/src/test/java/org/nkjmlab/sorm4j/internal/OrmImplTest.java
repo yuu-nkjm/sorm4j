@@ -383,6 +383,10 @@ class OrmImplTest {
 
   @Test
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
+
+    sorm.executeUpdate(
+        ParameterizedSql.withOrderedParameters("insert into players values(?,?,?)", 9, "A", "B"));
+
     sorm.executeQuery(
         ParameterizedSql.of("select * from players"), sorm.getRowMapper(Player.class));
 

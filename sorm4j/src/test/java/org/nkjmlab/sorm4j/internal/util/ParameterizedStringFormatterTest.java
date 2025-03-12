@@ -7,11 +7,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.context.SormContext;
 
-class StringUtilsTest {
+class ParameterizedStringFormatterTest {
 
   @Test
   void testContainsIgnoreCase() {
-    assertThat(SormContext.getDefaultCanonicalStringCache().containsCanonicalName(List.of("a", "b"), null));
+    assertThat(
+        SormContext.getDefaultCanonicalStringCache()
+            .containsCanonicalName(List.of("a", "b"), null));
   }
 
   @Test
@@ -20,5 +22,12 @@ class StringUtilsTest {
     assertThat(ParameterizedStringFormatter.LENGTH_256.format("{}", params)).isEqualTo("{}");
     assertThat(ParameterizedStringFormatter.LENGTH_256.format("{}", (Object[]) null))
         .isEqualTo("{}");
+  }
+
+  @Test
+  void testNewStringStringObjectArray() {
+    Object[] params = {null, new Object[] {"a", null, new Object[] {1, null}}};
+    assertThat(ParameterizedStringFormatter.LENGTH_256.format("{},{}", params))
+        .isEqualTo("null,[a, null, [1, null]]]");
   }
 }

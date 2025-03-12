@@ -1,24 +1,18 @@
 package org.nkjmlab.sorm4j.util.sql.statement;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AND;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AS;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.BETWEEN;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.FROM;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.GROUP_BY;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.HAVING;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.IN;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.LIMIT;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.ORDER_BY;
 import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.WHERE;
 import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.join;
-import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.literal;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.nkjmlab.sorm4j.common.annotation.Experimental;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /**
  * API of creates a select SQL statement.
@@ -101,12 +95,12 @@ public final class SelectSql {
     }
 
     /**
-     * Creates having clause with the given {@link Condition}.
+     * Creates having clause with the given {@link ConditionSql}.
      *
      * @param condition
      * @return
      */
-    public Builder having(Condition condition) {
+    public Builder having(ConditionSql condition) {
       having(condition.toString());
       return this;
     }
@@ -230,7 +224,7 @@ public final class SelectSql {
      * @param condition
      * @return
      */
-    public Builder where(Condition condition) {
+    public Builder where(ConditionSql condition) {
       where(condition.toString());
       return this;
     }
@@ -244,44 +238,6 @@ public final class SelectSql {
     public Builder where(String expr) {
       where = expr;
       return this;
-    }
-  }
-
-  /**
-   * Value object represents conditions of where clause or having clause. This object could include
-   * AND and OR operators.
-   */
-  public static class Condition {
-    private final Object condition;
-
-    private Condition(Object expr) {
-      this.condition = expr;
-    }
-
-    /**
-     * Concatenates conditions with the given operator.
-     *
-     * @param op
-     * @param conds
-     */
-    private Condition(String op, Object... conds) {
-      this(wrapParentheses(join(wrapSpace(op), conds)));
-    }
-
-    /**
-     * Condition with binary operator
-     *
-     * @param left
-     * @param op
-     * @param right
-     */
-    private Condition(Object left, String op, Object right) {
-      this.condition = left + " " + op.trim() + " " + right;
-    }
-
-    @Override
-    public String toString() {
-      return condition.toString();
     }
   }
 
@@ -357,7 +313,7 @@ public final class SelectSql {
     return wrapSpace("where " + searchCondition);
   }
 
-  public static String where(Condition searchCondition) {
+  public static String where(ConditionSql searchCondition) {
     return where(searchCondition.toString());
   }
 
@@ -383,74 +339,6 @@ public final class SelectSql {
    */
   public static String op(Object left, String operator, Object right) {
     return wrapParentheses(left + wrapSpace(operator) + right);
-  }
-
-  /**
-   * Creates {@link Condition} instance.
-   *
-   * <p>For example,
-   *
-   * <pre>
-   * and(cond("id=?"), "name=?")  returns "id=? and name=?"
-   * </pre>
-   */
-  public static Condition cond(String cond) {
-    return new Condition(cond);
-  }
-
-  /**
-   * Creates a condition with binary operator
-   *
-   * @param left
-   * @param operator
-   * @param right
-   */
-  public static Condition cond(Object left, String operator, Object right) {
-    return new Condition(left, operator, right);
-  }
-
-  /** Conditions * */
-  /**
-   * Creates AND condition with concatenating arguments.
-   *
-   * <p>For example,
-   *
-   * <pre>
-   * and("id=?", "name=?") returns "id=? and name=?"
-   * </pre>
-   *
-   * @param conds condition in String or Condition
-   * @return
-   */
-  public static Condition and(Object... conds) {
-    return new Condition("and", conds);
-  }
-
-  /**
-   * Creates OR condition with concatenating arguments.
-   *
-   * <p>For example,
-   *
-   * <pre>
-   * or("id=?", "name=?") returns "id=? or name=?"
-   * </pre>
-   */
-  public static Condition or(Object... conds) {
-    return new Condition("or", conds);
-  }
-
-  public static Condition between(Object colName, Object startInclusive, Object endInclusive) {
-    return new Condition(
-        wrapSpace(
-            colName
-                + BETWEEN
-                + literal(startInclusive)
-                + AND
-                + SqlStringUtils.literal(endInclusive)));
-  }
-
-  public static Condition in(Object colName, List<?> values) {
-    return new Condition(wrapSpace(colName + IN + wrapParentheses(literal(values))));
   }
 
   public static String groupBy(Object... groups) {
@@ -510,7 +398,7 @@ public final class SelectSql {
    * @param str
    * @return
    */
-  private static String wrapParentheses(Object str) {
+  static String wrapParentheses(Object str) {
     return str == null ? null : "(" + str + ")";
   }
 
@@ -520,7 +408,7 @@ public final class SelectSql {
    * @param str
    * @return
    */
-  private static String wrapSpace(Object str) {
+  static String wrapSpace(Object str) {
     return str == null ? null : " " + str.toString().trim() + " ";
   }
 }

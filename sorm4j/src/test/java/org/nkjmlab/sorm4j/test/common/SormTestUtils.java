@@ -18,16 +18,16 @@ import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 public class SormTestUtils {
 
   /** <code>Guest("Alice", "Kyoto")</code> */
-  public static final Guest GUEST_ALICE = new Guest("Alice", "Kyoto");
+  public static final Guest GUEST_ALICE = Guest.of("Alice", "Kyoto");
 
   /** <code>Guest("Bob", "Tokyo")</code> */
-  public static final Guest GUEST_BOB = new Guest("Bob", "Tokyo");
+  public static final Guest GUEST_BOB = Guest.of("Bob", "Tokyo");
 
   /** <code>Guest("Carol", "Osaka")</code> */
-  public static final Guest GUEST_CAROL = new Guest("Carol", "Osaka");
+  public static final Guest GUEST_CAROL = Guest.of("Carol", "Osaka");
 
   /** <code>Guest("Dave", "Nara")</code> */
-  public static final Guest GUEST_DAVE = new Guest("Dave", "Nara");
+  public static final Guest GUEST_DAVE = Guest.of("Dave", "Nara");
 
   /** <code>Player(1, "Alice", "Kyoto")</code> */
   public static final Player PLAYER_ALICE = new Player(1, "Alice", "Kyoto");

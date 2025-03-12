@@ -56,12 +56,35 @@ public class H2WebConsoleService {
     }
   }
 
-  private String open(Connection conn) {
+  /**
+   * Creates a new session in the H2 Web Console using a connection obtained from the {@link
+   * DataSource}.
+   *
+   * @return the URL of the Web Console session
+   * @throws RuntimeException if any exception occurs while opening the session
+   */
+  public String createSession() {
+    try (Connection conn = dataSource.getConnection()) {
+      return createSession(conn);
+    } catch (SQLException e) {
+      throw Try.rethrow(e);
+    }
+  }
+
+  /**
+   * Creates a new session in the H2 Web Console using the given database connection.
+   *
+   * <p>This method registers the provided {@link Connection} with the H2 Web Console and returns
+   * the corresponding session URL.
+   *
+   * @param conn the database connection to be used for creating the session
+   * @return the URL of the Web Console session
+   * @throws RuntimeException if an error occurs while opening the session
+   */
+  public String createSession(Connection conn) {
     try {
-      String url = webServer.addSession(conn);
-      Server.openBrowser(url);
-      return url;
-    } catch (Exception e) {
+      return webServer.addSession(conn);
+    } catch (SQLException e) {
       throw Try.rethrow(e);
     }
   }
@@ -73,9 +96,11 @@ public class H2WebConsoleService {
    * @return the URL of the Web Console session
    * @throws RuntimeException if any exception occurs while opening the session
    */
-  public String open() {
-    try (Connection conn = dataSource.getConnection()) {
-      return open(conn);
+  public String openBrowser() {
+    try {
+      String url = createSession();
+      Server.openBrowser(url);
+      return url;
     } catch (Exception e) {
       throw Try.rethrow(e);
     }

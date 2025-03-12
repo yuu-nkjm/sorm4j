@@ -18,7 +18,7 @@ public class DataSourceFactory {
    *
    * <pre>
    * <code>
-   *    DriverManagerDataSource dataSource = DriverManagerDataSource.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+   *    DataSource dataSource = DataSourceFactory.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
    * </code>
    * </pre>
    *
@@ -42,7 +42,7 @@ public class DataSourceFactory {
    *
    * <pre>
    * <code>
-   *    DriverManagerDataSource dataSource = DriverManagerDataSource.create(
+   *    DataSource dataSource = DataSourceFactory.create(
    *        "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", "username", "password");
    * </code>
    * </pre>
@@ -53,6 +53,6 @@ public class DataSourceFactory {
    * @return a new instance of {@link DriverManagerDataSource}
    */
   public static DataSource create(String jdbcUrl, String username, String password) {
-    return DriverManagerDataSource.create(jdbcUrl, username, password);
+    return DriverManagerDataSource.of(jdbcUrl, username, password);
   }
 }

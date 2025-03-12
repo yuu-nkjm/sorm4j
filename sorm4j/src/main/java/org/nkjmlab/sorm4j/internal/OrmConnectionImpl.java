@@ -36,7 +36,6 @@ import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.mapping.result.ResultsToContainerMapper;
 import org.nkjmlab.sorm4j.internal.sql.metadata.TableMetaData;
-import org.nkjmlab.sorm4j.internal.sql.metadata.jdbc.JdbcDatabaseMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamOrmConnection;
@@ -198,8 +197,7 @@ public class OrmConnectionImpl implements OrmConnection {
     if (objects == null || objects.length == 0) {
       return notExists.get();
     }
-    ContainerToTableMapper<T> mapping =
-        getCastedTableMapping(tableName, objects[0].getClass());
+    ContainerToTableMapper<T> mapping = getCastedTableMapping(tableName, objects[0].getClass());
     return sqlFunction.apply(mapping);
   }
 
@@ -336,7 +334,7 @@ public class OrmConnectionImpl implements OrmConnection {
   public JdbcDatabaseMetaData getJdbcDatabaseMetaData() {
     try {
       java.sql.DatabaseMetaData metaData = connection.getMetaData();
-      return JdbcDatabaseMetaDataImpl.of(metaData);
+      return JdbcDatabaseMetaData.of(metaData);
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
@@ -517,31 +515,19 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> join(
-      Class<T1> t1, Class<T2> t2, String sql, Object... parameters) {
-    return readTupleList(t1, t2, sql, parameters);
-  }
-
-  @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
-      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters) {
-    return readTupleList(t1, t2, t3, sql, parameters);
-  }
-
-  @Override
   public <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return join(t1, t2, joinSql(JOIN, t1, t2, ON + onCondition));
+    return readTupleList(t1, t2, joinSql(JOIN, t1, t2, ON + onCondition));
   }
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition) {
-    return join(t1, t2, t3, joinSql(JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+    return readTupleList(t1, t2, t3, joinSql(JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
 
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns) {
-    return join(
+    return readTupleList(
         t1, t2, joinSql(JOIN, t1, t2, " using (" + SqlStringUtils.join(", ", columns) + ")"));
   }
 
@@ -603,13 +589,14 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition) {
-    return join(t1, t2, joinSql(LEFT + JOIN, t1, t2, ON + onCondition));
+    return readTupleList(t1, t2, joinSql(LEFT + JOIN, t1, t2, ON + onCondition));
   }
 
   @Override
   public <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition) {
-    return join(t1, t2, t3, joinSql(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
+    return readTupleList(
+        t1, t2, t3, joinSql(LEFT + JOIN, t1, t2, t1T2OnCondition, t3, t2T3OnCondition));
   }
 
   public <T> T loadFirst(Class<T> objectClass, ResultSet resultSet) throws SQLException {

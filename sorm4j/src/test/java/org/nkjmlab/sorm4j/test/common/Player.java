@@ -3,8 +3,10 @@ package org.nkjmlab.sorm4j.test.common;
 import java.util.Objects;
 
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 
+/** With Constructor */
 @OrmTableName("PLAYERS")
 @OrmColumnAliasPrefix("p")
 public class Player {
@@ -13,8 +15,7 @@ public class Player {
   private String name;
   public String address;
 
-  public Player() {}
-
+  @OrmConstructor({"id", "name", "address"})
   public Player(int id, String name, String address) {
     this.id = id;
     this.name = name;
@@ -25,17 +26,13 @@ public class Player {
     return id;
   }
 
-  // not match address field
+  // not match address field, Sorm accesses the public filed directly.
   public String readAddress() {
     return address;
   }
 
   public String getName() {
     return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

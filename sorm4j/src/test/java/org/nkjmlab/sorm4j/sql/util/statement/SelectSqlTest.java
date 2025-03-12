@@ -2,16 +2,18 @@ package org.nkjmlab.sorm4j.sql.util.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
-import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.and;
+import static org.nkjmlab.sorm4j.util.sql.statement.ConditionSql.and;
+import static org.nkjmlab.sorm4j.util.sql.statement.ConditionSql.between;
+import static org.nkjmlab.sorm4j.util.sql.statement.ConditionSql.cond;
+import static org.nkjmlab.sorm4j.util.sql.statement.ConditionSql.in;
+import static org.nkjmlab.sorm4j.util.sql.statement.ConditionSql.or;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.as;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.avg;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.castAs;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.columnWithTableName;
-import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.cond;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.count;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.func;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.op;
-import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.or;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.orderByDesc;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.select;
 import static org.nkjmlab.sorm4j.util.sql.statement.SelectSql.selectDistinct;
@@ -23,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.test.common.Guest;
+import org.nkjmlab.sorm4j.util.sql.statement.ConditionSql;
 import org.nkjmlab.sorm4j.util.sql.statement.SelectSql;
 
 class SelectSqlTest {
@@ -33,8 +36,8 @@ class SelectSqlTest {
     assertThat(select("a")).isEqualTo(" select a ");
     assertThat(select("a", "b")).isEqualTo(" select a, b ");
 
-    assertThat(SelectSql.in("id", List.of("a", 1)).toString()).isEqualTo(" id in ('a', 1) ");
-    assertThat(SelectSql.between("id", 1, 2).toString()).isEqualTo(" id between 1 and 2 ");
+    assertThat(in("id", List.of("a", 1)).toString()).isEqualTo(" id in ('a', 1) ");
+    assertThat(between("id", 1, 2).toString()).isEqualTo(" id between 1 and 2 ");
 
     assertThat(SelectSql.groupBy("id, name")).isEqualTo(" group by id, name ");
     assertThat(SelectSql.orderBy("id, name")).isEqualTo(" order by id, name ");
@@ -82,12 +85,12 @@ class SelectSqlTest {
 
   @Test
   void testBuild2() {
-    SelectSql.Condition where =
+    ConditionSql where =
         or(
             and("ID=A", "NAME=B"),
             and("YEAR=C", "DATE=D"),
             or(cond("ID", "=", "'test'"), cond("NAME='Hello'")));
-    SelectSql.Condition having = and("aveage_age>0", "a>0");
+    ConditionSql having = and("aveage_age>0", "a>0");
 
     String sql =
         SelectSql.builder()

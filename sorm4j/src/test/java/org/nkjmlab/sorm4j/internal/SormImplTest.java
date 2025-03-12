@@ -37,6 +37,7 @@ class SormImplTest {
   @Test
   void testCreate() {
     Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", Sorm.getDefaultContext());
     Sorm.getDefaultContext().toString();
   }
 
@@ -78,7 +79,7 @@ class SormImplTest {
   @Test
   void testJoin3() {
     assertThat(
-            sorm.join(
+            sorm.readTupleList(
                     Guest.class,
                     Player.class,
                     Sport.class,

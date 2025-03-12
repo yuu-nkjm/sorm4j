@@ -39,19 +39,15 @@ class H2WebConsoleServiceTest {
   void testWebServerIsRunning() {
     WebServer webServer = h2WebConsoleService.getWebServer();
     assertNotNull(webServer, "WebServer should not be null");
-    assertTrue(webServer.isRunning(true), "WebServer should be running");
+    assertTrue(webServer.isRunning(false), "WebServer should be running");
+    webServer.stop();
+    assertFalse(webServer.isRunning(false), "WebServer should be stopped");
   }
 
   @Test
   void testOpenSession() {
-    String url = h2WebConsoleService.open();
+    String url = h2WebConsoleService.openBrowser();
     assertNotNull(url, "Session URL should not be null");
     assertTrue(url.startsWith("http"), "Session URL should start with http");
-  }
-
-  @Test
-  void testStopServer() {
-    h2WebConsoleService.stop();
-    assertFalse(h2WebConsoleService.getWebServer().isRunning(false), "WebServer should be stopped");
   }
 }

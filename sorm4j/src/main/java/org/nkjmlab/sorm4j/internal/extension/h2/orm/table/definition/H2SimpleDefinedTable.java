@@ -7,6 +7,16 @@ import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 public final class H2SimpleDefinedTable<T> extends H2DefinedTableBase<T> {
 
   /**
+   * This table instance is bind to the table name defined in the given class.
+   *
+   * @param orm
+   * @param valueType
+   */
+  public H2SimpleDefinedTable(Sorm orm, Class<T> valueType) {
+    super(orm, valueType);
+  }
+
+  /**
    * This table instance is bind to the table name defined in the given {@link TableDefinition}.
    *
    * @param orm
@@ -15,15 +25,5 @@ public final class H2SimpleDefinedTable<T> extends H2DefinedTableBase<T> {
    */
   public H2SimpleDefinedTable(Sorm orm, Class<T> valueType, TableDefinition tableDefinition) {
     super(orm, valueType, tableDefinition);
-  }
-
-  /**
-   * This table instance is bind to the table name defined in the given class.
-   *
-   * @param orm
-   * @param valueType
-   */
-  public H2SimpleDefinedTable(Sorm orm, Class<T> valueType) {
-    this(orm, valueType, TableDefinition.builder(valueType).build());
   }
 }

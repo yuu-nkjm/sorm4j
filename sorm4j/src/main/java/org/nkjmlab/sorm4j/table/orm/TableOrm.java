@@ -122,10 +122,6 @@ public interface TableOrm<T> {
     return getOrm().insertInto(getTableName(), objects);
   }
 
-  default int insertMapIn(RowMap object) {
-    return getOrm().insertMapInto(getTableName(), object);
-  }
-
   default int[] insertMapIn(RowMap... objects) {
     return getOrm().insertMapInto(getTableName(), objects);
   }
@@ -300,12 +296,13 @@ public interface TableOrm<T> {
   }
 
   default <S> List<Tuple2<T, S>> join(TableOrm<S> second, String sql, Object... parameters) {
-    return getOrm().join(getValueType(), second.getValueType(), sql, parameters);
+    return getOrm().readTupleList(getValueType(), second.getValueType(), sql, parameters);
   }
 
   default <S, U> List<Tuple3<T, S, U>> join(
       TableOrm<S> second, TableOrm<U> third, String sql, Object... parameters) {
     return getOrm()
-        .join(getValueType(), second.getValueType(), third.getValueType(), sql, parameters);
+        .readTupleList(
+            getValueType(), second.getValueType(), third.getValueType(), sql, parameters);
   }
 }

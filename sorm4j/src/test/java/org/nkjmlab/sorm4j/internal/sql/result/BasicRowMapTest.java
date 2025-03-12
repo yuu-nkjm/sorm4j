@@ -1,19 +1,24 @@
 package org.nkjmlab.sorm4j.internal.sql.result;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.container.RowMap;
@@ -276,5 +281,418 @@ class BasicRowMapTest {
 
     List<String> values = map.getStringList("key1", "key2");
     assertEquals(Arrays.asList("value1", "value2"), values);
+  }
+
+  @Test
+  void testContainsKeyCaseInsensitive() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("Key1", "value1");
+
+    assertTrue(map.containsKey("key1"));
+    assertTrue(map.containsKey("KEY1"));
+  }
+
+  @Test
+  void testContainsValue() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+
+    assertTrue(map.containsValue("value1"));
+    assertFalse(map.containsValue("value2"));
+  }
+
+  @Test
+  void testRemove() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+
+    assertEquals("value1", map.remove("key1"));
+    assertFalse(map.containsKey("key1"));
+  }
+
+  @Test
+  void testClear() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
+
+    map.clear();
+    assertEquals(0, map.size());
+    assertTrue(map.isEmpty());
+  }
+
+  @Test
+  void testGetArrayReturnsNullForMissingKey() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getArray("missing_key", Integer.class));
+  }
+
+  @Test
+  void testGetObject() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+
+    assertEquals("value1", map.getObject("key1"));
+  }
+
+  @Test
+  void testInvalidConversionThrowsException() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "not_a_number");
+
+    assertThatThrownBy(() -> map.getInteger("key1")).isInstanceOf(NumberFormatException.class);
+    assertThatThrownBy(() -> map.getDouble("key1")).isInstanceOf(NumberFormatException.class);
+  }
+
+  @Test
+  void testGetStringWithValidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "hello");
+
+    assertEquals("hello", map.getString("key"));
+  }
+
+  @Test
+  void testGetStringWithByteArray() {
+    BasicRowMap map = new BasicRowMap();
+    byte[] data = "hello".getBytes();
+    map.put("key", data);
+
+    assertEquals("hello", map.getString("key"));
+  }
+
+  @Test
+  void testGetStringWithNull() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getString("key"));
+  }
+
+  @Test
+  void testGetIntegerWithValidInteger() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123);
+
+    assertEquals(123, map.getInteger("key"));
+  }
+
+  @Test
+  void testGetIntegerWithValidLong() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123L);
+
+    assertEquals(123, map.getInteger("key"));
+  }
+
+  @Test
+  void testGetIntegerWithValidDouble() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123.0);
+
+    assertEquals(123, map.getInteger("key"));
+  }
+
+  @Test
+  void testGetIntegerWithStringNumber() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "123");
+
+    assertEquals(123, map.getInteger("key"));
+  }
+
+  @Test
+  void testGetIntegerWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "not_a_number");
+
+    assertThatThrownBy(() -> map.getInteger("key")).isInstanceOf(NumberFormatException.class);
+  }
+
+  @Test
+  void testGetLongWithValidInteger() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123);
+
+    assertEquals(123L, map.getLong("key"));
+  }
+
+  @Test
+  void testGetLongWithValidLong() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123L);
+
+    assertEquals(123L, map.getLong("key"));
+  }
+
+  @Test
+  void testGetLongWithValidDouble() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123.0);
+
+    assertEquals(123L, map.getLong("key"));
+  }
+
+  @Test
+  void testGetLongWithStringNumber() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "123");
+
+    assertEquals(123L, map.getLong("key"));
+  }
+
+  @Test
+  void testGetLongWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "not_a_number");
+
+    assertThatThrownBy(() -> map.getLong("key")).isInstanceOf(NumberFormatException.class);
+  }
+
+  @Test
+  void testGetFloatWithValidInteger() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123);
+
+    assertEquals(123.0f, map.getFloat("key"));
+  }
+
+  @Test
+  void testGetFloatWithValidLong() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123L);
+
+    assertEquals(123.0f, map.getFloat("key"));
+  }
+
+  @Test
+  void testGetFloatWithValidDouble() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123.0);
+
+    assertEquals(123.0f, map.getFloat("key"));
+  }
+
+  @Test
+  void testGetFloatWithStringNumber() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "123.0");
+
+    assertEquals(123.0f, map.getFloat("key"));
+  }
+
+  @Test
+  void testGetFloatWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "not_a_number");
+
+    assertThatThrownBy(() -> map.getFloat("key")).isInstanceOf(NumberFormatException.class);
+  }
+
+  @Test
+  void testGetDoubleWithValidInteger() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123);
+
+    assertEquals(123.0d, map.getDouble("key"));
+  }
+
+  @Test
+  void testGetDoubleWithValidLong() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123L);
+
+    assertEquals(123.0d, map.getDouble("key"));
+  }
+
+  @Test
+  void testGetDoubleWithValidDouble() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", 123.0);
+
+    assertEquals(123.0d, map.getDouble("key"));
+  }
+
+  @Test
+  void testGetDoubleWithStringNumber() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "123.0");
+
+    assertEquals(123.0d, map.getDouble("key"));
+  }
+
+  @Test
+  void testGetDoubleWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key", "not_a_number");
+
+    assertThatThrownBy(() -> map.getDouble("key")).isInstanceOf(NumberFormatException.class);
+  }
+
+  @Test
+  void testKeySet() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
+
+    Set<String> keys = map.keySet();
+    assertEquals(Set.of("KEY1", "KEY2"), keys);
+  }
+
+  @Test
+  void testKeySetWithEmptyMap() {
+    BasicRowMap map = new BasicRowMap();
+    assertTrue(map.keySet().isEmpty());
+  }
+
+  @Test
+  void testValues() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+    map.put("key2", 2);
+
+    Collection<Object> values = map.values();
+    assertTrue(values.containsAll(List.of("value1", 2)));
+    assertEquals(2, values.size());
+  }
+
+  @Test
+  void testValuesWithEmptyMap() {
+    BasicRowMap map = new BasicRowMap();
+    assertTrue(map.values().isEmpty());
+  }
+
+  @Test
+  void testEntrySet() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("key1", "value1");
+    map.put("key2", 2);
+
+    Set<Map.Entry<String, Object>> entries = map.entrySet();
+    assertEquals(2, entries.size());
+    assertTrue(entries.contains(Map.entry("KEY1", "value1")));
+    assertTrue(entries.contains(Map.entry("KEY2", 2)));
+  }
+
+  @Test
+  void testEntrySetWithEmptyMap() {
+    BasicRowMap map = new BasicRowMap();
+    assertTrue(map.entrySet().isEmpty());
+  }
+
+  @Test
+  void testGetLocalDateWithSqlDate() {
+    BasicRowMap map = new BasicRowMap();
+    LocalDate date = LocalDate.of(2023, 5, 10);
+    map.put("date", java.sql.Date.valueOf(date));
+
+    assertEquals(date, map.getLocalDate("date"));
+  }
+
+  @Test
+  void testGetLocalDateWithString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("date", "2023-05-10");
+
+    assertEquals(LocalDate.of(2023, 5, 10), map.getLocalDate("date"));
+  }
+
+  @Test
+  void testGetLocalDateWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("date", "invalid-date");
+
+    assertThatThrownBy(() -> map.getLocalDate("date")).isInstanceOf(DateTimeParseException.class);
+  }
+
+  @Test
+  void testGetLocalDateWithNull() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getLocalDate("date"));
+  }
+
+  @Test
+  void testGetLocalTimeWithSqlTime() {
+    BasicRowMap map = new BasicRowMap();
+    LocalTime time = LocalTime.of(14, 30, 15);
+    map.put("time", java.sql.Time.valueOf(time));
+
+    assertEquals(time, map.getLocalTime("time"));
+  }
+
+  @Test
+  void testGetLocalTimeWithString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("time", "14:30:15");
+
+    assertEquals(LocalTime.of(14, 30, 15), map.getLocalTime("time"));
+  }
+
+  @Test
+  void testGetLocalTimeWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("time", "invalid-time");
+
+    assertThatThrownBy(() -> map.getLocalTime("time")).isInstanceOf(DateTimeParseException.class);
+  }
+
+  @Test
+  void testGetLocalTimeWithNull() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getLocalTime("time"));
+  }
+
+  @Test
+  void testGetLocalDateTimeWithSqlTimestamp() {
+    BasicRowMap map = new BasicRowMap();
+    LocalDateTime dateTime = LocalDateTime.of(2023, 5, 10, 14, 30, 15);
+    map.put("datetime", java.sql.Timestamp.valueOf(dateTime));
+
+    assertEquals(dateTime, map.getLocalDateTime("datetime"));
+  }
+
+  @Test
+  void testGetLocalDateTimeWithString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("datetime", "2023-05-10T14:30:15");
+
+    assertEquals(LocalDateTime.of(2023, 5, 10, 14, 30, 15), map.getLocalDateTime("datetime"));
+  }
+
+  @Test
+  void testGetLocalDateTimeWithInvalidString() {
+    BasicRowMap map = new BasicRowMap();
+    map.put("datetime", "invalid-datetime");
+
+    assertThatThrownBy(() -> map.getLocalDateTime("datetime"))
+        .isInstanceOf(DateTimeParseException.class);
+  }
+
+  @Test
+  void testGetLocalDateTimeWithNull() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getLocalDateTime("datetime"));
+  }
+
+  @Test
+  void testGetArrayWithValidObjectArray() {
+    BasicRowMap map = new BasicRowMap();
+    Integer[] intArray = {1, 2, 3};
+    map.put("array", intArray);
+
+    assertArrayEquals(intArray, map.getArray("array", Integer.class));
+  }
+
+  @Test
+  void testGetArrayWithDifferentComponentType() {
+    BasicRowMap map = new BasicRowMap();
+    String[] strArray = {"1", "2", "3"};
+    map.put("array", strArray);
+
+    assertThatException().isThrownBy(() -> map.getArray("array", Integer.class));
+  }
+
+  @Test
+  void testGetArrayWithNull() {
+    BasicRowMap map = new BasicRowMap();
+    assertNull(map.getArray("missing_array", Integer.class));
   }
 }

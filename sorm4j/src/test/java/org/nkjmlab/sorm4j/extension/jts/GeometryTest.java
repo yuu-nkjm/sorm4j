@@ -12,6 +12,7 @@ import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
 import org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts;
 import org.nkjmlab.sorm4j.extension.datatype.jts.JtsSupport;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class GeometryTest {
@@ -51,7 +52,11 @@ class GeometryTest {
             SormTestUtils.createNewDatabaseDataSource(),
             new JtsSupport().addSupport(SormContext.builder()).build());
 
-    H2DefinedTable<GeometryJtsRecord> table = H2DefinedTable.of(sorm, GeometryJtsRecord.class);
+    H2DefinedTable<GeometryJtsRecord> table =
+        H2DefinedTable.of(
+            sorm,
+            GeometryJtsRecord.class,
+            TableDefinition.builder(GeometryJtsRecord.class).build());
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_JTS geometry");
     table.createTableIfNotExists();
@@ -71,7 +76,6 @@ class GeometryTest {
     assertThat(ret).isEqualTo(g);
   }
 
-   
   public static class GeometryStringRecord {
 
     public final GeometryString geoStr;
@@ -86,7 +90,6 @@ class GeometryTest {
     }
   }
 
-   
   public static class GeometryJtsRecord {
 
     public final GeometryJts geoJts;

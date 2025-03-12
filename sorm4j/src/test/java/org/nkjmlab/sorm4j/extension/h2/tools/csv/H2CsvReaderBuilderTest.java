@@ -1,14 +1,11 @@
-package org.nkjmlab.sorm4j.extension.h2.tools;
+package org.nkjmlab.sorm4j.extension.h2.tools.csv;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.h2.tools.Csv;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.h2.tools.csv.H2Csv;
-import org.nkjmlab.sorm4j.extension.h2.tools.csv.H2CsvReader;
 
-class H2CsvBuilderTest {
-
+class H2CsvReaderBuilderTest {
   @Test
   void testDefaultBuilderValues() {
     H2CsvReader csv = H2CsvReader.builder().build();
@@ -126,7 +123,7 @@ class H2CsvBuilderTest {
 
   private Csv extractCsvConfig(H2CsvReader h2Csv) {
     try {
-      java.lang.reflect.Field csvField = H2Csv.class.getDeclaredField("csv");
+      java.lang.reflect.Field csvField = h2Csv.getClass().getDeclaredField("csv");
       csvField.setAccessible(true);
       return (Csv) csvField.get(h2Csv);
     } catch (NoSuchFieldException | IllegalAccessException e) {

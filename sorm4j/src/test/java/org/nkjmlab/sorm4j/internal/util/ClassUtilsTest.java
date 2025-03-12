@@ -1,61 +1,27 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
+import static org.nkjmlab.sorm4j.internal.util.ClassUtils.primitiveToWrapper;
 
 import org.junit.jupiter.api.Test;
 
 class ClassUtilsTest {
 
   @Test
-  void testConvertToClass() {
-    Map<String, Class<?>> clazzes =
-        Map.of(
-            "java.lang.Boolean",
-            Boolean.class,
-            "java.lang.Character",
-            Character.class,
-            "java.lang.Byte",
-            Byte.class,
-            "java.lang.Short",
-            Short.class,
-            "java.lang.Integer",
-            Integer.class,
-            "java.lang.Long",
-            Long.class,
-            "java.lang.Float",
-            Float.class,
-            "java.lang.Double",
-            Double.class,
-            "java.lang.Object",
-            Object.class);
+  void shouldConvertPrimitiveToWrapper() {
+    assertThat(primitiveToWrapper(boolean.class)).isEqualTo(Boolean.class);
+    assertThat(primitiveToWrapper(byte.class)).isEqualTo(Byte.class);
+    assertThat(primitiveToWrapper(char.class)).isEqualTo(Character.class);
+    assertThat(primitiveToWrapper(short.class)).isEqualTo(Short.class);
+    assertThat(primitiveToWrapper(int.class)).isEqualTo(Integer.class);
+    assertThat(primitiveToWrapper(long.class)).isEqualTo(Long.class);
+    assertThat(primitiveToWrapper(double.class)).isEqualTo(Double.class);
+    assertThat(primitiveToWrapper(float.class)).isEqualTo(Float.class);
+  }
 
-    clazzes
-        .entrySet()
-        .forEach(en -> assertThat(ClassUtils.convertToClass(en.getKey())).isEqualTo(en.getValue()));
-
-    Map<String, Class<?>> primitives =
-        Map.of(
-            "boolean",
-            boolean.class,
-            "char",
-            char.class,
-            "byte",
-            byte.class,
-            "short",
-            short.class,
-            "int",
-            int.class,
-            "long",
-            long.class,
-            "float",
-            float.class,
-            "double",
-            double.class);
-
-    primitives
-        .entrySet()
-        .forEach(en -> assertThat(ClassUtils.convertToClass(en.getKey())).isEqualTo(en.getValue()));
+  @Test
+  void shouldReturnNullForNonPrimitiveType() {
+    assertThat(primitiveToWrapper(String.class)).isNull();
+    assertThat(primitiveToWrapper(Integer.class)).isNull();
   }
 }
