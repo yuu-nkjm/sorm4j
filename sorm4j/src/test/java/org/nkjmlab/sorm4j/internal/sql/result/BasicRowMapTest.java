@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.common.container.RowMap;
-import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
 
 class BasicRowMapTest {
 

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.util.sql.binding;
+package org.nkjmlab.sorm4j.internal.sql.parameterize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,6 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
@@ -23,7 +22,7 @@ import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
  *
  * @author nkjm
  */
-public final class NamedParameterSqlParserImpl implements NamedParameterSqlBuilder {
+public final class NamedParameterSqlBuilderImpl implements NamedParameterSqlBuilder {
 
   private static final Map<Class<?>, Map<String, ContainerAccessor>> nameToFieldMaps =
       new ConcurrentHashMap<>();
@@ -39,14 +38,14 @@ public final class NamedParameterSqlParserImpl implements NamedParameterSqlBuild
   private final RowMap parameters;
   private Object parametersContainer;
 
-  public NamedParameterSqlParserImpl(String sql, ColumnToFieldAccessorMapper nameToFieldMapper) {
+  public NamedParameterSqlBuilderImpl(String sql, ColumnToFieldAccessorMapper nameToFieldMapper) {
     this.sql = sql;
     this.nameToFieldMapper = nameToFieldMapper;
     this.parameters = RowMap.of();
     this.pattern = Pattern.compile(DEFAULT_NAMED_PARAMETER_PREFIX + "([a-zA-Z0-9_]+)");
   }
 
-  public NamedParameterSqlParserImpl(String sql) {
+  public NamedParameterSqlBuilderImpl(String sql) {
     this(sql, DEFAULT_COLUMN_FIELD_MAPPER);
   }
 

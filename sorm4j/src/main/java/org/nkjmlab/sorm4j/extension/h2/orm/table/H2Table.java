@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.extension.h2.functions.system.CsvWrite;
-import org.nkjmlab.sorm4j.extension.h2.orm.table.H2TableBase.H2SimpleTable;
+import org.nkjmlab.sorm4j.internal.extension.h2.orm.table.H2SimpleTable;
 import org.nkjmlab.sorm4j.table.orm.Table;
 
 public interface H2Table<T> extends Table<T> {

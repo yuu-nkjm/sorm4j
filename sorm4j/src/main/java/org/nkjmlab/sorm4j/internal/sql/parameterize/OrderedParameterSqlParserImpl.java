@@ -1,10 +1,9 @@
-package org.nkjmlab.sorm4j.internal.util.sql.binding;
+package org.nkjmlab.sorm4j.internal.sql.parameterize;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.internal.sql.parameterize.ParameterizedSqlImpl;
 import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 

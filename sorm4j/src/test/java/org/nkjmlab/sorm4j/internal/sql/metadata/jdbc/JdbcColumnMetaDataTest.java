@@ -12,7 +12,6 @@ import java.sql.Statement;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.sql.metadata.jdbc.JdbcColumnMetaDataImpl;
 
 class JdbcColumnMetaDataTest {
 

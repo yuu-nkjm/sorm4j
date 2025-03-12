@@ -18,7 +18,6 @@ class ArrayUtilsTest {
 
   @Test
   void testToObjectArrayBooleanArray() {
-    assertThat(SystemPropertyUtils.getJavaProperties().toString()).contains("java");
     assertThat(ArrayUtils.toObjectArray(new boolean[] {true, false}))
         .isEqualTo(new Boolean[] {true, false});
   }

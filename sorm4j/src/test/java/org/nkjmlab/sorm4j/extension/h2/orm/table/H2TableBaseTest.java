@@ -42,6 +42,16 @@ class H2TableBaseTest {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+    {
+      H2Table<TestEntity> otherTable = table = H2Table.of(sorm, TestEntity.class);
+      try (Connection conn = sorm.openJdbcConnection()) {
+        conn.createStatement()
+            .execute("CREATE TABLE TEST_ENTITIES (id INT PRIMARY KEY, name VARCHAR(255))");
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+      otherTable.selectAll();
+    }
   }
 
   @AfterEach

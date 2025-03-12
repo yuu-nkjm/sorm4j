@@ -19,12 +19,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.sql.metadata.jdbc.JdbcDatabaseMetaDataImpl;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcForeignKeyMetaData;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcIndexMetaData;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcTableMetaData;
-import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class JdbcDatabaseMetaDataImplTest {

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.sql.parameterize;
 
 import java.util.List;
 
-import org.nkjmlab.sorm4j.internal.util.sql.binding.OrderedParameterSqlParserImpl;
+import org.nkjmlab.sorm4j.internal.sql.parameterize.OrderedParameterSqlParserImpl;
 
 /**
  * SQL parser for ordered parameters. The instance could be convert to {@link ParameterizedSql}. The

@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.sql.parameterize;
 import java.util.Map;
 
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.internal.util.sql.binding.NamedParameterSqlParserImpl;
+import org.nkjmlab.sorm4j.internal.sql.parameterize.NamedParameterSqlBuilderImpl;
 
 /**
  * A builder interface for constructing SQL statements with named parameters.
@@ -128,6 +128,6 @@ public interface NamedParameterSqlBuilder extends ParameterizedSqlBuilder {
    * @return a new {@link NamedParameterSqlBuilder} instance
    */
   static NamedParameterSqlBuilder builder(String sql) {
-    return new NamedParameterSqlParserImpl(sql);
+    return new NamedParameterSqlBuilderImpl(sql);
   }
 }
