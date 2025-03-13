@@ -42,21 +42,23 @@ class CsvWriteTest {
             .file(csvFile)
             .query("SELECT * FROM table")
             .charset("UTF-8")
+            .escape("\\")
             .fieldDelimiter("\"")
             .fieldSeparator(";")
             .lineComment("#")
             .lineSeparator("\n")
             .nullString("\\N")
-            .quotedNulls("false")
-            .preserveWhitespace("true")
-            .writeColumnHeader("false")
+            .quotedNulls(false)
+            .preserveWhitespace(true)
+            .writeColumnHeader(false)
+            .caseSensitiveColumnNames(false)
             .build();
     String expectedSql =
         "csvwrite('"
             + csvFile.getAbsolutePath()
             + "', 'SELECT * FROM table', stringdecode('"
             + SqlStringUtils.escapeJavaString(
-                "charset=UTF-8 fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
+                "caseSensitiveColumnNames=false charset=UTF-8 escape=\\ fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
             + "'))";
     assertEquals(expectedSql, csvWrite.getSql());
   }
@@ -66,7 +68,7 @@ class CsvWriteTest {
     CsvWrite.Builder builder = CsvWrite.builder(new File("/test"));
     builder.escape("'");
     builder.query("select * from table");
-    builder.caseSensitiveColumnNames("true");
+    builder.caseSensitiveColumnNames(true);
     assertThat(builder.build().toString()).contains("escape=\\'");
     assertThat(builder.build().toString()).contains("caseSensitiveColumnNames=true");
   }

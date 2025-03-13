@@ -19,6 +19,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcColumnMetaData;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcForeignKeyMetaData;
@@ -54,6 +55,96 @@ class JdbcDatabaseMetaDataImplTest {
   @AfterAll
   static void tearDown() throws SQLException {
     connection.close();
+  }
+
+  @Test
+  void testDatabaseMetadataProperties() {
+    assertNotNull(metaData.toString());
+    assertNotNull(metaData.getSqlKeywords(), "SQL keywords should not be null");
+    assertNotNull(metaData.getNumericFunctions(), "Numeric functions should not be null");
+    assertNotNull(metaData.getStringFunctions(), "String functions should not be null");
+    assertNotNull(metaData.getSystemFunctions(), "System functions should not be null");
+    assertNotNull(metaData.getTimeDateFunctions(), "Time/date functions should not be null");
+    assertNotNull(metaData.getDatabaseProductName(), "Database product name should not be null");
+    assertNotNull(
+        metaData.getDatabaseProductVersion(), "Database product version should not be null");
+    assertNotNull(metaData.getDriverName(), "Driver name should not be null");
+    assertNotNull(metaData.getDriverVersion(), "Driver version should not be null");
+    assertNotNull(metaData.getSearchStringEscape(), "Search string escape should not be null");
+    assertNotNull(metaData.getUrl(), "Database URL should not be null");
+    assertNotNull(metaData.getUserName(), "User name should not be null");
+
+    assertTrue(metaData.isSupportsTransactions(), "Should support transactions");
+    assertTrue(metaData.isSupportsBatchUpdates(), "Should support batch updates");
+    assertFalse(metaData.isSupportsStoredProcedures(), "Does not support stored procedures");
+
+    assertTrue(metaData.getJdbcMajorVersion() > 0, "JDBC major version should be greater than 0");
+    assertTrue(metaData.getJdbcMinorVersion() >= 0, "JDBC minor version should be non-negative");
+    assertTrue(
+        metaData.getDefaultTransactionIsolation() >= 0,
+        "Default transaction isolation should be non-negative");
+    assertTrue(
+        metaData.getMaxConnections() >= 0, "Max connections should be equals or greater than 0");
+  }
+
+  @Test
+  void testGetJdbcColumnsMetaData() {
+    Map<TableName, List<JdbcColumnMetaData>> columnsMetaData = metaData.getJdbcColumnsMetaData();
+    assertNotNull(columnsMetaData, "Columns metadata should not be null");
+
+    assertTrue(
+        columnsMetaData.containsKey(TableName.of("USERS")),
+        "USERS table should exist in column metadata");
+    assertTrue(
+        columnsMetaData.containsKey(TableName.of("ORDERS")),
+        "ORDERS table should exist in column metadata");
+
+    List<JdbcColumnMetaData> usersColumns = columnsMetaData.get(TableName.of("USERS"));
+    assertNotNull(usersColumns, "Columns for USERS should not be null");
+    assertFalse(usersColumns.isEmpty(), "USERS table should have at least one column");
+
+    JdbcColumnMetaData userIdColumn =
+        usersColumns.stream()
+            .filter(col -> "ID".equalsIgnoreCase(col.getColumnName()))
+            .findFirst()
+            .orElse(null);
+    assertNotNull(userIdColumn, "ID column in USERS table should exist");
+    assertEquals("USERS", userIdColumn.getTableName(), "Column should belong to USERS table");
+    assertEquals("ID", userIdColumn.getColumnName(), "Column name should be ID");
+    assertTrue(userIdColumn.getDataType() > 0, "Data type should be valid");
+    assertTrue(userIdColumn.getColumnSize() > 0, "Column size should be greater than 0");
+    assertNotNull(userIdColumn.getIsNullable(), "Nullable flag should not be null");
+    assertNotNull(userIdColumn.getIsAutoIncremented(), "Auto-increment flag should not be null");
+
+    List<JdbcColumnMetaData> ordersColumns = columnsMetaData.get(TableName.of("ORDERS"));
+    assertNotNull(ordersColumns, "Columns for ORDERS should not be null");
+    assertFalse(ordersColumns.isEmpty(), "ORDERS table should have at least one column");
+
+    JdbcColumnMetaData orderAmountColumn =
+        ordersColumns.stream()
+            .filter(col -> "AMOUNT".equalsIgnoreCase(col.getColumnName()))
+            .findFirst()
+            .orElse(null);
+    assertNotNull(orderAmountColumn, "AMOUNT column in ORDERS table should exist");
+    assertEquals(
+        "ORDERS", orderAmountColumn.getTableName(), "Column should belong to ORDERS table");
+    assertEquals("AMOUNT", orderAmountColumn.getColumnName(), "Column name should be AMOUNT");
+    assertTrue(orderAmountColumn.getDataType() > 0, "Data type should be valid");
+    assertTrue(orderAmountColumn.getColumnSize() > 0, "Column size should be greater than 0");
+    assertNotNull(orderAmountColumn.getIsNullable(), "Nullable flag should not be null");
+  }
+
+  @Test
+  void testMetadataTablesAndKeys() {
+    assertNotNull(metaData.getJdbcTablesMetaData(), "Tables metadata should not be null");
+    assertNotNull(metaData.getJdbcIndexesMetaData(), "Indexes metadata should not be null");
+    assertNotNull(metaData.getTableNames(), "Table names should not be null");
+
+    assertNotNull(metaData.getPrimaryKeysMetaData(), "Primary keys metadata should not be null");
+    assertNotNull(
+        metaData.getJdbcForeignKeysMetaData(), "Foreign keys metadata should not be null");
+
+    assertNotNull(metaData.getSchemasMetaData(), "Schemas metadata should not be null");
   }
 
   @Test

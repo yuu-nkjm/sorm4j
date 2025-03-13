@@ -115,14 +115,13 @@ public class H2WebServer implements H2Server {
 
   /** A builder for constructing instances of {@code H2WebServer}. */
   public static class Builder {
-    private static final int DEFAULT_WEB_PORT = 8082;
-    private int webPort = DEFAULT_WEB_PORT;
+    private Integer webPort;
     private boolean webSSL;
     private boolean webAllowOthers;
     private boolean webDaemon;
     private boolean trace;
-    private boolean ifExists;
-    private boolean ifNotExists;
+    private boolean ifExists = true;
+    private boolean ifNotExists = false;
     private String baseDir;
     private DataSource dataSource;
 
@@ -180,7 +179,7 @@ public class H2WebServer implements H2Server {
 
   /** A record that holds configuration properties for an H2 Web Console server. */
   public static record H2WebServerProperties(
-      int webPort,
+      Integer webPort,
       boolean webSSL,
       boolean webAllowOthers,
       boolean webDaemon,
@@ -196,9 +195,11 @@ public class H2WebServer implements H2Server {
      */
     public String[] toArgs() {
       List<String> args = new ArrayList<>();
-      args.add("-webPort");
-      args.add(String.valueOf(webPort));
 
+      if (webPort != null) {
+        args.add("-webPort");
+        args.add(String.valueOf(webPort));
+      }
       if (webSSL) {
         args.add("-webSSL");
       }

@@ -32,7 +32,8 @@ public final class ColumnToAccessorMapping {
         columnToAccessorMap.entrySet().stream()
             .collect(
                 Collectors.toMap(
-                    e -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(e.getKey()), e -> e.getValue()));
+                    e -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(e.getKey()),
+                    e -> e.getValue()));
     this.columnAliasPrefix = columnAliasPrefix;
 
     this.aliasColumnToAccessorMap =
@@ -158,10 +159,6 @@ public final class ColumnToAccessorMapping {
     }
   }
 
-  public Set<String> keySet() {
-    return columnToAccessorMap.keySet();
-  }
-
   private Map<String, ContainerAccessor> createAliasAccessors(
       String prefix, Map<String, ContainerAccessor> accessors) {
     if (prefix.length() == 0) {
@@ -171,7 +168,8 @@ public final class ColumnToAccessorMapping {
     Map<String, ContainerAccessor> ret = new HashMap<>();
 
     for (String key : accessors.keySet()) {
-      String aKey = SormContext.getDefaultCanonicalStringCache().toCanonicalNameWithTableName(prefix, key);
+      String aKey =
+          SormContext.getDefaultCanonicalStringCache().toCanonicalNameWithTableName(prefix, key);
       if (accessors.containsKey(aKey)) {
         Object[] params = {prefix, key};
         throw new SormException(

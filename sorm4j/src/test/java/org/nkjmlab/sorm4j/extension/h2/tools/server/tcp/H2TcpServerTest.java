@@ -74,7 +74,7 @@ class H2TcpServerTest {
             .tcpAllowOthers(true)
             .tcpDaemon(true)
             .trace(true)
-            .ifExists(false)
+            .ifExists(true)
             .ifNotExists(true)
             .baseDir("/tmp/h2")
             .key("from", "to")

@@ -85,6 +85,11 @@ class TryTest {
         ThrowableBiConsumer.toBiConsumer((a, b) -> i.addAndGet(a + b), e -> {});
     func.accept(1, 2);
     assertEquals(3, i.get());
+    {
+      BiConsumer<Integer, Integer> f =
+          ThrowableBiConsumer.toBiConsumer((a, b) -> Integer.parseInt("a"), e -> {});
+      assertDoesNotThrow(() -> f.accept(1, 2));
+    }
   }
 
   @Test
@@ -93,12 +98,27 @@ class TryTest {
     Consumer<Integer> func = ThrowableConsumer.toConsumer(a -> i.addAndGet(a), e -> {});
     func.accept(2);
     assertEquals(2, i.get());
+    {
+      Consumer<Integer> f = ThrowableConsumer.toConsumer(a -> Integer.parseInt("a"), e -> {});
+      assertDoesNotThrow(() -> f.accept(1));
+    }
   }
 
   @Test
   void testCreateFunction() {
-    Function<Integer, Integer> func = ThrowableFunction.toFunction(a -> a + 1, e -> -1);
-    assertEquals(3, func.apply(2));
+    {
+      Function<Integer, Integer> func = ThrowableFunction.toFunction(a -> a + 1, e -> -1);
+      assertEquals(3, func.apply(2));
+    }
+    {
+      Function<Integer, Integer> func =
+          ThrowableFunction.toFunction(
+              a -> {
+                throw new RuntimeException();
+              },
+              e -> -1);
+      assertEquals(-1, func.apply(2));
+    }
   }
 
   @Test

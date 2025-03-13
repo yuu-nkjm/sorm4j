@@ -50,8 +50,8 @@ public class CsvWrite {
       return this;
     }
 
-    public CsvWrite.Builder caseSensitiveColumnNames(String val) {
-      csvOptionsBuilder.caseSensitiveColumnNames(val);
+    public CsvWrite.Builder caseSensitiveColumnNames(boolean caseSensitiveColumnNames) {
+      csvOptionsBuilder.caseSensitiveColumnNames(caseSensitiveColumnNames);
       return this;
     }
 
@@ -90,17 +90,17 @@ public class CsvWrite {
       return this;
     }
 
-    public CsvWrite.Builder quotedNulls(String val) {
+    public CsvWrite.Builder quotedNulls(boolean val) {
       csvOptionsBuilder.quotedNulls(val);
       return this;
     }
 
-    public CsvWrite.Builder preserveWhitespace(String val) {
+    public CsvWrite.Builder preserveWhitespace(boolean val) {
       csvOptionsBuilder.preserveWhitespace(val);
       return this;
     }
 
-    public CsvWrite.Builder writeColumnHeader(String val) {
+    public CsvWrite.Builder writeColumnHeader(boolean val) {
       csvOptionsBuilder.writeColumnHeader(val);
       return this;
     }

@@ -11,17 +11,6 @@ import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
 public final class DefaultColumnValueToMapValueConverters
     implements ColumnValueToMapValueConverters {
 
-  private final Map<Integer, ColumnValueToMapValueConverters> converters;
-
-  public DefaultColumnValueToMapValueConverters() {
-    this(Collections.emptyMap());
-  }
-
-  public DefaultColumnValueToMapValueConverters(
-      Map<Integer, ColumnValueToMapValueConverters> converters) {
-    this.converters = Map.copyOf(converters);
-  }
-
   /**
    * Reads a column from the current row in the provided {@link java.sql.ResultSet} and returns an
    * instance of the specified Java {@link SQLType} containing the values read.
@@ -40,10 +29,6 @@ public final class DefaultColumnValueToMapValueConverters
   @Override
   public Object convertToValue(ResultSet resultSet, int column, int sqlType) throws SQLException {
 
-    final ColumnValueToMapValueConverters converter = converters.get(sqlType);
-    if (converter != null) {
-      return converter.convertToValue(resultSet, column, sqlType);
-    }
     switch (sqlType) {
       case java.sql.Types.ARRAY:
         return resultSet.getArray(column).getArray();

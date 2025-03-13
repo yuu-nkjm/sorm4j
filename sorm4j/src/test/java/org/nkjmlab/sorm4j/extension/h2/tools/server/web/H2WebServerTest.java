@@ -77,12 +77,20 @@ class H2WebServerTest {
     String sessionUrl = webServer.createSession(conn);
     assertNotNull(sessionUrl, "Session URL should not be null");
     assertTrue(sessionUrl.startsWith("http"), "Session URL should start with http");
+    webServer.openBrowser();
   }
 
   @Test
   void testBuilderPattern() {
     H2WebServer.Builder builder = new H2WebServer.Builder(dataSource);
-    builder.webPort(9090).webSSL(true).webAllowOthers(true).baseDir("/testDir");
+    builder
+        .webPort(9090)
+        .webSSL(true)
+        .webAllowOthers(true)
+        .baseDir("/testDir")
+        .trace(true)
+        .ifExists(true)
+        .ifNotExists(true);
     H2WebServer builtServer = builder.build();
     assertEquals(9090, builtServer.getPort(), "Expected server port is 9090");
   }

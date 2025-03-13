@@ -36,8 +36,8 @@ public class CsvOptions {
      * @param val
      * @return
      */
-    public Builder caseSensitiveColumnNames(String val) {
-      return putCsvOption("caseSensitiveColumnNames", val);
+    public Builder caseSensitiveColumnNames(boolean caseSensitiveColumnNames) {
+      return putCsvOption("caseSensitiveColumnNames", caseSensitiveColumnNames + "");
     }
 
     /**
@@ -69,6 +69,7 @@ public class CsvOptions {
     public CsvOptions.Builder fieldDelimiter(String val) {
       return putCsvOption("fieldDelimiter", val);
     }
+
     /**
      * fieldSeparator (a comma by default),
      *
@@ -116,26 +117,28 @@ public class CsvOptions {
      * @param val
      * @return
      */
-    public CsvOptions.Builder quotedNulls(String val) {
-      return putCsvOption("quotedNulls", val);
+    public CsvOptions.Builder quotedNulls(boolean val) {
+      return putCsvOption("quotedNulls", val + "");
     }
+
     /**
      * preserveWhitespace (true or false; disabled by default),
      *
      * @param val
      * @return
      */
-    public CsvOptions.Builder preserveWhitespace(String val) {
-      return putCsvOption("preserveWhitespace", val);
+    public CsvOptions.Builder preserveWhitespace(boolean val) {
+      return putCsvOption("preserveWhitespace", val + "");
     }
+
     /**
      * writeColumnHeader (true or false; enabled by default).
      *
      * @param val
      * @return
      */
-    public CsvOptions.Builder writeColumnHeader(String val) {
-      return putCsvOption("writeColumnHeader", val);
+    public CsvOptions.Builder writeColumnHeader(boolean val) {
+      return putCsvOption("writeColumnHeader", val + "");
     }
 
     private Builder putCsvOption(String key, String val) {

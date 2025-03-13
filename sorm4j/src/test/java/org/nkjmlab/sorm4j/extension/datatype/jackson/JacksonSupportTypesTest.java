@@ -21,15 +21,19 @@ class JacksonSupportTypesTest {
   @Test
   void testIsSupport_withAnnotatedClass() {
     assertThat(supportTypes.isSupport(AnnotatedClass.class)).isTrue();
+    assertThat(supportTypes.isSupport(AnnotatedClass.class)).isTrue();
   }
 
   @Test
   void testIsSupport_withNonAnnotatedClass() {
     assertThat(supportTypes.isSupport(NonAnnotatedClass.class)).isFalse();
+    assertThat(supportTypes.isSupport(NonAnnotatedClass.class)).isFalse();
   }
 
   @Test
   void testIsSupport_withSupportedCollectionTypes() {
+    assertThat(supportTypes.isSupport(List.class)).isTrue();
+    assertThat(supportTypes.isSupport(Map.class)).isTrue();
     assertThat(supportTypes.isSupport(List.class)).isTrue();
     assertThat(supportTypes.isSupport(Map.class)).isTrue();
   }
@@ -38,16 +42,22 @@ class JacksonSupportTypesTest {
   void testIsSupport_withUnsupportedTypes() {
     assertThat(supportTypes.isSupport(String.class)).isFalse();
     assertThat(supportTypes.isSupport(Integer.class)).isFalse();
+    assertThat(supportTypes.isSupport(String.class)).isFalse();
+    assertThat(supportTypes.isSupport(Integer.class)).isFalse();
   }
 
   @Test
   void testIsSupport_withArrayType() {
     assertThat(supportTypes.isSupport(AnnotatedClass[].class)).isTrue();
     assertThat(supportTypes.isSupport(NonAnnotatedClass[].class)).isFalse();
+    assertThat(supportTypes.isSupport(AnnotatedClass[].class)).isTrue();
+    assertThat(supportTypes.isSupport(NonAnnotatedClass[].class)).isFalse();
   }
 
   @Test
   void testIsSupport_withNestedArrayType() {
+    assertThat(supportTypes.isSupport(AnnotatedClass[][].class)).isTrue();
+    assertThat(supportTypes.isSupport(NonAnnotatedClass[][].class)).isFalse();
     assertThat(supportTypes.isSupport(AnnotatedClass[][].class)).isTrue();
     assertThat(supportTypes.isSupport(NonAnnotatedClass[][].class)).isFalse();
   }

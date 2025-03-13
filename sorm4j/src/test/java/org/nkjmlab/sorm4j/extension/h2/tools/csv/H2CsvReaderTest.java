@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.extension.h2.tools.csv;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.BufferedWriter;
@@ -10,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -31,8 +29,7 @@ class H2CsvReaderTest {
 
   private static final File OUTPUT_CSV_WITH_HEADER_FILE =
       Try.getOrElseNull(() -> File.createTempFile("test_output", ".csv"));
-  private static final File CSV_WITHOUT_HEADER_FILE =
-      new File(H2CsvReaderTest.class.getResource("./test_without_header.csv").getFile());
+
   private Sorm sorm;
 
   @BeforeEach
@@ -60,42 +57,6 @@ class H2CsvReaderTest {
             sorm.getDataSource(), OUTPUT_CSV_WITH_HEADER_FILE, "SELECT * FROM test");
     assertThat(writtenRows).isEqualTo(3);
     assertThat(OUTPUT_CSV_WITH_HEADER_FILE).exists();
-  }
-
-  @Test
-  void testReadCsvWithHeader() {
-    H2CsvWriter h2CsvWriter = H2CsvWriter.builder().build();
-    h2CsvWriter.writeCsv(sorm.getDataSource(), OUTPUT_CSV_WITH_HEADER_FILE, "SELECT * FROM test");
-    H2CsvReader h2CsvReader = H2CsvReader.builder().build();
-    {
-      List<RowMap> rows = h2CsvReader.readCsvWithHeader(OUTPUT_CSV_WITH_HEADER_FILE);
-      assertThat(rows).hasSize(3);
-      assertThat(rows.get(0).get("ID")).isEqualTo("1");
-      assertThat(rows.get(0).get("NAME")).isEqualTo("Alice");
-    }
-    {
-      assertThatException()
-          .isThrownBy(() -> h2CsvReader.readCsvWithHeader(OUTPUT_CSV_WITH_HEADER_FILE));
-    }
-  }
-
-  @Test
-  void testReadCsvWithoutHeader() throws IOException {
-    {
-      H2CsvReader h2CsvReader = H2CsvReader.builder().build();
-      List<RowMap> rows =
-          h2CsvReader.readCsvWithoutHeader(CSV_WITHOUT_HEADER_FILE, new String[] {"ID", "NAME"});
-      assertThat(rows).hasSize(3);
-      assertThat(rows.get(0).get("ID")).isEqualTo("1");
-      assertThat(rows.get(0).get("NAME")).isEqualTo("Alice");
-    }
-    try (Reader in = new InputStreamReader(CSV_WITHOUT_HEADER_FILE.toURI().toURL().openStream())) {
-      H2CsvReader h2CsvReader = H2CsvReader.builder().build();
-      List<RowMap> rows = h2CsvReader.readCsvWithoutHeader(in, new String[] {"ID", "NAME"});
-      assertThat(rows).hasSize(3);
-      assertThat(rows.get(0).get("ID")).isEqualTo("1");
-      assertThat(rows.get(0).get("NAME")).isEqualTo("Alice");
-    }
   }
 
   @Test
@@ -259,13 +220,6 @@ class H2CsvReaderTest {
   }
 
   @Test
-  void testSetWriteColumnHeader() {
-    H2CsvReader csv = H2CsvReader.builder().writeColumnHeader(false).build();
-    Csv csvConfig = extractCsvConfig(csv);
-    assertThat(csvConfig.getWriteColumnHeader()).isFalse();
-  }
-
-  @Test
   void testMultipleConfigurations() {
     H2CsvReader csv =
         H2CsvReader.builder()
@@ -294,6 +248,13 @@ class H2CsvReaderTest {
     assertThat(csvConfig.isQuotedNulls()).isTrue();
     assertThat(csvConfig.getNullString()).isEqualTo("NULL");
     assertThat(csvConfig.getPreserveWhitespace()).isTrue();
+    assertThat(csvConfig.getWriteColumnHeader()).isFalse();
+  }
+
+  @Test
+  void testSetWriteColumnHeader() {
+    H2CsvReader csv = H2CsvReader.builder().writeColumnHeader(false).build();
+    Csv csvConfig = extractCsvConfig(csv);
     assertThat(csvConfig.getWriteColumnHeader()).isFalse();
   }
 

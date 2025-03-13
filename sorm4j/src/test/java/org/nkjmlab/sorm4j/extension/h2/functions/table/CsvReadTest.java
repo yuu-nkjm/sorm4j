@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.extension.h2.functions.table;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
@@ -48,6 +49,7 @@ class CsvReadTest {
             .charset("UTF-8")
             .fieldSeparator(";")
             .build();
+    assertThat(csvRead.getCsvColumns().size()).isEqualTo(3);
     assertEquals(
         "csvread('"
             + csvFile.getAbsolutePath()
@@ -62,16 +64,18 @@ class CsvReadTest {
     CsvRead csvRead =
         CsvRead.builder()
             .file(csvFile)
+            .caseSensitiveColumnNames(false)
             .columns(columns)
             .charset("UTF-8")
+            .escape("\\")
             .fieldDelimiter("\"")
             .fieldSeparator(";")
             .lineComment("#")
             .lineSeparator("\n")
             .nullString("\\N")
-            .quotedNulls("false")
-            .preserveWhitespace("true")
-            .writeColumnHeader("false")
+            .quotedNulls(false)
+            .preserveWhitespace(true)
+            .writeColumnHeader(false)
             .build();
     String expectedSql =
         "csvread('"
@@ -79,7 +83,7 @@ class CsvReadTest {
             + "', 'col1;col2', "
             + "stringdecode('"
             + SqlStringUtils.escapeJavaString(
-                "charset=UTF-8 fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
+                "caseSensitiveColumnNames=false charset=UTF-8 escape=\\ fieldDelimiter=\" fieldSeparator=; lineComment=# lineSeparator=\n null=\\N preserveWhitespace=true quotedNulls=false writeColumnHeader=false")
             + "'))";
     assertEquals(expectedSql, csvRead.getSql());
   }
