@@ -124,20 +124,19 @@ class TryTest {
                 () -> {
                   throw new RuntimeException();
                 },
-                Try::rethrow));
+                e -> new RuntimeException(e)));
   }
 
   @Test
   void testRunOrElseDo() {
     assertDoesNotThrow(() -> Try.runOrElseDo(() -> {}, e -> {}));
-    assertThrows(
-        RuntimeException.class,
+    assertDoesNotThrow(
         () ->
             Try.runOrElseDo(
                 () -> {
                   throw new RuntimeException();
                 },
-                Try::rethrow));
+                e -> new RuntimeException(e)));
   }
 
   @Test

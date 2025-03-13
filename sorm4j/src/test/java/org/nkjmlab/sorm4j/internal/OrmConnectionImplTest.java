@@ -167,12 +167,13 @@ class OrmConnectionImplTest {
                   Guest.class,
                   Player.class,
                   Sport.class,
-                  "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
-                      + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address, "
-                      + "s.id sport_DOT_id, s.name sport_DOT_name "
-                      + "from guests g "
-                      + "join players p on g.id=p.id "
-                      + "join sports s on g.id=s.id");
+                  ParameterizedSql.of(
+                      "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                          + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address, "
+                          + "s.id sport_DOT_id, s.name sport_DOT_name "
+                          + "from guests g "
+                          + "join players p on g.id=p.id "
+                          + "join sports s on g.id=s.id"));
 
           assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
           assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());

@@ -13,8 +13,7 @@ import java.sql.SQLException;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.extension.h2.tools.server.tcp.H2TcpServerProcess;
-import org.nkjmlab.sorm4j.internal.extension.h2.tools.server.tcp.H2TcpServerProperties;
+import org.nkjmlab.sorm4j.extension.h2.tools.server.tcp.H2TcpServer;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -46,13 +45,12 @@ class H2DataSourceFactoryTest {
         factory.getUsername(),
         factory.getPassword());
 
-    H2TcpServerProcess p =
-        H2TcpServerProcess.of(H2TcpServerProperties.builder().setPort(9999).build());
-
-    p.awaitStart();
+    H2TcpServer server = H2TcpServer.builder("tcpPassword").tcpPort(9999).tcpDaemon(true).build();
+    server.start();
     factory.createServerModeDataSource().getConnection().close();
     factory.createServerModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
-    p.awaitShutdown();
+    factory.createServerModeDataSource().getConnection().close();
+    server.stop();
   }
 
   @Test

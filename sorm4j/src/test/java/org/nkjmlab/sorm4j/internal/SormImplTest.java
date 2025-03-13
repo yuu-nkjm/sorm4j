@@ -83,7 +83,8 @@ class SormImplTest {
                     Guest.class,
                     Player.class,
                     Sport.class,
-                    "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id")
+                    ParameterizedSql.of(
+                        "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id"))
                 .size())
         .isEqualTo(0);
 
