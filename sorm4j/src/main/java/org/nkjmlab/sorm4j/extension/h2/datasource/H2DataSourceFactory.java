@@ -36,14 +36,14 @@ public class H2DataSourceFactory {
   private final String mixedModeJdbcUrl;
 
   private H2DataSourceFactory(
-      File databaseDirectory, String databaseName, String username, String password) {
+      File databaseDirectory, String databaseName, String username, String password, int tcpPort) {
     this.username = username;
     this.password = password;
     this.databaseName = databaseName;
     this.databaseDirectory = databaseDirectory;
     this.databasePath = createDatabasePath(databaseDirectory, databaseName);
     this.inMemoryModeJdbcUrl = "jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1";
-    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost/" + databasePath;
+    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost:" + tcpPort + "/" + databasePath;
     this.embeddedModeJdbcUrl = "jdbc:h2:file:" + databasePath;
     this.mixedModeJdbcUrl = "jdbc:h2:" + databasePath + ";AUTO_SERVER=TRUE";
   }
@@ -264,14 +264,26 @@ public class H2DataSourceFactory {
     private String databaseName = "h2db-tmp";
     private String username = "";
     private String password = "";
+    private int tcpPort = 9092;
 
     public Builder() {}
 
     private Builder(File databaseDirectory, String dbName, String username, String password) {
+      this(databaseDirectory, dbName, username, password, 9092);
+    }
+
+    private Builder(
+        File databaseDirectory, String dbName, String username, String password, int tcpPort) {
       this.databaseName = dbName;
       this.username = username;
       this.password = password;
+      this.tcpPort = tcpPort;
       setDatabaseDirectory(databaseDirectory);
+    }
+
+    public H2DataSourceFactory.Builder setTcpPort(int tcpPort) {
+      this.tcpPort = tcpPort;
+      return this;
     }
 
     public H2DataSourceFactory.Builder setUsername(String username) {
@@ -329,7 +341,7 @@ public class H2DataSourceFactory {
      * @return
      */
     public H2DataSourceFactory build() {
-      return new H2DataSourceFactory(databaseDirectory, databaseName, username, password);
+      return new H2DataSourceFactory(databaseDirectory, databaseName, username, password, tcpPort);
     }
   }
 

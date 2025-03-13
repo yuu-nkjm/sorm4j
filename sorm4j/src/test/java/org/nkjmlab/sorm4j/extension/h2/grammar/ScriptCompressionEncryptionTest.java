@@ -17,28 +17,28 @@ class ScriptCompressionEncryptionTest {
   @Test
   public void testBuilderWithCustomCompression() {
     ScriptCompressionEncryption script =
-        new ScriptCompressionEncryption.Builder().compression("ZIP").password("pass").build();
+        ScriptCompressionEncryption.builder().compression("ZIP").password("pass").build();
     assertEquals("compression ZIP password 'pass'", script.getSql());
   }
 
   @Test
   public void testBuilderWithCustomCipher() {
     ScriptCompressionEncryption script =
-        new ScriptCompressionEncryption.Builder().cipher("DES").password("pass").build();
+        ScriptCompressionEncryption.builder().cipher("DES").password("pass").build();
     assertEquals("cipher DES password 'pass'", script.getSql());
   }
 
   @Test
   public void testBuilderWithCustomPassword() {
     ScriptCompressionEncryption script =
-        new ScriptCompressionEncryption.Builder().password("myPassword").build();
+        ScriptCompressionEncryption.builder().password("myPassword").build();
     assertEquals("password 'myPassword'", script.getSql());
   }
 
   @Test
   public void testBuilderWithAllCustomProperties() {
     ScriptCompressionEncryption script =
-        new ScriptCompressionEncryption.Builder()
+        ScriptCompressionEncryption.builder()
             .compression("GZIP")
             .cipher("TripleDES")
             .password("securePass")
@@ -48,7 +48,7 @@ class ScriptCompressionEncryptionTest {
 
   @Test
   public void testBuilderWithNoProperties() {
-    ScriptCompressionEncryption script = new ScriptCompressionEncryption.Builder().build();
+    ScriptCompressionEncryption script = ScriptCompressionEncryption.builder().build();
     assertEquals("", script.getSql());
   }
 

@@ -105,7 +105,7 @@ class SormImplTest {
   @Test
   void readMapOne() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
-
+    Table.of(sorm, Guest.class, "guests");
     Table.of(sorm, Guest.class);
     try (Connection conn = sorm.openJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())

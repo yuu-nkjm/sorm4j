@@ -136,12 +136,12 @@ class OrmConnectionImplTest {
   @Test
   void testTupleList2() {
     orm.acceptHandler(
-        m -> {
-          m.insert(GUEST_ALICE, GUEST_BOB);
-          m.insert(PLAYER_ALICE, PLAYER_BOB);
+        conn -> {
+          conn.insert(GUEST_ALICE, GUEST_BOB);
+          conn.insert(PLAYER_ALICE, PLAYER_BOB);
 
           List<Tuple2<Guest, Player>> result =
-              m.readTupleList(
+              conn.readTupleList(
                   Guest.class,
                   Player.class,
                   "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "

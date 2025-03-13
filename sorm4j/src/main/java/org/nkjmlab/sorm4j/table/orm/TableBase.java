@@ -1,9 +1,8 @@
 package org.nkjmlab.sorm4j.table.orm;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.sql.SqlKeyword;
 
-public class TableBase<T> implements Table<T>, SqlKeyword {
+public class TableBase<T> implements Table<T> {
   private final Sorm orm;
   private final Class<T> valueType;
   private final String tableName;

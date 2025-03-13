@@ -20,12 +20,14 @@ public class ScriptCompressionEncryption {
     return sql;
   }
 
-  public Builder builder() {
+  public static Builder builder() {
     return new Builder();
   }
 
   public static class Builder {
     private final Map<String, String> props = new LinkedHashMap<>();
+
+    private Builder() {}
 
     private void procProp(String key, BiConsumer<String, String> func) {
       String val = props.get(key);
@@ -37,12 +39,6 @@ public class ScriptCompressionEncryption {
 
     public Builder compression(String compression) {
       this.props.put("compression", compression);
-      return this;
-    }
-
-    public Builder cipherAndPassword(String cipher, String password) {
-      cipher(cipher);
-      password(password);
       return this;
     }
 

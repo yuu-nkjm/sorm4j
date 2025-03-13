@@ -42,6 +42,9 @@ class JdbcDatabaseMetaDataTest {
     TableName t2 = TableName.of("users");
     TableName t3 = TableName.of("orders");
 
+    assertThat(t1.equals(t1)).isTrue();
+    assertThat(t1.equals("1")).isFalse();
+
     assertThat(t1).isEqualTo(t2);
     assertThat(t1).isNotEqualTo(t3);
   }

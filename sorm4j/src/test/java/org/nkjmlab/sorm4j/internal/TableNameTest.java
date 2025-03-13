@@ -11,6 +11,9 @@ class TableNameTest {
   void testTableName() {
     TableName t1 = TableName.of("test");
     TableName t2 = TableName.of("test");
+    assertThat(t1.equals(t1)).isTrue();
+    assertThat(t1.equals("1")).isFalse();
+
     assertThat(t1.toString().equals("test")).isTrue();
     assertThat(t1.equals(t1)).isTrue();
     assertThat(t1.equals(t2)).isTrue();

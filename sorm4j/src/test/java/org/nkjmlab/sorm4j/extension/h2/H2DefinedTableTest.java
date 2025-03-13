@@ -75,6 +75,7 @@ class H2DefinedTableTest {
       DefinedTable.of(sorm, OrmRecordExample.class);
     }
     table.dropTableIfExists();
+    table.dropTableIfExistsCascade();
     table.createTableIfNotExists(CsvRead.builderForCsvWithHeader(tmpCsv).build());
     OrmRecordExample ret = table.selectAll().get(0);
     assertThat(ret.id).isEqualTo(1);

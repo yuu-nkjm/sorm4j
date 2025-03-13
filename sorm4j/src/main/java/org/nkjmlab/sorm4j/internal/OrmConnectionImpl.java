@@ -383,10 +383,6 @@ public class OrmConnectionImpl implements OrmConnection {
     return sormContext.getTableSql(connection, getTableMetaData(tableName));
   }
 
-  public OrmTableMetaData getTableMetaData(Class<?> objectClass) {
-    return getTableMapping(objectClass).getTableMetaData();
-  }
-
   private TableMetaData getTableMetaData(String tableName) {
     return sormContext.getTableMetaData(connection, tableName);
   }

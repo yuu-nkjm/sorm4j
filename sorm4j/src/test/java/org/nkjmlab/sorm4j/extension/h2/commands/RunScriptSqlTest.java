@@ -28,7 +28,7 @@ class RunScriptSqlTest {
   public void testBuilderWithFileAndCompressionEncryption() {
     File file = new File("script.sql");
     ScriptCompressionEncryption compressionEncryption =
-        new ScriptCompressionEncryption.Builder()
+        ScriptCompressionEncryption.builder()
             .compression("DEFLATE")
             .cipher("AES")
             .password("password")
@@ -50,7 +50,7 @@ class RunScriptSqlTest {
   public void testBuilderWithAllOptions() {
     File file = new File("script.sql");
     ScriptCompressionEncryption compressionEncryption =
-        new ScriptCompressionEncryption.Builder()
+        ScriptCompressionEncryption.builder()
             .compression("ZIP")
             .cipher("DES")
             .password("secure")

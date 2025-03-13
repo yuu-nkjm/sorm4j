@@ -1,5 +1,6 @@
 package org.nkjmlab.sorm4j.internal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,6 +26,7 @@ class TableConnectionImplTest {
     TableConnection<Player> tableConnection =
         TableConnection.of(ormConnection, Player.class, "players");
 
+    assertThat(tableConnection.getValueType()).isEqualTo(Player.class);
     assertDoesNotThrow(() -> tableConnection.close());
     verify(mockConnection).close();
   }

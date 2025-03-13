@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.extension.h2.grammar.ScriptCompressionEncryption;
 
 class ScriptSqlTest {
 
@@ -54,9 +55,22 @@ class ScriptSqlTest {
   public void testBuilderWithFileName() {
     // Assuming File and ScriptCompressionEncryption classes are correctly imported and used
     File file = new File("test.sql");
-    ScriptSql scriptSql = ScriptSql.builder().to(file).charset("UTF-8").build();
+    ScriptSql scriptSql =
+        ScriptSql.builder()
+            .to(file)
+            .scriptCompressionEncryption(
+                ScriptCompressionEncryption.builder()
+                    .compression("ZIP")
+                    .cipher("AES")
+                    .password("PASSWORD")
+                    .build())
+            .charset("UTF-8")
+            .build();
     assertEquals(
-        "script to '" + file.getAbsolutePath() + "' charset 'UTF-8'",
+        "script to '"
+            + file.getAbsolutePath()
+            + "'"
+            + " compression ZIP cipher AES password 'PASSWORD' charset 'UTF-8'",
         scriptSql.getSql()); // Assuming wrapSingleQuote works as intended
   }
 

@@ -12,14 +12,11 @@ import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.join;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import org.nkjmlab.sorm4j.common.annotation.Experimental;
-
 /**
  * API of creates a select SQL statement.
  *
  * @author nkjm
  */
-@Experimental
 public final class SelectSql {
 
   private SelectSql() {}

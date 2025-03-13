@@ -13,6 +13,8 @@ import java.sql.SQLException;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.internal.extension.h2.tools.server.tcp.H2TcpServerProcess;
+import org.nkjmlab.sorm4j.internal.extension.h2.tools.server.tcp.H2TcpServerProperties;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -33,7 +35,7 @@ class H2DataSourceFactoryTest {
     factory.makeFileDatabaseIfNotExists();
 
     assertThat(factory.getServerModeJdbcUrl())
-        .isEqualTo("jdbc:h2:tcp://localhost/" + userHomeDir() + "/h2db/testdir/testdb1");
+        .isEqualTo("jdbc:h2:tcp://localhost:9999/" + userHomeDir() + "/h2db/testdir/testdb1");
 
     assertThat(factory.toString()).contains("jdbc:h2:mem:testdb1;DB_CLOSE_DELAY=-1");
 
@@ -44,10 +46,13 @@ class H2DataSourceFactoryTest {
         factory.getUsername(),
         factory.getPassword());
 
-    H2DataSourceFactory.createTemporalInMemoryDataSource();
+    H2TcpServerProcess p =
+        H2TcpServerProcess.of(H2TcpServerProperties.builder().setPort(9999).build());
 
+    p.awaitStart();
     factory.createServerModeDataSource().getConnection().close();
     factory.createServerModeDataSource("DB_CLOSE_DELAY=-1").getConnection();
+    p.awaitShutdown();
   }
 
   @Test

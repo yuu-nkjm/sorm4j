@@ -11,8 +11,8 @@ import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
+import org.nkjmlab.sorm4j.internal.util.function.ThrowableBiConsumer;
+import org.nkjmlab.sorm4j.internal.util.function.ThrowableFunction;
 
 public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessorBase<T> {
 
