@@ -236,6 +236,16 @@ public class H2DataSourceFactory {
     return new Builder(databaseDirectory, databaseName, username, password);
   }
 
+  /**
+   * Creates temporal an in memory data source.
+   *
+   * @return
+   */
+  public static DataSource createTemporalInMemoryDataSource() {
+    return JdbcConnectionPool.create(
+        "jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1", "", "");
+  }
+
   @Override
   public String toString() {
     return "H2LocalDataSourceFactory [databaseDirectory="
@@ -343,15 +353,5 @@ public class H2DataSourceFactory {
     public H2DataSourceFactory build() {
       return new H2DataSourceFactory(databaseDirectory, databaseName, username, password, tcpPort);
     }
-  }
-
-  /**
-   * Creates temporal an in memory data source.
-   *
-   * @return
-   */
-  public static DataSource createTemporalInMemoryDataSource() {
-    return JdbcConnectionPool.create(
-        "jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1", "", "");
   }
 }
