@@ -32,7 +32,7 @@ class GeometryTest {
 
     assertThat(g.equals(g1)).isTrue();
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
-    assertThat(g.text()).isEqualTo("POINT (30 10)");
+    assertThat(g.toString()).isEqualTo("POINT (30 10)");
 
     table.insert(new GeometryStringRecord(g));
 
@@ -65,7 +65,7 @@ class GeometryTest {
     JtsGeometry g1 = new JtsGeometry(coordinate);
     assertThat(g.equals(g1)).isTrue();
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
-    assertThat(g.geometry().toString()).isEqualTo("POINT (100 200)");
+    assertThat(g.toString()).isEqualTo("POINT (100 200)");
 
     table.insert(new GeometryJtsRecord(g));
 

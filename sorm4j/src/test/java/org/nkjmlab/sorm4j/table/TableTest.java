@@ -313,6 +313,12 @@ class TableTest {
   }
 
   @Test
+  void testSelectOneAllEqualBlank() {
+    playersTable.insert(PLAYER_ALICE);
+    assertThat(playersTable.selectOneAllEqual().getId()).isEqualTo(PLAYER_ALICE.getId());
+  }
+
+  @Test
   void testSelectOneAllEqual() {
     playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectOneAllEqual("name", PLAYER_ALICE.getName()).getId())

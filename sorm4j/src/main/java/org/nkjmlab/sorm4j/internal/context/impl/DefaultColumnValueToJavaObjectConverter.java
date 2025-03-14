@@ -70,27 +70,13 @@ public final class DefaultColumnValueToJavaObjectConverter
       throws SQLException {
 
     Object value = convertToAux(resultSet, columnIndex, columnType, toType);
-    try {
-      if (toType.isPrimitive()) {
-        @SuppressWarnings("unchecked")
-        T val = (T) value;
-        return val;
-      }
-
-      return toType.cast(value);
-    } catch (Exception e) {
-      String tableName =
-          Try.getOrElse(() -> resultSet.getMetaData().getTableName(columnIndex), "UNKNOWN_TABLE");
-      String columnLabel =
-          Try.getOrElse(
-              () -> resultSet.getMetaData().getColumnLabel(columnIndex), "UNKNOWN_COLUMN");
-      Object[] params = {JDBCType.valueOf(columnType), toType, tableName, columnLabel};
-      throw new SormException(
-          ParameterizedStringFormatter.LENGTH_256.format(
-              "Could not cast column [{}] to java object type [{}], tableName=[{}], columnLabel=[{}]",
-              params),
-          e);
+    if (toType.isPrimitive()) {
+      @SuppressWarnings("unchecked")
+      T val = (T) value;
+      return val;
     }
+
+    return toType.cast(value);
   }
 
   private Object convertToAux(ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)

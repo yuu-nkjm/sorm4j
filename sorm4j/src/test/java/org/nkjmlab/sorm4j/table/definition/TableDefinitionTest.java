@@ -21,7 +21,6 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
@@ -36,18 +35,21 @@ import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class TableDefinitionTest {
+  @Test
+  void testMisc() {
+    assertThat(TableDefinition.toTableName(Player.class)).isEqualTo("PLAYERS");
+    assertThat(TableDefinition.builder("").setTableName("tbn").build().getTableName())
+        .isEqualTo("tbn");
+  }
 
   @Test
   void testEnum() {
     Sorm sorm = SormTestUtils.createSormWithNewContext();
     TableDefinition def = TableDefinition.builder(SimpleEnum.class).build();
     def.createTableIfNotExists(sorm);
-    sorm.insert(new SimpleEnum(1, EnumExample.A));
+    sorm.insert(new SimpleEnum(1, EnumExample.A, new File("java_object")));
     assertThat(sorm.readFirst(SimpleEnum.class, "SELECT * FROM SIMPLE_ENUMS").enumCol)
         .isInstanceOf(EnumExample.class);
-    assertThat(TableDefinition.toTableName(Player.class)).isEqualTo("PLAYERS");
-    assertThat(TableDefinition.builder("").setTableName("tbn").build().getTableName())
-        .isEqualTo("tbn");
   }
 
   @Test
@@ -86,16 +88,7 @@ class TableDefinitionTest {
     C
   }
 
-  public static class SimpleEnum {
-    public final long id;
-    public final EnumExample enumCol;
-
-    @OrmConstructor({"id", "enumCol"})
-    public SimpleEnum(long id, EnumExample en) {
-      this.id = id;
-      this.enumCol = en;
-    }
-  }
+  public record SimpleEnum(long id, EnumExample enumCol, Object str) {}
 
   @IndexColumnPair({"boolean_col", "byte_col"})
   @IndexColumnPair({"boolean_col", "char_col"})

@@ -2,6 +2,7 @@ package org.nkjmlab.sorm4j.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
@@ -32,6 +33,15 @@ class OrmImplTest {
   @BeforeEach
   void setUp() {
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
+  }
+
+  @Test
+  void testStream() {
+    sorm.insert(PLAYER_ALICE);
+    assertEquals(
+        sorm.stream(Player.class, ParameterizedSql.of("select * from players"))
+            .apply(e -> e.count()),
+        1);
   }
 
   @Test
@@ -287,6 +297,8 @@ class OrmImplTest {
   void testUpdateT() {
     sorm.insert(PLAYER_ALICE);
     sorm.update(PLAYER_ALICE);
+    sorm.updateByPrimaryKey(Player.class, RowMap.of("name", "AAAA"), PLAYER_ALICE.getId());
+    assertEquals(sorm.selectByPrimaryKey(Player.class, PLAYER_ALICE.getId()).getName(), "AAAA");
   }
 
   @Test

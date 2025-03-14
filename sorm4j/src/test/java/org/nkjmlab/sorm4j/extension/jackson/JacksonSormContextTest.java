@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension.jackson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -10,6 +11,7 @@ import org.nkjmlab.sorm4j.extension.datatype.jackson.JacksonSupport;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,6 +19,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class JacksonSormContextTest {
+
+  public record SimpleJackson(Person person) {}
+
+  @OrmJacksonColumn
+  public record Person(String name, int age) {}
+
+  @Test
+  void testJackson() {
+    Sorm sorm =
+        Sorm.create(
+            SormTestUtils.createNewDatabaseDataSource(),
+            new JacksonSupport(new ObjectMapper()).addSupport(SormContext.builder()).build());
+    TableDefinition def = TableDefinition.builder(SimpleJackson.class).build();
+    def.createTableIfNotExists(sorm);
+    sorm.insert(new SimpleJackson(new Person("taro", 33)));
+    assertEquals(
+        33, sorm.readFirst(SimpleJackson.class, "SELECT * FROM SIMPLE_JACKSONS").person().age());
+  }
 
   @Test
   void testBuilder() {
