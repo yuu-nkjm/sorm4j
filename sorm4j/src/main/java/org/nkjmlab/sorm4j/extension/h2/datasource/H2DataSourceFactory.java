@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.extension.h2.datasource;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,33 +26,97 @@ import org.nkjmlab.sorm4j.internal.util.Try;
  */
 public class H2DataSourceFactory {
 
-  private final File databaseDirectory;
-  private final String databaseName;
-  private final String username;
-  private final String password;
-  private final String databasePath;
+  public static record Config(
+      Path databaseDirectory, String databaseName, String username, String password, int tcpPort) {
+
+    public static Config of(
+        Path databaseDirectory, String databaseName, String username, String password) {
+      return new Config(databaseDirectory, databaseName, username, password, 9092);
+    }
+
+    public static Config of(
+        Path databaseDirectory,
+        String databaseName,
+        String username,
+        String password,
+        int tcpPort) {
+      return new Config(databaseDirectory, databaseName, username, password, tcpPort);
+    }
+
+    @Override
+    public String toString() {
+      return "Config [databaseDirectory="
+          + databaseDirectory
+          + ", databaseName="
+          + databaseName
+          + ", username="
+          + username
+          + ", tcpPort="
+          + tcpPort
+          + "]";
+    }
+  }
+
+  private final Config config;
+  private final Path databaseDirectoryPath;
+  private final Path databaseFilePath;
+
   private final String inMemoryModeJdbcUrl;
   private final String serverModeJdbcUrl;
   private final String embeddedModeJdbcUrl;
   private final String mixedModeJdbcUrl;
 
-  private H2DataSourceFactory(
-      File databaseDirectory, String databaseName, String username, String password, int tcpPort) {
-    this.username = username;
-    this.password = password;
-    this.databaseName = databaseName;
-    this.databaseDirectory = databaseDirectory;
-    this.databasePath = createDatabasePath(databaseDirectory, databaseName);
-    this.inMemoryModeJdbcUrl = "jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=-1";
-    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost:" + tcpPort + "/" + databasePath;
-    this.embeddedModeJdbcUrl = "jdbc:h2:file:" + databasePath;
-    this.mixedModeJdbcUrl = "jdbc:h2:" + databasePath + ";AUTO_SERVER=TRUE";
+  private H2DataSourceFactory(Config config) {
+    this.config = config;
+    this.databaseDirectoryPath = resolveDatabaseDirectoryPath(config.databaseDirectory());
+    Path databaseFilePath = databaseDirectoryPath.resolve(config.databaseName()).normalize();
+    this.databaseFilePath = Path.of(databaseFilePath.toString() + ".mv.db");
+    this.inMemoryModeJdbcUrl = "jdbc:h2:mem:" + config.databaseName() + ";DB_CLOSE_DELAY=-1";
+    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost:" + config.tcpPort() + "/" + databaseFilePath;
+    this.embeddedModeJdbcUrl = "jdbc:h2:file:" + databaseFilePath;
+    this.mixedModeJdbcUrl = "jdbc:h2:" + databaseFilePath + ";AUTO_SERVER=TRUE";
   }
 
-  private String createDatabasePath(File databaseDirectory, String databaseName) {
-    String absolutePath = databaseDirectory.getAbsolutePath().replace("\\", "/");
-    File dir = new File(absolutePath + (absolutePath.endsWith("/") ? "" : "/"));
-    return new File(dir, databaseName).getAbsolutePath().replace("\\", "/");
+  public static H2DataSourceFactory of(Config config) {
+    return new H2DataSourceFactory(config);
+  }
+
+  private static Path resolveDatabaseDirectoryPath(Path databaseDirectoryPath) {
+    final Set<String> allowPrefixes =
+        Set.of("~/", "~\\", "./", ".\\", "%TEMP%", "$TMPDIR", "%USERPROFILE%");
+    String databaseDirectoryPathStr = databaseDirectoryPath.toString();
+    if (!databaseDirectoryPath.isAbsolute()
+        && allowPrefixes.stream()
+                .filter(prefix -> databaseDirectoryPathStr.startsWith(prefix))
+                .count()
+            == 0) {
+      throw new IllegalArgumentException(
+          "the databaseDirectory path should be startWith "
+              + allowPrefixes
+              + " or absolute path. The given is ["
+              + databaseDirectoryPath
+              + "]");
+    }
+    return SystemPropertyUtils.convertVariableInPath(databaseDirectoryPath);
+  }
+
+  @Override
+  public String toString() {
+    return "H2DataSourceFactory [config="
+        + config
+        + ", databaseDirectoryPath="
+        + databaseDirectoryPath
+        + ", databaseFilePath="
+        + databaseFilePath
+        + ", inMemoryModeJdbcUrl="
+        + inMemoryModeJdbcUrl
+        + ", serverModeJdbcUrl="
+        + serverModeJdbcUrl
+        + ", embeddedModeJdbcUrl="
+        + embeddedModeJdbcUrl
+        + ", mixedModeJdbcUrl="
+        + mixedModeJdbcUrl
+        + "]";
   }
 
   private static String toUrlOption(String[] options) {
@@ -166,17 +231,17 @@ public class H2DataSourceFactory {
   }
 
   /**
-   * Make a new file database in not exists
+   * Make a new database file in not exists
    *
    * @return true if and only if the directory was created,along with all necessary parent
    *     directories; false otherwise
    */
-  public boolean makeFileDatabaseIfNotExists() {
-    if (getDatabaseFile().exists()) {
+  public boolean makeDatabaseFileIfNotExists() {
+    if (getDatabaseFilePath().toFile().exists()) {
       return false;
     }
-    if (!databaseDirectory.exists()) {
-      databaseDirectory.mkdirs();
+    if (!databaseDirectoryPath.toFile().exists()) {
+      databaseDirectoryPath.toFile().mkdirs();
     }
     try (Connection con =
         DriverManager.getConnection(getEmbeddedModeJdbcUrl(), getUsername(), getPassword())) {
@@ -186,54 +251,28 @@ public class H2DataSourceFactory {
     }
   }
 
-  public File getDatabaseFile() {
-    return new File(databasePath + ".mv.db");
+  public Path getDatabaseFilePath() {
+    return databaseFilePath;
   }
 
   public String getUsername() {
-    return username;
+    return config.username();
   }
 
   public String getPassword() {
-    return password;
+    return config.password();
   }
 
-  public File getDatabaseDirectory() {
-    return databaseDirectory;
+  public Path getDatabaseDirectoryPath() {
+    return databaseDirectoryPath;
   }
 
   public String getDatabaseName() {
-    return databaseName;
-  }
-
-  public String getDatabasePath() {
-    return databasePath;
+    return config.databaseName();
   }
 
   public static Builder builder() {
     return new Builder();
-  }
-
-  /**
-   * Initializes a newly created {@link H2DataSourceFactory.Builder} object; you can get {{@code
-   * LocalDataSourceFactory} object via build method.
-   *
-   * <p>following variables in the path of database directory will be expanded.
-   *
-   * <ul>
-   *   <li>"~/" , "~\" or "%USERPROFILE%" to "user.home"
-   *   <li>"%TEMP%" or "$TMPDIR" to "java.io.tmpdir"
-   * </ul>
-   *
-   * @see {@link H2DataSourceFactory.Builder#setDatabaseDirectory(File)}
-   * @param databaseDirectory the directory including the database file.
-   * @param databaseName the name of database.
-   * @param username
-   * @param password
-   */
-  public static Builder builder(
-      File databaseDirectory, String databaseName, String username, String password) {
-    return new Builder(databaseDirectory, databaseName, username, password);
   }
 
   /**
@@ -246,68 +285,27 @@ public class H2DataSourceFactory {
         "jdbc:h2:mem:" + UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1", "", "");
   }
 
-  @Override
-  public String toString() {
-    return "H2LocalDataSourceFactory [databaseDirectory="
-        + databaseDirectory
-        + ", databaseName="
-        + databaseName
-        + ", username="
-        + username
-        + ", password="
-        + password
-        + ", databasePath="
-        + databasePath
-        + ", inMemoryModeJdbcUrl="
-        + inMemoryModeJdbcUrl
-        + ", serverModeJdbcUrl="
-        + serverModeJdbcUrl
-        + ", embeddedModeJdbcUrl="
-        + embeddedModeJdbcUrl
-        + ", mixedModeJdbcUrl="
-        + mixedModeJdbcUrl
-        + "]";
-  }
-
   public static class Builder {
-    private File databaseDirectory = new File(SystemPropertyUtils.getTempDir(), "h2db-tmp");
-    private String databaseName = "h2db-tmp";
+    private Path databaseDirectory = Try.getOrElseRethrow(() -> Files.createTempDirectory("h2db"));
+    private String databaseName = "sormdb";
     private String username = "";
     private String password = "";
     private int tcpPort = 9092;
 
-    public Builder() {}
-
-    private Builder(File databaseDirectory, String dbName, String username, String password) {
-      this(databaseDirectory, dbName, username, password, 9092);
-    }
-
-    private Builder(
-        File databaseDirectory, String dbName, String username, String password, int tcpPort) {
-      this.databaseName = dbName;
-      this.username = username;
-      this.password = password;
-      this.tcpPort = tcpPort;
-      setDatabaseDirectory(databaseDirectory);
-    }
-
-    public H2DataSourceFactory.Builder setTcpPort(int tcpPort) {
+    public H2DataSourceFactory.Builder tcpPort(int tcpPort) {
       this.tcpPort = tcpPort;
       return this;
     }
 
-    public H2DataSourceFactory.Builder setUsername(String username) {
+    public H2DataSourceFactory.Builder username(String username) {
       this.username = username;
       return this;
     }
 
-    public H2DataSourceFactory.Builder setPassword(String password) {
+    public H2DataSourceFactory.Builder password(String password) {
       this.password = password;
       return this;
     }
-
-    private static final Set<String> allowPrefixes =
-        Set.of("~/", "~\\", "./", ".\\", "%TEMP%", "$TMPDIR", "%USERPROFILE%");
 
     /**
      * Sets database directory.
@@ -319,29 +317,16 @@ public class H2DataSourceFactory {
      *   <li>"%TEMP%" or "$TMPDIR" to "java.io.tmpdir"
      * </ul>
      *
-     * @param databaseDirectoryPath
+     * @param databaseDirectory
      * @return
      */
-    public H2DataSourceFactory.Builder setDatabaseDirectory(File databaseDirectoryPath) {
-      String databaseDirectoryPathStr = databaseDirectoryPath.toString();
-      if (!databaseDirectoryPath.isAbsolute()
-          && allowPrefixes.stream()
-                  .filter(prefix -> databaseDirectoryPathStr.startsWith(prefix))
-                  .count()
-              == 0) {
-        throw new IllegalArgumentException(
-            "the databaseDirectory path should be startWith "
-                + allowPrefixes
-                + " or absolute path. The given is ["
-                + databaseDirectoryPath.getPath()
-                + "]");
-      }
-      this.databaseDirectory = SystemPropertyUtils.convertVariableInFilePath(databaseDirectoryPath);
+    public H2DataSourceFactory.Builder databaseDirectory(Path databaseDirectory) {
+      this.databaseDirectory = databaseDirectory;
       return this;
     }
 
-    public H2DataSourceFactory.Builder setDatabaseName(String dbName) {
-      this.databaseName = dbName;
+    public H2DataSourceFactory.Builder databaseName(String databaseName) {
+      this.databaseName = databaseName;
       return this;
     }
 
@@ -351,7 +336,8 @@ public class H2DataSourceFactory {
      * @return
      */
     public H2DataSourceFactory build() {
-      return new H2DataSourceFactory(databaseDirectory, databaseName, username, password, tcpPort);
+      return new H2DataSourceFactory(
+          new Config(databaseDirectory, databaseName, username, password, tcpPort));
     }
   }
 }

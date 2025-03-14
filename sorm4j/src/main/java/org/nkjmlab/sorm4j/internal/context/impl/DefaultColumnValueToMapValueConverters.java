@@ -3,8 +3,6 @@ package org.nkjmlab.sorm4j.internal.context.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
-import java.util.Collections;
-import java.util.Map;
 
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
 
@@ -84,7 +82,7 @@ public final class DefaultColumnValueToMapValueConverters
         return resultSet.getRowId(column);
       case java.sql.Types.SMALLINT:
         {
-          final short ret = (short) resultSet.getInt(column);
+          final short ret = resultSet.getShort(column);
           return (ret == 0 && resultSet.wasNull()) ? null : ret;
         }
       case java.sql.Types.TIME:

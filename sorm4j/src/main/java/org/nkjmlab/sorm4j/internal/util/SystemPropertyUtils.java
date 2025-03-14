@@ -1,45 +1,58 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
 public class SystemPropertyUtils {
   private SystemPropertyUtils() {}
 
   /**
-   * Getting the user's home directory which is referenced by {@code
-   * System.getProperty("user.home")}.
+   * Gets the user's home directory from {@code System.getProperty("user.home")}.
    *
-   * @return
+   * @return User home directory as a Path.
    */
-  static File getUserHomeDirectory() {
-    return new File(System.getProperty("user.home"));
+  static Path getUserHomeDirectory() {
+    return Paths.get(System.getProperty("user.home"));
   }
 
-  public static File getTempDir() {
-    return new File(System.getProperty("java.io.tmpdir"));
+  /**
+   * Gets the system temporary directory from {@code System.getProperty("java.io.tmpdir")}.
+   *
+   * @return Temporary directory as a Path.
+   */
+  public static Path getTempDir() {
+    return Paths.get(System.getProperty("java.io.tmpdir"));
   }
 
-  public static File convertTildeInFilePath(File filePath) {
-    return new File(
-        (filePath.getName().equals("~")
-                || filePath.getPath().startsWith("~/")
-                || filePath.getPath().startsWith("~\\"))
-            ? filePath.getPath().replace("~", getUserHomeDirectory().getAbsolutePath())
-            : filePath.getAbsolutePath());
-  }
+  /**
+   * Converts environment variables like %TEMP%, $TMPDIR, %USERPROFILE%, and ~ in the given path.
+   *
+   * @param path The input path
+   * @return The resolved path
+   */
+  public static Path convertVariableInPath(Path path) {
+    Map<String, Path> replaceStringMap =
+        Map.of(
+            "%TEMP%", getTempDir(),
+            "$TMPDIR", getTempDir(),
+            "%USERPROFILE%", getUserHomeDirectory(),
+            "~", getUserHomeDirectory());
 
-  public static File convertVariableInFilePath(File filePath) {
-    String path = filePath.toString();
-    if (path.startsWith("%TEMP%")) {
-      return new File(getTempDir(), path.replace("%TEMP%", ""));
-    } else if (path.startsWith("$TMPDIR")) {
-      return new File(getTempDir(), path.replace("$TMPDIR", ""));
-    } else if (path.startsWith("%USERPROFILE%")) {
-      return new File(getUserHomeDirectory(), path.replace("%USERPROFILE%", ""));
-    } else if (path.contains("~")) {
-      return SystemPropertyUtils.convertTildeInFilePath(filePath);
-    } else {
-      return filePath;
+    String pathStr = path.toString();
+
+    for (Map.Entry<String, Path> entry : replaceStringMap.entrySet()) {
+      if (pathStr.startsWith(entry.getKey())) {
+        return entry
+            .getValue()
+            .resolve(stripLeadingSeparator(pathStr.substring(entry.getKey().length())));
+      }
     }
+
+    return path;
+  }
+
+  private static String stripLeadingSeparator(String pathStr) {
+    return pathStr.replaceFirst("^[\\\\/]+", "");
   }
 }
