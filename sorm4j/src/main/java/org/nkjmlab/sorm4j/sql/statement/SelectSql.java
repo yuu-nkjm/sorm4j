@@ -1,13 +1,13 @@
-package org.nkjmlab.sorm4j.util.sql.statement;
+package org.nkjmlab.sorm4j.sql.statement;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AS;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.FROM;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.GROUP_BY;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.HAVING;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.LIMIT;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.ORDER_BY;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.WHERE;
-import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.join;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.AS;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.FROM;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.GROUP_BY;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.HAVING;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.LIMIT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.ORDER_BY;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.WHERE;
+import static org.nkjmlab.sorm4j.sql.statement.SqlStringUtils.join;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

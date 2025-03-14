@@ -12,9 +12,9 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
 import org.nkjmlab.sorm4j.internal.context.impl.ContainerAccessor;
 import org.nkjmlab.sorm4j.internal.context.impl.DefaultColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlBuilder;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * SQL parser for named parameters. The instance could be convert to {@link ParameterizedSql}.The

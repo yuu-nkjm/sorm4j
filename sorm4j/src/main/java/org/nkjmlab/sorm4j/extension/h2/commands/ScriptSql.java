@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.nkjmlab.sorm4j.extension.h2.grammar.ScriptCompressionEncryption;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 public class ScriptSql {
   private final String sql;

@@ -1,10 +1,10 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.FROM;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.JOIN;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.LEFT;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.ON;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.SELECT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.FROM;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.JOIN;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.LEFT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.ON;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.SELECT;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +40,6 @@ import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamOrmConnection;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.sql.TableSql;
@@ -49,8 +48,9 @@ import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 import org.nkjmlab.sorm4j.table.orm.TableConnection;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * A database connection with object-relation mapping function.
@@ -94,7 +94,7 @@ public class OrmConnectionImpl implements OrmConnection {
 
   @Override
   public void commit() {
-    Try.runOrElseThrow(() -> getJdbcConnection().commit(), Try::rethrow);
+    Try.runOrThrow(() -> getJdbcConnection().commit(), Try::rethrow);
   }
 
   // private String createInsertSql(String tableName, List<String> cols) {

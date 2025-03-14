@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 class ParameterizedSqlTest {
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.nkjmlab.sorm4j.extension.h2.grammar.ScriptCompressionEncryption;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 public class RunScriptSql {
   private final String sql;

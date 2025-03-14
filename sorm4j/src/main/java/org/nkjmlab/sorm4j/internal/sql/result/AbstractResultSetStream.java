@@ -17,8 +17,8 @@ import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 abstract class AbstractResultSetStream<T> implements ResultSetStream<T> {
   private final Class<T> objectClass;

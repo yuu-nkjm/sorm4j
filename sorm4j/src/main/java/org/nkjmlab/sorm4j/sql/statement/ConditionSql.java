@@ -1,14 +1,12 @@
-package org.nkjmlab.sorm4j.util.sql.statement;
+package org.nkjmlab.sorm4j.sql.statement;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AND;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.BETWEEN;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.IN;
-import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.join;
-import static org.nkjmlab.sorm4j.util.sql.SqlStringUtils.literal;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.AND;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.BETWEEN;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.IN;
+import static org.nkjmlab.sorm4j.sql.statement.SqlStringUtils.join;
+import static org.nkjmlab.sorm4j.sql.statement.SqlStringUtils.literal;
 
 import java.util.List;
-
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
 
 /**
    * Value object represents conditions of where clause or having clause. This object could include

@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.util.sql.statement;
+package org.nkjmlab.sorm4j.sql.statement;
 
 import java.util.ArrayList;
 import java.util.List;

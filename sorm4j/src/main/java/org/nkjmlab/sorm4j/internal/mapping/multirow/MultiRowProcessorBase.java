@@ -13,8 +13,8 @@ import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public abstract class MultiRowProcessorBase<T> implements MultiRowProcessor<T> {
 

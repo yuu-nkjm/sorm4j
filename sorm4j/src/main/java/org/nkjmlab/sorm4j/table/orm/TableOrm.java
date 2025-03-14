@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.table.orm;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AND;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.WHERE;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.AND;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.WHERE;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
-import org.nkjmlab.sorm4j.util.sql.statement.SelectSql;
+import org.nkjmlab.sorm4j.sql.statement.SelectSql;
 
 public interface TableOrm<T> {
 

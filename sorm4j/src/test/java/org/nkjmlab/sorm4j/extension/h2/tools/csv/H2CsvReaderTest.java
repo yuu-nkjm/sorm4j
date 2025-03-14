@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.orm.H2SormFactory;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 class H2CsvReaderTest {
 

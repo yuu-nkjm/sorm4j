@@ -3,7 +3,7 @@ package org.nkjmlab.sorm4j.extension.h2.grammar;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 public class CsvOptions {
 

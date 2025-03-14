@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.nkjmlab.sorm4j.internal.sql.metadata.jdbc.JdbcDatabaseMetaDataImpl;
 import org.nkjmlab.sorm4j.internal.util.CanonicalStringCache;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public interface JdbcDatabaseMetaData {
 

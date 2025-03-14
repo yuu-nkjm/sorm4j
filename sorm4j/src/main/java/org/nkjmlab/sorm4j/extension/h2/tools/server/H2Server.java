@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import org.h2.server.Service;
 import org.h2.tools.Server;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * Interface for managing an H2 database server instance. This interface provides methods to start,

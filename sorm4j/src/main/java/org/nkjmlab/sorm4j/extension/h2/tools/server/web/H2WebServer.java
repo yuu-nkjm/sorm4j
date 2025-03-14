@@ -5,12 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.h2.server.web.WebServer;
 import org.h2.tools.Server;
 import org.nkjmlab.sorm4j.extension.h2.tools.server.H2Server;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * A class that manages an H2 Web Console server. This class provides functionalities to start and
@@ -20,20 +18,18 @@ import org.nkjmlab.sorm4j.internal.util.Try;
 public class H2WebServer implements H2Server {
 
   private final Server server;
-  private final DataSource dataSource;
 
   /**
    * Initializes the H2 Web Console Service with the specified properties.
    *
    * @param properties the properties for configuring the H2 Web Console server
    */
-  public H2WebServer(H2WebServerProperties properties, DataSource dataSource) {
+  public H2WebServer(H2WebServerProperties properties) {
     try {
       this.server = Server.createWebServer(properties.toArgs());
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
-    this.dataSource = dataSource;
   }
 
   /** Stops the H2 Web Console server. If the server is not running, this method does nothing. */
@@ -55,21 +51,6 @@ public class H2WebServer implements H2Server {
   }
 
   /**
-   * Creates a new session in the H2 Web Console using a connection obtained from the {@link
-   * DataSource}.
-   *
-   * @return the URL of the Web Console session
-   * @throws RuntimeException if any exception occurs while opening the session
-   */
-  public String createSession() {
-    try (Connection conn = dataSource.getConnection()) {
-      return createSession(conn);
-    } catch (SQLException e) {
-      throw Try.rethrow(e);
-    }
-  }
-
-  /**
    * Creates a new session in the H2 Web Console using the given database connection.
    *
    * <p>This method registers the provided {@link Connection} with the H2 Web Console and returns
@@ -88,15 +69,23 @@ public class H2WebServer implements H2Server {
   }
 
   /**
-   * Opens a new session in the H2 Web Console using a connection obtained from the {@link
-   * DataSource}. Automatically opens a browser window for accessing the session.
+   * Creates a new session in the H2 Web Console using the given database connection and opens the
+   * session URL in a web browser.
    *
+   * <p>This method registers the provided {@link Connection} with the H2 Web Console, retrieves the
+   * corresponding session URL, and attempts to open it in the default web browser. The current
+   * transaction is preserved, making it particularly useful for debugging by allowing manual
+   * inspection of the database state.
+   *
+   * <p>The method returns as soon as the user disconnects from the session.
+   *
+   * @param connection the database connection to be used for creating the session (must be open)
    * @return the URL of the Web Console session
-   * @throws RuntimeException if any exception occurs while opening the session
+   * @throws RuntimeException if an error occurs while opening the session or launching the browser
    */
-  public String openBrowser() {
+  public String openBrowser(Connection connection) {
     try {
-      String url = createSession();
+      String url = createSession(connection);
       Server.openBrowser(url);
       return url;
     } catch (Exception e) {
@@ -109,8 +98,8 @@ public class H2WebServer implements H2Server {
    *
    * @return a new {@code Builder} instance
    */
-  public static Builder builder(DataSource dataSource) {
-    return new Builder(dataSource);
+  public static Builder builder() {
+    return new Builder();
   }
 
   /** A builder for constructing instances of {@code H2WebServer}. */
@@ -123,11 +112,6 @@ public class H2WebServer implements H2Server {
     private boolean ifExists = true;
     private boolean ifNotExists = false;
     private String baseDir;
-    private DataSource dataSource;
-
-    public Builder(DataSource dataSource) {
-      this.dataSource = dataSource;
-    }
 
     public Builder webPort(int port) {
       this.webPort = port;
@@ -172,8 +156,7 @@ public class H2WebServer implements H2Server {
     public H2WebServer build() {
       return new H2WebServer(
           new H2WebServerProperties(
-              webPort, webSSL, webAllowOthers, webDaemon, trace, ifExists, ifNotExists, baseDir),
-          dataSource);
+              webPort, webSSL, webAllowOthers, webDaemon, trace, ifExists, ifNotExists, baseDir));
     }
   }
 

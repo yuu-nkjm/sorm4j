@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 class ResultSetIterator<T> implements Iterator<T> {
 

@@ -7,7 +7,7 @@ import java.util.List;
 import org.h2.server.TcpServer;
 import org.h2.tools.Server;
 import org.nkjmlab.sorm4j.extension.h2.tools.server.H2Server;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * A class that manages an H2 TCP server instance. This class provides methods to start, stop, and

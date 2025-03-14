@@ -16,10 +16,10 @@ import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * Maps query results from a {@link ResultSet} to container objects of type {@code T}. This class

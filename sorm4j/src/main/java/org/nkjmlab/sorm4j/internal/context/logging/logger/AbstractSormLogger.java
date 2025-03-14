@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.util.MethodInvokerInfoUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public abstract class AbstractSormLogger implements SormLogger {
 

@@ -20,7 +20,6 @@ import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamSorm;
 import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
 import org.nkjmlab.sorm4j.sql.TableSql;
@@ -30,6 +29,7 @@ import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.table.orm.Table;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * An entry point of object-relation mapping.

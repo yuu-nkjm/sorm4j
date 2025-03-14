@@ -12,11 +12,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableBiConsumer;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableConsumer;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableFunction;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableRunnable;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableSupplier;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
+import org.nkjmlab.sorm4j.util.function.exception.TryBiConsumer;
+import org.nkjmlab.sorm4j.util.function.exception.TryConsumer;
+import org.nkjmlab.sorm4j.util.function.exception.TryFunction;
+import org.nkjmlab.sorm4j.util.function.exception.TryRunnable;
+import org.nkjmlab.sorm4j.util.function.exception.TrySupplier;
 
 class TryTest {
 
@@ -72,7 +73,7 @@ class TryTest {
     assertThrows(
         RuntimeException.class,
         () ->
-            Try.getOrElseRethrow(
+            Try.getOrElseThrow(
                 () -> {
                   throw new RuntimeException();
                 }));
@@ -82,12 +83,12 @@ class TryTest {
   void testCreateBiConsumer() {
     AtomicInteger i = new AtomicInteger(0);
     BiConsumer<Integer, Integer> func =
-        ThrowableBiConsumer.toBiConsumer((a, b) -> i.addAndGet(a + b), e -> {});
+        TryBiConsumer.toBiConsumer((a, b) -> i.addAndGet(a + b), e -> {});
     func.accept(1, 2);
     assertEquals(3, i.get());
     {
       BiConsumer<Integer, Integer> f =
-          ThrowableBiConsumer.toBiConsumer((a, b) -> Integer.parseInt("a"), e -> {});
+          TryBiConsumer.toBiConsumer((a, b) -> Integer.parseInt("a"), e -> {});
       assertDoesNotThrow(() -> f.accept(1, 2));
     }
   }
@@ -95,11 +96,11 @@ class TryTest {
   @Test
   void testCreateConsumer() {
     AtomicInteger i = new AtomicInteger(0);
-    Consumer<Integer> func = ThrowableConsumer.toConsumer(a -> i.addAndGet(a), e -> {});
+    Consumer<Integer> func = TryConsumer.toConsumer(a -> i.addAndGet(a), e -> {});
     func.accept(2);
     assertEquals(2, i.get());
     {
-      Consumer<Integer> f = ThrowableConsumer.toConsumer(a -> Integer.parseInt("a"), e -> {});
+      Consumer<Integer> f = TryConsumer.toConsumer(a -> Integer.parseInt("a"), e -> {});
       assertDoesNotThrow(() -> f.accept(1));
     }
   }
@@ -107,12 +108,12 @@ class TryTest {
   @Test
   void testCreateFunction() {
     {
-      Function<Integer, Integer> func = ThrowableFunction.toFunction(a -> a + 1, e -> -1);
+      Function<Integer, Integer> func = TryFunction.toFunction(a -> a + 1, e -> -1);
       assertEquals(3, func.apply(2));
     }
     {
       Function<Integer, Integer> func =
-          ThrowableFunction.toFunction(
+          TryFunction.toFunction(
               a -> {
                 throw new RuntimeException();
               },
@@ -124,14 +125,14 @@ class TryTest {
   @Test
   void testCreateRunnable() {
     AtomicInteger i = new AtomicInteger(0);
-    Runnable func = ThrowableRunnable.toRunnable(() -> i.incrementAndGet(), e -> {});
+    Runnable func = TryRunnable.toRunnable(() -> i.incrementAndGet(), e -> {});
     func.run();
     assertEquals(1, i.get());
   }
 
   @Test
   void testCreateSupplier() {
-    Supplier<Integer> func = ThrowableSupplier.toSupplier(() -> 42, e -> -1);
+    Supplier<Integer> func = TrySupplier.toSupplier(() -> 42, e -> -1);
     assertEquals(42, func.get());
   }
 
@@ -140,7 +141,7 @@ class TryTest {
     assertThrows(
         RuntimeException.class,
         () ->
-            Try.runOrElseThrow(
+            Try.runOrThrow(
                 () -> {
                   throw new RuntimeException();
                 },
@@ -149,10 +150,10 @@ class TryTest {
 
   @Test
   void testRunOrElseDo() {
-    assertDoesNotThrow(() -> Try.runOrElseDo(() -> {}, e -> {}));
+    assertDoesNotThrow(() -> Try.runOrHandle(() -> {}, e -> {}));
     assertDoesNotThrow(
         () ->
-            Try.runOrElseDo(
+            Try.runOrHandle(
                 () -> {
                   throw new RuntimeException();
                 },
@@ -164,7 +165,7 @@ class TryTest {
     assertThrows(
         RuntimeException.class,
         () ->
-            Try.runOrElseRethrow(
+            Try.runOrThrow(
                 () -> {
                   throw new RuntimeException();
                 }));

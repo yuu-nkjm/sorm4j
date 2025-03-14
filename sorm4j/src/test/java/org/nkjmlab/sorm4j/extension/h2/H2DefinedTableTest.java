@@ -17,10 +17,10 @@ import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 class H2DefinedTableTest {
 

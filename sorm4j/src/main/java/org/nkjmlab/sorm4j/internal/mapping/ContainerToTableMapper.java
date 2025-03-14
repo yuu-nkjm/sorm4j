@@ -26,9 +26,9 @@ import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.sql.result.InsertResultImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.TableSql;
 import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /** Holds mapping data from a given class and a table */
 public final class ContainerToTableMapper<T> {

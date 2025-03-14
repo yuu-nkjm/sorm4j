@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.internal.util.function;
+package org.nkjmlab.sorm4j.util.function.exception;
 
 import java.util.function.Consumer;
 
@@ -7,13 +7,13 @@ import java.util.function.Consumer;
  * interface enables lambda expressions and method references to handle exceptions explicitly within
  * the execution logic.
  *
- * <p>Use {@link #toRunnable(ThrowableRunnable, Consumer)} to convert it into a standard {@link
- * Runnable} while handling exceptions gracefully.
+ * <p>Use {@link #toRunnable(TryRunnable, Consumer)} to convert it into a standard {@link Runnable}
+ * while handling exceptions gracefully.
  *
  * @author yuu_nkjm
  */
 @FunctionalInterface
-public interface ThrowableRunnable {
+public interface TryRunnable {
 
   /**
    * Executes the operation, allowing checked exceptions to be thrown.
@@ -29,17 +29,18 @@ public interface ThrowableRunnable {
    * <p>This method allows integrating exception-throwing runnables into standard Java functional
    * interfaces while handling errors in a controlled manner.
    *
-   * @param onTry the {@code ThrowableRunnable} to be executed
-   * @param exceptionHandler a {@code Consumer} to handle any thrown exceptions
+   * @param tryRunnable the {@code ThrowableRunnable} to be executed
+   * @param exceptionConsumer a {@code Consumer} to handle any thrown exceptions
    * @return a {@code Runnable} that wraps the given {@code ThrowableRunnable} with exception
    *     handling
    */
-  public static Runnable toRunnable(ThrowableRunnable onTry, Consumer<Exception> exceptionHandler) {
+  public static Runnable toRunnable(
+      TryRunnable tryRunnable, Consumer<Exception> exceptionConsumer) {
     return () -> {
       try {
-        onTry.run();
+        tryRunnable.run();
       } catch (Exception e) {
-        exceptionHandler.accept(e);
+        exceptionConsumer.accept(e);
       }
     };
   }

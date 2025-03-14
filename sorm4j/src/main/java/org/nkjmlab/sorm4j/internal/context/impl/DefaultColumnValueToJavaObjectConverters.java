@@ -13,7 +13,7 @@ import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * Default implementation of {@link ColumnValueToJavaObjectConverters}

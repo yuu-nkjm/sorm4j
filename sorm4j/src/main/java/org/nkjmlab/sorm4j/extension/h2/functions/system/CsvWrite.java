@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.extension.h2.grammar.CsvOptions;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 /** <a href="https://www.h2database.com/html/functions.html#csvwrite">Functions</a> */
 public class CsvWrite {

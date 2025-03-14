@@ -28,8 +28,8 @@ import org.nkjmlab.sorm4j.internal.mapping.result.ResultsToContainerMapper;
 import org.nkjmlab.sorm4j.internal.sql.TableName;
 import org.nkjmlab.sorm4j.internal.sql.metadata.ColumnMetaData;
 import org.nkjmlab.sorm4j.internal.sql.metadata.TableMetaData;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public final class SormContextImpl implements SormContext {
 

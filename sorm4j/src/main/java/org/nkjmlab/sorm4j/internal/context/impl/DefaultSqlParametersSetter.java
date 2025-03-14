@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * Default implementation of {@link SqlParametersSetter}

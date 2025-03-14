@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.sorm4j.internal.util.SystemPropertyUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * A factory of local data source with h2 database.
@@ -286,7 +286,7 @@ public class H2DataSourceFactory {
   }
 
   public static class Builder {
-    private Path databaseDirectory = Try.getOrElseRethrow(() -> Files.createTempDirectory("h2db"));
+    private Path databaseDirectory = Try.getOrElseThrow(() -> Files.createTempDirectory("h2db"));
     private String databaseName = "sormdb";
     private String username = "";
     private String password = "";

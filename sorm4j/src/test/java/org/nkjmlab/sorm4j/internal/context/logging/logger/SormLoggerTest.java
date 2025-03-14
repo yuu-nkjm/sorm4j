@@ -27,9 +27,9 @@ import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.logging.LogContext.Category;
 import org.nkjmlab.sorm4j.context.logging.SormLogger;
 import org.nkjmlab.sorm4j.internal.context.logging.LogPoint;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 class SormLoggerTest {
   private static final StringWriter stringWriter = new StringWriter();

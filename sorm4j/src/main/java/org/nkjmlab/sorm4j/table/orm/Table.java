@@ -6,7 +6,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
 import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public interface Table<T> extends TableOrm<T> {
 

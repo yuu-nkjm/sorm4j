@@ -14,6 +14,7 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class H2WebServerTest {
 
@@ -28,7 +29,7 @@ class H2WebServerTest {
     ds.setPassword("");
     dataSource = ds;
 
-    webServer = H2WebServer.builder(dataSource).webDaemon(true).build();
+    webServer = H2WebServer.builder().webDaemon(true).build();
   }
 
   @AfterEach
@@ -65,7 +66,8 @@ class H2WebServerTest {
   @Test
   void testCreateSession() throws SQLException {
     webServer.start();
-    String sessionUrl = webServer.createSession();
+    String sessionUrl =
+        webServer.createSession(SormTestUtils.createNewDatabaseDataSource().getConnection());
     assertNotNull(sessionUrl, "Session URL should not be null");
     assertTrue(sessionUrl.startsWith("http"), "Session URL should start with http");
   }
@@ -77,20 +79,19 @@ class H2WebServerTest {
     String sessionUrl = webServer.createSession(conn);
     assertNotNull(sessionUrl, "Session URL should not be null");
     assertTrue(sessionUrl.startsWith("http"), "Session URL should start with http");
-    webServer.openBrowser();
   }
 
   @Test
   void testBuilderPattern() {
-    H2WebServer.Builder builder = new H2WebServer.Builder(dataSource);
-    builder
-        .webPort(9090)
-        .webSSL(true)
-        .webAllowOthers(true)
-        .baseDir("/testDir")
-        .trace(true)
-        .ifExists(true)
-        .ifNotExists(true);
+    H2WebServer.Builder builder =
+        H2WebServer.builder()
+            .webPort(9090)
+            .webSSL(true)
+            .webAllowOthers(true)
+            .baseDir("/testDir")
+            .trace(true)
+            .ifExists(true)
+            .ifNotExists(true);
     H2WebServer builtServer = builder.build();
     assertEquals(9090, builtServer.getPort(), "Expected server port is 9090");
   }

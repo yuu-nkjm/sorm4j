@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.extension.datatype.SupportTypes;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

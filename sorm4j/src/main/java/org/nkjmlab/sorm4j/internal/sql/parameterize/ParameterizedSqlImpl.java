@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
-import org.nkjmlab.sorm4j.util.sql.SqlStringUtils;
+import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
 /**
  * This class represents a sql statement with ordered parameters.

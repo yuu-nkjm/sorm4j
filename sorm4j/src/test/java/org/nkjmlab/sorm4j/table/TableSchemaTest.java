@@ -1,11 +1,11 @@
 package org.nkjmlab.sorm4j.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.INT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.VARCHAR;
 import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.ID;
 import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.NAME;
 import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.TEL;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.INT;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
 
 import java.util.stream.Stream;
 

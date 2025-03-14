@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.h2.tools.Csv;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public class H2CsvWriter {
   private final Csv csv;

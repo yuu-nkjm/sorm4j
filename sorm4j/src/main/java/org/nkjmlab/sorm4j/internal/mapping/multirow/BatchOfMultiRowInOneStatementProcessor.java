@@ -11,9 +11,9 @@ import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
 import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableBiConsumer;
-import org.nkjmlab.sorm4j.internal.util.function.ThrowableFunction;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
+import org.nkjmlab.sorm4j.util.function.exception.TryBiConsumer;
+import org.nkjmlab.sorm4j.util.function.exception.TryFunction;
 
 /**
  * A sql statement processor for multirow update and batch. This object could be set ormapper via
@@ -76,8 +76,8 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
    */
   private final int[] procMultiRowOneStatementAndBatch(
       Connection con,
-      ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
-      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter,
+      TryFunction<Integer, PreparedStatement> multiRowStatementCreator,
+      TryBiConsumer<PreparedStatement, T[]> parametersSetter,
       T[] objects) {
 
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);

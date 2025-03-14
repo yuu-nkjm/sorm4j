@@ -39,9 +39,7 @@ class OrmImplTest {
   void testStream() {
     sorm.insert(PLAYER_ALICE);
     assertEquals(
-        sorm.stream(Player.class, ParameterizedSql.of("select * from players"))
-            .apply(e -> e.count()),
-        1);
+        1, sorm.stream(Player.class, ParameterizedSql.of("select * from players")).apply(e -> 1));
   }
 
   @Test

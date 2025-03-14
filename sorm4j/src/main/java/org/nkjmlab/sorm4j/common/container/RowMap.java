@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.sql.result.BasicRowMap;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * A instance represents a row in a table. This interface extends {@link Map<String, Object>}. The
