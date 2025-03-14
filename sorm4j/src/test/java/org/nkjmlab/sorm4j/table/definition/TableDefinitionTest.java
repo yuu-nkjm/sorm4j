@@ -77,7 +77,7 @@ class TableDefinitionTest {
     table.insertMapIn(csvRows);
 
     assertThat(sorm.selectAll(TableDefExample.class).get(0).phoneNumber).isEqualTo("000-000-0000");
-    System.out.println(sorm.selectAll(TableDefExample.class));
+    assertThat(sorm.selectAll(TableDefExample.class));
   }
 
   public static enum EnumExample {

@@ -25,6 +25,6 @@ public class JtsSqlParameterSetter implements SqlParameterSetter {
   @Override
   public void setParameter(PreparedStatement stmt, int parameterIndex, Object parameter)
       throws SQLException {
-    stmt.setObject(parameterIndex, ((GeometryJts) parameter).getGeometry());
+    stmt.setObject(parameterIndex, ((JtsGeometry) parameter).geometry());
   }
 }

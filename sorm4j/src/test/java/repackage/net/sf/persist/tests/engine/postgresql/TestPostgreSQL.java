@@ -168,7 +168,7 @@ public class TestPostgreSQL {
 
       conn.setAutoCommit(false);
 
-      Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
+      Class<?>[] characterTypes = new Class<?>[] {Character.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, Object.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};
 

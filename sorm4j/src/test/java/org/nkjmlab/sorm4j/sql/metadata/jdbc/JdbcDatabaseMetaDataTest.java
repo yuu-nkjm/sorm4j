@@ -33,7 +33,7 @@ class JdbcDatabaseMetaDataTest {
     assertThat(md.getUrl()).contains("jdbc:h2:mem:test");
     assertThat(md.getUserName()).isEqualTo("");
     assertThat(md.getDriverVersion()).startsWith("2.");
-    System.out.println(md);
+    assertThat(md);
   }
 
   @Test

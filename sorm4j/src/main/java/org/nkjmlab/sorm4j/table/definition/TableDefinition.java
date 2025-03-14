@@ -172,8 +172,8 @@ public interface TableDefinition {
         return "longvarbinary";
       case "java.io.Reader":
         return "longvarchar";
-      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryString":
-      case "org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts":
+      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryText":
+      case "org.nkjmlab.sorm4j.extension.datatype.jts.JtsGeometry":
         return "geometry";
       case "org.nkjmlab.sorm4j.extension.datatype.container.JsonByte":
       case "java.util.List":

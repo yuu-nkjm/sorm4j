@@ -11,7 +11,7 @@ class JtsSupportTypesTest {
 
   @Test
   void testIsSupport_withSupportedType() {
-    assertThat(supportTypes.isSupport(GeometryJts.class)).isTrue();
+    assertThat(supportTypes.isSupport(JtsGeometry.class)).isTrue();
   }
 
   @Test
@@ -22,13 +22,13 @@ class JtsSupportTypesTest {
 
   @Test
   void testIsSupport_withArrayType() {
-    assertThat(supportTypes.isSupport(GeometryJts[].class)).isTrue();
+    assertThat(supportTypes.isSupport(JtsGeometry[].class)).isTrue();
     assertThat(supportTypes.isSupport(String[].class)).isFalse();
   }
 
   @Test
   void testIsSupport_withNestedArrayType() {
-    assertThat(supportTypes.isSupport(GeometryJts[][].class)).isTrue();
+    assertThat(supportTypes.isSupport(JtsGeometry[][].class)).isTrue();
     assertThat(supportTypes.isSupport(Integer[][].class)).isFalse();
   }
 

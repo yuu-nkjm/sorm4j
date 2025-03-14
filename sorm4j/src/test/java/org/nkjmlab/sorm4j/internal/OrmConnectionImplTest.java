@@ -144,8 +144,9 @@ class OrmConnectionImplTest {
               conn.readTupleList(
                   Guest.class,
                   Player.class,
-                  "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
-                      + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address from guests g join players p on g.id=p.id");
+                  ParameterizedSql.of(
+                      "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                          + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address from guests g join players p on g.id=p.id"));
 
           assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
           assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);

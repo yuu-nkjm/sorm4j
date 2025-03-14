@@ -8,8 +8,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
-import org.nkjmlab.sorm4j.extension.datatype.jts.GeometryJts;
+import org.nkjmlab.sorm4j.extension.datatype.container.GeometryText;
+import org.nkjmlab.sorm4j.extension.datatype.jts.JtsGeometry;
 import org.nkjmlab.sorm4j.extension.datatype.jts.JtsSupport;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
@@ -27,19 +27,17 @@ class GeometryTest {
     assertThat(table.getTableDefinition().getCreateTableIfNotExistsStatement())
         .contains("GEO_STR geometry");
     table.createTableIfNotExists();
-    GeometryString g = GeometryString.of("POINT (30 10)");
-    GeometryString g1 = GeometryString.of("POINT (30 10)");
+    GeometryText g = GeometryText.of("POINT (30 10)");
+    GeometryText g1 = GeometryText.of("POINT (30 10)");
 
     assertThat(g.equals(g1)).isTrue();
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
-    assertThat(g.toString()).isEqualTo("POINT (30 10)");
+    assertThat(g.text()).isEqualTo("POINT (30 10)");
 
     table.insert(new GeometryStringRecord(g));
 
-    GeometryString ret =
-        table
-            .getOrm()
-            .readFirst(GeometryString.class, "select geo_str from geometry_string_records");
+    GeometryText ret =
+        table.getOrm().readFirst(GeometryText.class, "select geo_str from geometry_string_records");
 
     assertThat(ret).isEqualTo(g);
   }
@@ -63,24 +61,24 @@ class GeometryTest {
 
     GeometryFactory factory = new GeometryFactory();
     Point coordinate = factory.createPoint(new Coordinate(100, 200));
-    GeometryJts g = new GeometryJts(coordinate);
-    GeometryJts g1 = new GeometryJts(coordinate);
+    JtsGeometry g = new JtsGeometry(coordinate);
+    JtsGeometry g1 = new JtsGeometry(coordinate);
     assertThat(g.equals(g1)).isTrue();
     assertThat(g.hashCode() == g1.hashCode()).isTrue();
-    assertThat(g.toString()).isEqualTo("POINT (100 200)");
+    assertThat(g.geometry().toString()).isEqualTo("POINT (100 200)");
 
     table.insert(new GeometryJtsRecord(g));
 
-    GeometryJts ret =
-        table.getOrm().readFirst(GeometryJts.class, "select geo_jts from geometry_jts_records");
+    JtsGeometry ret =
+        table.getOrm().readFirst(JtsGeometry.class, "select geo_jts from geometry_jts_records");
     assertThat(ret).isEqualTo(g);
   }
 
   public static class GeometryStringRecord {
 
-    public final GeometryString geoStr;
+    public final GeometryText geoStr;
 
-    public GeometryStringRecord(GeometryString geoStr) {
+    public GeometryStringRecord(GeometryText geoStr) {
       this.geoStr = geoStr;
     }
 
@@ -92,9 +90,9 @@ class GeometryTest {
 
   public static class GeometryJtsRecord {
 
-    public final GeometryJts geoJts;
+    public final JtsGeometry geoJts;
 
-    public GeometryJtsRecord(GeometryJts geoJts) {
+    public GeometryJtsRecord(JtsGeometry geoJts) {
       this.geoJts = geoJts;
     }
 

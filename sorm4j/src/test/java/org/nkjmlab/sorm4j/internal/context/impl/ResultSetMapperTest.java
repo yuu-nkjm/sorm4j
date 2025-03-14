@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.context;
+package org.nkjmlab.sorm4j.internal.context.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;

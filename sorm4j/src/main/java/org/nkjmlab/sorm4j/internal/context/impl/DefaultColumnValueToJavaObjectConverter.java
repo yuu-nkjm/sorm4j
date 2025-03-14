@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
-import org.nkjmlab.sorm4j.extension.datatype.container.GeometryString;
+import org.nkjmlab.sorm4j.extension.datatype.container.GeometryText;
 import org.nkjmlab.sorm4j.extension.datatype.container.JsonByte;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.JdbcTypeUtils;
@@ -55,7 +55,7 @@ public final class DefaultColumnValueToJavaObjectConverter
           java.util.Date.class,
           java.util.UUID.class,
           org.nkjmlab.sorm4j.extension.datatype.container.JsonByte.class,
-          org.nkjmlab.sorm4j.extension.datatype.container.GeometryString.class);
+          org.nkjmlab.sorm4j.extension.datatype.container.GeometryText.class);
 
   @Override
   public boolean test(Class<?> objectClass) {
@@ -124,10 +124,14 @@ public final class DefaultColumnValueToJavaObjectConverter
         return resultSet.getDouble(columnIndex);
       case "java.lang.String":
         return resultSet.getString(columnIndex);
-      case "java.lang.Character":
       case "char":
+        return resultSet.getString(columnIndex) != null
+                && !resultSet.getString(columnIndex).isEmpty()
+            ? resultSet.getString(columnIndex).charAt(0)
+            : '\0';
+      case "java.lang.Character":
         return Optional.ofNullable(resultSet.getString(columnIndex))
-            .filter(str -> str.length() != 0)
+            .filter(str -> !str.isEmpty())
             .map(str -> str.charAt(0))
             .orElse(null);
       case "java.lang.Object":
@@ -150,8 +154,8 @@ public final class DefaultColumnValueToJavaObjectConverter
         return resultSet.getClob(columnIndex);
       case "org.nkjmlab.sorm4j.extension.datatype.container.JsonByte":
         return JsonByte.of(resultSet.getBytes(columnIndex));
-      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryString":
-        return GeometryString.of(resultSet.getString(columnIndex));
+      case "org.nkjmlab.sorm4j.extension.datatype.container.GeometryText":
+        return GeometryText.of(resultSet.getString(columnIndex));
       //      case "java.util.Date":
       //      case "java.time.LocalTime":
       //      case "java.time.LocalDate":

@@ -24,6 +24,6 @@ public class JtsColumnValueToJavaObjectConverter implements ColumnValueToJavaObj
   @Override
   public <T> T convertTo(ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
       throws SQLException {
-    return toType.cast(new GeometryJts((Geometry) resultSet.getObject(columnIndex)));
+    return toType.cast(new JtsGeometry((Geometry) resultSet.getObject(columnIndex)));
   }
 }

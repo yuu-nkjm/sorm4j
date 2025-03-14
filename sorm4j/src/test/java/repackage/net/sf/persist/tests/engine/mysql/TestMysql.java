@@ -169,7 +169,7 @@ public class TestMysql {
     try (Connection conn = dataSource.getConnection();
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
-      Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
+      Class<?>[] characterTypes = new Class<?>[] {Character.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};
       // Class<?>[] clobTypes =
       // new Class<?>[] {String.class, char[].class, Character[].class, Reader.class, Clob.class};
@@ -183,7 +183,7 @@ public class TestMysql {
               .addField(new FieldMap("mediumtextCol").setTypes(clobTypes).setSize(1024))
               .addField(new FieldMap("longtextCol").setTypes(clobTypes).setSize(16384))
               .addField(new FieldMap("textCol").setTypes(clobTypes).setSize(16384))
-              .addField(new FieldMap("enumCol").setTypes(characterTypes).setSize(1));
+              .addField(new FieldMap("enumCol").setTypes(stringTypes).setSize(1));
       // .addField(new FieldMap("setCol").setTypes(characterTypes).setSize(1));
 
       BeanTest.test(

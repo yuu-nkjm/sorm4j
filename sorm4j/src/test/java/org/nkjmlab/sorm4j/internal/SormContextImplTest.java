@@ -89,7 +89,7 @@ class SormContextImplTest {
 
     // assertThat(context.toString()).contains("created by");
 
-    System.out.println(context.toString());
+    assertThat(context.toString());
   }
 
   @Test

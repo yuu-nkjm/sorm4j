@@ -36,7 +36,7 @@ class OrderedParameterSqlBuilderTest {
   // String sql = "select * from customer where id=? and address=?";
   // ParameterizedSql statement = OrderedParameterSqlParser.from(sql).addParameter(1,
   // "Kyoto").parse();
-  // System.out.println(statement);
+  // assertThat(statement);
   // // assertThat(sqlSt.getParameters().length).isEqualTo(1);
   // // assertThat(sqlSt.getParameters()[0]).isEqualTo("'alice', 1");
   //

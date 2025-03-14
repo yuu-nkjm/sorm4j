@@ -159,7 +159,7 @@ public class TestOracle {
     try (Connection conn = dataSource.getConnection();
         OrmConnection ormConn = OrmConnection.of(conn, SormContext.builder().build())) {
 
-      Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
+      Class<?>[] characterTypes = new Class<?>[] {Character.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class};
       // Class<?>[] clobTypes = new Class<?>[] {String.class, char[].class, Character[].class};
 

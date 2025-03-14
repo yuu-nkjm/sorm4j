@@ -1,4 +1,4 @@
-package org.nkjmlab.sorm4j.context;
+package org.nkjmlab.sorm4j.internal.context.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableNameMapper;
 import org.nkjmlab.sorm4j.internal.sql.TableName;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;

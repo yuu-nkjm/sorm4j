@@ -7,7 +7,7 @@ class JtsSupportTypes implements SupportTypes {
 
   @Override
   public boolean isSupport(Class<?> toType) {
-    return GeometryJts.class.equals(toType)
-        || GeometryJts.class.equals(ArrayUtils.getInternalComponentType(toType));
+    return JtsGeometry.class.equals(toType)
+        || JtsGeometry.class.equals(ArrayUtils.getInternalComponentType(toType));
   }
 }

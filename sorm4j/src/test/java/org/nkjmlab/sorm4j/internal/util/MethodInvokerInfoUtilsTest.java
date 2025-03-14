@@ -14,6 +14,6 @@ class MethodInvokerInfoUtilsTest {
             MethodInvokerInfoUtils.getInvokerInfo(
                 Integer.MAX_VALUE, new Throwable().getStackTrace()))
         .isNotNull();
-    System.out.println(MethodInvokerInfoUtils.getOutsideInvoker(""));
+    assertThat(MethodInvokerInfoUtils.getOutsideInvoker(""));
   }
 }
