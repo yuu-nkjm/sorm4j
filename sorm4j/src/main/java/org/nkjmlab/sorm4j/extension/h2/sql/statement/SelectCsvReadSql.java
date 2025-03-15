@@ -9,11 +9,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.sql.statement.annotation.CsvColumnExpression;
 import org.nkjmlab.sorm4j.extension.h2.sql.statement.annotation.CsvIgnore;
+import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
 import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 
@@ -151,25 +152,19 @@ public class SelectCsvReadSql {
      * @param valueType The class type whose fields should be mapped.
      * @return The {@link Builder} instance with the configured mappings.
      */
-    public <T extends Record> Builder valueType(Class<T> valueType) {
+    public Builder valueType(Class<?> valueType) {
 
       Annotation[][] parameterAnnotationsOfConstructor =
-          TableDefinition.getCanonicalConstructor(valueType)
+          ReflectionConstrucorsUtils.getRecordCanonicalConstructor(valueType)
               .map(constructor -> constructor.getParameterAnnotations())
               .orElse(null);
 
-      Field[] fields =
-          Stream.of(valueType.getDeclaredFields())
-              .filter(
-                  f ->
-                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
-                          && !f.getName().startsWith(("this$")))
-              .toArray(Field[]::new);
+      List<Field> fields = RefrectionOrmComponentUtils.getDeclaredFields(valueType);
 
       List<Field> csvSkipColumns = new ArrayList<>();
 
-      for (int i = 0; i < fields.length; i++) {
-        Field field = fields[i];
+      for (int i = 0; i < fields.size(); i++) {
+        Field field = fields.get(i);
         List<String> opt = new ArrayList<>();
         opt.add(TableDefinition.toSqlDataType(field.getType()));
 
@@ -189,7 +184,7 @@ public class SelectCsvReadSql {
         }
       }
       tableColumns(
-          Stream.of(fields)
+          fields.stream()
               .map(
                   f ->
                       (csvSkipColumns.contains(f) ? "null as " : "")

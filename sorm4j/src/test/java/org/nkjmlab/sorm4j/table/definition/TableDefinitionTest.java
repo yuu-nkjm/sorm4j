@@ -21,6 +21,7 @@ import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
@@ -37,7 +38,7 @@ import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 class TableDefinitionTest {
   @Test
   void testMisc() {
-    assertThat(TableDefinition.toTableName(Player.class)).isEqualTo("PLAYERS");
+    assertThat(RefrectionTableNameUtils.toNaiveTableName(Player.class)).isEqualTo("PLAYERS");
     assertThat(TableDefinition.builder("").setTableName("tbn").build().getTableName())
         .isEqualTo("tbn");
   }

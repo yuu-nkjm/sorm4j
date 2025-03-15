@@ -1,23 +1,20 @@
 package org.nkjmlab.sorm4j.internal.mapping.result;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.RecordComponent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl.ColumnsAndTypes;
 import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
 import org.nkjmlab.sorm4j.internal.mapping.ColumnToAccessorMapping;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils;
+import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils.OrmConstructorDefinition;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
 import org.nkjmlab.sorm4j.util.function.exception.Try;
 
@@ -62,102 +59,30 @@ public final class ResultsToContainerMapper<T> {
   }
 
   private ResultsContainerFactory<T> createResultsContainerFactory() {
-    Constructor<T> ormConstructor = getAnnotatedOrmConstructor(objectClass);
-    if (ormConstructor != null) {
-      return createAnnotatedOrmConstructorFactory(objectClass, ormConstructor);
+    OrmConstructorDefinition<T> constructorDef =
+        ReflectionConstrucorsUtils.createOrmConstructorDefinition(objectClass);
+
+    if (constructorDef != null) {
+      return new ResultsContainerWithConstructorFactory<>(
+          getColumnToAccessorMap(), constructorDef.constructor(), constructorDef.parameterNames());
     }
-    Constructor<T> ormCanonicalConstructor = getOrmRecordCompatibleConstructor(objectClass);
-    if (ormCanonicalConstructor != null) {
-      return createOrmRecordCompatibleConstructorFactory(objectClass, ormCanonicalConstructor);
+
+    Constructor<T> defaultConstructor =
+        ReflectionConstrucorsUtils.getDefaultConstructor(objectClass);
+    if (defaultConstructor != null) {
+      return new ResultsContainerWithSetterFactory<>(getColumnToAccessorMap(), defaultConstructor);
     }
-    Constructor<T> recordConstructor = getRecordConstructor(objectClass);
-    if (recordConstructor != null) {
-      return createRecordConstructorFactory(objectClass, recordConstructor);
-    }
-    return createDefaultConstructorFactory(objectClass);
-  }
 
-  private ResultsContainerFactory<T> createDefaultConstructorFactory(Class<T> objectClass) {
-    return new ResultsContainerWithSetterFactory<>(
-        getColumnToAccessorMap(), getDefaultConstructor(objectClass));
-  }
-
-  private ResultsContainerFactory<T> createRecordConstructorFactory(
-      Class<T> objectClass, Constructor<T> constructor) {
-    String[] parameterNames =
-        Arrays.stream(objectClass.getRecordComponents())
-            .map(RecordComponent::getName)
-            .toArray(String[]::new);
-    return new ResultsContainerWithConstructorFactory<>(
-        getColumnToAccessorMap(), constructor, parameterNames);
-  }
-
-  private ResultsContainerFactory<T> createOrmRecordCompatibleConstructorFactory(
-      Class<T> objectClass, Constructor<T> constructor) {
-
-    String[] parameterNames =
-        Arrays.stream(objectClass.getDeclaredFields()).map(f -> f.getName()).toArray(String[]::new);
-    return new ResultsContainerWithConstructorFactory<>(
-        getColumnToAccessorMap(), constructor, parameterNames);
-  }
-
-  private static <T> Constructor<T> getRecordConstructor(Class<T> objectClass) {
-    if (!objectClass.isRecord()) {
-      return null;
-    }
-    try {
-      Class<?>[] paramTypes =
-          Arrays.stream(objectClass.getRecordComponents())
-              .map(RecordComponent::getType)
-              .toArray(Class<?>[]::new);
-      Constructor<T> constructor = objectClass.getDeclaredConstructor(paramTypes);
-      return constructor.getAnnotation(OrmIgnore.class) == null ? constructor : null;
-    } catch (NoSuchMethodException e) {
-      return null;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private Constructor<T> getOrmRecordCompatibleConstructor(Class<T> objectClass) {
-    Optional<Constructor<?>> constructor =
-        Arrays.stream(objectClass.getConstructors())
-            .filter(c -> c.getAnnotation(OrmRecordCompatibleConstructor.class) != null)
-            .findFirst();
-    return constructor.isEmpty() ? null : (Constructor<T>) constructor.get();
-  }
-
-  @SuppressWarnings("unchecked")
-  private Constructor<T> getAnnotatedOrmConstructor(Class<T> objectClass) {
-    Optional<Constructor<?>> constructor =
-        Arrays.stream(objectClass.getConstructors())
-            .filter(c -> c.getAnnotation(OrmConstructor.class) != null)
-            .findFirst();
-    return constructor.isEmpty() ? null : (Constructor<T>) constructor.get();
-  }
-
-  private ResultsContainerFactory<T> createAnnotatedOrmConstructorFactory(
-      Class<T> objectClass, Constructor<T> constructor) {
-    String[] _parameters = constructor.getAnnotation(OrmConstructor.class).value();
-    return new ResultsContainerWithConstructorFactory<>(
-        getColumnToAccessorMap(), constructor, _parameters);
-  }
-
-  private Constructor<T> getDefaultConstructor(Class<T> objectClass) {
     Object[] params = {
       objectClass,
       OrmConstructor.class.getSimpleName(),
       OrmRecordCompatibleConstructor.class.getSimpleName()
     };
-
-    return Try.getOrElseThrow(
-        () -> objectClass.getConstructor(),
-        e ->
-            new SormException(
-                ParameterizedStringFormatter.LENGTH_256.format(
-                    "The given container class [{}] should be record class, "
-                        + "must be a record class, have a constructor annotated with @{}, have a constructor annotated with @{}, or have a default constructor.",
-                    params),
-                e));
+    throw new SormException(
+        ParameterizedStringFormatter.LENGTH_256.format(
+            "The given container class [{}] should be record class, "
+                + "must be a record class, have a constructor annotated with @{}, have a constructor annotated with @{}, or have a default constructor.",
+            params));
   }
 
   public List<T> traverseAndMap(ResultSet resultSet) throws SQLException {

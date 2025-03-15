@@ -1,11 +1,7 @@
 package org.nkjmlab.sorm4j.table.definition;
 
 import static java.lang.String.join;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,14 +12,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
 import org.nkjmlab.sorm4j.internal.sql.result.TableDefinitionImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
+import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils.OrmContainerComponent;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -190,39 +187,6 @@ public interface TableDefinition {
     }
   }
 
-  /**
-   * Retrieves the canonical constructor of the given record class, if available.
-   *
-   * @param recordClass the record class to retrieve the canonical constructor from
-   * @return an {@code Optional} containing the canonical constructor if found, otherwise an empty
-   *     {@code Optional}
-   */
-  static Optional<Constructor<?>> getCanonicalConstructor(Class<?> recordClass) {
-    try {
-      Class<?>[] componentTypes =
-          Arrays.stream(recordClass.getDeclaredFields())
-              .filter(
-                  f ->
-                      !java.lang.reflect.Modifier.isStatic(f.getModifiers())
-                          && !f.getName().startsWith(("this$")))
-              .map(f -> f.getType())
-              .toArray(Class[]::new);
-      return Optional.of(recordClass.getDeclaredConstructor(componentTypes));
-    } catch (NoSuchMethodException | SecurityException e) {
-      return Optional.empty();
-    }
-  }
-
-  static String toTableName(Class<?> valueType) {
-    OrmTableName ann = valueType.getAnnotation(OrmTableName.class);
-    if (ann == null || ann.value().length() == 0) {
-      return SormContext.getDefaultCanonicalStringCache()
-          .toCanonicalName(valueType.getSimpleName() + "s");
-    } else {
-      return ann.value();
-    }
-  }
-
   static TableDefinition.Builder builder(Class<?> valueType, String tableName) {
     TableDefinitionImpl.Builder builder = builder(tableName);
 
@@ -240,60 +204,76 @@ public interface TableDefinition {
     Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
 
-    Annotation[][] parameterAnnotationsOfConstructor =
-        TableDefinition.getCanonicalConstructor(valueType)
-            .map(constructor -> constructor.getParameterAnnotations())
-            .orElse(null);
+    List<ColumnComponent> columnDefinitions = toColumnDefinition(valueType);
 
-    Field[] fields =
-        Stream.of(valueType.getDeclaredFields())
-            .filter(f -> !Modifier.isStatic(f.getModifiers()))
-            .toArray(Field[]::new);
-
-    for (int i = 0; i < fields.length; i++) {
-      Field field = fields[i];
-      List<String> opt = new ArrayList<>();
-
-      Set<Annotation> anns = new LinkedHashSet<>();
-      Arrays.stream(field.getAnnotations()).forEach(a -> anns.add(a));
-
-      if (parameterAnnotationsOfConstructor != null) {
-        Arrays.stream(parameterAnnotationsOfConstructor[i]).forEach(a -> anns.add(a));
-      }
-
-      opt.add(
-          anns.stream().filter(ann -> ann instanceof OrmJacksonColumn).count() > 0
-              ? "json"
-              : TableDefinition.toSqlDataType(field.getType()));
-
-      for (Annotation ann : anns) {
-        if (ann instanceof PrimaryKey) {
-          opt.add("primary key");
-        } else if (ann instanceof AutoIncrement) {
-          opt.add("auto_increment");
-        } else if (ann instanceof NotNull) {
-          opt.add("not null");
-        } else if (ann instanceof Index) {
-          builder.addIndexDefinition(
-              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
-        } else if (ann instanceof Unique) {
-          builder.addUniqueConstraint(
-              SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()));
-        } else if (ann instanceof Check) {
-          opt.add("check (" + ((Check) ann).value() + ")");
-        } else if (ann instanceof Default) {
-          opt.add("default " + ((Default) ann).value());
-        }
-      }
-      builder.addColumnDefinition(
-          SormContext.getDefaultCanonicalStringCache().toCanonicalName(field.getName()),
-          opt.toArray(String[]::new));
-    }
+    columnDefinitions.stream()
+        .forEach(columnDefinition -> addColumnDefinition(builder, columnDefinition));
     return builder;
   }
 
+  static void addColumnDefinition(Builder builder, ColumnComponent columnDefinitionBase) {
+    String columnName =
+        SormContext.getDefaultCanonicalStringCache()
+            .toCanonicalName(columnDefinitionBase.componentName());
+    builder.addColumnDefinition(
+        columnName, toDataTypeAndOptions(builder, columnName, columnDefinitionBase));
+  }
+
+  static List<ColumnComponent> toColumnDefinition(Class<?> valueType) {
+    List<ColumnComponent> ret = new ArrayList<>();
+    Annotation[][] constructorParameterAnnotations =
+        ReflectionConstrucorsUtils.getRecordCanonicalConstructor(valueType)
+            .map(constructor -> constructor.getParameterAnnotations())
+            .orElse(null);
+
+    List<RefrectionOrmComponentUtils.OrmContainerComponent> ormComponents = RefrectionOrmComponentUtils.getOrmComponents(valueType);
+    for (int i = 0; i < ormComponents.size(); i++) {
+      RefrectionOrmComponentUtils.OrmContainerComponent ormComp = ormComponents.get(i);
+      Annotation[] fieldAnnotations = ormComp.annotations();
+
+      Set<Annotation> columnAnnotations = new LinkedHashSet<>();
+      Arrays.stream(fieldAnnotations).forEach(ann -> columnAnnotations.add(ann));
+      if (constructorParameterAnnotations != null) {
+        Annotation[] constructorAnnotations = constructorParameterAnnotations[i];
+        Arrays.stream(constructorAnnotations).forEach(ann -> columnAnnotations.add(ann));
+      }
+      ret.add(
+          new ColumnComponent(ormComp.name(), ormComp.type(), new ArrayList<>(columnAnnotations)));
+    }
+    return ret;
+  }
+
+  static record ColumnComponent(
+      String componentName, Class<?> componentType, List<Annotation> annotations) {}
+
+  static String[] toDataTypeAndOptions(
+      Builder builder, String columnName, ColumnComponent columnComponent) {
+
+    List<String> opt = new ArrayList<>();
+    opt.add(TableDefinition.toSqlDataType(columnComponent.componentType()));
+
+    for (Annotation ann : columnComponent.annotations()) {
+      if (ann instanceof PrimaryKey) {
+        opt.add("primary key");
+      } else if (ann instanceof AutoIncrement) {
+        opt.add("auto_increment");
+      } else if (ann instanceof NotNull) {
+        opt.add("not null");
+      } else if (ann instanceof Index) {
+        builder.addIndexDefinition(columnName);
+      } else if (ann instanceof Unique) {
+        builder.addUniqueConstraint(columnName);
+      } else if (ann instanceof Check) {
+        opt.add("check (" + ((Check) ann).value() + ")");
+      } else if (ann instanceof Default) {
+        opt.add("default " + ((Default) ann).value());
+      }
+    }
+    return opt.toArray(String[]::new);
+  }
+
   static TableDefinitionImpl.Builder builder(Class<?> valueType) {
-    return TableDefinition.builder(valueType, TableDefinition.toTableName(valueType));
+    return TableDefinition.builder(valueType, RefrectionTableNameUtils.toNaiveTableName(valueType));
   }
 
   /**
