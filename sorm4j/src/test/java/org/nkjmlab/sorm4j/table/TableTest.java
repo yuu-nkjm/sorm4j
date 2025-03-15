@@ -19,10 +19,8 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createPlayersTable;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewContext;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSportsTable;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
@@ -33,7 +31,6 @@ import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
 import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.statement.JoinSql;
 import org.nkjmlab.sorm4j.table.orm.DefinedTable;
 import org.nkjmlab.sorm4j.table.orm.Table;
 import org.nkjmlab.sorm4j.table.orm.TableConnection;
@@ -341,8 +338,6 @@ class TableTest {
 
     assertThat(playersTable.joinUsing(sportsTable, "id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
-
-    JoinSql.builder(playersTable.getOrm().getOrmTableMetaData(Player.class));
   }
 
   @Test

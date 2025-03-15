@@ -69,12 +69,12 @@ public class H2DataSourceFactory {
   private H2DataSourceFactory(Config config) {
     this.config = config;
     this.databaseDirectoryPath = resolveDatabaseDirectoryPath(config.databaseDirectory());
-    Path databaseFilePath = databaseDirectoryPath.resolve(config.databaseName()).normalize();
-    this.databaseFilePath = Path.of(databaseFilePath.toString() + ".mv.db");
+    Path databasePath = databaseDirectoryPath.resolve(config.databaseName()).normalize();
+    this.databaseFilePath = Path.of(databasePath.toString() + ".mv.db");
     this.inMemoryModeJdbcUrl = "jdbc:h2:mem:" + config.databaseName() + ";DB_CLOSE_DELAY=-1";
-    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost:" + config.tcpPort() + "/" + databaseFilePath;
-    this.embeddedModeJdbcUrl = "jdbc:h2:file:" + databaseFilePath;
-    this.mixedModeJdbcUrl = "jdbc:h2:" + databaseFilePath + ";AUTO_SERVER=TRUE";
+    this.serverModeJdbcUrl = "jdbc:h2:tcp://localhost:" + config.tcpPort() + "/" + databasePath;
+    this.embeddedModeJdbcUrl = "jdbc:h2:file:" + databasePath;
+    this.mixedModeJdbcUrl = "jdbc:h2:" + databasePath + ";AUTO_SERVER=TRUE";
   }
 
   public static H2DataSourceFactory of(Config config) {
