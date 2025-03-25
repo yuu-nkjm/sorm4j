@@ -3,25 +3,26 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
-import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
-public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
+import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
+import org.nkjmlab.sorm4j.util.function.exception.TryBiConsumer;
+import org.nkjmlab.sorm4j.util.function.exception.TryFunction;
+
+public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessorBase<T> {
 
   private final int multiRowSize;
 
   public MultiRowInOneStatementProcessor(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping,
+      ContainerToTableMapper<T> tableMapping,
       int batchSize,
       int multiRowSize) {
     super(loggerContext, sqlParametersSetter, statementSupplier, tableMapping, batchSize);
@@ -56,8 +57,8 @@ public final class MultiRowInOneStatementProcessor<T> extends MultiRowProcessor<
 
   private final int[] procMultiRowOneStatement(
       Connection con,
-      ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
-      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter,
+      TryFunction<Integer, PreparedStatement> multiRowStatementCreator,
+      TryBiConsumer<PreparedStatement, T[]> parametersSetter,
       T[] objects) {
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);
     final int[] result = new int[objsPartitions.size()];

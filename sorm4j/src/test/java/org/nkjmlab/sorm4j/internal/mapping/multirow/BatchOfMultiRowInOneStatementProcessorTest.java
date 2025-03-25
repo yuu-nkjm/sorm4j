@@ -1,20 +1,24 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.internal.util.logger.Log4jSormLogger;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.internal.context.logging.logger.Log4jSormLogger;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
 
 class BatchOfMultiRowInOneStatementProcessorTest {
 
@@ -29,10 +33,11 @@ class BatchOfMultiRowInOneStatementProcessorTest {
         SormContext.builder()
             .setMultiRowProcessorFactory(
                 MultiRowProcessorFactory.builder()
-                    .setMultiRowProcessorType(MultiRowProcessorType.MULTI_ROW_AND_BATCH)
+                    .setMultiRowProcessorType(
+                        MultiRowProcessorFactory.ProcessorType.MULTI_ROW_AND_BATCH)
                     .build())
-            .setLoggerContext(
-                LoggerContext.builder()
+            .setLogContext(
+                LogContext.builder()
                     .enableAll()
                     .disableAll()
                     .setLoggerSupplier(() -> Log4jSormLogger.getLogger())
@@ -40,7 +45,7 @@ class BatchOfMultiRowInOneStatementProcessorTest {
             .build();
     sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables(context);
     assertThat(sorm.getContext().toString())
-        .contains(MultiRowProcessorType.MULTI_ROW_AND_BATCH.name());
+        .contains(MultiRowProcessorFactory.ProcessorType.MULTI_ROW_AND_BATCH.name());
   }
 
   @BeforeEach

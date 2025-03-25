@@ -1,18 +1,24 @@
 package org.nkjmlab.sorm4j.internal.mapping.multirow;
 
-import static java.sql.Connection.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory.MultiRowProcessorType;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -28,7 +34,8 @@ class SimpleBatchProcessorTest {
         SormContext.builder()
             .setMultiRowProcessorFactory(
                 MultiRowProcessorFactory.builder()
-                    .setMultiRowProcessorType(MultiRowProcessorType.SIMPLE_BATCH)
+                    .setMultiRowProcessorType(
+                        MultiRowProcessorFactory.ProcessorType.SIMPLE_BATCH)
                     .build())
             .build();
     sorm = Sorm.create(ds, context);

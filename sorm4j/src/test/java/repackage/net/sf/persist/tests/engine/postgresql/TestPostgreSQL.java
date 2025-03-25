@@ -5,11 +5,14 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.context.SormContext;
+
 import repackage.net.sf.persist.tests.engine.framework.BeanMap;
 import repackage.net.sf.persist.tests.engine.framework.BeanTest;
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
@@ -165,7 +168,7 @@ public class TestPostgreSQL {
 
       conn.setAutoCommit(false);
 
-      Class<?>[] characterTypes = new Class<?>[] {Character.class, char.class, String.class};
+      Class<?>[] characterTypes = new Class<?>[] {Character.class, String.class};
       Class<?>[] stringTypes = new Class<?>[] {String.class, Object.class};
       Class<?>[] clobTypes = new Class<?>[] {Clob.class};
 

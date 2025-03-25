@@ -5,23 +5,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.annotation.Experimental;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.annotation.Internal;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.context.TableSql;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
 
 /**
  * Main API for object relation mapping.
@@ -35,7 +34,6 @@ public interface Orm {
    *
    * @return
    */
-  @Experimental
   SormContext getContext();
 
   /**
@@ -89,7 +87,6 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  @Experimental
   <T> int deleteByPrimaryKey(Class<T> type, Object... primaryKeyValues);
 
   /**
@@ -100,7 +97,6 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  @Experimental
   <T> int deleteByPrimaryKeyIn(String tableName, Object... primaryKeyValues);
 
   /**
@@ -133,10 +129,8 @@ public interface Orm {
    */
   <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects);
 
-  @Experimental
   boolean execute(ParameterizedSql sql);
 
-  @Experimental
   boolean execute(String sql, Object... parameters);
 
   /**
@@ -150,7 +144,6 @@ public interface Orm {
    * @param traverser
    * @return
    */
-  @Experimental
   <T> T executeQuery(
       FunctionHandler<Connection, PreparedStatement> statementSupplier,
       ResultSetTraverser<T> traverser);
@@ -165,7 +158,6 @@ public interface Orm {
    * @param rowMapper
    * @return
    */
-  @Experimental
   <T> List<T> executeQuery(
       FunctionHandler<Connection, PreparedStatement> statementSupplier, RowMapper<T> rowMapper);
 
@@ -276,22 +268,23 @@ public interface Orm {
    * @param type
    * @return
    */
-  TableMetaData getTableMetaData(Class<?> type);
+  OrmTableMetaData getOrmTableMetaData(Class<?> type);
 
   /**
-   * Gets JDBC table metadata.
+   * Gets table metadata.
    *
    * @param tableName
    * @return
    */
-  JdbcTableMetaData getJdbcTableMetaData(String tableName);
+  OrmTableMetaData getOrmTableMetaData(String tableName);
 
   /**
-   * Gets table metadata corresponding to the given object class.
+   * Gets table sql corresponding to the given object class.
    *
    * @param type
    * @return
    */
+  @Internal
   TableSql getTableSql(Class<?> type);
 
   /**
@@ -300,6 +293,7 @@ public interface Orm {
    * @param tableName
    * @return
    */
+  @Internal
   TableSql getTableSql(String tableName);
 
   /**
@@ -408,7 +402,6 @@ public interface Orm {
    * @param result
    * @return
    */
-  @Experimental
   int[] insertMapInto(String tableName, List<RowMap> result);
 
   /**
@@ -416,7 +409,6 @@ public interface Orm {
    * @param object
    * @return
    */
-  @Experimental
   int insertMapInto(String tableName, RowMap object);
 
   /**
@@ -426,7 +418,6 @@ public interface Orm {
    * @param objects
    * @return
    */
-  @Experimental
   int[] insertMapInto(String tableName, RowMap... objects);
 
   /**
@@ -459,27 +450,15 @@ public interface Orm {
    */
   <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects);
 
-  @Experimental
-  <T1, T2> List<Tuple2<T1, T2>> join(Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
-
-  @Experimental
-  <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
-      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters);
-
-  @Experimental
   <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
-  @Experimental
   <T1, T2> List<Tuple2<T1, T2>> joinUsing(Class<T1> t1, Class<T2> t2, String... columns);
 
-  @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> joinOn(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition);
 
-  @Experimental
   <T1, T2> List<Tuple2<T1, T2>> leftJoinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
-  @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> leftJoinOn(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String t1T2OnCondition, String t2T3OnCondition);
 
@@ -634,7 +613,6 @@ public interface Orm {
    * @param sql
    * @return
    */
-  @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, ParameterizedSql sql);
 
@@ -650,7 +628,6 @@ public interface Orm {
    * @param parameters
    * @return
    */
-  @Experimental
   <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters);
 
@@ -665,7 +642,6 @@ public interface Orm {
    * @param sql
    * @return
    */
-  @Experimental
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(Class<T1> t1, Class<T2> t2, ParameterizedSql sql);
 
   /**
@@ -680,7 +656,6 @@ public interface Orm {
    * @param parameters
    * @return
    */
-  @Experimental
   <T1, T2> List<Tuple2<T1, T2>> readTupleList(
       Class<T1> t1, Class<T2> t2, String sql, Object... parameters);
 
@@ -740,7 +715,6 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  @Experimental
   <T> int updateByPrimaryKey(Class<T> clazz, RowMap object, Object... primaryKeyValues);
 
   /**
@@ -752,7 +726,6 @@ public interface Orm {
    * @param primaryKeyValues the order should be the same as the column order.
    * @return
    */
-  @Experimental
   int updateByPrimaryKeyIn(String tableName, RowMap object, Object... primaryKeyValues);
 
   /**

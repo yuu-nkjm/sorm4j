@@ -1,6 +1,10 @@
 package org.nkjmlab.sorm4j.jmh;
 
-import static org.nkjmlab.sorm4j.jmh.OrmBenchmarkPostSimple.Post.*;
+import static org.nkjmlab.sorm4j.jmh.OrmBenchmarkPostSimple.Post.batchSize;
+import static org.nkjmlab.sorm4j.jmh.OrmBenchmarkPostSimple.Post.insertMultiRowSql;
+import static org.nkjmlab.sorm4j.jmh.OrmBenchmarkPostSimple.Post.insertSql;
+import static org.nkjmlab.sorm4j.jmh.OrmBenchmarkPostSimple.Post.insertSqlWithNamedParameter;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -14,11 +18,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.BeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
@@ -60,10 +66,8 @@ import org.sql2o.Sql2o;
 import org.sql2o.tools.FeatureDetector;
 
 /**
- *
  * This code is based on following code at first.
  * https://github.com/aaberg/sql2o/blob/master/core/src/test/java/org/sql2o/performance/PojoPerformanceTest.java
- *
  */
 @Warmup(iterations = 1)
 @Measurement(iterations = 3)
@@ -111,55 +115,50 @@ public class OrmBenchmarkPostSimple {
 
     private static final QueryRunner runner = new QueryRunner();
 
-    private static final ResultSetHandler<Post> rsHandler = new BeanHandler<Post>(Post.class,
-        new BasicRowProcessor(new IgnoreUnderscoreBeanProcessor()));
-
-
+    private static final ResultSetHandler<Post> rsHandler =
+        new BeanHandler<Post>(
+            Post.class, new BasicRowProcessor(new IgnoreUnderscoreBeanProcessor()));
 
     @Override
-    public int insert(Post row) {
+    public int insert(Object row) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
-
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
-
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
-
     @Override
-    public Post readOneRow(int input) {
+    public Object readOneRow(int input) {
       try (Connection conn = dataSource.getConnection()) {
         return runner.query(conn, SELECT_TYPICAL_SQL + " WHERE id = ?", rsHandler, input);
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }
     }
-
   }
 
   public static interface BenchmarkBase {
-    int insert(Post input);
+    int insert(Object input);
 
-    int[] insertMultiRow(Post... inputs);
+    int[] insertMultiRow(Object... inputs);
 
-    List<Post> readAll(int input);
+    List<? extends Object> readAll(int input);
 
-    Post readOneRow(int input);
-
+    Object readOneRow(int input);
   }
 
   static class HandCodedBench implements BenchmarkBase {
 
-    private static void setParametersToStatement(PreparedStatement stmt, Post a, int i)
+    private static void setParametersToStatement(PreparedStatement stmt, Object o, int i)
         throws SQLException {
+      Post a = (Post) o;
       final int cols = 5;
       stmt.setString((cols * i) + 1, a.getText());
       stmt.setTimestamp((cols * i) + 2, a.getCreationDate());
@@ -169,7 +168,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       try (Connection connection = dataSource.getConnection();
           PreparedStatement stmt = connection.prepareStatement(insertSql)) {
         setParametersToStatement(stmt, input, 0);
@@ -182,7 +181,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       int i = 0;
       int[] ret = new int[inputs.length / batchSize + 1];
       try (Connection connection = dataSource.getConnection()) {
@@ -204,7 +203,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       try (Connection conn = dataSource.getConnection();
           PreparedStatement stmt = conn.prepareStatement(SELECT_TYPICAL_SQL)) {
         try (ResultSet rs = stmt.executeQuery()) {
@@ -229,7 +228,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public Post readOneRow(int input) {
+    public Object readOneRow(int input) {
       try (Connection conn = dataSource.getConnection();
           PreparedStatement stmt = conn.prepareStatement(SELECT_TYPICAL_SQL + " WHERE id = ?")) {
         stmt.setInt(1, input);
@@ -253,64 +252,64 @@ public class OrmBenchmarkPostSimple {
         throw new RuntimeException("error when executing query", e);
       }
     }
-
   }
 
   static class JdbiBench implements BenchmarkBase {
 
     private static final Jdbi jdbi = Jdbi.create(dataSource);
 
-
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       return jdbi.withHandle(
           handler -> handler.createUpdate(insertSqlWithNamedParameter).bindBean(input).execute());
     }
 
-
     @Override
-    public int[] insertMultiRow(Post... inputs) {
-      return jdbi.withHandle(handle -> {
-        PreparedBatch batch = handle.prepareBatch(insertSqlWithNamedParameter);
-        for (Post a : inputs) {
-          batch.bindBean(a).add();
-        }
-        return batch.execute();
-      });
+    public int[] insertMultiRow(Object... inputs) {
+      return jdbi.withHandle(
+          handle -> {
+            PreparedBatch batch = handle.prepareBatch(insertSqlWithNamedParameter);
+            for (Object o : inputs) {
+              Post a = (Post) o;
+              batch.bindBean(a).add();
+            }
+            return batch.execute();
+          });
     }
 
-
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       return jdbi.withHandle(
           handler -> handler.createQuery(SELECT_TYPICAL_SQL).mapToBean(Post.class).list());
     }
 
-
     @Override
-    public Post readOneRow(int input) {
-      return jdbi.withHandle(handler -> handler.createQuery(SELECT_TYPICAL_SQL + " WHERE id=?")
-          .bind(0, input).mapToBean(Post.class).findFirst()).get();
+    public Object readOneRow(int input) {
+      return jdbi.withHandle(
+              handler ->
+                  handler
+                      .createQuery(SELECT_TYPICAL_SQL + " WHERE id=?")
+                      .bind(0, input)
+                      .mapToBean(Post.class)
+                      .findFirst())
+          .get();
     }
-
   }
-
 
   static class JooqBench implements BenchmarkBase {
 
-
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       try (Connection conn = dataSource.getConnection()) {
         DSLContext context = DSL.using(conn, SQLDialect.H2);
         return context.select().from("post").fetch().into(Post.class);
@@ -320,7 +319,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public Post readOneRow(int input) {
+    public Object readOneRow(int input) {
       try (Connection conn = dataSource.getConnection()) {
         DSLContext context = DSL.using(conn, SQLDialect.H2);
         return context.select().from("post").where("id = ?", input).fetchOne().into(Post.class);
@@ -328,26 +327,27 @@ public class OrmBenchmarkPostSimple {
         throw new RuntimeException(e);
       }
     }
-
   }
 
-  /**
-   * It appears executing raw SQL is not possible with MyBatis.
-   */
+  /** It appears executing raw SQL is not possible with MyBatis. */
   static class MyBatisBench implements BenchmarkBase {
     private interface MyBatisPostAllMapper {
       @Select(SELECT_TYPICAL_SQL)
-      @Results({@Result(property = "creationDate", column = "creation_date"),
-          @Result(property = "lastChangeDate", column = "last_change_date")})
+      @Results({
+        @Result(property = "creationDate", column = "creation_date"),
+        @Result(property = "lastChangeDate", column = "last_change_date")
+      })
       List<Post> selectPost(int id);
     }
+
     private interface MyBatisPostPrimaryKeyMapper {
       @Select(SELECT_TYPICAL_SQL + " WHERE id = #{id}")
-      @Results({@Result(property = "creationDate", column = "creation_date"),
-          @Result(property = "lastChangeDate", column = "last_change_date")})
+      @Results({
+        @Result(property = "creationDate", column = "creation_date"),
+        @Result(property = "lastChangeDate", column = "last_change_date")
+      })
       Post selectPost(int id);
     }
-
 
     private static final SqlSessionFactory sqlSessionFactory;
 
@@ -362,44 +362,71 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       try (SqlSession session = sqlSessionFactory.openSession()) {
         return session.getMapper(MyBatisPostAllMapper.class).selectPost(input);
       }
     }
 
     @Override
-    public Post readOneRow(int input) {
+    public Object readOneRow(int input) {
       try (SqlSession session = sqlSessionFactory.openSession()) {
         return session.getMapper(MyBatisPostPrimaryKeyMapper.class).selectPost(input);
       }
     }
+  }
 
+  public static record PostRecord(
+      int id,
+      Integer counter1,
+      Double counter2,
+      Timestamp creationDate,
+      Timestamp lastChangeDate,
+      String text) {
+    public static final String CREATE_TABLE_IF_NOT_EXISTS =
+        "CREATE TABLE IF NOT EXISTS post_record ( "
+            + "id INT AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date TIMESTAMP, last_change_date TIMESTAMP , "
+            + "counter1 INT , counter2 DOUBLE);";
+
+    public static PostRecord createRandom(int seed) {
+      ThreadLocalRandom r = ThreadLocalRandom.current();
+      PostRecord p =
+          new PostRecord(
+              -1,
+              r.nextDouble() < 0.99 ? r.nextInt() : null,
+              r.nextDouble() < 0.99 ? r.nextDouble() : null,
+              Timestamp.valueOf(LocalDateTime.now()),
+              Timestamp.valueOf(LocalDateTime.now()),
+              "a name " + seed);
+      return p;
+    }
   }
 
   public static class Post {
-    public static final String CREATE_TABLE_IF_NOT_EXISTS = "CREATE TABLE IF NOT EXISTS post ( "
-        + "id INT AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date TIMESTAMP, last_change_date TIMESTAMP , "
-        + "counter1 INT , counter2 DOUBLE);";
+    public static final String CREATE_TABLE_IF_NOT_EXISTS =
+        "CREATE TABLE IF NOT EXISTS post ( "
+            + "id INT AUTO_INCREMENT PRIMARY KEY , text VARCHAR(255) , creation_date TIMESTAMP, last_change_date TIMESTAMP , "
+            + "counter1 INT , counter2 DOUBLE);";
 
-
-    private final static List<String> colsWithoutId =
+    private static final List<String> colsWithoutId =
         List.of("text", "creation_date", "last_change_date", "counter1", "counter2");
 
-    private static final String placeHolders = "("
-        + String.join(",",
-            Stream.generate(() -> "?").limit(colsWithoutId.size()).collect(Collectors.toList()))
-        + ")";
+    private static final String placeHolders =
+        "("
+            + String.join(
+                ",",
+                Stream.generate(() -> "?").limit(colsWithoutId.size()).collect(Collectors.toList()))
+            + ")";
 
     private static final String insertSqlPrefix =
         "insert into post (" + String.join(",", colsWithoutId) + ") values ";
@@ -410,11 +437,16 @@ public class OrmBenchmarkPostSimple {
 
     public static final int batchSize = 32;
 
-    public static final String insertMultiRowSql = insertSqlPrefix + String.join(",",
-        Stream.generate(() -> placeHolders).limit(batchSize).collect(Collectors.toList()));
+    public static final String insertMultiRowSql =
+        insertSqlPrefix
+            + String.join(
+                ",",
+                Stream.generate(() -> placeHolders).limit(batchSize).collect(Collectors.toList()));
 
-    private static final Post[] posts = Stream.generate(() -> createRandom(randomIdGenerator()))
-        .limit(NUM_OF_ROWS).toArray(Post[]::new);
+    private static final Post[] posts =
+        Stream.generate(() -> createRandom(randomIdGenerator()))
+            .limit(NUM_OF_ROWS)
+            .toArray(Post[]::new);
 
     private static final Post post = createPost();
 
@@ -450,8 +482,13 @@ public class OrmBenchmarkPostSimple {
     public Post() {}
 
     @OrmConstructor({"id", "counter1", "counter2", "creationDate", "lastChangeDate", "text"})
-    public Post(int id, Integer counter1, Double counter2, Timestamp creationDate,
-        Timestamp lastChangeDate, String text) {
+    public Post(
+        int id,
+        Integer counter1,
+        Double counter2,
+        Timestamp creationDate,
+        Timestamp lastChangeDate,
+        String text) {
       this.id = id;
       this.counter1 = counter1;
       this.counter2 = counter2;
@@ -512,28 +549,26 @@ public class OrmBenchmarkPostSimple {
   static class SormBench implements BenchmarkBase {
     private static final Sorm sorm = Sorm.create(dataSource);
 
-
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       return sorm.applyHandler(conn -> conn.insert(input));
     }
 
-
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       return sorm.applyHandler(conn -> conn.insert(inputs));
     }
 
     @Override
-    public List<Post> readAll(int input) {
-      return sorm.applyHandler(conn -> conn.readList(Post.class, SELECT_TYPICAL_SQL));
+    public List<? extends Object> readAll(int input) {
+      return sorm.applyHandler(conn -> conn.readList(PostRecord.class, SELECT_TYPICAL_SQL));
     }
 
     @Override
-    public Post readOneRow(int input) {
-      // return sorm
-      // .apply(conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
-      return sorm.applyHandler(conn -> conn.selectByPrimaryKey(Post.class, input));
+    public Object readOneRow(int input) {
+      //      return sorm.applyHandler(
+      //          conn -> conn.readFirst(Post.class, SELECT_TYPICAL_SQL + " WHERE id=?", input));
+      return sorm.applyHandler(conn -> conn.selectByPrimaryKey(PostRecord.class, input));
     }
   }
 
@@ -542,29 +577,32 @@ public class OrmBenchmarkPostSimple {
         new NamedParameterJdbcTemplate(dataSource);
 
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public Post readOneRow(int input) {
-      return jdbcTemplate.queryForObject(SELECT_TYPICAL_SQL + " WHERE id = :id",
-          Collections.singletonMap("id", input), new BeanPropertyRowMapper<Post>(Post.class));
+    public Object readOneRow(int input) {
+      return jdbcTemplate.queryForObject(
+          SELECT_TYPICAL_SQL + " WHERE id = :id",
+          Collections.singletonMap("id", input),
+          new BeanPropertyRowMapper<Post>(Post.class));
     }
-
   }
+
   static class Sql2oBench implements BenchmarkBase {
     private static Sql2o sql2o = new Sql2o(dataSource);
+
     static {
       setOracleAvailable(false);
       // sql2o.setDefaultColumnMappings(
@@ -584,18 +622,21 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public int insert(Post input) {
+    public int insert(Object input) {
       try (org.sql2o.Connection conn = sql2o.open()) {
-        return conn.createQuery(insertSqlWithNamedParameter).bind(input).executeUpdate()
+        return conn.createQuery(insertSqlWithNamedParameter)
+            .bind(input)
+            .executeUpdate()
             .getResult();
       }
     }
 
     @Override
-    public int[] insertMultiRow(Post... inputs) {
+    public int[] insertMultiRow(Object... inputs) {
       try (org.sql2o.Connection conn = sql2o.open()) {
         Query query = conn.createQuery(insertSqlWithNamedParameter);
-        for (Post a : inputs) {
+        for (Object o : inputs) {
+          Post a = (Post) o;
           query.bind(a).addToBatch();
         }
         int[] ret = query.executeBatch().getBatchResult();
@@ -605,7 +646,7 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public List<Post> readAll(int input) {
+    public List<? extends Object> readAll(int input) {
       try (org.sql2o.Connection conn = sql2o.open()) {
         Query query = conn.createQuery(SELECT_TYPICAL_SQL).setAutoDeriveColumnNames(true);
         return query.executeAndFetch(Post.class);
@@ -613,22 +654,19 @@ public class OrmBenchmarkPostSimple {
     }
 
     @Override
-    public Post readOneRow(int input) {
+    public Object readOneRow(int input) {
       try (org.sql2o.Connection conn = sql2o.open()) {
         Query query =
             conn.createQuery(SELECT_TYPICAL_SQL + " WHERE id = :id").setAutoDeriveColumnNames(true);
         return query.addParameter("id", input).executeAndFetchFirst(Post.class);
       }
     }
-
   }
 
-  private final static String DB_PASSWORD = "";
+  private static final String DB_PASSWORD = "";
 
-  private final static String DB_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
-  private final static String DB_USER = "sa";
-
-
+  private static final String DB_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
+  private static final String DB_USER = "sa";
 
   private static final javax.sql.DataSource dataSource =
       JdbcConnectionPool.create(DB_URL, DB_USER, DB_PASSWORD);
@@ -647,15 +685,21 @@ public class OrmBenchmarkPostSimple {
       new SpringJdbcTemplateBench();
   private static final Sql2oBench sql2oBench = new Sql2oBench();
 
-  private static final List<BenchmarkBase> benchs =
-      List.of(handCodedBench, apacheDbUtilsBench, jdbiBench, jooqBench, myBatisBench, sormBench,
-          springJdbcTemplateBench, sql2oBench, springJdbcTemplateBench);
-
+  private static final List<BenchmarkBase> ALL_BENCHS =
+      List.of(
+          handCodedBench,
+          apacheDbUtilsBench,
+          jdbiBench,
+          jooqBench,
+          myBatisBench,
+          sormBench,
+          springJdbcTemplateBench,
+          sql2oBench,
+          springJdbcTemplateBench);
 
   // "select * " is faster than "select col1, col2, ..., coln" in H2 2.1.210. the former is also
   // faster than "select tablname.col1, tablname.col2, ..., tablname.coln".
   static final String SELECT_TYPICAL_SQL = "SELECT * FROM post";
-
 
   static final int NUM_OF_ROWS = 10240;
 
@@ -669,48 +713,79 @@ public class OrmBenchmarkPostSimple {
     return obj == null ? null : (Integer) obj;
   }
 
-
-
   public static void main(String[] args) {
     OrmBenchmarkPostSimple b = new OrmBenchmarkPostSimple();
     b.setup();
-    benchs.forEach(bench -> {
-      try {
-        bench.readAll(randomIdGenerator());
-      } catch (UnsupportedOperationException e) {
-        System.err.println(e.getMessage());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
-    benchs.forEach(bench -> {
-      try {
-        bench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
-      } catch (UnsupportedOperationException e) {
-        System.err.println(e.getMessage());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
-    benchs.forEach(bench -> {
-      try {
-        bench.insert(Post.post);
-      } catch (UnsupportedOperationException e) {
-        System.err.println(e.getMessage());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
-    benchs.forEach(bench -> {
-      try {
-        bench.insertMultiRow(Post.posts);
-      } catch (UnsupportedOperationException e) {
-        System.err.println(e.getMessage());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
 
+    System.out.println(">>>");
+    new Scanner(System.in).nextLine();
+    List<BenchmarkBase> benchs = List.of(sormBench);
+    b.runReadOne(benchs);
+    b.runReadAll(benchs);
+    //    b.runInsertOne(benchs);
+    //    b.runInsertAll(benchs);
+    //    b.runAll(benchs);
+  }
+
+  private void runReadOne(List<BenchmarkBase> benchs) {
+    benchs.forEach(
+        bench -> {
+          try {
+            IntStream.range(0, 10)
+                .forEach(i -> bench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator()));
+          } catch (UnsupportedOperationException e) {
+            System.err.println(e.getMessage());
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+  }
+
+  private void runReadAll(List<BenchmarkBase> benchs) {
+    benchs.forEach(
+        bench -> {
+          try {
+            IntStream.range(0, 2).forEach(i -> bench.readAll(randomIdGenerator()));
+          } catch (UnsupportedOperationException e) {
+            System.err.println(e.getMessage());
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+  }
+
+  private void runInsertOne(List<BenchmarkBase> benchs) {
+
+    benchs.forEach(
+        bench -> {
+          try {
+            IntStream.range(0, 10).forEach(i -> bench.insert(Post.post));
+          } catch (UnsupportedOperationException e) {
+            System.err.println(e.getMessage());
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+  }
+
+  private void runInsertAll(List<BenchmarkBase> benchs) {
+    benchs.forEach(
+        bench -> {
+          try {
+            IntStream.range(0, 2).forEach(i -> bench.insertMultiRow(Post.posts));
+          } catch (UnsupportedOperationException e) {
+            System.err.println(e.getMessage());
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+  }
+
+  private void runAll(List<BenchmarkBase> benchs) {
+    runReadOne(benchs);
+    runReadAll(benchs);
+    runInsertOne(benchs);
+    runInsertAll(benchs);
   }
 
   /**
@@ -725,7 +800,6 @@ public class OrmBenchmarkPostSimple {
   public Object apacheDbUtilsReadOne() {
     return apacheDbUtilsBench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
-
 
   @Benchmark
   public Object handCodedInsertOne() {
@@ -757,7 +831,6 @@ public class OrmBenchmarkPostSimple {
     return jdbiBench.insertMultiRow(Post.posts);
   }
 
-
   @Benchmark
   public Object jDBIReadAll() {
     return jdbiBench.readAll(OrmBenchmarkPostSimple.randomIdGenerator());
@@ -783,7 +856,6 @@ public class OrmBenchmarkPostSimple {
     return jooqBench.readAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
-
   @Benchmark
   public Object jOOQReadOne() {
     return jooqBench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
@@ -804,7 +876,6 @@ public class OrmBenchmarkPostSimple {
     return myBatisBench.readAll(OrmBenchmarkPostSimple.randomIdGenerator());
   }
 
-
   @Benchmark
   public Object myBatisReadOne() {
     return myBatisBench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
@@ -814,13 +885,23 @@ public class OrmBenchmarkPostSimple {
   public void setup() {
     System.out.println(System.lineSeparator() + "### setup ##################");
     Sorm sorm = Sorm.create(dataSource);
-    sorm.acceptHandler(conn -> {
-      conn.executeUpdate(Post.CREATE_TABLE_IF_NOT_EXISTS);
-      conn.insert(IntStream.range(0, OrmBenchmarkPostSimple.NUM_OF_ROWS)
-          .mapToObj(i -> Post.createRandom(i)).toArray(Post[]::new));
-    });
+    sorm.acceptHandler(
+        conn -> {
+          conn.executeUpdate(Post.CREATE_TABLE_IF_NOT_EXISTS);
+          conn.insert(
+              IntStream.range(0, OrmBenchmarkPostSimple.NUM_OF_ROWS)
+                  .mapToObj(i -> Post.createRandom(i))
+                  .toArray(Post[]::new));
+        });
+    sorm.acceptHandler(
+        conn -> {
+          conn.executeUpdate(PostRecord.CREATE_TABLE_IF_NOT_EXISTS);
+          conn.insert(
+              IntStream.range(0, OrmBenchmarkPostSimple.NUM_OF_ROWS)
+                  .mapToObj(i -> PostRecord.createRandom(i))
+                  .toArray(PostRecord[]::new));
+        });
   }
-
 
   @Benchmark
   public Object sormInsertOne() {
@@ -832,7 +913,6 @@ public class OrmBenchmarkPostSimple {
     return sormBench.insertMultiRow(Post.posts);
   }
 
-
   @Benchmark
   public Object sormReadAll() {
     return sormBench.readAll(OrmBenchmarkPostSimple.randomIdGenerator());
@@ -842,7 +922,6 @@ public class OrmBenchmarkPostSimple {
   public Object sormReadOne() {
     return sormBench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
-
 
   @Benchmark
   public Object springJdbcTemplateReadOne() {
@@ -854,12 +933,10 @@ public class OrmBenchmarkPostSimple {
     return sql2oBench.insert(Post.post);
   }
 
-
   @Benchmark
   public int[] sql2oInsertMultiRow() {
     return sql2oBench.insertMultiRow(Post.posts);
   }
-
 
   @Benchmark
   public Object sql2oReadAll() {
@@ -870,6 +947,4 @@ public class OrmBenchmarkPostSimple {
   public Object sql2oReadOne() {
     return sql2oBench.readOneRow(OrmBenchmarkPostSimple.randomIdGenerator());
   }
-
-
 }

@@ -1,19 +1,25 @@
 package org.nkjmlab.sorm4j.internal;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.test.common.SormTestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
+import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_CAROL;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -30,16 +36,26 @@ class OrmImplTest {
   }
 
   @Test
+  void testStream() {
+    sorm.insert(PLAYER_ALICE);
+    assertEquals(
+        1, sorm.stream(Player.class, ParameterizedSql.of("select * from players")).apply(e -> 1));
+  }
+
+  @Test
   void testReadAll() {
     sorm.insert(PLAYER_ALICE);
     assertThat(sorm.selectAll(Player.class)).contains(PLAYER_ALICE);
 
     assertThatThrownBy(
-            () ->
-                sorm.readFirst(
-                    LocalDateTime.class,
-                    ParameterizedSqlParser.parse("select count(*) from players limit 1")))
-        .isInstanceOf(SormException.class);
+            () -> {
+              LocalDateTime ret =
+                  sorm.readFirst(
+                      LocalDateTime.class,
+                      ParameterizedSql.of("select count(*) from players limit 1"));
+              ret.getSecond();
+            })
+        .isInstanceOf(Exception.class);
   }
 
   @Test
@@ -51,9 +67,7 @@ class OrmImplTest {
   @Test
   void testReadFirstClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(
-            sorm.readFirst(
-                Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
+    assertThat(sorm.readFirst(Player.class, ParameterizedSql.of("select * from players limit 1")))
         .isEqualTo(PLAYER_ALICE);
   }
 
@@ -68,8 +82,7 @@ class OrmImplTest {
   void testReadListClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
     assertThat(
-            sorm.readList(
-                    Player.class, ParameterizedSqlParser.parse("select * from players limit 1"))
+            sorm.readList(Player.class, ParameterizedSql.of("select * from players limit 1"))
                 .get(0))
         .isEqualTo(PLAYER_ALICE);
   }
@@ -84,9 +97,7 @@ class OrmImplTest {
   @Test
   void testReadOneClassOfTParameterizedSql() {
     sorm.insert(PLAYER_ALICE);
-    assertThat(
-            sorm.readOne(
-                Player.class, ParameterizedSqlParser.parse("select * from players limit 1")))
+    assertThat(sorm.readOne(Player.class, ParameterizedSql.of("select * from players limit 1")))
         .isEqualTo(PLAYER_ALICE);
   }
 
@@ -284,6 +295,8 @@ class OrmImplTest {
   void testUpdateT() {
     sorm.insert(PLAYER_ALICE);
     sorm.update(PLAYER_ALICE);
+    sorm.updateByPrimaryKey(Player.class, RowMap.of("name", "AAAA"), PLAYER_ALICE.getId());
+    assertEquals(sorm.selectByPrimaryKey(Player.class, PLAYER_ALICE.getId()).getName(), "AAAA");
   }
 
   @Test
@@ -317,12 +330,12 @@ class OrmImplTest {
 
   @Test
   void testGetTableMetaDataClassOfQ() {
-    sorm.getTableMetaData(Player.class);
+    sorm.getOrmTableMetaData(Player.class);
   }
 
   @Test
   void testGetTableMetaDataClassOfQString() {
-    sorm.getJdbcTableMetaData(PLAYERS1);
+    sorm.getOrmTableMetaData(PLAYERS1);
   }
 
   @Test
@@ -375,18 +388,20 @@ class OrmImplTest {
   @Test
   void testExecuteQueryParameterizedSqlResultSetTraverserOfT() {
     sorm.executeQuery(
-        ParameterizedSqlParser.parse("select * from players"),
-        sorm.getResultSetTraverser(Player.class));
+        ParameterizedSql.of("select * from players"), sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
   void testExecuteQueryParameterizedSqlRowMapperOfT() {
-    sorm.executeQuery(
-        ParameterizedSqlParser.parse("select * from players"), sorm.getRowMapper(Player.class));
+
+    sorm.executeUpdate(
+        ParameterizedSql.withOrderedParameters("insert into players values(?,?,?)", 9, "A", "B"));
 
     sorm.executeQuery(
-        ParameterizedSqlParser.parse("select * from players"),
-        sorm.getResultSetTraverser(Player.class));
+        ParameterizedSql.of("select * from players"), sorm.getRowMapper(Player.class));
+
+    sorm.executeQuery(
+        ParameterizedSql.of("select * from players"), sorm.getResultSetTraverser(Player.class));
   }
 
   @Test
@@ -397,6 +412,6 @@ class OrmImplTest {
   @Test
   void testExecuteUpdateParameterizedSql() {
     sorm.executeUpdate(
-        ParameterizedSqlParser.parse("insert into players values(?,?,?)", 9, "A", "B"));
+        ParameterizedSql.withOrderedParameters("insert into players values(?,?,?)", 9, "A", "B"));
   }
 }

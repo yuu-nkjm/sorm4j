@@ -1,8 +1,10 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,7 +12,6 @@ import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
 import org.nkjmlab.sorm4j.test.common.Guest;
-import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class ColumnToAccessorMappingTest {
@@ -59,7 +60,7 @@ class ColumnToAccessorMappingTest {
       sorm.acceptHandler(
           m -> {
             Guest a = SormTestUtils.GUEST_ALICE;
-            SqlParametersToTableMapping<Guest> tm = getTableMapping(m, Guest.class);
+            ContainerToTableMapper<Guest> tm = getTableMapping(m, Guest.class);
             tm.insertAndGet(conMock, a);
           });
     } catch (Exception e) {
@@ -92,10 +93,10 @@ class ColumnToAccessorMappingTest {
       sorm.acceptHandler(
           m -> {
             ColumnToAccessorMapping tm = getTableMapping(m, Guest.class).getColumnToAccessorMap();
-            tm.setValue(new Player(), "name", 1);
+            tm.setValue(new Guest(), "name", 1);
           });
     } catch (Exception e) {
-      assertThat(e.getMessage()).contains("No valid setter for");
+      assertThat(e.getMessage()).contains("Could not set");
     }
   }
 
@@ -109,7 +110,7 @@ class ColumnToAccessorMappingTest {
         });
   }
 
-  public static <T> SqlParametersToTableMapping<T> getTableMapping(
+  public static <T> ContainerToTableMapper<T> getTableMapping(
       OrmConnection conn, Class<T> objectClass) {
     return ((OrmConnectionImpl) conn).getTableMapping(objectClass);
   }

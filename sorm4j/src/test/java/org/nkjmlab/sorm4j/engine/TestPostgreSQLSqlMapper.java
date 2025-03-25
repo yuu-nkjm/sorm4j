@@ -29,20 +29,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.sql.DataSource;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
-import org.nkjmlab.sorm4j.context.DefaultColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.DefaultSqlParametersSetter;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.SqlParameterSetter;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSqlBuilder;
 import org.postgresql.util.PGobject;
+
 import repackage.net.sf.persist.tests.engine.framework.DbEngineTestUtils;
 
 public class TestPostgreSQLSqlMapper {
@@ -68,10 +69,10 @@ public class TestPostgreSQLSqlMapper {
           }
 
           @Override
-          public Object convertTo(
-              ResultSet resultSet, int columnIndex, int columnType, Class<?> toType)
+          public <T> T convertTo(
+              ResultSet resultSet, int columnIndex, int columnType, Class<T> toType)
               throws SQLException {
-            return PGobject.class.cast(resultSet.getObject(columnIndex));
+            return toType.cast(resultSet.getObject(columnIndex));
           }
         };
 
@@ -96,9 +97,8 @@ public class TestPostgreSQLSqlMapper {
 
     context =
         SormContext.builder()
-            .setColumnValueToJavaObjectConverters(
-                new DefaultColumnValueToJavaObjectConverters(columnValueConverter))
-            .setSqlParametersSetter(new DefaultSqlParametersSetter(parameterSetter))
+            .addColumnValueToJavaObjectConverter(columnValueConverter)
+            .addSqlParameterSetter(parameterSetter)
             .build();
   }
 
@@ -313,10 +313,10 @@ public class TestPostgreSQLSqlMapper {
     String messagePrefix = "bindIn: " + column + "(" + param.getClass() + ") ";
     try {
       ParameterizedSql statement =
-          OrderedParameterSqlParser.of(
+          ParameterizedSqlBuilder.orderedParameterBuilder(
                   "SELECT " + column + " FROM sql_mapper_test WHERE " + column + " in(<?>)")
               .addParameter(param)
-              .parse();
+              .build();
       Map<String, Object> ret = c.readFirst(RowMap.class, statement);
       if (ret != null) {
         // log.debug("[" + testName + "] " + messagePrefix + "success => " + ret);

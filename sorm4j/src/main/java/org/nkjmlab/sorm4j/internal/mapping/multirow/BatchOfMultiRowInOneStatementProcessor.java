@@ -3,16 +3,17 @@ package org.nkjmlab.sorm4j.internal.mapping.multirow;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
+
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
 import org.nkjmlab.sorm4j.internal.OrmConnectionImpl;
-import org.nkjmlab.sorm4j.internal.mapping.SqlParametersToTableMapping;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.mapping.ContainerToTableMapper;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
-import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableBiConsumer;
-import org.nkjmlab.sorm4j.internal.util.Try.ThrowableFunction;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
+import org.nkjmlab.sorm4j.util.function.exception.TryBiConsumer;
+import org.nkjmlab.sorm4j.util.function.exception.TryFunction;
 
 /**
  * A sql statement processor for multirow update and batch. This object could be set ormapper via
@@ -21,16 +22,16 @@ import org.nkjmlab.sorm4j.util.logger.LoggerContext;
  * @author nkjm
  * @param <T>
  */
-public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessor<T> {
+public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowProcessorBase<T> {
 
   private final int multiRowSize;
   private final int batchSizeWithMultiRow;
 
   public BatchOfMultiRowInOneStatementProcessor(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       SqlParametersSetter sqlParametersSetter,
       PreparedStatementSupplier statementSupplier,
-      SqlParametersToTableMapping<T> tableMapping,
+      ContainerToTableMapper<T> tableMapping,
       int batchSize,
       int multiRowSize,
       int batchSizeWithMultiRow) {
@@ -75,8 +76,8 @@ public final class BatchOfMultiRowInOneStatementProcessor<T> extends MultiRowPro
    */
   private final int[] procMultiRowOneStatementAndBatch(
       Connection con,
-      ThrowableFunction<Integer, PreparedStatement> multiRowStatementCreator,
-      ThrowableBiConsumer<PreparedStatement, T[]> parametersSetter,
+      TryFunction<Integer, PreparedStatement> multiRowStatementCreator,
+      TryBiConsumer<PreparedStatement, T[]> parametersSetter,
       T[] objects) {
 
     final List<T[]> objsPartitions = ArrayUtils.split(multiRowSize, objects);

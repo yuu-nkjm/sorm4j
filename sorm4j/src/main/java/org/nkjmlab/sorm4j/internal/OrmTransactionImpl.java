@@ -2,8 +2,9 @@ package org.nkjmlab.sorm4j.internal;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.nkjmlab.sorm4j.OrmTransaction;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * An transaction with object relation mapping.

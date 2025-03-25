@@ -16,7 +16,6 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,21 +23,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.SormException;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
-import org.nkjmlab.sorm4j.context.DefaultColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.NamedParameterSqlParser;
-import org.nkjmlab.sorm4j.sql.OrderedParameterSqlParser;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.parameterize.NamedParameterSqlBuilder;
+import org.nkjmlab.sorm4j.sql.parameterize.OrderedParameterSqlBuilder;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.command.Command;
 
 class OrmConnectionImplTest {
   private Sorm orm;
@@ -104,11 +101,9 @@ class OrmConnectionImplTest {
   }
 
   @Test
-  void testJoin() {
+  void testJoin2() {
     orm.insert(GUEST_ALICE, GUEST_BOB);
     orm.insert(PLAYER_ALICE, PLAYER_BOB);
-    orm.insert(SormTestUtils.SOCCER);
-    orm.insert(SormTestUtils.TENNIS);
 
     List<Tuple2<Guest, Player>> result =
         orm.joinOn(Guest.class, Player.class, "guests.id=players.id");
@@ -116,6 +111,14 @@ class OrmConnectionImplTest {
     assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
     assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result.get(0).toString()).contains("Alice");
+  }
+
+  @Test
+  void testJoin3() {
+    orm.insert(GUEST_ALICE, GUEST_BOB);
+    orm.insert(PLAYER_ALICE, PLAYER_BOB);
+    orm.insert(SormTestUtils.SOCCER);
+    orm.insert(SormTestUtils.TENNIS);
 
     List<Tuple3<Guest, Player, Sport>> result1 =
         orm.joinOn(
@@ -126,12 +129,33 @@ class OrmConnectionImplTest {
     assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
     assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
     assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
-    assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
+    assertThat(result1.get(0).getT3().name()).isEqualTo(TENNIS.name());
     assertThat(result1.get(0).toString()).contains("Alice");
   }
 
   @Test
-  void testTupleList() {
+  void testTupleList2() {
+    orm.acceptHandler(
+        conn -> {
+          conn.insert(GUEST_ALICE, GUEST_BOB);
+          conn.insert(PLAYER_ALICE, PLAYER_BOB);
+
+          List<Tuple2<Guest, Player>> result =
+              conn.readTupleList(
+                  Guest.class,
+                  Player.class,
+                  ParameterizedSql.of(
+                      "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                          + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address from guests g join players p on g.id=p.id"));
+
+          assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
+          assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
+          assertThat(result.get(0).toString()).contains("Alice");
+        });
+  }
+
+  @Test
+  void testTupleList3() {
     orm.acceptHandler(
         m -> {
           m.insert(GUEST_ALICE, GUEST_BOB);
@@ -139,47 +163,27 @@ class OrmConnectionImplTest {
           m.insert(SormTestUtils.SOCCER);
           m.insert(SormTestUtils.TENNIS);
 
-          List<Tuple2<Guest, Player>> result =
-              m.readTupleList(
-                  Guest.class,
-                  Player.class,
-                  "select g.id as gid, g.name as gname, g.address as gaddress, p.id as pid, p.name as pname, p.address as paddress from guests g join players p on g.id=p.id");
-
-          assertThat(result.get(0).getT1().getClass()).isEqualTo(Guest.class);
-          assertThat(result.get(0).getT2().getClass()).isEqualTo(Player.class);
-          assertThat(result.get(0).toString()).contains("Alice");
-
           List<Tuple3<Guest, Player, Sport>> result1 =
               m.readTupleList(
                   Guest.class,
                   Player.class,
                   Sport.class,
-                  "select g.id as gid, g.name as gname, g.address as gaddress, "
-                      + "p.id as pid, p.name as pname, p.address as paddress, "
-                      + "s.id sportdotid, s.name sportdotname "
-                      + "from guests g "
-                      + "join players p on g.id=p.id "
-                      + "join sports s on g.id=s.id");
+                  ParameterizedSql.of(
+                      "select g.id as g_DOT_id, g.name as g_DOT_name, g.address as g_DOT_address, "
+                          + "p.id as p_DOT_id, p.name as p_DOT_name, p.address as p_DOT_address, "
+                          + "s.id sport_DOT_id, s.name sport_DOT_name "
+                          + "from guests g "
+                          + "join players p on g.id=p.id "
+                          + "join sports s on g.id=s.id"));
 
           assertThat(result1.get(0).getT1().getClass()).isEqualTo(Guest.class);
           assertThat(result1.get(0).getT1().getName()).isEqualTo(GUEST_ALICE.getName());
           assertThat(result1.get(0).getT2().getClass()).isEqualTo(Player.class);
           assertThat(result1.get(0).getT2().getName()).isEqualTo(PLAYER_ALICE.getName());
           assertThat(result1.get(0).getT3().getClass()).isEqualTo(Sport.class);
-          assertThat(result1.get(0).getT3().getName()).isEqualTo(TENNIS.getName());
+          assertThat(result1.get(0).getT3().name()).isEqualTo(TENNIS.name());
           assertThat(result1.get(0).toString()).contains("Alice");
         });
-  }
-
-  @Test
-  void testNamedRequest1() {
-    int row =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bindBean(new Player(1, "Frank", "Tokyo"))
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
   }
 
   @Test
@@ -188,45 +192,16 @@ class OrmConnectionImplTest {
 
     int row =
         orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bindAll(
-                        Map.of("id", id.incrementAndGet(), "name", "Frank", "address", "Tokyo"))
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-    row =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "insert into players values(:id, :name, :address)")
-                    .bind("id", id.incrementAndGet())
-                    .bind("name", "Frank")
-                    .bind("address", "Tokyo")
-                    .executeUpdate());
-    assertThat(row).isEqualTo(1);
-
-    row =
-        orm.applyHandler(
             conn -> {
-              NamedParameterSqlParser sql =
-                  NamedParameterSqlParser.of(
-                      "insert into players values(`id`, `name`, `address`)",
-                      '`',
-                      '`',
-                      new DefaultColumnToFieldAccessorMapper());
-              sql.bind("id", id.incrementAndGet()).bind("name", "Frank").bind("address", "Tokyo");
-              return conn.executeUpdate(sql.parse());
+              NamedParameterSqlBuilder sql =
+                  NamedParameterSqlBuilder.builder(
+                      "insert into players values(:id, :name, :address)");
+              sql.bindParameter("id", id.incrementAndGet())
+                  .bindParameter("name", "Frank")
+                  .bindParameter("address", "Tokyo");
+              return conn.executeUpdate(sql.build());
             });
     assertThat(row).isEqualTo(1);
-
-    var ret =
-        orm.applyHandler(
-            conn ->
-                Command.create(conn, "select * from players where id=:id")
-                    .bind("id", id.get())
-                    .executeQuery(conn.getResultSetTraverser(Player.class)));
-
-    assertThat(ret.size()).isEqualTo(1);
   }
 
   @Test
@@ -427,7 +402,9 @@ class OrmConnectionImplTest {
           m.insert(PLAYER_ALICE);
           assertThat(m.executeUpdate("delete from players")).isEqualTo(1);
           m.insert(PLAYER_ALICE, PLAYER_BOB);
-          assertThat(m.executeUpdate(ParameterizedSql.of("delete from players", new Object[0])))
+          assertThat(
+                  m.executeUpdate(
+                      ParameterizedSql.withOrderedParameters("delete from players", new Object[0])))
               .isEqualTo(2);
           ;
         });
@@ -545,7 +522,9 @@ class OrmConnectionImplTest {
           assertThat(
                   m.readOne(
                       Player.class,
-                      OrderedParameterSqlParser.parse("select * from players where id=?", 1)))
+                      OrderedParameterSqlBuilder.builder("select * from players where id=?")
+                          .addParameter(1)
+                          .build()))
               .isEqualTo(a);
           assertThat(m.readOne(Player.class, "select * from players where id=?", 1)).isEqualTo(a);
         });
@@ -563,7 +542,7 @@ class OrmConnectionImplTest {
             Guest g =
                 m.readOne(
                     Guest.class,
-                    OrderedParameterSqlParser.parse("select * from guests where id=?", 1));
+                    ParameterizedSql.withOrderedParameters("select * from guests where id=?", 1));
             assertThat(g.getAddress()).isEqualTo(a.getAddress());
             assertThat(g.getName()).isEqualTo(a.getName());
             g = m.readOne(Guest.class, ParameterizedSql.of("select * from guests"));

@@ -1,6 +1,8 @@
 package org.nkjmlab.sorm4j.internal.mapping;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,10 +14,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmIgnore;
-import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmIgnore;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DefaultResultSetValueGetterTest {
@@ -23,7 +26,7 @@ class DefaultResultSetValueGetterTest {
   @Test
   void testGetValueBySetterType() {
     String sql =
-        "CREATE TABLE IF NOT EXISTS LocalDateTimeSample(time TIME, date DATE, date_time dateTime, arry VARCHAR ARRAY, fl FLOAT)";
+        "CREATE TABLE IF NOT EXISTS Local_Date_Time_Sample(time TIME, date DATE, date_time dateTime, arry VARCHAR ARRAY, fl FLOAT)";
     Sorm sorm = SormTestUtils.createSormWithNewDatabaseAndCreateTables();
     sorm.acceptHandler(con -> con.executeUpdate(sql));
     LocalDateTimeSample a = LocalDateTimeSample.buildRandom();
@@ -31,7 +34,8 @@ class DefaultResultSetValueGetterTest {
 
     LocalDateTimeSample r =
         sorm.applyHandler(
-            con -> con.readFirst(LocalDateTimeSample.class, "select * from LocalDateTimeSample"));
+            con ->
+                con.readFirst(LocalDateTimeSample.class, "select * from Local_Date_Time_Sample"));
     assertThat(r).isEqualTo(a);
     sorm.acceptHandler(
         con ->
@@ -47,7 +51,7 @@ class DefaultResultSetValueGetterTest {
       assertThat(e.getMessage()).contains("doesn't have them");
     }
 
-    RowMap map = sorm.readFirst(RowMap.class, "select * from LocalDateTimeSample");
+    RowMap map = sorm.readFirst(RowMap.class, "select * from Local_Date_Time_Sample");
 
     assertThat(Arrays.asList(map.getArray("arry", String.class))).isEqualTo(List.of("a", "1"));
   }
@@ -131,8 +135,12 @@ class DefaultResultSetValueGetterTest {
     // without array
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (!(obj instanceof LocalDateTimeSample)) return false;
+      if (this == obj) {
+        return true;
+      }
+      if (!(obj instanceof LocalDateTimeSample)) {
+        return false;
+      }
       LocalDateTimeSample other = (LocalDateTimeSample) obj;
       return Arrays.deepEquals(arry, other.arry)
           && Objects.equals(date, other.date)

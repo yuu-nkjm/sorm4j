@@ -1,16 +1,16 @@
 package org.nkjmlab.sorm4j.internal;
 
-import org.nkjmlab.sorm4j.context.ColumnToFieldAccessorMapper;
-import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverters;
-import org.nkjmlab.sorm4j.context.ColumnValueToMapValueConverters;
-import org.nkjmlab.sorm4j.context.DefaultTableMetaDataParser;
 import org.nkjmlab.sorm4j.context.MultiRowProcessorFactory;
-import org.nkjmlab.sorm4j.context.PreparedStatementSupplier;
-import org.nkjmlab.sorm4j.context.SqlParametersSetter;
-import org.nkjmlab.sorm4j.context.TableMetaDataParser;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
-import org.nkjmlab.sorm4j.context.TableSqlFactory;
-import org.nkjmlab.sorm4j.util.logger.LoggerContext;
+import org.nkjmlab.sorm4j.context.logging.LogContext;
+import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToJavaObjectConverters;
+import org.nkjmlab.sorm4j.internal.context.ColumnValueToMapValueConverters;
+import org.nkjmlab.sorm4j.internal.context.PreparedStatementSupplier;
+import org.nkjmlab.sorm4j.internal.context.SqlParametersSetter;
+import org.nkjmlab.sorm4j.internal.context.TableMetaDataParser;
+import org.nkjmlab.sorm4j.internal.context.TableSqlFactory;
+import org.nkjmlab.sorm4j.internal.context.impl.DefaultTableMetaDataParser;
 
 final class SormConfig {
 
@@ -21,12 +21,12 @@ final class SormConfig {
   private final ColumnValueToMapValueConverters columnValueToMapValueConverter;
   private final SqlParametersSetter sqlParametersSetter;
   private final PreparedStatementSupplier preparedStatementSupplier;
-  private final LoggerContext loggerContext;
+  private final LogContext loggerContext;
   private final TableSqlFactory tableSqlFactory;
   private final TableMetaDataParser tableMetaDataReader = new DefaultTableMetaDataParser();
 
   SormConfig(
-      LoggerContext loggerContext,
+      LogContext loggerContext,
       ColumnToFieldAccessorMapper columnFieldMapper,
       TableNameMapper tableNameMapper,
       ColumnValueToJavaObjectConverters columnValueToJavaObjectConverter,
@@ -66,7 +66,7 @@ final class SormConfig {
     return preparedStatementSupplier;
   }
 
-  LoggerContext getLoggerContext() {
+  LogContext getLoggerContext() {
     return loggerContext;
   }
 

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.nkjmlab.sorm4j.sql.statement.SelectSql.selectCountFrom;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.TENNIS;
@@ -18,7 +19,6 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createPlayersTable;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewContext;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSormWithNewDatabaseAndCreateTables;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.createSportsTable;
-import static org.nkjmlab.sorm4j.util.sql.SelectSql.selectCountFrom;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,23 +27,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData.TableName;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.statement.JoinSql;
+import org.nkjmlab.sorm4j.table.orm.DefinedTable;
+import org.nkjmlab.sorm4j.table.orm.Table;
+import org.nkjmlab.sorm4j.table.orm.TableConnection;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.Sport;
-import org.nkjmlab.sorm4j.util.sql.JoinSql;
-import org.nkjmlab.sorm4j.util.table_def.SimpleTableWithDefinition;
 
 class TableTest {
   private static final String SELECT_FROM_PLAYERS_WHERE_ID_SQL = "select * from players where id=?";
   private static final ParameterizedSql SELECT_FROM_PLAYERS_WHERE_ID_PSQL =
-      ParameterizedSql.of(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
+      ParameterizedSql.withOrderedParameters(SELECT_FROM_PLAYERS_WHERE_ID_SQL, 1);
 
-  private SimpleTableWithDefinition<Player> playersTable;
-  private SimpleTableWithDefinition<Sport> sportsTable;
+  private DefinedTable<Player> playersTable;
+  private DefinedTable<Sport> sportsTable;
 
   @BeforeEach
   void setUp() {
@@ -93,7 +97,8 @@ class TableTest {
   @Test
   void testCreateTableIfNotExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
+        .contains(TableName.of("PLAYERS"));
   }
 
   @Test
@@ -107,7 +112,8 @@ class TableTest {
   @Test
   void testDropTableIfExists() {
     playersTable.createTableIfNotExists();
-    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames()).contains("PLAYERS");
+    assertThat(playersTable.getOrm().getJdbcDatabaseMetaData().getTableNames())
+        .contains(TableName.of("PLAYERS"));
   }
 
   @Test
@@ -296,7 +302,7 @@ class TableTest {
 
   @Test
   void testGetTableMetaData() {
-    assertThat(playersTable.getTableMetaData()).isNotNull();
+    assertThat(playersTable.getOrmTableMetaData()).isNotNull();
   }
 
   @Test
@@ -304,6 +310,12 @@ class TableTest {
     playersTable.insert(PLAYER_ALICE);
     assertThat(playersTable.selectFirstAllEqual("name", PLAYER_ALICE.getName()).getId())
         .isEqualTo(PLAYER_ALICE.getId());
+  }
+
+  @Test
+  void testSelectOneAllEqualBlank() {
+    playersTable.insert(PLAYER_ALICE);
+    assertThat(playersTable.selectOneAllEqual().getId()).isEqualTo(PLAYER_ALICE.getId());
   }
 
   @Test
@@ -330,15 +342,7 @@ class TableTest {
     assertThat(playersTable.joinUsing(sportsTable, "id").get(0).getT1().getId())
         .isEqualTo(PLAYER_ALICE.getId());
 
-    JoinSql.builder(playersTable.getOrm().getTableMetaData(Player.class));
-    assertThat(
-            playersTable
-                .join(
-                    sportsTable, playersTable.joinSqlBuilder().joinUsing(sportsTable, "id").build())
-                .get(0)
-                .getT1()
-                .getId())
-        .isEqualTo(PLAYER_ALICE.getId());
+    JoinSql.builder(playersTable.getOrm().getOrmTableMetaData(Player.class));
   }
 
   @Test
@@ -367,7 +371,7 @@ class TableTest {
     Sorm mockSorm = mock(Sorm.class);
     Class<?> valueType = Player.class;
 
-    Table<?> table = Table.create(mockSorm, valueType);
+    Table<?> table = Table.of(mockSorm, valueType);
 
     assertNotNull(table);
     assertTrue(table instanceof Table);
@@ -379,7 +383,7 @@ class TableTest {
     OrmConnection mockOrmConnection = mock(OrmConnection.class);
     when(mockSorm.open()).thenReturn(mockOrmConnection);
 
-    Table<?> table = Table.create(mockSorm, Player.class);
+    Table<?> table = Table.of(mockSorm, Player.class);
     TableConnection<?> tableConnection = table.open();
 
     assertNotNull(tableConnection);
@@ -411,12 +415,13 @@ class TableTest {
   void testAcceptHandlerWithException() throws Exception {
     Sorm orm = mock(Sorm.class);
     OrmConnection conn = mock(OrmConnection.class);
+    @SuppressWarnings("unchecked")
     ConsumerHandler<TableConnection<Object>> handler = mock(ConsumerHandler.class);
 
     when(orm.open()).thenReturn(conn);
     doThrow(new RuntimeException("Test Exception")).when(handler).accept(any());
 
-    Table<Object> table = Table.create(orm, Object.class);
+    Table<Object> table = Table.of(orm, Object.class);
 
     Exception exception = assertThrows(RuntimeException.class, () -> table.acceptHandler(handler));
 
@@ -427,12 +432,13 @@ class TableTest {
   void testApplyHandlerWithException() throws Exception {
     Sorm orm = mock(Sorm.class);
     OrmConnection conn = mock(OrmConnection.class);
+    @SuppressWarnings("unchecked")
     FunctionHandler<TableConnection<Object>, String> handler = mock(FunctionHandler.class);
 
     when(orm.open()).thenReturn(conn);
     when(handler.apply(any())).thenThrow(new RuntimeException("Test Exception"));
 
-    Table<Object> table = Table.create(orm, Object.class);
+    Table<Object> table = Table.of(orm, Object.class);
 
     Exception exception = assertThrows(RuntimeException.class, () -> table.applyHandler(handler));
 

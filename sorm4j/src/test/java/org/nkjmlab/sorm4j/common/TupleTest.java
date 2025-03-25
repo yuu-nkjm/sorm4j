@@ -1,10 +1,12 @@
 package org.nkjmlab.sorm4j.common;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple1;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.container.Tuple;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple1;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
 
 class TupleTest {
 
@@ -22,7 +24,12 @@ class TupleTest {
   void testOfT2() {
     Tuple2<String, String> t1 = Tuple.of("t1", "t2");
     Tuple2<String, String> t2 = Tuple.of("t1", "t2");
+    Tuple2<String, String> t3 = Tuple.of("t1", "t1");
+    Tuple1<String> t4 = Tuple.of("t1");
 
+    assertThat(t1.equals(t1)).isTrue();
+    assertThat(t1.equals(t3)).isFalse();
+    assertThat(t1.equals(t4)).isFalse();
     assertThat(t1.equals(t2)).isTrue();
     assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
     assertThat(t1.toString()).isEqualTo("(t1, t2)");

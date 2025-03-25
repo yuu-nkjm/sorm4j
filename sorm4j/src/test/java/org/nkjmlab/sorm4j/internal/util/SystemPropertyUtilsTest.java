@@ -2,7 +2,8 @@ package org.nkjmlab.sorm4j.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,57 +11,57 @@ class SystemPropertyUtilsTest {
 
   @Test
   public void testConvertTilde() {
-    File input = new File("~\\subdir");
-    File expected = new File(SystemPropertyUtils.getUserHomeDirectory(), "/subdir");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("~\\subdir");
+    Path expected = SystemPropertyUtils.getUserHomeDirectory().resolve("subdir");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertTilde1() {
-    File input = new File("~/subdir");
-    File expected = new File(SystemPropertyUtils.getUserHomeDirectory(), "/subdir");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("~/subdir");
+    Path expected = SystemPropertyUtils.getUserHomeDirectory().resolve("subdir");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertTilde2() {
-    File input = new File("~/");
-    File expected = SystemPropertyUtils.getUserHomeDirectory();
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("~/");
+    Path expected = SystemPropertyUtils.getUserHomeDirectory();
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertVariableInFilePathWithTemp() {
-    File input = new File("%TEMP%/subdir");
-    File expected = new File(SystemPropertyUtils.getTempDir(), "/subdir");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("%TEMP%/subdir");
+    Path expected = SystemPropertyUtils.getTempDir().resolve("subdir");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertVariableInFilePathWithTmpDir() {
-    File input = new File("$TMPDIR/subdir");
-    File expected = new File(SystemPropertyUtils.getTempDir(), "/subdir");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("$TMPDIR/subdir");
+    Path expected = SystemPropertyUtils.getTempDir().resolve("subdir");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertVariableInFilePathWithUserProfile() {
-    File input = new File("%USERPROFILE%/subdir");
-    File expected = new File(SystemPropertyUtils.getUserHomeDirectory(), "/subdir");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("%USERPROFILE%/subdir");
+    Path expected = SystemPropertyUtils.getUserHomeDirectory().resolve("subdir");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 
   @Test
   public void testConvertVariableInFilePathWithRegularPath() {
-    File input = new File("/regular/path");
-    File expected = new File("/regular/path");
-    File actual = SystemPropertyUtils.convertVariableInFilePath(input);
-    assertThat(actual.getAbsolutePath()).isEqualTo(expected.getAbsolutePath());
+    Path input = Paths.get("/regular/path");
+    Path expected = Paths.get("/regular/path");
+    Path actual = SystemPropertyUtils.convertVariableInPath(input);
+    assertThat(actual.toAbsolutePath().toString()).isEqualTo(expected.toAbsolutePath().toString());
   }
 }

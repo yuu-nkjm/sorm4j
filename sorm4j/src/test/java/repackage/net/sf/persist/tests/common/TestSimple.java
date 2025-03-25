@@ -1,8 +1,13 @@
 package repackage.net.sf.persist.tests.common;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -17,9 +23,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.OrmConnection;
+import org.nkjmlab.sorm4j.common.container.RowMap;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.RowMap;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 public class TestSimple {
 

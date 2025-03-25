@@ -1,9 +1,10 @@
 package org.nkjmlab.sorm4j.test.common;
 
 import java.util.Objects;
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
 
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+
+/** Results POJO container */
 @OrmColumnAliasPrefix("g")
 public class Guest {
 
@@ -11,19 +12,13 @@ public class Guest {
   private String name;
   private String address;
 
-  // Require public no arg constructor (default constructor)
   public Guest() {}
 
-  public Guest(String name, String address) {
-    this.name = name;
-    this.address = address;
-  }
-
-  @OrmConstructor({"id", "name", "address"})
-  public Guest(int id, String name, String address) {
-    this.id = id;
-    this.name = name;
-    this.address = address;
+  public static Guest of(String name, String address) {
+    Guest g = new Guest();
+    g.setName(name);
+    g.setAddress(address);
+    return g;
   }
 
   public int getId() {
@@ -36,6 +31,18 @@ public class Guest {
 
   public String getName() {
     return name;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
   }
 
   @Override
@@ -56,9 +63,5 @@ public class Guest {
     return Objects.equals(address, other.address)
         && id == other.id
         && Objects.equals(name, other.name);
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 }

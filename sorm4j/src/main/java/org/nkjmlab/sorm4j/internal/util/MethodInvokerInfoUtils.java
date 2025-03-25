@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public final class MethodInvokerInfoUtils {
 
+  private MethodInvokerInfoUtils() {}
+
   public static String getInvokerInfo(int depth, StackTraceElement[] stackTraceElements) {
     StackTraceElement e = getStackTraceElement(depth, stackTraceElements);
     return e.getClassName()

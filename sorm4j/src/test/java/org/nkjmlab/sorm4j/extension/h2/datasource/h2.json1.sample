@@ -1,0 +1,7 @@
+{
+  "username": "sa",
+  "password": "password",
+  "databaseDirectory": "~/h2db/testdir",
+  "databaseName": "testdb1",
+  "tcpPort": 9999
+}

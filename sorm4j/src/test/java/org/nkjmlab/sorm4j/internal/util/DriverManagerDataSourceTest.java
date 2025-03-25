@@ -1,14 +1,18 @@
 package org.nkjmlab.sorm4j.internal.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.common.DriverManagerDataSource;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
 class DriverManagerDataSourceTest {
 
-  private static DriverManagerDataSource ds = SormTestUtils.createNewDatabaseDataSource();
+  private static DataSource ds = SormTestUtils.createNewDatabaseDataSource();
 
   @Test
   void testGetParentLogger() {

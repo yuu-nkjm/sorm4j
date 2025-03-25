@@ -6,29 +6,30 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.sql.DataSource;
+
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.ConsumerHandler;
-import org.nkjmlab.sorm4j.common.FunctionHandler;
-import org.nkjmlab.sorm4j.common.JdbcTableMetaData;
-import org.nkjmlab.sorm4j.common.TableMetaData;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.container.RowMap;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.common.handler.ConsumerHandler;
+import org.nkjmlab.sorm4j.common.handler.FunctionHandler;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.context.TableSql;
-import org.nkjmlab.sorm4j.internal.result.ResultSetStreamSorm;
-import org.nkjmlab.sorm4j.internal.util.Try;
+import org.nkjmlab.sorm4j.internal.sql.result.ResultSetStreamSorm;
+import org.nkjmlab.sorm4j.internal.table.orm.SimpleTable;
 import org.nkjmlab.sorm4j.mapping.ResultSetTraverser;
 import org.nkjmlab.sorm4j.mapping.RowMapper;
-import org.nkjmlab.sorm4j.result.InsertResult;
-import org.nkjmlab.sorm4j.result.JdbcDatabaseMetaData;
-import org.nkjmlab.sorm4j.result.ResultSetStream;
-import org.nkjmlab.sorm4j.result.RowMap;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.SimpleTable;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.sql.TableSql;
+import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
+import org.nkjmlab.sorm4j.sql.metadata.jdbc.JdbcDatabaseMetaData;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.ResultSetStream;
+import org.nkjmlab.sorm4j.table.orm.Table;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 /**
  * An entry point of object-relation mapping.
@@ -104,7 +105,6 @@ public final class SormImpl implements Sorm {
   public DataSource getDataSource() {
     return this.dataSource;
   }
-
 
   @Override
   public Connection openJdbcConnection() {
@@ -184,12 +184,6 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
-      Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.readTupleList(t1, t2, t3, sql, parameters));
-  }
-
-  @Override
   public <T1, T2> List<Tuple2<T1, T2>> readTupleList(
       Class<T1> t1, Class<T2> t2, ParameterizedSql sql) {
     return readTupleList(t1, t2, sql.getSql(), sql.getParameters());
@@ -202,15 +196,9 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public <T1, T2> List<Tuple2<T1, T2>> join(
-      Class<T1> t1, Class<T2> t2, String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.join(t1, t2, sql, parameters));
-  }
-
-  @Override
-  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> join(
+  public <T1, T2, T3> List<Tuple3<T1, T2, T3>> readTupleList(
       Class<T1> t1, Class<T2> t2, Class<T3> t3, String sql, Object... parameters) {
-    return applyAndClose(conn -> conn.join(t1, t2, t3, sql, parameters));
+    return applyAndClose(conn -> conn.readTupleList(t1, t2, t3, sql, parameters));
   }
 
   @Override
@@ -472,13 +460,13 @@ public final class SormImpl implements Sorm {
   }
 
   @Override
-  public TableMetaData getTableMetaData(Class<?> objectClass) {
-    return applyAndClose(conn -> conn.getTableMetaData(objectClass));
+  public OrmTableMetaData getOrmTableMetaData(Class<?> objectClass) {
+    return applyAndClose(conn -> conn.getOrmTableMetaData(objectClass));
   }
 
   @Override
-  public JdbcTableMetaData getJdbcTableMetaData(String tableName) {
-    return applyAndClose(conn -> conn.getJdbcTableMetaData(tableName));
+  public OrmTableMetaData getOrmTableMetaData(String tableName) {
+    return applyAndClose(conn -> conn.getOrmTableMetaData(tableName));
   }
 
   @Override

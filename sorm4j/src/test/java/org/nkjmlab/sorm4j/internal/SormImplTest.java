@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.nkjmlab.sorm4j.OrmConnection;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple2;
-import org.nkjmlab.sorm4j.common.Tuple.Tuple3;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple2;
+import org.nkjmlab.sorm4j.common.container.Tuple.Tuple3;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
+import org.nkjmlab.sorm4j.table.orm.Table;
 import org.nkjmlab.sorm4j.test.common.Guest;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
@@ -37,6 +37,7 @@ class SormImplTest {
   @Test
   void testCreate() {
     Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
+    Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", Sorm.getDefaultContext());
     Sorm.getDefaultContext().toString();
   }
 
@@ -78,11 +79,12 @@ class SormImplTest {
   @Test
   void testJoin3() {
     assertThat(
-            sorm.join(
+            sorm.readTupleList(
                     Guest.class,
                     Player.class,
                     Sport.class,
-                    "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id")
+                    ParameterizedSql.of(
+                        "select guests.id, guests.name, guests.address, players.id, players.name, players.address, sports.id, sports.name from guests join players on guests.id=players.id join sports on guests.id=sports.id"))
                 .size())
         .isEqualTo(0);
 
@@ -104,8 +106,8 @@ class SormImplTest {
   @Test
   void readMapOne() {
     sorm.insert(SormTestUtils.GUEST_ALICE);
-
-    Table.create(sorm, Guest.class);
+    Table.of(sorm, Guest.class, "guests");
+    Table.of(sorm, Guest.class);
     try (Connection conn = sorm.openJdbcConnection()) {
       assertThat(SormImpl.DEFAULT_CONTEXT.getTableMapping(conn, "guests", Guest.class).toString())
           .contains("CsvColumn");

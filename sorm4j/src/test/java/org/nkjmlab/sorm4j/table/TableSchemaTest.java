@@ -1,13 +1,18 @@
 package org.nkjmlab.sorm4j.table;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.*;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.INT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.VARCHAR;
+import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.ID;
+import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.NAME;
+import static org.nkjmlab.sorm4j.table.TableSchemaTest.TempGuestTable.Column.TEL;
+
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
-import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
 
 class TableSchemaTest {
 
