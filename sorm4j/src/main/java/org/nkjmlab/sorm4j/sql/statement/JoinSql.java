@@ -2,12 +2,11 @@ package org.nkjmlab.sorm4j.sql.statement;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.table.orm.TableOrm;
 
 public class JoinSql {
-
-  private JoinSql() {}
 
   public static JoinSql.Builder builder(TableOrm<?> firstTable) {
     return new Builder(firstTable);

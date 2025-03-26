@@ -111,18 +111,6 @@ public interface SqlKeyword {
 
   public static final String SELECT_STAR = wrapSpace("select *");
 
-  public static String chars(int num) {
-    return wrapSpace("char(" + num + ")");
-  }
-
-  public static String decimal(int precision) {
-    return wrapSpace("decimal(" + precision + ")");
-  }
-
-  public static String decimal(int precision, int scale) {
-    return wrapSpace("decimal(" + precision + "," + scale + ")");
-  }
-
   private static String wrapSpace(String str) {
     return str == null ? null : " " + str + " ";
   }
