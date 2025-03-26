@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.nkjmlab.sorm4j.extension.datatype.SupportTypes;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonMapped;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 
 class JacksonSupportTypes implements SupportTypes {
@@ -31,7 +31,7 @@ class JacksonSupportTypes implements SupportTypes {
     if (cache.contains(toType)) {
       return true;
     }
-    if (toType.getAnnotation(OrmJacksonColumn.class) != null) {
+    if (toType.getAnnotation(OrmJacksonMapped.class) != null) {
       cache.add(toType);
       return true;
     }

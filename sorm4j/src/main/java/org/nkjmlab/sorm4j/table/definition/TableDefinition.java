@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.table.definition;
 
 import static java.lang.String.join;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,15 +13,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.Orm;
 import org.nkjmlab.sorm4j.context.SormContext;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonMapped;
 import org.nkjmlab.sorm4j.internal.sql.result.TableDefinitionImpl;
 import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
-import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils.OrmContainerComponent;
 import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
 import org.nkjmlab.sorm4j.table.definition.annotation.Check;
 import org.nkjmlab.sorm4j.table.definition.annotation.Default;
@@ -111,10 +112,10 @@ public interface TableDefinition {
   String getTableNameAndColumnDefinitions();
 
   static String toSqlDataType(Class<?> type) {
-    if (type.getAnnotation(OrmJacksonColumn.class) != null) {
+    if (type.getAnnotation(OrmJacksonMapped.class) != null) {
       return "json";
     }
-    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJacksonColumn.class) != null) {
+    if (ArrayUtils.getInternalComponentType(type).getAnnotation(OrmJacksonMapped.class) != null) {
       return "json";
     }
 
@@ -226,7 +227,8 @@ public interface TableDefinition {
             .map(constructor -> constructor.getParameterAnnotations())
             .orElse(null);
 
-    List<RefrectionOrmComponentUtils.OrmContainerComponent> ormComponents = RefrectionOrmComponentUtils.getOrmComponents(valueType);
+    List<RefrectionOrmComponentUtils.OrmContainerComponent> ormComponents =
+        RefrectionOrmComponentUtils.getOrmComponents(valueType);
     for (int i = 0; i < ormComponents.size(); i++) {
       RefrectionOrmComponentUtils.OrmContainerComponent ormComp = ormComponents.get(i);
       Annotation[] fieldAnnotations = ormComp.annotations();
