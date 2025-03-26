@@ -27,6 +27,7 @@ public class H2WebServer implements H2Server {
   public H2WebServer(H2WebServerProperties properties) {
     try {
       this.server = Server.createWebServer(properties.toArgs());
+      server.setShutdownHandler(() -> server.stop());
     } catch (SQLException e) {
       throw Try.rethrow(e);
     }
