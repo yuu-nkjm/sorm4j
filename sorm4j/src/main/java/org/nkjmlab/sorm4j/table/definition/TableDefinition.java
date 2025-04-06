@@ -313,7 +313,7 @@ public interface TableDefinition {
     }
 
     private static String createUniqueConstraint(List<String[]> uniqueColumnPairs) {
-      return (uniqueColumnPairs == null || uniqueColumnPairs.size() == 0)
+      return (uniqueColumnPairs == null || uniqueColumnPairs.isEmpty())
           ? ""
           : ", "
               + String.join(
@@ -324,7 +324,7 @@ public interface TableDefinition {
     }
 
     private static String createCheckConstraint(List<String> checkConditions) {
-      return (checkConditions == null || checkConditions.size() == 0)
+      return (checkConditions == null || checkConditions.isEmpty())
           ? ""
           : ", "
               + String.join(
