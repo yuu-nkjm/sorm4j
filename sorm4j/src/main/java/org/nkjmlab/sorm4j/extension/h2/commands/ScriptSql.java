@@ -118,11 +118,11 @@ public class ScriptSql {
         }
       }
 
-      if (tables.size() != 0) {
+      if (!tables.isEmpty()) {
         ret.add("table");
         ret.add(String.join(",", tables));
       }
-      if (schemas.size() != 0) {
+      if (!schemas.isEmpty()) {
         ret.add("schema");
         ret.add(String.join(",", schemas));
       }

@@ -25,7 +25,7 @@ public class LogContextImpl implements LogContext {
       Supplier<SormLogger> loggerSupplier, Set<LogContext.Category> enabledCategories) {
     this.loggerSupplier = loggerSupplier != null ? loggerSupplier : getDefaultLoggerSupplier();
     this.enabledCategories =
-        enabledCategories.size() == 0 ? Collections.emptySet() : EnumSet.copyOf(enabledCategories);
+        enabledCategories.isEmpty() ? Collections.emptySet() : EnumSet.copyOf(enabledCategories);
   }
 
   public static Supplier<SormLogger> getDefaultLoggerSupplier() {
