@@ -36,7 +36,7 @@ artifactId:jmh-java-benchmark-archetype,
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nkjmlab</groupId>
 	<artifactId>sorm4j-jmh</artifactId>
-	<version>2.2.0</version>
+	<version>3.0.0</version>
 	<packaging>jar</packaging>
 	<name>Sorm4j benchmark</name>
 

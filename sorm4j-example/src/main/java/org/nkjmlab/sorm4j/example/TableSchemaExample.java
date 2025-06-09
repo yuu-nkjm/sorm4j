@@ -1,18 +1,23 @@
 package org.nkjmlab.sorm4j.example;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.*;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AUTO_INCREMENT;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.INT;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.PRIMARY_KEY;
+import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
+
 import java.util.List;
+
 import javax.sql.DataSource;
+
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.util.table_def.TableDefinition;
+import org.nkjmlab.sorm4j.table.definition.TableDefinition;
+import org.nkjmlab.sorm4j.util.datasource.DataSourceFactory;
 
 public class TableSchemaExample {
 
   public static void main(String[] args) {
     String jdbcUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;";
-    String user = "username";
-    String password = "password";
-    DataSource dataSorce = Sorm.createDataSource(jdbcUrl, user, password);
+    DataSource dataSorce = DataSourceFactory.create(jdbcUrl);
 
     QuizTable quizTable = new QuizTable(dataSorce);
     quizTable.createTableAndIndexesIfNotExists();

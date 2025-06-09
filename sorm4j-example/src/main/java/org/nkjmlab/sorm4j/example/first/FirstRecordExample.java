@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.example.first;
 
 import java.util.List;
+
 import org.nkjmlab.sorm4j.Sorm;
 
 public class FirstRecordExample {

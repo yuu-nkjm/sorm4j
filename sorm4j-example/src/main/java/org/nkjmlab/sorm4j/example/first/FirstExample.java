@@ -3,8 +3,9 @@ package org.nkjmlab.sorm4j.example.first;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.table.Table;
+import org.nkjmlab.sorm4j.table.orm.Table;
 
 public class FirstExample {
 
@@ -27,8 +28,9 @@ public class FirstExample {
     System.out.println("all customers = " + allCustomers);
 
     // Execute select sql and convert result to stream.
-    Map<String, Customer> tmp = sorm.stream(Customer.class, "select * from customer where id>?", 1)
-        .apply(stream -> stream.collect(Collectors.toMap(c -> c.getName(), c -> c)));
+    Map<String, Customer> tmp =
+        sorm.stream(Customer.class, "select * from customer where id>?", 1)
+            .apply(stream -> stream.collect(Collectors.toMap(c -> c.getName(), c -> c)));
     System.out.println(tmp);
 
     // Execute select sql and convert result to a pojo object.
@@ -45,11 +47,7 @@ public class FirstExample {
         sorm.readList(Customer.class, "SELECT * FROM customer WHERE address=?", "Kyoto");
     System.out.println("customers living in Kyoto = " + customersLivingInKyoto);
 
-
-    Table<Customer> customerTable = Table.create(sorm, Customer.class);
+    Table<Customer> customerTable = Table.of(sorm, Customer.class);
     customerTable.streamAll().apply(stream -> stream.collect(Collectors.toList()));
-
   }
-
-
 }

@@ -2,7 +2,7 @@ package org.nkjmlab.sorm4j.example;
 
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Guest;
-import org.nkjmlab.sorm4j.result.InsertResult;
+import org.nkjmlab.sorm4j.sql.result.InsertResult;
 
 public class InsertAndGetExample {
 
