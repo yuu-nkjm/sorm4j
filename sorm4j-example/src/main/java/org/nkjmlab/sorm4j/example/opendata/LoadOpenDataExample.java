@@ -11,41 +11,34 @@ import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.annotation.OrmRecord;
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ElectronicsTable.Electronic;
 import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.ModClothsTable.ModCloth;
-import org.nkjmlab.sorm4j.example.opendata.LoadOpenDataExample.TwitchsTable.Twitch;
+import org.nkjmlab.sorm4j.extension.h2.datasource.H2DataSourceFactory;
+import org.nkjmlab.sorm4j.extension.h2.datasource.H2DataSourceFactory.Config;
+import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
+import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTableBase;
 import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.util.h2.H2BasicTable;
-import org.nkjmlab.sorm4j.util.h2.datasource.H2DataSourceFactory;
-import org.nkjmlab.sorm4j.util.h2.functions.table.CsvRead;
-import org.nkjmlab.sorm4j.util.h2.server.H2Startup;
-import org.nkjmlab.sorm4j.util.table_def.annotation.PrimaryKeyColumns;
+import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyConstraint;
 
 public class LoadOpenDataExample {
   private static final org.apache.logging.log4j.Logger log =
       org.apache.logging.log4j.LogManager.getLogger();
 
   private static final H2DataSourceFactory dataSourceFactory =
-      H2DataSourceFactory.builder(new File("$TMPDIR/sorm4j"), "sorm4j_example", "sa", "")
-          .build();
+      H2DataSourceFactory.of(Config.of(Path.of("$TMPDIR/sorm4j"), "sorm4j_example", "sa", ""));
 
   static {
-    dataSourceFactory.makeFileDatabaseIfNotExists();
-    dataSourceFactory.getDatabaseDirectory().mkdirs();
+    dataSourceFactory.makeDatabaseFileIfNotExists();
     log.debug(dataSourceFactory.getMixedModeJdbcUrl());
-    log.info("{}", dataSourceFactory.getDatabaseDirectory());
+    log.info("{}", dataSourceFactory.getDatabaseDirectoryPath());
   }
 
-  private Sorm fileDb = Sorm.create(dataSourceFactory.createMixedModeDataSource());
+  private Sorm fileDb = Sorm.create(dataSourceFactory.createEmbeddedModeDataSource());
 
   public static void main(String[] args) {
-    H2Startup.startDefaultLocalTcpServer();
-    H2Startup.startDefaultWebConsole();
     LoadOpenDataExample example = new LoadOpenDataExample();
     example.loadElectronic();
     example.loadModCloth();
-    example.loadTwitch();
   }
 
   void loadElectronic() {
@@ -72,21 +65,8 @@ public class LoadOpenDataExample {
         });
   }
 
-  void loadTwitch() {
-    TwitchsTable tbl = new TwitchsTable(fileDb);
-    tbl.dropTableIfExists();
-    File csvFile = tbl.getCsv();
-
-    load(
-        "create table as select to mem",
-        tbl.getTableName(),
-        memDb -> {
-          tbl.createTableIfNotExists(CsvRead.builderForCsvWithoutHeader(csvFile, 5).build());
-        });
-  }
-
   private static File downloadFile(String fileURL, String fileName) {
-    File outFile = new File(dataSourceFactory.getDatabaseDirectory(), fileName);
+    File outFile = new File(dataSourceFactory.getDatabaseDirectoryPath().toFile(), fileName);
     if (outFile.exists()) {
       return outFile;
     }
@@ -108,10 +88,9 @@ public class LoadOpenDataExample {
    * @see <a href="https://github.com/MengtingWan/marketBias/tree/master/data">marketBias/data at
    *     master · MengtingWan/marketBias</a>
    */
-  public static class ModClothsTable extends H2BasicTable<ModCloth> {
+  public static class ModClothsTable extends H2DefinedTableBase<ModCloth> {
 
-    @OrmRecord
-    @PrimaryKeyColumns({"item_id", "user_id"})
+    @PrimaryKeyConstraint("item_id, user_id")
     public static record ModCloth(
         int item_id,
         String user_id,
@@ -137,10 +116,9 @@ public class LoadOpenDataExample {
     }
   }
 
-  public static class ElectronicsTable extends H2BasicTable<Electronic> {
+  public static class ElectronicsTable extends H2DefinedTableBase<Electronic> {
 
-    @OrmRecord
-    @PrimaryKeyColumns({"item_id", "user_id"})
+    @PrimaryKeyConstraint("item_id, user_id")
     public static record Electronic(
         int item_id,
         String user_id,
@@ -161,35 +139,6 @@ public class LoadOpenDataExample {
       return downloadFile(
           "https://raw.githubusercontent.com/MengtingWan/marketBias/master/data/df_electronics.csv",
           "df_electronics.csv");
-    }
-  }
-
-  public static class TwitchsTable extends H2BasicTable<Twitch> {
-
-    /**
-     * This is a dataset of users consuming streaming content on Twitch. We retrieved all streamers,
-     * and all users connected in their respective chats, every 10 minutes during 43 days.
-     *
-     * <pre>
-     * user_id: user identifier (anonymized).
-     * stream id: stream identifier, could be used to retreive a single broadcast segment (not used in our study).
-     * streamer name: name of the channel.
-     * start time: first crawling round at which the user was seen in the chat.
-     * stop time: last crawling round at which the user was seen in the chat.</pre>
-     *
-     * @see <a href="https://github.com/JRappaz/liverec">JRappaz/liverec</a>
-     */
-    @OrmRecord
-    @PrimaryKeyColumns({"user_id", "stream_id"})
-    public static record Twitch(
-        long userId, long streamId, String streamer, long startTime, long stopTime) {}
-
-    public TwitchsTable(Sorm orm) {
-      super(orm, Twitch.class);
-    }
-
-    public File getCsv() {
-      return new File(dataSourceFactory.getDatabaseDirectory(), "100k_a.csv");
     }
   }
 

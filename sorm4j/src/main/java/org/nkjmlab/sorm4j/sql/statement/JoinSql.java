@@ -3,20 +3,12 @@ package org.nkjmlab.sorm4j.sql.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nkjmlab.sorm4j.common.annotation.Internal;
 import org.nkjmlab.sorm4j.sql.metadata.OrmTableMetaData;
 import org.nkjmlab.sorm4j.table.orm.TableOrm;
 
 public class JoinSql {
 
-  private JoinSql() {}
-
   public static JoinSql.Builder builder(TableOrm<?> firstTable) {
-    return new Builder(firstTable.getOrmTableMetaData());
-  }
-
-  @Internal
-  public static JoinSql.Builder builder(OrmTableMetaData firstTable) {
     return new Builder(firstTable);
   }
 
@@ -29,7 +21,8 @@ public class JoinSql {
     private String orderBy;
     private String limit;
 
-    private Builder(OrmTableMetaData tableMetaData) {
+    private Builder(TableOrm<?> firstTable) {
+      OrmTableMetaData tableMetaData = firstTable.getOrmTableMetaData();
       this.columns.addAll(tableMetaData.getColumnAliases());
       this.froms.add(tableMetaData.getTableName());
     }
@@ -73,7 +66,7 @@ public class JoinSql {
 
     private JoinSql.Builder joinUsing(
         String joinType, OrmTableMetaData tableMetaData, String... columnsForJoin) {
-      return join(joinType, tableMetaData, "using (" + String.join(",", columnsForJoin) + ")");
+      return join(joinType, tableMetaData, "using (" + String.join(", ", columnsForJoin) + ")");
     }
 
     private JoinSql.Builder joinOn(
@@ -153,7 +146,7 @@ public class JoinSql {
       if (distinct) {
         sql.append(" distinct");
       }
-      sql.append(" " + String.join(",", columns.stream().toArray(String[]::new)));
+      sql.append(" " + String.join(", ", columns.stream().toArray(String[]::new)));
       sql.append(" from " + String.join(" ", froms));
       if (where != null) {
         sql.append(" where " + where);

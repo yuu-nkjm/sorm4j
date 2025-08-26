@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.nkjmlab.sorm4j.common.exception.SormException;
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.context.TableNameMapper;
 import org.nkjmlab.sorm4j.internal.util.ParameterizedStringFormatter;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmTableName;
 
 /**
@@ -53,22 +53,24 @@ public final class DefaultTableNameMapper implements TableNameMapper {
    */
   private List<String> guessTableNameCandidates(Class<?> objectClass) {
 
-    Optional<String> annotatedTableName =
-        Optional.ofNullable(objectClass.getAnnotation(OrmTableName.class)).map(a -> a.value());
+    Optional<String> annotatedTableName = RefrectionTableNameUtils.getAnotatedTableName(objectClass);
 
     if (annotatedTableName.isPresent()) {
       return List.of(annotatedTableName.get());
     }
 
     String className = objectClass.getSimpleName();
-    String cannonicalClassName = SormContext.getDefaultCanonicalStringCache().toCanonicalName(className);
+    String cannonicalClassName =
+        SormContext.getDefaultCanonicalStringCache().toCanonicalName(className);
 
     List<String> candidates =
         new ArrayList<>(
             List.of(
                 cannonicalClassName,
-                SormContext.getDefaultCanonicalStringCache().toCanonicalName(cannonicalClassName + "S"),
-                SormContext.getDefaultCanonicalStringCache().toCanonicalName(cannonicalClassName + "ES")));
+                SormContext.getDefaultCanonicalStringCache()
+                    .toCanonicalName(cannonicalClassName + "S"),
+                SormContext.getDefaultCanonicalStringCache()
+                    .toCanonicalName(cannonicalClassName + "ES")));
     if (cannonicalClassName.endsWith("Y")) {
       candidates.add(
           SormContext.getDefaultCanonicalStringCache()
@@ -94,7 +96,8 @@ public final class DefaultTableNameMapper implements TableNameMapper {
       while (resultSet.next()) {
         // 3. TABLE_NAME String => table name
         String tableNameOnDb = resultSet.getString(3);
-        if (SormContext.getDefaultCanonicalStringCache().containsCanonicalName(tableNameCandidates, tableNameOnDb)) {
+        if (SormContext.getDefaultCanonicalStringCache()
+            .containsCanonicalName(tableNameCandidates, tableNameOnDb)) {
           return Optional.of(tableNameOnDb);
         }
       }

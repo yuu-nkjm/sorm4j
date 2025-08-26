@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import org.nkjmlab.sorm4j.context.ColumnValueToJavaObjectConverter;
 import org.nkjmlab.sorm4j.extension.datatype.SupportTypes;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonMapped;
 import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * ResultSet} into Java objects.
  *
  * <p>This implementation supports JSON serialization and deserialization for types such as lists,
- * maps, and arrays where components are annotated with {@link OrmJacksonColumn}.
+ * maps, and arrays where components are annotated with {@link OrmJacksonMapped}.
  */
 public class JacksonColumnValueToJavaObjectConverter implements ColumnValueToJavaObjectConverter {
 

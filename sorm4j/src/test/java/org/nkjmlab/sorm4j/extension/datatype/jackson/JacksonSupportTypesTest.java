@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonColumn;
+import org.nkjmlab.sorm4j.extension.datatype.jackson.annotation.OrmJacksonMapped;
 
 class JacksonSupportTypesTest {
 
   private final JacksonSupportTypes supportTypes = new JacksonSupportTypes();
 
-  @OrmJacksonColumn
+  @OrmJacksonMapped
   static class AnnotatedClass {}
 
   static class NonAnnotatedClass {}

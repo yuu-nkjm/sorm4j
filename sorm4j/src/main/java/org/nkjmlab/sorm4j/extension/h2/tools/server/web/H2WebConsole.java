@@ -1,9 +1,14 @@
 package org.nkjmlab.sorm4j.extension.h2.tools.server.web;
 
 import java.sql.Connection;
+import java.util.function.Consumer;
 
 public class H2WebConsole {
   private H2WebConsole() {}
+
+  public static void openBlocking(Connection connection) {
+    openBlocking(connection, url -> {});
+  }
 
   /**
    * Starts an H2 Web Console server for the given database connection and opens a browser for
@@ -17,18 +22,22 @@ public class H2WebConsole {
    *
    * @param connection the database connection to be used for the Web Console (must be open)
    */
-  public static void openBlocking(Connection connection) {
-
-    H2WebServer server = H2WebServer.builder().webPort(0).build();
-    server.start();
-    server.getServer().setShutdownHandler(() -> server.stop());
-    server.openBrowser(connection);
+  public static void openBlocking(Connection connection, Consumer<String> urlHandler) {
+    H2WebServer server = createAndStartServer();
+    String url = server.openBrowser(connection);
+    urlHandler.accept(url);
     try {
       while (server.isRunning() && !connection.isClosed()) {
         Thread.sleep(1000);
       }
     } catch (Exception e) {
     }
+  }
+
+  private static H2WebServer createAndStartServer() {
+    H2WebServer server = H2WebServer.builder().webPort(0).build();
+    server.start();
+    return server;
   }
 
   /**
@@ -42,12 +51,9 @@ public class H2WebConsole {
    * until the server is explicitly stopped.
    *
    * @param connection the database connection to be used for the Web Console (must be open)
-   * @return
+   * @return the URL of the Web Console session
    */
-  public static H2WebServer open(Connection connection) {
-    H2WebServer server = H2WebServer.builder().webPort(0).build();
-    server.start();
-    server.openBrowser(connection);
-    return server;
+  public static String open(Connection connection) {
+    return createAndStartServer().openBrowser(connection);
   }
 }

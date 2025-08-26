@@ -1,7 +1,6 @@
 package org.nkjmlab.sorm4j.internal.context.impl;
 
 import static java.util.Objects.nonNull;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,9 +14,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.nkjmlab.sorm4j.context.SormContext;
 import org.nkjmlab.sorm4j.internal.context.ColumnToFieldAccessorMapper;
+import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumn;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmGetter;
@@ -109,10 +108,8 @@ public final class DefaultColumnToFieldAccessorMapper implements ColumnToFieldAc
   }
 
   private static Map<String, Field> getAllFields(final Class<?> objectClass) {
-    Class<OrmIgnore> ignoreAnn = OrmIgnore.class;
-    return Arrays.stream(objectClass.getFields())
-        .filter(
-            f -> Objects.isNull(f.getAnnotation(ignoreAnn)) && !Modifier.isStatic(f.getModifiers()))
+
+    return RefrectionOrmComponentUtils.getFields(objectClass).stream()
         .collect(
             Collectors.toMap(
                 f -> SormContext.getDefaultCanonicalStringCache().toCanonicalName(f.getName()),

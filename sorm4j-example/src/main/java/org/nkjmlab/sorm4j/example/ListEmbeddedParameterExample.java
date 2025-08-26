@@ -1,32 +1,32 @@
 package org.nkjmlab.sorm4j.example;
 
 import java.util.List;
+
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;
-import org.nkjmlab.sorm4j.sql.ParameterizedSql;
-import org.nkjmlab.sorm4j.sql.ParameterizedSqlParser;
-import org.nkjmlab.sorm4j.util.command.Command;
+import org.nkjmlab.sorm4j.sql.parameterize.ParameterizedSql;
 
 public class ListEmbeddedParameterExample {
 
   public static void main(String[] args) {
     Sorm sorm = Sorm.create("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;");
 
-    sorm.acceptHandler(conn -> {
-      conn.executeUpdate(Customer.CREATE_TABLE_SQL);
-      conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
-    });
-
+    sorm.acceptHandler(
+        conn -> {
+          conn.executeUpdate(Customer.CREATE_TABLE_SQL);
+          conn.insert(Customer.ALICE, Customer.BOB, Customer.CAROL, Customer.DAVE);
+        });
 
     // List parameter and embedded parameter binding
-    ParameterizedSql psql = ParameterizedSqlParser.parse(
-        "select * from customer where name like {?} and address in(<?>)", "'A%'",
-        List.of("Kyoto", "Tokyo"));
+    ParameterizedSql psql =
+        ParameterizedSql.withOrderedParameters(
+            "select * from customer where name like {?} and address in(<?>)",
+            "'A%'",
+            List.of("Kyoto", "Tokyo"));
 
     System.out.println(psql);
 
-    List<Customer> customers =
-        sorm.applyHandler(conn -> Command.create(conn, psql).readList(Customer.class));
+    List<Customer> customers = sorm.applyHandler(conn -> conn.readList(Customer.class, psql));
     System.out.println("customers=" + customers);
 
     // try {
@@ -40,6 +40,4 @@ public class ListEmbeddedParameterExample {
     // }
 
   }
-
-
 }

@@ -1,6 +1,7 @@
 package org.nkjmlab.sorm4j.example;
 
 import java.sql.Connection;
+
 import org.nkjmlab.sorm4j.OrmTransaction;
 import org.nkjmlab.sorm4j.Sorm;
 import org.nkjmlab.sorm4j.example.first.Customer;

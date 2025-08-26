@@ -1,6 +1,6 @@
 package org.nkjmlab.sorm4j.example.first;
 
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 
 public class Guest {
 

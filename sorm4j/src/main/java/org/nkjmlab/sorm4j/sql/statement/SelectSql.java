@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
  *
  * @author nkjm
  */
-public final class SelectSql {
-
-  private SelectSql() {}
+public class SelectSql {
 
   /**
    * Creates {@link Builder} object.

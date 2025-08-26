@@ -1,7 +1,7 @@
 package org.nkjmlab.sorm4j.example.first;
 
-import org.nkjmlab.sorm4j.annotation.OrmColumnAliasPrefix;
-import org.nkjmlab.sorm4j.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmColumnAliasPrefix;
+import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
 
 @OrmColumnAliasPrefix("c")
 public class Customer {

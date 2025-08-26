@@ -8,11 +8,9 @@ import static org.nkjmlab.sorm4j.test.common.SormTestUtils.GUEST_BOB;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_ALICE;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_BOB;
 import static org.nkjmlab.sorm4j.test.common.SormTestUtils.PLAYER_CAROL;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.nkjmlab.sorm4j.Sorm;
@@ -38,8 +36,10 @@ class OrmImplTest {
   @Test
   void testStream() {
     sorm.insert(PLAYER_ALICE);
-    assertEquals(
-        1, sorm.stream(Player.class, ParameterizedSql.of("select * from players")).apply(e -> 1));
+    int size =
+        sorm.stream(Player.class, ParameterizedSql.of("select * from players"))
+            .apply(e -> e.toList().size());
+    assertEquals(1, size);
   }
 
   @Test
