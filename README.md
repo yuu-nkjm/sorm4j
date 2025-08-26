@@ -1,29 +1,37 @@
 # Sorm4j: Simple micro Object-Relation Mapper for Java
-
 ![](https://i.gyazo.com/821728c9ea8eb75e3139448ddd81cc13.png)
-
-[![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=develop&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=develop) [![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j) [![javadoc](https://javadoc.io/badge2/org.nkjmlab/sorm4j/javadoc.svg)](https://javadoc.io/doc/org.nkjmlab/sorm4j) 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Web Sites](https://img.shields.io/badge/Web%20Site-scrapbox-important.svg)](https://scrapbox.io/sorm4j/)
+[![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=develop&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=develop)
+ [![GitHub Package Registry](https://img.shields.io/badge/GitHub%20Packages-3.0.0-blue.svg)](https://github.com/yuu-nkjm/sorm4j/packages)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![Web Sites](https://img.shields.io/badge/Web%20Site-scrapbox-important.svg)](https://scrapbox.io/sorm4j/)
 
 Sorm4j (Simple micro Object-Relation Mapper for Java) is a Java-based micro-ORM tool. Sorm4j is a sort of JDBC wrapper. It provides simple functionalities to select, insert, update, delete and merge.
-
 Sorm4j sets Java objects into parameters of an SQL statement and executes the SQL statement, and maps the result to Java objects. It opens a connection to a database and closes it after the execution automatically.
-
 Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-relation mapping. Sorm4j has no runtime dependencies. It means this tool can be integrated with any code that depends on JDBC (including code that already uses another ORM tool).
-
 Sorm4j requires Java 17 (or above) after version 2.0.0.
 
-
 ## Quickstart
-The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j). Add dependency to your `pom.xml`:
+Add the following repository configuration to your `pom.xml` for using GitHub Packages:
 
 ```xml
- <dependency>
-   <groupId>org.nkjmlab</groupId>
-   <artifactId>sorm4j</artifactId>
-   <version>3.0.0-rc.2</version>
- </dependency>
+<repositories>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/yuu-nkjm/</url>
+  </repository>
+</repositories>
 ```
+
+Add the dependency:
+
+```xml
+<dependency>
+  <groupId>org.nkjmlab</groupId>
+  <artifactId>sorm4j</artifactId>
+  <version>3.0.0</version>
+</dependency>
+```
+
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`
 
 Create a Record class that has components and names matching the columns and the table name. For example:
