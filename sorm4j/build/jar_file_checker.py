@@ -39,7 +39,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 # --- Extension policies -------------------------------------------------------
 
 DOC_EXTS: Set[str] = {
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".rtf",
+    ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".rtf", "csv", "md"
 }
 
 CONFIG_EXTS: Set[str] = {".yml", ".yaml", ".json", ".properties", ".xml", ".env", ".txt"}
