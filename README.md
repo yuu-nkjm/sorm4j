@@ -1,7 +1,7 @@
 # Sorm4j: Simple micro Object-Relation Mapper for Java
 ![](https://i.gyazo.com/821728c9ea8eb75e3139448ddd81cc13.png)
 [![Coverage Status](https://coveralls.io/repos/github/yuu-nkjm/sorm4j/badge.svg?branch=develop&service=github)](https://coveralls.io/github/yuu-nkjm/sorm4j?branch=develop)
- [![GitHub Package Registry](https://img.shields.io/badge/GitHub%20Packages-3.0.0-blue.svg)](https://github.com/yuu-nkjm/sorm4j/packages)
+[![Maven Central](https://img.shields.io/maven-central/v/org.nkjmlab/sorm4j.svg)](http://mvnrepository.com/artifact/org.nkjmlab/sorm4j)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 [![Web Sites](https://img.shields.io/badge/Web%20Site-scrapbox-important.svg)](https://scrapbox.io/sorm4j/)
 
@@ -11,25 +11,14 @@ Sorm4j uses an object it simply wraps a `java.sql.Connection` object for object-
 Sorm4j requires Java 17 (or above) after version 2.0.0.
 
 ## Quickstart
-Add the following repository configuration to your `pom.xml` for using GitHub Packages:
+The latest release is available at [Maven Central Repository](https://mvnrepository.com/artifact/org.nkjmlab/sorm4j). Add dependency to your `pom.xml`:
 
 ```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/yuu-nkjm/</url>
-  </repository>
-</repositories>
-```
-
-Add the dependency:
-
-```xml
-<dependency>
-  <groupId>org.nkjmlab</groupId>
-  <artifactId>sorm4j</artifactId>
-  <version>3.0.0</version>
-</dependency>
+ <dependency>
+   <groupId>org.nkjmlab</groupId>
+   <artifactId>sorm4j</artifactId>
+   <version>3.0.0</version>
+ </dependency>
 ```
 
 We assume the following customer table in example: `create table customer (id int primary key, name varchar, address varchar)`
