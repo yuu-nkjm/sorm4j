@@ -203,7 +203,11 @@ def search_pattern_recursive(root: Path, pattern: re.Pattern, skip_extensions: L
             total_stats['decode_errors'] += 1
     
     # Print summary report
-    print(f"\nResult: {total_matches} pattern matches found")
+    if total_matches == 0:
+      print("\n✅ ALL_OK: No pattern matches found in any processed files.")
+    else:
+      print(f"\n⚠ FOUND")
+    print(f"Result: {total_matches} pattern matches found")
     print(f"\nSearch pattern: {pattern.pattern}")
     print(f"Skipped extensions: {', '.join(skip_extensions) if skip_extensions else 'None'}")
     print(f"ZIP/JAR files processed: {total_stats['zip_files']}")
@@ -222,7 +226,6 @@ def search_pattern_recursive(root: Path, pattern: re.Pattern, skip_extensions: L
     if total_matches > 0:
         return 1
     else:
-        print("✅ CONFIRMATION: No pattern matches found in any processed files.")
         return 0
 
 
@@ -338,7 +341,11 @@ Examples:
     
     # Print summary for multiple files
     if len(target_paths) > 1 or not any(p.is_dir() for p in target_paths):
-        print(f"\nResult: {total_matches} pattern matches found")
+        if total_matches == 0:
+          print("\n✅ ALL_OK: No pattern matches found in any processed files.")
+        else:
+          print(f"\n⚠ FOUND")
+        print(f"Result: {total_matches} pattern matches found")
         print(f"\nSearch pattern: {pattern.pattern}")
         print(f"Skipped extensions: {', '.join(skip_extensions) if skip_extensions else 'None'}")
         print(f"ZIP/JAR files processed: {total_stats['zip_files']}")
@@ -357,7 +364,6 @@ Examples:
         if total_matches > 0:
             return 1
         else:
-            print("✅ CONFIRMATION: No pattern matches found in any processed files.")
             return 0
     
     return 0
