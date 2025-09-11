@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
+
+import javax.lang.model.SourceVersion;
 
 /**
  * A utility class for caching and converting strings to different case formats.
@@ -71,7 +72,7 @@ public final class CanonicalStringCache {
    * @return the canonical uppercase snake_case representation of the input
    */
   public static String canonicalize(String name) {
-    return toUpperSnakeCase(replaceInvalidCharacters(name));
+    return toUpperSnakeCase(toSafeIdentifier(name));
   }
 
   /**
@@ -111,39 +112,110 @@ public final class CanonicalStringCache {
     return false;
   }
 
-  private static final Pattern INVALID_CHAR_PATTERN = Pattern.compile("[^\\p{L}\\p{N}]+");
-  private static final Pattern LAST_UNDERSCORE_PATTERN = Pattern.compile("_+$");
-  private static final Pattern MULTI_UNDERSCORES_PATTERN = Pattern.compile("_{2,}");
-
   /**
-   * Replaces all invalid characters in the given string with an underscore ("_"), ensuring that the
-   * result consists only of letters and numbers.
+   * Converts an arbitrary string into a valid Java identifier.
    *
-   * <p>This method replaces any sequence of non-alphanumeric characters with a single underscore
-   * ("_"). It preserves letters and numbers from any language (Unicode-compatible) and removes any
-   * trailing underscores.
+   * <p>Sanitization rules:
    *
-   * <p><b>Example Usage:</b>
+   * <ul>
+   *   <li>Invalid code points are replaced with a single underscore ({@code '_'}).
+   *   <li>Consecutive underscores are collapsed into one.
+   *   <li>A trailing underscore is removed if present.
+   *   <li>If the first code point is not a valid {@linkplain Character#isJavaIdentifierStart(int)
+   *       Java identifier start}, a single underscore is prefixed.
+   *   <li>If the result is not a legal Java identifier according to {@link
+   *       javax.lang.model.SourceVersion#isIdentifier(CharSequence)}, a single underscore is
+   *       prefixed as a rescue (e.g., {@code "class"} → {@code "_class"}). If still illegal, an
+   *       {@link IllegalArgumentException} is thrown. This includes the single underscore
+   *       identifier ({@code "_"}).
+   * </ul>
    *
-   * <pre>
-   * replaceInvalidCharacters("User Name (USD)");  // "User_Name_USD"
-   * replaceInvalidCharacters("Café Déjà-vu!");   // "Café_Déjà_vu"
-   * replaceInvalidCharacters("価格（円）");  // "価格_円"
-   * replaceInvalidCharacters("data-set#1");      // "data_set_1"
-   * replaceInvalidCharacters("Test__Value__");   // "Test_Value"
-   * </pre>
+   * <p>Examples:
    *
-   * @param name the input string to sanitize
-   * @return a sanitized string where non-alphanumeric characters are replaced with underscores, and
-   *     trailing underscores are removed
+   * <pre>{@code
+   * sanitizeToIdentifier("abc");           // "abc"
+   * sanitizeToIdentifier("123abc");        // "_123abc"
+   * sanitizeToIdentifier("a・b・c");        // "a_b_c"
+   * sanitizeToIdentifier("Test__Value__"); // "Test_Value"
+   * sanitizeToIdentifier("_");             // throws IllegalArgumentException
+   * sanitizeToIdentifier("class");         // "_class"
+   * }</pre>
+   *
+   * @param raw the input string to sanitize, must not be {@code null} or empty
+   * @return a valid Java identifier derived from {@code raw}
+   * @throws IllegalArgumentException if {@code raw} is {@code null}, empty, or cannot be sanitized
+   *     into a legal Java identifier
    */
-  public static String replaceInvalidCharacters(String name) {
-    return LAST_UNDERSCORE_PATTERN
-        .matcher(
-            MULTI_UNDERSCORES_PATTERN
-                .matcher(INVALID_CHAR_PATTERN.matcher(name).replaceAll("_"))
-                .replaceAll(""))
-        .replaceAll("");
+  static String toSafeIdentifier(String raw) {
+    if (raw == null) {
+      throw new IllegalArgumentException("name is null");
+    }
+    if (raw.isEmpty()) {
+      throw new IllegalArgumentException("name is empty");
+    }
+
+    final StringBuilder sb = new StringBuilder(raw.length());
+    boolean prevUnderscore = false;
+    int index = 0;
+
+    // 1) Single pass: replace invalid code points with '_' and avoid consecutive '_'.
+    for (int offset = 0; offset < raw.length(); ) {
+      final int cp = raw.codePointAt(offset);
+      final boolean ok =
+          (index == 0 && Character.isJavaIdentifierStart(cp))
+              || (index > 0 && Character.isJavaIdentifierPart(cp));
+
+      if (ok) {
+        if (cp == '_') {
+          // Avoid consecutive underscores from original input.
+          if (!prevUnderscore) {
+            sb.append('_');
+            prevUnderscore = true;
+          }
+        } else {
+          sb.appendCodePoint(cp);
+          prevUnderscore = false;
+        }
+      } else {
+        // Replace invalid with '_' (avoiding runs).
+        if (!prevUnderscore) {
+          sb.append('_');
+          prevUnderscore = true;
+        }
+      }
+
+      index++;
+      offset += Character.charCount(cp);
+    }
+
+    // 2) Remove a trailing underscore without regex.
+    int len = sb.length();
+    if (len == 0) {
+      throw new IllegalArgumentException("empty after sanitization");
+    }
+    if (sb.charAt(len - 1) == '_') {
+      sb.setLength(len - 1);
+      if (sb.length() == 0) {
+        // Only underscores were present.
+        throw new IllegalArgumentException("empty after trimming trailing underscore");
+      }
+    }
+
+    // 3) Ensure the first code point is a valid IdentifierStart; if not, prefix a single '_'.
+    if (!Character.isJavaIdentifierStart(sb.codePointAt(0))) {
+      sb.insert(0, '_');
+    }
+
+    // 4) Final legality check; rescue once by prefixing '_' if needed (e.g., keywords).
+    String candidate = sb.toString();
+    if (!SourceVersion.isIdentifier(candidate)) {
+      candidate = "_" + candidate;
+      if (!SourceVersion.isIdentifier(candidate)) {
+        throw new IllegalArgumentException("not a legal Java identifier: " + candidate);
+      }
+    }
+
+    return candidate;
   }
 
   /**
