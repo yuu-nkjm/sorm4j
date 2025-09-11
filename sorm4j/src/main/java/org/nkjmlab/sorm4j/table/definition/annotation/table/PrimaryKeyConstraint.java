@@ -1,5 +1,6 @@
-package org.nkjmlab.sorm4j.table.definition.annotation;
+package org.nkjmlab.sorm4j.table.definition.annotation.table;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
  *
  * <p>The specified column names should match the corresponding field names in the class.
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface PrimaryKeyConstraint {
@@ -32,5 +34,5 @@ public @interface PrimaryKeyConstraint {
    *
    * @return the primary key column names
    */
-  String value();
+  String[] value();
 }

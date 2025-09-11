@@ -1,13 +1,15 @@
-package org.nkjmlab.sorm4j.table.definition.annotation;
+package org.nkjmlab.sorm4j.table.definition.annotation.table;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RepeatableCheck {
+public @interface UniqueConstraints {
 
-  public Check[] value();
+  public UniqueConstraint[] value();
 }

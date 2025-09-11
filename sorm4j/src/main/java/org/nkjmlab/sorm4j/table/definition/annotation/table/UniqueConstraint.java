@@ -1,5 +1,6 @@
-package org.nkjmlab.sorm4j.table.definition.annotation;
+package org.nkjmlab.sorm4j.table.definition.annotation.table;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -28,7 +29,7 @@ import java.lang.annotation.Target;
  * }
  * </code></pre>
  *
- * <p>Alternatively, multiple constraints can be grouped using {@link RepeatableUniqueConstraint}:
+ * <p>Alternatively, multiple constraints can be grouped using {@link UniqueConstraints}:
  *
  * <pre><code>
  * {@literal @}RepeatableUniqueConstraint({
@@ -42,7 +43,8 @@ import java.lang.annotation.Target;
  * }
  * </code></pre>
  */
-@Repeatable(RepeatableUniqueConstraint.class)
+@Documented
+@Repeatable(UniqueConstraints.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface UniqueConstraint {

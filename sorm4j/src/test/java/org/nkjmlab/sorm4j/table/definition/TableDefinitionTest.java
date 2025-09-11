@@ -23,15 +23,15 @@ import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
-import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
-import org.nkjmlab.sorm4j.table.definition.annotation.Check;
-import org.nkjmlab.sorm4j.table.definition.annotation.Default;
-import org.nkjmlab.sorm4j.table.definition.annotation.Index;
-import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumnPair;
-import org.nkjmlab.sorm4j.table.definition.annotation.NotNull;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
-import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.AutoIncrement;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Check;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Default;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.NotNull;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.PrimaryKey;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Unique;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.CheckConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.Index;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.UniqueConstraint;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -91,11 +91,12 @@ class TableDefinitionTest {
 
   public record SimpleEnum(long id, EnumExample enumCol, Object str) {}
 
-  @IndexColumnPair({"boolean_col", "byte_col"})
-  @IndexColumnPair({"boolean_col", "char_col"})
+  @Index({"phone_number"})
+  @Index({"boolean_col", "byte_col"})
+  @Index({"boolean_col", "char_col"})
   @UniqueConstraint({"boolean_col", "byte_col"})
   @UniqueConstraint({"boolean_col", "char_col"})
-  @Check("int_col>=0")
+  @CheckConstraint("int_col>=0")
   public static class TableDefExample {
     public final Long id;
     public final Boolean booleanCol;
@@ -129,7 +130,7 @@ class TableDefinitionTest {
         Float floatCol,
         @Check("double_col>0") Double doubleCol,
         BigDecimal bigDecimal,
-        @Index @Unique @NotNull String phoneNumber,
+         @Unique @NotNull String phoneNumber,
         LocalDate localDateCol,
         LocalTime localTimeCol,
         LocalDateTime localDateTimeCol,

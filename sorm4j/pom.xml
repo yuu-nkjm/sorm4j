@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nkjmlab</groupId>
   <artifactId>sorm4j</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <name>sorm4j</name>
   <description>Simple micro Object-Relation Mapper for Java</description>
   <url>https://github.com/yuu-nkjm/sorm4j</url>
@@ -146,7 +146,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <resources>
       <resource>
@@ -170,7 +170,7 @@
         </excludes>
       </testResource>
     </testResources>
-    
+
     <plugins>
       <!--
       https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
