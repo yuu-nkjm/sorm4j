@@ -60,7 +60,7 @@ class TableDefinitionTest {
     TableDefinition def = TableDefinition.builder(TableDefExample.class).build();
     assertThat(def.toString())
         .isEqualTo(
-            "TableDefinition [tableName=TABLE_DEF_EXAMPLES, tableNameAndColumnDefinitions=TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), columnNames=[ID, BOOLEAN_COL, BYTE_COL, CHAR_COL, SHORT_COL, INT_COL, FLOAT_COL, DOUBLE_COL, BIG_DECIMAL, PHONE_NUMBER, LOCAL_DATE_COL, LOCAL_TIME_COL, LOCAL_DATE_TIME, OFFSET_TIME, OFFSET_DATE_TIME, BLOB, CLOB, INPUT_STREAM, READER, STR_ARRAY], createTableStatement=create table if not exists TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), dropTableStatement=drop table if exists TABLE_DEF_EXAMPLES, createIndexStatements=[create index if not exists index_in_TABLE_DEF_EXAMPLES_on_boolean_col_byte_col on TABLE_DEF_EXAMPLES(boolean_col, byte_col), create index if not exists index_in_TABLE_DEF_EXAMPLES_on_boolean_col_char_col on TABLE_DEF_EXAMPLES(boolean_col, char_col), create index if not exists index_in_TABLE_DEF_EXAMPLES_on_PHONE_NUMBER on TABLE_DEF_EXAMPLES(PHONE_NUMBER)]]");
+            "TableDefinition [tableName=TABLE_DEF_EXAMPLES, tableNameAndColumnDefinitions=TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), columnNames=[ID, BOOLEAN_COL, BYTE_COL, CHAR_COL, SHORT_COL, INT_COL, FLOAT_COL, DOUBLE_COL, BIG_DECIMAL, PHONE_NUMBER, LOCAL_DATE_COL, LOCAL_TIME_COL, LOCAL_DATE_TIME, OFFSET_TIME, OFFSET_DATE_TIME, BLOB, CLOB, INPUT_STREAM, READER, STR_ARRAY], createTableStatement=create table if not exists TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), dropTableStatement=drop table if exists TABLE_DEF_EXAMPLES, createIndexStatements=[create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_BOOLEAN_COL_BYTE_COL on TABLE_DEF_EXAMPLES(boolean_col, byte_col), create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_BOOLEAN_COL_CHAR_COL on TABLE_DEF_EXAMPLES(boolean_col, char_col), create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_PHONE_NUMBER on TABLE_DEF_EXAMPLES(phone_number)]]");
 
     assertThat(def.getTableNameAndColumnDefinitions())
         .isEqualTo(
@@ -91,9 +91,9 @@ class TableDefinitionTest {
 
   public record SimpleEnum(long id, EnumExample enumCol, Object str) {}
 
-  @Index({"phone_number"})
   @Index({"boolean_col", "byte_col"})
   @Index({"boolean_col", "char_col"})
+  @Index({"phone_number"})
   @UniqueConstraint({"boolean_col", "byte_col"})
   @UniqueConstraint({"boolean_col", "char_col"})
   @CheckConstraint("int_col>=0")
@@ -130,7 +130,7 @@ class TableDefinitionTest {
         Float floatCol,
         @Check("double_col>0") Double doubleCol,
         BigDecimal bigDecimal,
-         @Unique @NotNull String phoneNumber,
+        @Unique @NotNull String phoneNumber,
         LocalDate localDateCol,
         LocalTime localTimeCol,
         LocalDateTime localDateTimeCol,

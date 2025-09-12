@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +30,7 @@ import org.nkjmlab.sorm4j.table.definition.annotation.column.Indexed;
 import org.nkjmlab.sorm4j.table.definition.annotation.column.NotNull;
 import org.nkjmlab.sorm4j.table.definition.annotation.column.PrimaryKey;
 import org.nkjmlab.sorm4j.table.definition.annotation.column.Unique;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.CheckConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.table.Index;
 import org.nkjmlab.sorm4j.table.definition.annotation.table.PrimaryKeyConstraint;
 import org.nkjmlab.sorm4j.table.definition.annotation.table.UniqueConstraint;
@@ -202,8 +204,9 @@ public interface TableDefinition {
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
+    Optional.ofNullable(valueType.getAnnotationsByType(CheckConstraint.class))
+    .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
+
 
     List<ColumnComponent> columnDefinitions = toColumnDefinition(valueType);
 
@@ -262,7 +265,7 @@ public interface TableDefinition {
       } else if (ann instanceof NotNull) {
         opt.add("not null");
       } else if (ann instanceof Indexed) {
-          builder.addIndexDefinition(columnName);
+        builder.addIndexDefinition(columnName);
       } else if (ann instanceof Unique) {
         builder.addUniqueConstraint(columnName);
       } else if (ann instanceof Check) {
@@ -507,7 +510,10 @@ public interface TableDefinition {
           .map(
               columns ->
                   getCreateIndexOnStatement(
-                      "index_in_" + tableName + "_on_" + join("_", columns), tableName, columns))
+                      ("index_in_" + tableName + "_on_" + join("_", columns))
+                          .toUpperCase(Locale.ROOT),
+                      tableName,
+                      columns))
           .collect(Collectors.toList());
     }
 

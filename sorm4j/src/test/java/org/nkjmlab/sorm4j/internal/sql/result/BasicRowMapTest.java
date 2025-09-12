@@ -99,7 +99,7 @@ class BasicRowMapTest {
 
   @Test
   void testToString1() {
-    assertThat(map0.toString()).isEqualTo("{K1=v1}");
+    assertThat(map0.toString()).isEqualTo("{K_1=v1}");
   }
 
   @Test
@@ -208,7 +208,7 @@ class BasicRowMapTest {
     BasicRowMap map = new BasicRowMap();
     map.put("key1", "value1");
 
-    String expected = "{KEY1=value1}";
+    String expected = "{KEY_1=value1}";
     assertEquals(expected, map.toString());
   }
 
@@ -534,7 +534,7 @@ class BasicRowMapTest {
     map.put("key2", "value2");
 
     Set<String> keys = map.keySet();
-    assertEquals(Set.of("KEY1", "KEY2"), keys);
+    assertEquals(Set.of("KEY_1", "KEY_2"), keys);
   }
 
   @Test
@@ -568,8 +568,8 @@ class BasicRowMapTest {
 
     Set<Map.Entry<String, Object>> entries = map.entrySet();
     assertEquals(2, entries.size());
-    assertTrue(entries.contains(Map.entry("KEY1", "value1")));
-    assertTrue(entries.contains(Map.entry("KEY2", 2)));
+    assertTrue(entries.contains(Map.entry("KEY_1", "value1")));
+    assertTrue(entries.contains(Map.entry("KEY_2", 2)));
   }
 
   @Test
