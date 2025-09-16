@@ -29,6 +29,7 @@ public final class ArrayUtils {
   }
 
   @SafeVarargs
+  @SuppressWarnings("varargs")
   public static <T> List<T[]> split(int size, T... objects) {
     int slotNum = Math.floorDiv(objects.length, size);
     List<T[]> result = new ArrayList<>(slotNum + 1);

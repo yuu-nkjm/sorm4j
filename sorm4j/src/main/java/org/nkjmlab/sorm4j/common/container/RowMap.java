@@ -38,6 +38,7 @@ public interface RowMap extends Map<String, Object> {
   }
 
   @SafeVarargs
+  @SuppressWarnings("varargs")
   static RowMap of(Entry<String, Object>... entries) {
     return create(Map.ofEntries(entries));
   }

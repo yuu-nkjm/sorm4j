@@ -126,7 +126,8 @@ public class OrmConnectionImpl implements OrmConnection {
    * be thrown.
    */
   @Override
-  public <T> int[] delete(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] delete(T... objects) {
     return execSqlIfParameterExists(
         objects,
         mapping ->
@@ -172,7 +173,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] deleteIn(String tableName, T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
@@ -414,7 +416,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] insert(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] insert(T... objects) {
     return execSqlIfParameterExists(
         objects, mapping -> mapping.insert(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
@@ -431,7 +434,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> InsertResult insertAndGet(T... objects) {
     return execSqlIfParameterExists(
         objects,
         mapping -> mapping.insertAndGet(getJdbcConnection(), objects),
@@ -450,8 +454,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> InsertResult insertAndGetIn(
-      String tableName, @SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> InsertResult insertAndGetIn(String tableName, T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
@@ -471,7 +475,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] insertInto(String tableName, T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
@@ -648,7 +653,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] merge(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] merge(T... objects) {
     return execSqlIfParameterExists(
         objects, mapping -> mapping.merge(getJdbcConnection(), objects), EMPTY_INT_SUPPLIER);
   }
@@ -665,7 +671,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] mergeIn(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] mergeIn(String tableName, T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,
@@ -954,7 +961,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] update(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] update(T... objects) {
     return execSqlIfParameterExists(
         objects,
         mapping ->
@@ -978,7 +986,8 @@ public class OrmConnectionImpl implements OrmConnection {
   }
 
   @Override
-  public <T> int[] updateWith(String tableName, @SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  public <T> int[] updateWith(String tableName, T... objects) {
     return execSqlIfParameterExists(
         tableName,
         objects,

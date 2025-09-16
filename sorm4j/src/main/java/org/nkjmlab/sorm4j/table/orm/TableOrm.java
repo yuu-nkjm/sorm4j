@@ -94,7 +94,8 @@ public interface TableOrm<T> {
     return getOrm().deleteIn(getTableName(), object);
   }
 
-  default int[] delete(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  default int[] delete(T... objects) {
     return getOrm().deleteIn(getTableName(), objects);
   }
 
@@ -118,7 +119,8 @@ public interface TableOrm<T> {
     return getOrm().insertInto(getTableName(), object);
   }
 
-  default int[] insert(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  default int[] insert(T... objects) {
     return getOrm().insertInto(getTableName(), objects);
   }
 
@@ -138,7 +140,8 @@ public interface TableOrm<T> {
     return getOrm().insertAndGetIn(getTableName(), object);
   }
 
-  default InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  default InsertResult insertAndGet(T... objects) {
     return getOrm().insertAndGetIn(getTableName(), objects);
   }
 
@@ -150,7 +153,8 @@ public interface TableOrm<T> {
     return getOrm().mergeIn(getTableName(), object);
   }
 
-  default int[] merge(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  default int[] merge(T... objects) {
     return getOrm().mergeIn(getTableName(), objects);
   }
 
@@ -162,7 +166,8 @@ public interface TableOrm<T> {
     return getOrm().updateWith(getTableName(), object);
   }
 
-  default int[] update(@SuppressWarnings("unchecked") T... objects) {
+  @SuppressWarnings("unchecked")
+  default int[] update(T... objects) {
     return getOrm().updateWith(getTableName(), objects);
   }
 

@@ -122,8 +122,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
       <version>8.0.33</version>
       <scope>test</scope>
     </dependency>
@@ -217,6 +217,17 @@
         <version>3.14.0</version>
         <configuration>
           <release>17</release>
+          <compilerArgs>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:varargs</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.immutables</groupId>
+              <artifactId>value</artifactId>
+              <version>2.11.3</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <!--

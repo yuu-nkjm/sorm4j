@@ -61,7 +61,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] delete(@SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] delete(T... objects);
 
   /**
    * Deletes all objects in the table corresponding to the given class.
@@ -127,7 +128,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] deleteIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] deleteIn(String tableName, T... objects);
 
   boolean execute(ParameterizedSql sql);
 
@@ -336,7 +338,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insert(@SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] insert(T... objects);
 
   /**
    * Inserts objects and get the last insert result.
@@ -363,7 +366,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult insertAndGet(@SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> InsertResult insertAndGet(T... objects);
 
   /**
    * Inserts objects and get the last insert result.
@@ -393,7 +397,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> InsertResult insertAndGetIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> InsertResult insertAndGetIn(String tableName, T... objects);
 
   /**
    * This method is experimental.
@@ -448,7 +453,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] insertInto(String tableName, @SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] insertInto(String tableName, T... objects);
 
   <T1, T2> List<Tuple2<T1, T2>> joinOn(Class<T1> t1, Class<T2> t2, String onCondition);
 
@@ -495,7 +501,8 @@ public interface Orm {
    * @return
    * @see #merge(Object)
    */
-  <T> int[] merge(@SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] merge(T... objects);
 
   /**
    * Merges by objects in the table corresponding to the given table name.
@@ -525,7 +532,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] mergeIn(String tableName, @SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] mergeIn(String tableName, T... objects);
 
   /**
    * Reads an object from the database.
@@ -703,7 +711,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] update(@SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] update(T... objects);
 
   /**
    * Updates with map in the table corresponding to the class. the map should not be included
@@ -756,7 +765,8 @@ public interface Orm {
    * @param objects
    * @return
    */
-  <T> int[] updateWith(String tableName, @SuppressWarnings("unchecked") T... objects);
+  @SuppressWarnings("unchecked")
+  <T> int[] updateWith(String tableName, T... objects);
 
   /**
    * Returns {@link ResultSetStream} represents all rows from the table indicated by object class.
