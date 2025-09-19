@@ -18,7 +18,7 @@ The latest release is available at [Maven Central Repository](https://mvnreposit
  <dependency>
    <groupId>org.nkjmlab</groupId>
    <artifactId>sorm4j</artifactId>
-   <version>3.0.0</version>
+   <version>3.0.1</version>
  </dependency>
 ```
 
