@@ -46,8 +46,8 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.nkjmlab.sorm4j.Sorm;
-import org.nkjmlab.sorm4j.internal.util.Try;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmConstructor;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -685,7 +685,7 @@ public class OrmBenchmarkPostSimple {
       new SpringJdbcTemplateBench();
   private static final Sql2oBench sql2oBench = new Sql2oBench();
 
-  private static final List<BenchmarkBase> ALL_BENCHS =
+  static final List<BenchmarkBase> ALL_BENCHS =
       List.of(
           handCodedBench,
           apacheDbUtilsBench,
@@ -718,13 +718,15 @@ public class OrmBenchmarkPostSimple {
     b.setup();
 
     System.out.println(">>>");
-    new Scanner(System.in).nextLine();
-    List<BenchmarkBase> benchs = List.of(sormBench);
-    b.runReadOne(benchs);
-    b.runReadAll(benchs);
-    //    b.runInsertOne(benchs);
-    //    b.runInsertAll(benchs);
-    //    b.runAll(benchs);
+    try (Scanner sc = new Scanner(System.in)) {
+      sc.nextLine();
+      List<BenchmarkBase> benchs = List.of(sormBench);
+      b.runReadOne(benchs);
+      b.runReadAll(benchs);
+      //    b.runInsertOne(benchs);
+      //    b.runInsertAll(benchs);
+      //    b.runAll(benchs);
+    }
   }
 
   private void runReadOne(List<BenchmarkBase> benchs) {
@@ -772,7 +774,7 @@ public class OrmBenchmarkPostSimple {
     benchs.forEach(
         bench -> {
           try {
-            IntStream.range(0, 2).forEach(i -> bench.insertMultiRow(Post.posts));
+            IntStream.range(0, 2).forEach(i -> bench.insertMultiRow((Object[]) Post.posts));
           } catch (UnsupportedOperationException e) {
             System.err.println(e.getMessage());
           } catch (Exception e) {
@@ -781,7 +783,7 @@ public class OrmBenchmarkPostSimple {
         });
   }
 
-  private void runAll(List<BenchmarkBase> benchs) {
+  void runAll(List<BenchmarkBase> benchs) {
     runReadOne(benchs);
     runReadAll(benchs);
     runInsertOne(benchs);
@@ -808,7 +810,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public int[] handCodedInsertMultiRow() {
-    return handCodedBench.insertMultiRow(Post.posts);
+    return handCodedBench.insertMultiRow((Object[]) Post.posts);
   }
 
   @Benchmark
@@ -828,7 +830,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public int[] jDBIInsertMultiRow() {
-    return jdbiBench.insertMultiRow(Post.posts);
+    return jdbiBench.insertMultiRow((Object[]) Post.posts);
   }
 
   @Benchmark
@@ -848,7 +850,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public int[] jOOQInsertMultiRow() {
-    return jooqBench.insertMultiRow(Post.posts);
+    return jooqBench.insertMultiRow((Object[])Post.posts);
   }
 
   @Benchmark
@@ -868,7 +870,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public Object myBatisInsertMultiRow() {
-    return myBatisBench.insertMultiRow(Post.posts);
+    return myBatisBench.insertMultiRow((Object[]) Post.posts);
   }
 
   @Benchmark
@@ -910,7 +912,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public int[] sormInsertMultiRow() {
-    return sormBench.insertMultiRow(Post.posts);
+    return sormBench.insertMultiRow((Object[]) Post.posts);
   }
 
   @Benchmark
@@ -935,7 +937,7 @@ public class OrmBenchmarkPostSimple {
 
   @Benchmark
   public int[] sql2oInsertMultiRow() {
-    return sql2oBench.insertMultiRow(Post.posts);
+    return sql2oBench.insertMultiRow((Object[]) Post.posts);
   }
 
   @Benchmark

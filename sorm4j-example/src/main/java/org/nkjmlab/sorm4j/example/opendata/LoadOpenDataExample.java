@@ -17,8 +17,8 @@ import org.nkjmlab.sorm4j.extension.h2.datasource.H2DataSourceFactory;
 import org.nkjmlab.sorm4j.extension.h2.datasource.H2DataSourceFactory.Config;
 import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTableBase;
-import org.nkjmlab.sorm4j.internal.util.Try;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.PrimaryKeyConstraint;
+import org.nkjmlab.sorm4j.util.function.exception.Try;
 
 public class LoadOpenDataExample {
   private static final org.apache.logging.log4j.Logger log =
