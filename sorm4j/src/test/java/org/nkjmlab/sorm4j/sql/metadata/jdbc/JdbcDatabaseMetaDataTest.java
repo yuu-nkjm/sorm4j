@@ -37,6 +37,7 @@ class JdbcDatabaseMetaDataTest {
   }
 
   @Test
+  @SuppressWarnings("unlikely-arg-type")
   void testEquality() {
     TableName t1 = TableName.of("users");
     TableName t2 = TableName.of("users");

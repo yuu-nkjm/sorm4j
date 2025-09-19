@@ -5,7 +5,7 @@ set BAT_DIR=%_B:~0,-1%
 cd /d %BAT_DIR%
 set CHECK_ROOT_PATH=..\
 set CHECK_RESOURCE_PATH=%CHECK_ROOT_PATH%\src\main\resource
-set CHECK_TARGET_PATH=%CHECK_ROOT_PATH%\target
+set CHECK_TARGET_PATH=%CHECK_ROOT_PATH%\target\classes
 set CHECK_JAR_PATH=%CHECK_ROOT_PATH%target/*.jar
 echo _____SIMPLE RESOURCE CHECK IN FILES_____
 powershell.exe -ExecutionPolicy Bypass -File simple_dir_check.ps1 "%CHECK_RESOURCE_PATH%"

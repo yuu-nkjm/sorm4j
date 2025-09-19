@@ -46,7 +46,7 @@ class SelectCsvReadSqlTest {
         SelectCsvReadSql.builder(mockCsvRead).valueType(TestClass.class);
     SelectCsvReadSql selectCsvReadSql = builder.build();
 
-    String expectedSql = "select col1 as COLUMN1, null as COLUMN2 from csvread('data.csv')";
+    String expectedSql = "select col1 as COLUMN_1, null as COLUMN_2 from csvread('data.csv')";
     assertEquals(expectedSql, selectCsvReadSql.getSql());
   }
 

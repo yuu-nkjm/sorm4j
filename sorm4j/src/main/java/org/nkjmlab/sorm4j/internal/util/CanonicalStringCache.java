@@ -1,10 +1,8 @@
 package org.nkjmlab.sorm4j.internal.util;
 
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 /**
  * A utility class for caching and converting strings to different case formats.
@@ -49,101 +47,7 @@ public final class CanonicalStringCache {
    * @return the cached or newly computed canonical uppercase snake_case representation
    */
   public String toCanonicalName(String name) {
-    return cache.computeIfAbsent(name, key -> canonicalize(name));
-  }
-
-  /**
-   * Converts the given string to its canonical uppercase snake_case representation.
-   *
-   * <p>This method normalizes the input by removing spaces and slashes before converting it to an
-   * uppercase snake_case format.
-   *
-   * <p><b>Example:</b>
-   *
-   * <pre>
-   * "STUDENT_ID" -> "STUDENT_ID"
-   * "studentId" -> "STUDENT_ID"
-   * "student id" -> "STUDENT_ID"
-   * "student-Id" -> "STUDENT_ID"
-   * </pre>
-   *
-   * @param name the input string
-   * @return the canonical uppercase snake_case representation of the input
-   */
-  public static String canonicalize(String name) {
-    return toUpperSnakeCase(replaceInvalidCharacters(name));
-  }
-
-  /**
-   * Converts the given string to an uppercase snake_case format.
-   *
-   * <p>Given a field or class name in camelCase or PascalCase format, this method converts it to an
-   * uppercase snake_case format. If the input string already follows snake_case, it remains
-   * unchanged.
-   *
-   * <p><b>Example:</b>
-   *
-   * <pre>
-   * "studentId" -> "STUDENT_ID"
-   * "StudentId" -> "STUDENT_ID"
-   * "SNAKE_CASE" -> "SNAKE_CASE"
-   * </pre>
-   *
-   * @param name the input string
-   * @return the converted uppercase snake_case string
-   */
-  private static String toUpperSnakeCase(final String name) {
-    if (name.indexOf('_') >= 0 || containsJapanese(name)) {
-      return name.toUpperCase(Locale.ENGLISH);
-    }
-    return name.replaceAll("([a-z0-9])([A-Z])", "$1_$2")
-        .replaceAll("([A-Z])([A-Z][a-z])", "$1_$2")
-        .toUpperCase(Locale.ENGLISH);
-  }
-
-  private static boolean containsJapanese(String text) {
-    for (int i = 0; i < text.length(); i++) {
-      if (Character.UnicodeBlock.of(text.charAt(i))
-          == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private static final Pattern INVALID_CHAR_PATTERN = Pattern.compile("[^\\p{L}\\p{N}]+");
-  private static final Pattern LAST_UNDERSCORE_PATTERN = Pattern.compile("_+$");
-  private static final Pattern MULTI_UNDERSCORES_PATTERN = Pattern.compile("_{2,}");
-
-  /**
-   * Replaces all invalid characters in the given string with an underscore ("_"), ensuring that the
-   * result consists only of letters and numbers.
-   *
-   * <p>This method replaces any sequence of non-alphanumeric characters with a single underscore
-   * ("_"). It preserves letters and numbers from any language (Unicode-compatible) and removes any
-   * trailing underscores.
-   *
-   * <p><b>Example Usage:</b>
-   *
-   * <pre>
-   * replaceInvalidCharacters("User Name (USD)");  // "User_Name_USD"
-   * replaceInvalidCharacters("Café Déjà-vu!");   // "Café_Déjà_vu"
-   * replaceInvalidCharacters("価格（円）");  // "価格_円"
-   * replaceInvalidCharacters("data-set#1");      // "data_set_1"
-   * replaceInvalidCharacters("Test__Value__");   // "Test_Value"
-   * </pre>
-   *
-   * @param name the input string to sanitize
-   * @return a sanitized string where non-alphanumeric characters are replaced with underscores, and
-   *     trailing underscores are removed
-   */
-  public static String replaceInvalidCharacters(String name) {
-    return LAST_UNDERSCORE_PATTERN
-        .matcher(
-            MULTI_UNDERSCORES_PATTERN
-                .matcher(INVALID_CHAR_PATTERN.matcher(name).replaceAll("_"))
-                .replaceAll(""))
-        .replaceAll("");
+    return cache.computeIfAbsent(name, key -> CanonicalStringUtils.canonicalize(name));
   }
 
   /**

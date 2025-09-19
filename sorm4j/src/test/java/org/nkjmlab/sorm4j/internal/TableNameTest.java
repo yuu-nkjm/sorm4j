@@ -7,6 +7,7 @@ import org.nkjmlab.sorm4j.internal.sql.TableName;
 
 class TableNameTest {
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   void testTableName() {
     TableName t1 = TableName.of("test");

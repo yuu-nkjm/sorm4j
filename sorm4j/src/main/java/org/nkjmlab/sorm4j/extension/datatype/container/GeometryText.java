@@ -20,6 +20,7 @@ public record GeometryText(String text) {
    *
    * @return the geometry string representation.
    */
+  @Override
   public String text() {
     return text;
   }

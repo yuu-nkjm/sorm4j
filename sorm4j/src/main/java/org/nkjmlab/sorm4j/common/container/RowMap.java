@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,44 +34,54 @@ public interface RowMap extends Map<String, Object> {
     return new BasicRowMap(initialCapacity, loadFactor);
   }
 
-  static RowMap create(Map<String, Object> map) {
+  static RowMap create(Map<String, ? extends Object> map) {
     return new BasicRowMap(map);
   }
 
   @SafeVarargs
-  static RowMap of(Entry<String, Object>... entries) {
-    return create(Map.ofEntries(entries));
+  @SuppressWarnings("varargs")
+  static RowMap ofEntries(Entry<String, ? extends Object>... entries) {
+    Map<String, Object> m = new LinkedHashMap<>(entries.length * 4 / 3 + 1);
+    for (Entry<String, ? extends Object> e : entries) {
+      m.put(e.getKey(), e.getValue());
+    }
+    return create(m);
+  }
+
+  @SafeVarargs
+  @SuppressWarnings("varargs")
+  static RowMap of(Object... kvs) {
+    if ((kvs.length & 1) != 0) {
+      throw new IllegalArgumentException("Key/value arguments must be even.");
+    }
+    Map<String, Object> m = new LinkedHashMap<>((kvs.length / 2) * 4 / 3 + 1);
+    for (int i = 0; i < kvs.length; i += 2) {
+      String k = (String) kvs[i];
+      Object v = kvs[i + 1];
+      m.put(k, v);
+    }
+    return create(m);
+  }
+
+  static RowMap of() {
+    return create();
   }
 
   static RowMap of(String k1, Object v1) {
-    return create(Map.of(k1, v1));
+    return of(new Object[] {k1, v1});
   }
 
   static RowMap of(String k1, Object v1, String k2, Object v2) {
-    return create(Map.of(k1, v1, k2, v2));
+    return of(new Object[] {k1, v1, k2, v2});
   }
 
   static RowMap of(String k1, Object v1, String k2, Object v2, String k3, Object v3) {
-    return create(Map.of(k1, v1, k2, v2, k3, v3));
+    return of(new Object[] {k1, v1, k2, v2, k3, v3});
   }
 
   static RowMap of(
       String k1, Object v1, String k2, Object v2, String k3, Object v3, String k4, Object v4) {
-    return create(Map.of(k1, v1, k2, v2, k3, v3, k4, v4));
-  }
-
-  static RowMap of(
-      String k1,
-      Object v1,
-      String k2,
-      Object v2,
-      String k3,
-      Object v3,
-      String k4,
-      Object v4,
-      String k5,
-      Object v5) {
-    return create(Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
+    return of(new Object[] {k1, v1, k2, v2, k3, v3, k4, v4});
   }
 
   /**

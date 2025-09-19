@@ -6,8 +6,12 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.nkjmlab.sorm4j.extension.h2.grammar.CsvOptions;
+import org.nkjmlab.sorm4j.extension.h2.tools.csv.H2CsvReader;
 import org.nkjmlab.sorm4j.sql.statement.SqlStringUtils;
 
+/**
+ * @see H2CsvReader
+ */
 public class CsvRead {
 
   private final String sql;

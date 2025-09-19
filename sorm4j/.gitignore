@@ -1,6 +1,7 @@
 /.settings
 /target
 /tmp
+/local
 .classpath
 .project
 

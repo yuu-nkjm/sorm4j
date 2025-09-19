@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,16 +23,17 @@ import org.nkjmlab.sorm4j.internal.util.ArrayUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.ReflectionConstrucorsUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionOrmComponentUtils;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
-import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
-import org.nkjmlab.sorm4j.table.definition.annotation.Check;
-import org.nkjmlab.sorm4j.table.definition.annotation.Default;
-import org.nkjmlab.sorm4j.table.definition.annotation.Index;
-import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumnPair;
-import org.nkjmlab.sorm4j.table.definition.annotation.NotNull;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKeyConstraint;
-import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
-import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.AutoIncrement;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Check;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Default;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Indexed;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.NotNull;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.PrimaryKey;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Unique;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.CheckConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.Index;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.PrimaryKeyConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.UniqueConstraint;
 
 /**
  * This class represent a table schema and indexes. This class is a utility for users to define
@@ -195,15 +197,16 @@ public interface TableDefinition {
         .map(a -> a.value())
         .ifPresent(val -> builder.setPrimaryKey(val));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(IndexColumnPair.class))
+    Optional.ofNullable(valueType.getAnnotationsByType(Index.class))
         .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addIndexDefinition(v.value())));
 
     Optional.ofNullable(valueType.getAnnotationsByType(UniqueConstraint.class))
         .ifPresent(
             vals -> Arrays.stream(vals).forEach(v -> builder.addUniqueConstraint(v.value())));
 
-    Optional.ofNullable(valueType.getAnnotationsByType(Check.class))
-        .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
+    Optional.ofNullable(valueType.getAnnotationsByType(CheckConstraint.class))
+    .ifPresent(vals -> Arrays.stream(vals).forEach(v -> builder.addCheckConstraint(v.value())));
+
 
     List<ColumnComponent> columnDefinitions = toColumnDefinition(valueType);
 
@@ -261,7 +264,7 @@ public interface TableDefinition {
         opt.add("auto_increment");
       } else if (ann instanceof NotNull) {
         opt.add("not null");
-      } else if (ann instanceof Index) {
+      } else if (ann instanceof Indexed) {
         builder.addIndexDefinition(columnName);
       } else if (ann instanceof Unique) {
         builder.addUniqueConstraint(columnName);
@@ -507,7 +510,10 @@ public interface TableDefinition {
           .map(
               columns ->
                   getCreateIndexOnStatement(
-                      "index_in_" + tableName + "_on_" + join("_", columns), tableName, columns))
+                      ("index_in_" + tableName + "_on_" + join("_", columns))
+                          .toUpperCase(Locale.ROOT),
+                      tableName,
+                      columns))
           .collect(Collectors.toList());
     }
 

@@ -23,15 +23,15 @@ import org.nkjmlab.sorm4j.extension.h2.functions.table.CsvRead;
 import org.nkjmlab.sorm4j.extension.h2.orm.table.definition.H2DefinedTable;
 import org.nkjmlab.sorm4j.internal.util.reflection.RefrectionTableNameUtils;
 import org.nkjmlab.sorm4j.mapping.annotation.OrmRecordCompatibleConstructor;
-import org.nkjmlab.sorm4j.table.definition.annotation.AutoIncrement;
-import org.nkjmlab.sorm4j.table.definition.annotation.Check;
-import org.nkjmlab.sorm4j.table.definition.annotation.Default;
-import org.nkjmlab.sorm4j.table.definition.annotation.Index;
-import org.nkjmlab.sorm4j.table.definition.annotation.IndexColumnPair;
-import org.nkjmlab.sorm4j.table.definition.annotation.NotNull;
-import org.nkjmlab.sorm4j.table.definition.annotation.PrimaryKey;
-import org.nkjmlab.sorm4j.table.definition.annotation.Unique;
-import org.nkjmlab.sorm4j.table.definition.annotation.UniqueConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.AutoIncrement;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Check;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Default;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.NotNull;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.PrimaryKey;
+import org.nkjmlab.sorm4j.table.definition.annotation.column.Unique;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.CheckConstraint;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.Index;
+import org.nkjmlab.sorm4j.table.definition.annotation.table.UniqueConstraint;
 import org.nkjmlab.sorm4j.test.common.Player;
 import org.nkjmlab.sorm4j.test.common.SormTestUtils;
 
@@ -60,7 +60,7 @@ class TableDefinitionTest {
     TableDefinition def = TableDefinition.builder(TableDefExample.class).build();
     assertThat(def.toString())
         .isEqualTo(
-            "TableDefinition [tableName=TABLE_DEF_EXAMPLES, tableNameAndColumnDefinitions=TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), columnNames=[ID, BOOLEAN_COL, BYTE_COL, CHAR_COL, SHORT_COL, INT_COL, FLOAT_COL, DOUBLE_COL, BIG_DECIMAL, PHONE_NUMBER, LOCAL_DATE_COL, LOCAL_TIME_COL, LOCAL_DATE_TIME, OFFSET_TIME, OFFSET_DATE_TIME, BLOB, CLOB, INPUT_STREAM, READER, STR_ARRAY], createTableStatement=create table if not exists TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), dropTableStatement=drop table if exists TABLE_DEF_EXAMPLES, createIndexStatements=[create index if not exists index_in_TABLE_DEF_EXAMPLES_on_boolean_col_byte_col on TABLE_DEF_EXAMPLES(boolean_col, byte_col), create index if not exists index_in_TABLE_DEF_EXAMPLES_on_boolean_col_char_col on TABLE_DEF_EXAMPLES(boolean_col, char_col), create index if not exists index_in_TABLE_DEF_EXAMPLES_on_PHONE_NUMBER on TABLE_DEF_EXAMPLES(PHONE_NUMBER)]]");
+            "TableDefinition [tableName=TABLE_DEF_EXAMPLES, tableNameAndColumnDefinitions=TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), columnNames=[ID, BOOLEAN_COL, BYTE_COL, CHAR_COL, SHORT_COL, INT_COL, FLOAT_COL, DOUBLE_COL, BIG_DECIMAL, PHONE_NUMBER, LOCAL_DATE_COL, LOCAL_TIME_COL, LOCAL_DATE_TIME, OFFSET_TIME, OFFSET_DATE_TIME, BLOB, CLOB, INPUT_STREAM, READER, STR_ARRAY], createTableStatement=create table if not exists TABLE_DEF_EXAMPLES(ID bigint primary key auto_increment, BOOLEAN_COL boolean, BYTE_COL tinyint, CHAR_COL character, SHORT_COL smallint, INT_COL integer default 0, FLOAT_COL float, DOUBLE_COL double check (double_col>0), BIG_DECIMAL numeric, PHONE_NUMBER varchar not null, LOCAL_DATE_COL date, LOCAL_TIME_COL time, LOCAL_DATE_TIME timestamp, OFFSET_TIME time with time zone, OFFSET_DATE_TIME timestamp with time zone, BLOB blob, CLOB clob, INPUT_STREAM longvarbinary, READER longvarchar, STR_ARRAY varchar array, unique(boolean_col, byte_col), unique(boolean_col, char_col), unique(PHONE_NUMBER), check(int_col>=0)), dropTableStatement=drop table if exists TABLE_DEF_EXAMPLES, createIndexStatements=[create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_BOOLEAN_COL_BYTE_COL on TABLE_DEF_EXAMPLES(boolean_col, byte_col), create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_BOOLEAN_COL_CHAR_COL on TABLE_DEF_EXAMPLES(boolean_col, char_col), create index if not exists INDEX_IN_TABLE_DEF_EXAMPLES_ON_PHONE_NUMBER on TABLE_DEF_EXAMPLES(phone_number)]]");
 
     assertThat(def.getTableNameAndColumnDefinitions())
         .isEqualTo(
@@ -91,11 +91,12 @@ class TableDefinitionTest {
 
   public record SimpleEnum(long id, EnumExample enumCol, Object str) {}
 
-  @IndexColumnPair({"boolean_col", "byte_col"})
-  @IndexColumnPair({"boolean_col", "char_col"})
+  @Index({"boolean_col", "byte_col"})
+  @Index({"boolean_col", "char_col"})
+  @Index({"phone_number"})
   @UniqueConstraint({"boolean_col", "byte_col"})
   @UniqueConstraint({"boolean_col", "char_col"})
-  @Check("int_col>=0")
+  @CheckConstraint("int_col>=0")
   public static class TableDefExample {
     public final Long id;
     public final Boolean booleanCol;
@@ -129,7 +130,7 @@ class TableDefinitionTest {
         Float floatCol,
         @Check("double_col>0") Double doubleCol,
         BigDecimal bigDecimal,
-        @Index @Unique @NotNull String phoneNumber,
+        @Unique @NotNull String phoneNumber,
         LocalDate localDateCol,
         LocalTime localTimeCol,
         LocalDateTime localDateTimeCol,

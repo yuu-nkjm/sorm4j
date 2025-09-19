@@ -1,17 +1,16 @@
-package org.nkjmlab.sorm4j.table.definition.annotation;
+package org.nkjmlab.sorm4j.table.definition.annotation.column;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field, constructor parameter, or record component parameter as having a unique
- * constraint.
+ * Marks a field, constructor parameter, or record component parameter as part of the primary key.
  *
  * <p>This annotation is used to indicate that a field, a constructor parameter, or a record
- * component parameter should have a uniqueness constraint in the database table definition. It can
- * be applied to:
+ * component parameter represents a primary key in a database table. It can be applied to:
  *
  * <ul>
  *   <li>Fields in a class
@@ -23,11 +22,11 @@ import java.lang.annotation.Target;
  *
  * <pre><code>
  * public class User {
- *     {@literal @}Unique
- *     private String email;
+ *     {@literal @}PrimaryKey
+ *     private String userId;
  *
- *     public User({@literal @}Unique String email) {
- *         this.email = email;
+ *     public User({@literal @}PrimaryKey String userId) {
+ *         this.userId = userId;
  *     }
  * }
  * </code></pre>
@@ -36,11 +35,12 @@ import java.lang.annotation.Target;
  *
  * <pre><code>
  * public record User(
- *     {@literal @}Unique String email,
+ *     {@literal @}PrimaryKey String userId,
  *     String name
  * ) {}
  * </code></pre>
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.FIELD})
-public @interface Unique {}
+@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.RECORD_COMPONENT})
+public @interface PrimaryKey {}

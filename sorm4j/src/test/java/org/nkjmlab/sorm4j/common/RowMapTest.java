@@ -30,17 +30,17 @@ class RowMapTest {
 
     assertThat(rm.equals(rm1)).isTrue();
 
-    assertThat(rm.containsKey("key1")).isTrue();
+    assertThat(rm.containsKey("key_1")).isTrue();
     assertThat(rm.containsValue("value")).isTrue();
-    assertThat(rm.get("key1")).isEqualTo("value");
-    assertThat(rm.keySet()).containsExactlyInAnyOrder("KEY1");
+    assertThat(rm.get("key_1")).isEqualTo("value");
+    assertThat(rm.keySet()).containsExactlyInAnyOrder("KEY_1");
     assertThat(rm.values()).containsExactlyInAnyOrder("value");
-    assertThat(rm.entrySet().toString()).isEqualTo("[KEY1=value]");
+    assertThat(rm.entrySet().toString()).isEqualTo("[KEY_1=value]");
 
     assertThat(rm.size()).isEqualTo(1);
     assertThat(rm.isEmpty()).isFalse();
 
-    rm.remove("key1");
+    rm.remove("key_1");
     assertThat(rm.size()).isEqualTo(0);
     rm.putAll(Map.of("a", "b", "c", "d", "e", "1"));
     assertThat(rm.size()).isEqualTo(3);
@@ -114,11 +114,11 @@ class RowMapTest {
     RowMap rowMap =
         RowMap.of("key1", "value1", "key2", 2, "key3", 3.0, "key4", true, "key5", "value5");
 
-    assertEquals("value1", rowMap.getString("key1"));
-    assertEquals(2, rowMap.getInteger("key2"));
-    assertEquals(3.0, rowMap.getDouble("key3"));
-    assertEquals(true, rowMap.get("key4"));
-    assertEquals("value5", rowMap.getString("key5"));
+    assertEquals("value1", rowMap.getString("key_1"));
+    assertEquals(2, rowMap.getInteger("key_2"));
+    assertEquals(3.0, rowMap.getDouble("key_3"));
+    assertEquals(true, rowMap.get("key_4"));
+    assertEquals("value5", rowMap.getString("key_5"));
 
     assertEquals(5, rowMap.size());
   }

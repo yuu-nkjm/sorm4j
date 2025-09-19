@@ -1,9 +1,9 @@
 package org.nkjmlab.sorm4j.example;
 
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.AUTO_INCREMENT;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.INT;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.PRIMARY_KEY;
-import static org.nkjmlab.sorm4j.util.sql.SqlKeyword.VARCHAR;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.AUTO_INCREMENT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.INT;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.PRIMARY_KEY;
+import static org.nkjmlab.sorm4j.sql.statement.SqlKeyword.VARCHAR;
 
 import java.util.List;
 

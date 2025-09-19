@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class BasicRowMap implements RowMap {
     this.map = new LinkedHashMap<>(initialCapacity, loadFactor);
   }
 
-  public BasicRowMap(Map<String, Object> map) {
+  public BasicRowMap(Map<String, ? extends Object> map) {
     this.map =
         List.copyOf(map.entrySet()).stream()
             .collect(
@@ -108,14 +107,7 @@ public class BasicRowMap implements RowMap {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof Map)) {
-      return false;
-    }
-    Map<?, ?> other = (Map<?, ?>) obj;
-    return Objects.equals(map, other);
+    return map.equals(obj);
   }
 
   @Override

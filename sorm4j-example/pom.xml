@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nkjmlab</groupId>
 	<artifactId>sorm4j-example</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 	<description>Example of Sorm4j</description>
 
 	<properties>
